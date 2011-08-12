@@ -1,0 +1,296 @@
+#include "specmodel.h"
+#include <QString>
+#include <QTextStream>
+#include <QIcon>
+#include <qwt_plot.h>
+#include <qwt_plot_curve.h>
+#include <QPicture>
+
+	QTextStream cout(stdout, QIODevice::WriteOnly);
+void specModel::rebuildTree() {
+	cout << "rebuilding tempTree" << endl ; // TODO shift list preparation to data source (specDataCollection)
+// 	content.sortByDescriptor(descriptors) ;
+	if(rootItem) delete rootItem ;
+	rootItem = new specModelItem(0,0,0,"Root") ;
+	rootItem->children += new specModelItem(0,0,rootItem,"Test1"); //test
+	rootItem->children += new specModelItem(0,0,rootItem,"Test"); //test
+	descriptors.clear() ;
+	
+	cout << "All cleared..." << endl ;
+	
+	for (specDataCollection::size_type i = 0 ; i < content.size() ; i ++)
+{
+		for (QStringList::size_type j = 0 ; j < content[i].descriptorKeys().size() ; j++)
+{
+			QString tempkey = content[i].descriptorKeys()[j] ;
+			if(!descriptors.contains(tempkey))
+				descriptors += tempkey ;
+}
+		rootItem->children[0]->children += new specModelItem(i,&content,rootItem) ;
+}
+	cout << "Generating child trees..." << endl ;
+// 	rootItem->children[0]->generateChildTree(descriptors) ;
+	
+	cout << "done rebuilding" << endl ;
+	showProperties(QModelIndex(),"");
+}
+
+QModelIndex specModel::parent(const QModelIndex & child) const
+{
+	if (child.isValid() && ((specModelItem*) child.internalPointer())->parent != rootItem ) // Parent may not be rootItem!
+		return createIndex(((specModelItem*) child.internalPointer())->parent->parent->children. // check which row in the parent's parent's children list the parent is
+				indexOf(((specModelItem*) child.internalPointer())->parent), // (it's a bit awkward, but works, as there is at least the rootItem left, if the parent
+					child.column(),((specModelItem*) child.internalPointer())->parent) ; // is a top level item).
+	return QModelIndex() ;
+}
+
+QModelIndex specModel::index(int row, int column, const QModelIndex & parent ) const
+{
+	QTextStream cout(stdout,QIODevice::WriteOnly) ;
+// 	cout << "Index:  Parent:  " << parent.internalPointer() << "  Row: " << row << "  Col:  " << column << endl ;
+	return (parent.isValid() && parent.internalPointer() != 0 && row < ((specModelItem*) parent.internalPointer())->children.size() ?
+			createIndex(row,column,(void*) ((specModelItem*) parent.internalPointer())->children[row]) : // regular case
+			(row < rootItem->children.size() ? createIndex(row,column,(void*) (rootItem->children[row])) : // rootItem case
+			QModelIndex() // fail.
+			));
+}
+
+int specModel::rowCount(const QModelIndex &parent) const
+{
+	return parent.isValid() && parent.internalPointer() != 0 ? ((specModelItem*) parent.internalPointer())->children.size() : rootItem->children.size() ;
+}
+
+specModel::specModel(specDataCollection collection, QObject *parent)
+	: QAbstractItemModel(parent), content(collection)
+{
+	rootItem = 0 ;
+	rebuildTree() ;
+}
+
+
+QVariant specModel::data(const QModelIndex &index, int role) const
+{
+	if (!index.isValid())
+		return QVariant();
+
+	if (index.row() >= rowCount(parent(index)) )
+		return QVariant();
+	
+// 	if (role == Qt::ToolTipRole && ((specModelItem*) index.internalPointer())->collection)
+// 	{
+// 		QwtPlot tempPlot ;
+// 		QwtPlotCurve tempCurve ;
+// 		tempCurve.setData(((specModelItem*) index.internalPointer())->item()->data(0), ((specModelItem*) index.internalPointer())->item()->data(1)) ;
+// 		tempCurve.attach(&tempPlot) ;
+// 		tempPlot.replot() ;
+// 		QImage pic(QSize(100,100),QImage::Format_RGB32) ;
+// // 		tempPlot.print(pic) ;
+// 		return pic ;
+// 	}
+	
+	if (role == Qt::DecorationRole && !index.column()) // TODO add small view of spectrum
+{
+		if (!((specModelItem*) index.internalPointer())->collection)
+			return QIcon(":/folder.xpm") ;
+		else
+			return QIcon(":/data.xpm") ;
+}
+
+	if (role == Qt::DisplayRole)
+{
+		if (index.column() == 0)
+			return ((specModelItem*) index.internalPointer())->tag ;
+		if (index.column() < descriptors.size()+1)
+{
+			if (((specModelItem*) index.internalPointer())->collection)
+				return ((specModelItem*) index.internalPointer())->descriptor(descriptors[index.column()-1]) ;
+			else 
+				return (index.column() == 0 ? ((specModelItem*) index.internalPointer())->descriptor(descriptors[index.column()-1]) : "") ;
+}
+		else
+			return QVariant() ;
+}
+	else
+		return QVariant();
+}
+	
+QVariant specModel::headerData(int section, Qt::Orientation orientation,
+			    int role) const
+{
+	if (role != Qt::DisplayRole)
+		return QVariant();
+
+	if (orientation == Qt::Horizontal)
+		return section == 0  ? "" : descriptors[section-1];
+	else
+		return QString("Row %1").arg(section);
+}
+
+Qt::ItemFlags specModel::flags(const QModelIndex &index) const
+{
+	Qt::ItemFlags retflags, defaultFlags = QAbstractItemModel::flags(index) ; //| Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled ;
+	if (!index.isValid())
+		retflags = Qt::ItemIsEnabled | Qt::ItemIsDropEnabled; // Disabled?
+
+	if (index.column() == 0 ||
+	    (((specModelItem*) index.internalPointer())->collection && ((specModelItem*) index.internalPointer())->item()->isEditable(descriptors[index.column()-1])))
+		retflags = defaultFlags | Qt::ItemIsEditable;
+	else
+		retflags = defaultFlags ;
+	cout << "Returning:  " << retflags << " for: " << (index.internalPointer());
+	return retflags ;
+}
+
+bool specModel::setData(const QModelIndex &index,
+			      const QVariant &value, int role)
+{
+	bool returnval = false ;
+	if (index.isValid() && role == Qt::EditRole) {
+		if(index.column() > 0 && ((specModelItem*) index.internalPointer())->collection )
+			returnval = ((specDataItem*) ((specModelItem*) index.internalPointer())->item())
+					->changeDescriptor(descriptors[index.column()-1],value.toString()) ;
+		else
+{
+			((specModelItem*) index.internalPointer())->tag = value.toString() ;
+			returnval = true ;
+}
+		emit dataChanged(index,index) ;
+}
+	return returnval;
+}
+
+
+specModel::~specModel()
+{
+}
+
+// bool specModel::insertRows(int position, int rows, const QModelIndex &index)
+// {
+// 	specModelItem* par = (specModelItem*) ( parent(index).internalPointer() == 0 ? rootItem : parent(index).internalPointer()) ; // TODO as private function
+// 	beginInsertRows(parent(index),position, position+rows-1) ;
+// 	for (int row = 0 ; row < rows ; row++)
+// 		par->children += new specModelItem ; // TODO use addChildren function
+// 	endInsertRows();
+// 	return true;
+// }
+// 
+// bool specModel::removeRows(int position, int rows, const QModelIndex &index)
+// {
+// 	specModelItem* par = (specModelItem*) ( parent(index).internalPointer() == 0 ? rootItem : parent(index).internalPointer()) ; //  TODO as private function
+// 	beginRemoveRows(parent(index),position,position-1);
+// 	for (int row = 0 ; row < rows ; row++)
+// 		delete par->children.takeAt(position) ; // TODO use takeChildren
+// 	endRemoveRows() ;
+// 	
+// }
+// 
+// QMimeData *specModel::mimeData(const QModelIndexList & indexes) const 
+// {
+// 	cout << "Sending MIME" << endl ;
+// 	QMimeData *mimeData = new QMimeData ;
+// 	QByteArray encodedData;
+// 	
+// 	QDataStream stream(&encodedData, QIODevice::WriteOnly) ;
+// 	foreach(QModelIndex index, indexes)
+// 	{
+// 		if (index.isValid())
+// 			stream << index.internalPointer() ;
+// 	}
+// 	mimeData->setData("application/specmodel.item.list", encodedData);
+// 	return mimeData ;
+// }
+// 
+// bool specModel::dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent)
+// {
+// 	if (action == Qt::IgnoreAction)
+// 		return true ;
+// 	
+// 	if (!data->hasFormat("application/specmodel.item.list"))
+// 		return false;
+// 	
+// 	if (column > 0)
+// 		return false ;
+// 	
+// 	cout << "Receiving MIME" << endl ;
+// 	int beginRow ;
+// 	if (parent.isValid())
+// 		beginRow = parent.row();
+// 	else
+// 		beginRow = rowCount(QModelIndex()) ;
+// 	
+// 	QByteArray encodedData = data->data("application/specmodel.item.list");
+// 	QDataStream stream(&encodedData, QIODevice::ReadOnly) ;
+// 	QList<specModelItem*> newItems ;
+// 	
+// 	while (!stream.atEnd())
+// 	{
+// 		specModelItem* entry ;
+// 		stream.readRawData((char*) (&entry), (int) sizeof(specModelItem*)) ;
+// 		newItems << entry ;
+// 	}
+// 	((specModelItem*) parent.internalPointer())->addChildren(newItems) ;
+// 	return true ;
+// }
+// 
+void specModel::showProperties(const QModelIndex index, QString prefix)
+{
+	if (index.isValid())
+		cout << prefix << ((specModelItem*) index.internalPointer())->tag << "\t" << flags(index) << endl ;
+	prefix += "  " ;
+	for (int i = 0 ; i < rowCount(index) ; i++)
+		showProperties(this->index(i,0,index),prefix) ;
+}
+
+#ifndef SPECMODEL_H
+#define SPECMODEL_H
+
+#include <QAbstractItemModel>
+#include <specdatacollection.h>
+#include <QPersistentModelIndex>
+#include <specmodelitem.h>
+#include <QMimeData>
+
+class specModel : public QAbstractItemModel
+{
+	Q_OBJECT
+	private:
+	specDataCollection content ;
+	QStringList descriptors ;
+	specModelItem* rootItem;
+	void rebuildTree() ;
+	public:
+	specModel(specDataCollection, QObject *parent = 0); // TODO change specDataCollection to pointer.
+	
+	int rowCount(const QModelIndex &parent) const ;
+	int columnCount(const QModelIndex &parent) const {return descriptors.size() ;}
+	QVariant data(const QModelIndex &index, int role) const;
+	QVariant headerData(int section, Qt::Orientation orientation,
+			    int role = Qt::DisplayRole) const;
+	bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+	QModelIndex parent(const QModelIndex & index) const ;
+	QModelIndex index(int row, int column, const QModelIndex & parent = QModelIndex() ) const ;
+	~specModel();
+	Qt::ItemFlags flags(const QModelIndex &index) const;
+	
+	
+// 	bool insertRows(int position, int rows, const QModelIndex &index = QModelIndex());
+// 	bool removeRows(int position, int rows, const QModelIndex &index = QModelIndex());
+// 	
+// 
+// 	Qt::DropActions supportedDropActions() const
+// 	{
+// 		return Qt::CopyAction | Qt::MoveAction ;
+// 	}
+// 	QStringList mimeTypes() const
+// 	{
+// 		QStringList types ;
+// 		types << "application/specmodel.item.list" ;
+// 		return types ;
+// 	}
+// 	QMimeData *mimeData(const QModelIndexList & indexes) const ;
+// 	bool dropMimeData(const QMimeData *data, Qt::DropAction action, int row, int column, const QModelIndex &parent) ;
+	
+	void showProperties(const QModelIndex, QString);
+};
+
+#endif

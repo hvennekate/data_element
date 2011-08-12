@@ -1,0 +1,47 @@
+<RCC>
+    <qresource prefix="/">
+        <file>add.png</file>
+        <file>addZeroRange.png</file>
+        <file>changetitle.png</file>
+        <file>changexlabel.png</file>
+        <file>changeylabel.png</file>
+        <file>close_dock.png</file>
+        <file>data.png</file>
+        <file>deleteZeroRange.png</file>
+        <file>export.png</file>
+        <file>fileimport.png</file>
+        <file>filenew.png</file>
+        <file>fileopen.png</file>
+        <file>filesave.png</file>
+        <file>float_dock.png</file>
+        <file>folder_new.png</file>
+        <file>folder.png</file>
+        <file>fromKinetic.png</file>
+        <file>individualZero.png</file>
+        <file>item_delete.png</file>
+        <file>kinetic.png</file>
+        <file>kineticwindow.png</file>
+        <file>lineWidth.png</file>
+        <file>log_message.png</file>
+        <file>merge2.png</file>
+        <file>merge_folder.png</file>
+        <file>merge.png</file>
+        <file>newrange.png</file>
+        <file>offline.png</file>
+        <file>offset.png</file>
+        <file>remove.png</file>
+        <file>scale.png</file>
+        <file>sys_message.png</file>
+        <file>toKinetic.png</file>
+        <file>tree.png</file>
+        <file>zeroCorrection.png</file>
+        <file>color.png</file>
+        <file>filesaveas.png</file>
+        <file>multiaction.png</file>
+        <file>cbi.png</file>
+        <file>ave.png</file>
+        <file>mave.png</file>
+        <file>multiminus.png</file>
+        <file>newMinus.png</file>
+    </qresource>
+</RCC>

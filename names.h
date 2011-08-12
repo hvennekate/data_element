@@ -1,0 +1,31 @@
+#ifndef NAMES_H
+#define NAMES_H
+
+
+/*! Namespace (mainly for enums) */
+namespace spec{
+	/*! Enum for specifying the mode of correction for spectra*/
+	enum move { none = 0,
+			shift=1,
+   			scale=2,
+      			slope=4,
+	 		shiftX = 8,
+			newZero= 16,
+			individualZero=32} ;
+	Q_DECLARE_FLAGS(moveMode,move)
+	Q_DECLARE_OPERATORS_FOR_FLAGS(moveMode)
+	
+	/*! Enum for descriptors.*/
+	enum desc {def = 0, numeric = 1, editable=2} ;
+	Q_DECLARE_FLAGS(descriptorFlags,desc)
+	Q_DECLARE_OPERATORS_FOR_FLAGS(descriptorFlags)
+	
+	/*! Enum for list item types.  Primarily for save/load purposes.*/
+	enum specItemType {data=0, folder=1, logEntry=2, sysEntry=3, kinetic=4};
+	
+	/*! Enums for export formats */
+	enum separator{ nosep=0, space=1, tab=2, newline=3 } ;
+	enum value{ time=0, wavenumber=1, signal=2, maxInt=3 } ;
+}
+
+#endif
