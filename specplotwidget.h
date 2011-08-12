@@ -2,7 +2,7 @@
 #define SPECPLOTWIDGET_H
 
 #include <QDockWidget>
-#include <specplot.h>
+#include "specplot.h"
 #include <QVBoxLayout>
 #include "specdataview.h"
 #include <QString>

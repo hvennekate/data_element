@@ -2,8 +2,8 @@
 #define SPECPLOT_H
 
 #include <qwt_plot.h>
-#include <canvaspicker.h>
-#include <speczoomer.h>
+#include "canvaspicker.h"
+#include "speczoomer.h"
 #include <QContextMenuEvent>
 #include <QMenu>
 #include <QActionGroup>

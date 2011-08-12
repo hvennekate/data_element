@@ -68,6 +68,12 @@ HEADERS += cutbyintensitydialog.h \
     spectral/specdatapoint.h \
     spectral/specdataview.h
 
+INCLUDEPATH += kinetic \
+	log \
+	model \
+	plot \
+	spectral
+
 
 TEMPLATE = app
 CONFIG += warn_on \
