@@ -1,3 +1,7 @@
+include(prefix.pri)
+
+OTHER_FILES += prefix.pri
+
 SOURCES += main.cpp \
     cutbyintensitydialog.cpp \
     specappwindow.cpp \
@@ -94,6 +98,7 @@ LIBS += -LC:/Qwt-5.2.1/lib \
     -lqwt
 }
 
-TARGET = ../bin/data_element
+TARGET = data_element
 
 RESOURCES += icons/application.qrc
+
