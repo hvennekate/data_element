@@ -17,6 +17,7 @@
 #include <QLineEdit>
 #include "specdataitem.h"
 #include "exportdialog.h"
+#include <QTime>
 // TODO replace isFolder() by addChildren(empty list,0)
 
 bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria)
@@ -292,8 +293,10 @@ bool specModel::isFolder(const QModelIndex& index) const
 
 void specModel::importFile(QModelIndex index)
 {
+	QTime timer ;
 	index = isFolder(index) ? index : parent(index) ;
 	QStringList fileNames = QFileDialog::getOpenFileNames();
+	timer.start() ;
 	if (fileNames.size())
 	{
 		foreach(QString fileName, fileNames)
@@ -302,7 +305,9 @@ void specModel::importFile(QModelIndex index)
 			QFile fileToImport(fileName) ;
 			fileToImport.open(QFile::ReadOnly | QFile::Text) ;
 			QList<specModelItem*> importedItems = importFunction(fileToImport) ;
+			qDebug("%d msecs to import",timer.restart()) ;
 			insertItems(importedItems,index) ;
+			qDebug("%d msecs to get header info",timer.elapsed()) ;
 		}
 	}
 }
@@ -400,6 +405,8 @@ bool specModel::removeColumns (int column,int count,const QModelIndex & parent)
 bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int row) // TODO
 {
 	// Check for possible new column headers
+	QTime timer ;
+	timer.start();
 	qDebug("checking new col headers") ;
 	for (QList<specModelItem*>::size_type i = 0 ; i < list.size() ; i++)
 	{
@@ -415,16 +422,19 @@ bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int 
 	}
 	row = row < rowCount(parent) ? row : rowCount(parent) ;
 	
-	qDebug("inserting") ;
+	qDebug("inserting %d",timer.restart()) ;
 	emit layoutAboutToBeChanged() ;
 	beginInsertRows(parent, row, row+list.size()-1);
-	qDebug("assigning to folder") ;
+	qDebug("assigning to folder %d", timer.restart()) ;
+	if (itemPointer(parent)->isFolder())
+		((specFolderItem*) itemPointer(parent))->haltRefreshes(true) ;
 	bool retVal = itemPointer(parent)->addChildren(list,row) ;
-	qDebug("done") ;
+	qDebug("done %d",timer.restart()) ;
 	endInsertRows();
 	emit layoutChanged() ;
 	
-	itemPointer(parent)->refreshPlotData() ;
+	if (itemPointer(parent)->isFolder())
+		((specFolderItem*) itemPointer(parent))->haltRefreshes(false) ;
 	return retVal ;
 }
 
