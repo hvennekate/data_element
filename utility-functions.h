@@ -6,7 +6,7 @@
 #include <QHash>
 #include <QString>
 #include <QStringList>
-#include <specdataitem.h>
+#include "specdataitem.h"
 #include <QTextStream>
 #include <QFile>
 

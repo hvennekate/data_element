@@ -3,10 +3,10 @@
 
 #include <QDialog>
 #include <QVBoxLayout>
-#include "specplot.h"
 #include <QPushButton>
-#include "specmodelitem.h"
 #include <QDialogButtonBox>
+#include "specplot.h"
+#include "specmodelitem.h"
 
 class cutByIntensityDialog : public QDialog
 {

@@ -1,76 +1,89 @@
+include(prefix.pri)
+
+OTHER_FILES += prefix.pri
+
 SOURCES += main.cpp \
-    specdataitem.cpp \
-    specmodel.cpp \
-    specdescriptordelegate.cpp \
-    specmodelitem.cpp \
+    cutbyintensitydialog.cpp \
+    specappwindow.cpp \
+    specdocktitle.cpp \
+    speckrcontextmenu.cpp \
+    speclabeldialog.cpp \
+    specminmaxvalidator.cpp \
     specplotwidget.cpp \
     utility-functions.cpp \
-    specappwindow.cpp \
-    specdelegate.cpp \
-    specview.cpp \
-    specdatapoint.cpp \
-    specdescriptor.cpp \
-    specdocktitle.cpp \
-    canvaspicker.cpp \
-    speczoomer.cpp \
-    specplot.cpp \
-    speclabeldialog.cpp \
-    specrange.cpp \
-    specminmaxvalidator.cpp \
-    speckineticwidget.cpp \
-    speckinetic.cpp \
-    specfolderitem.cpp \
-    speclogentryitem.cpp \
-    speccanvasitem.cpp \
-    exportdialog.cpp \
-    exportlayoutitem.cpp \
-    exportformatitem.cpp \
-    speclogmessage.cpp \
-    specdataview.cpp \
-    speckineticview.cpp \
-    speckineticmodel.cpp \
-    speckineticrange.cpp \
-    speckrcontextmenu.cpp \
-    cutbyintensitydialog.cpp
+    kinetic/speckinetic.cpp \
+    kinetic/speckineticwidget.cpp \
+    kinetic/speckineticview.cpp \
+    kinetic/speckineticmodel.cpp \
+    kinetic/speckineticrange.cpp \
+    log/speclogentryitem.cpp \
+    log/speclogmessage.cpp \
+    model/exportdialog.cpp \
+    model/exportlayoutitem.cpp \
+    model/exportformatitem.cpp \
+    model/specdelegate.cpp \
+    model/specview.cpp \
+    model/specdescriptor.cpp \
+    model/specdescriptordelegate.cpp \
+    model/specmodel.cpp \
+    model/specmodelitem.cpp \
+    model/specfolderitem.cpp \
+    plot/canvaspicker.cpp \
+    plot/speczoomer.cpp \
+    plot/specplot.cpp \
+    plot/specrange.cpp \
+    plot/speccanvasitem.cpp \
+    spectral/specdataitem.cpp \
+    spectral/specdatapoint.cpp \
+    spectral/specdataview.cpp
+
+HEADERS += cutbyintensitydialog.h \
+    specappwindow.h \
+    specdocktitle.h \
+    speckrcontextmenu.h \
+    speclabeldialog.h \
+    specminmaxvalidator.h \
+    specplotwidget.h \
+    names.h \
+    utility-functions.h \
+    kinetic/speckinetic.h \
+    kinetic/speckineticwidget.h \
+    kinetic/speckineticview.h \
+    kinetic/speckineticmodel.h \
+    kinetic/speckineticrange.h \
+    log/speclogentryitem.h \
+    log/speclogmessage.h \
+    model/exportdialog.h \
+    model/exportlayoutitem.h \
+    model/exportformatitem.h \
+    model/specdelegate.h \
+    model/specview.h \
+    model/specdescriptor.h \
+    model/specdescriptordelegate.h \
+    model/specmodel.h \
+    model/specmodelitem.h \
+    model/specfolderitem.h \
+    plot/canvaspicker.h \
+    plot/speczoomer.h \
+    plot/specplot.h \
+    plot/specrange.h \
+    plot/speccanvasitem.h \
+    spectral/specdataitem.h \
+    spectral/specdatapoint.h \
+    spectral/specdataview.h
+
+INCLUDEPATH += kinetic \
+	log \
+	model \
+	plot \
+	spectral
+
+
 TEMPLATE = app
 CONFIG += warn_on \
     thread \
     qt
-TARGET = ../bin/data_element
-HEADERS += specdataitem.h \
-    specmodel.h \
-    specdescriptordelegate.h \
-    specmodelitem.h \
-    specplotwidget.h \
-    utility-functions.h \
-    specappwindow.h \
-    specdelegate.h \
-    specview.h \
-    specdatapoint.h \
-    specdescriptor.h \
-    specdocktitle.h \
-    canvaspicker.h \
-    names.h \
-    speczoomer.h \
-    specplot.h \
-    speclabeldialog.h \
-    specrange.h \
-    specminmaxvalidator.h \
-    speckineticwidget.h \
-    speckinetic.h \
-    specfolderitem.h \
-    speclogentryitem.h \
-    speccanvasitem.h \
-    exportdialog.h \
-    exportlayoutitem.h \
-    exportformatitem.h \
-    speclogmessage.h \
-    specdataview.h \
-    speckineticview.h \
-    speckineticmodel.h \
-    speckineticrange.h \
-    speckrcontextmenu.h \
-    cutbyintensitydialog.h
+
 unix {
 INCLUDEPATH += . \
     /usr/include/qwt
@@ -85,4 +98,7 @@ LIBS += -LC:/Qwt-5.2.1/lib \
     -lqwt
 }
 
+TARGET = data_element
+
 RESOURCES += icons/application.qrc
+

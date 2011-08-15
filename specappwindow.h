@@ -5,7 +5,7 @@
 #include <QtGui>
 #include <QObject>
 #include <QList>
-#include <specplotwidget.h>
+#include "specplotwidget.h"
 #include <QSettings>
 
 class specAppWindow : public QMainWindow

@@ -1,7 +1,7 @@
 #ifndef SPECDATAVIEW_H
 #define SPECDATAVIEW_H
 
-#include <specview.h>
+#include "specview.h"
 #include <QPersistentModelIndex>
 
 class specDataView : public specView
