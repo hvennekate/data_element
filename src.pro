@@ -1,7 +1,5 @@
 include(prefix.pri)
 
-OTHER_FILES += prefix.pri
-
 SOURCES += main.cpp \
     cutbyintensitydialog.cpp \
     specappwindow.cpp \
