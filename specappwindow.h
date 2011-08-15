@@ -18,6 +18,7 @@ public:
 private slots:
 	void newFile();
 	void openFile();
+	void createToolBars() ;
 	
 protected:
 	void closeEvent(QCloseEvent*) ;

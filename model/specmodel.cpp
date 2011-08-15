@@ -651,8 +651,9 @@ void specModel::fillSubMap(const QModelIndexList & indexList)
 		specModelItem *pointer = itemPointer(index) ;
 		for (int i = 0 ; i < pointer->dataSize() ; i++)
 		{
-			subMap[pointer->x(i)] += pointer->y(i) ; // Qt promises "default-construction" of double as zero.
-			norm[pointer->x(i)] ++ ;
+			double xval = pointer->sample(i).x() ;
+			subMap[xval] += pointer->sample(i).y() ; // Qt promises "default-construction" of double as zero.
+			norm[xval] ++ ;
 		}
 	}
 	for (int i = 0 ; i < norm.keys().size() ; i++) // TODO iterators

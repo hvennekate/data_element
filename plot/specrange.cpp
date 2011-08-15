@@ -4,19 +4,19 @@
 #include "specplot.h"
 
 specRange::specRange(double min, double max)
-	: QwtDoubleInterval(min,max)
+	: QwtInterval(min,max)
 { // TODO set curve properties
-	QwtArray<double> x, y ;
+	QVector<double> x, y ;
 	x << min << max ;
 	y << 0 << 0 ;
-	QwtPlotCurve::setData(x,y) ;
+	QwtPlotCurve::setSamples(x,y) ;
 	
 	QPen pen ( QColor ( 255,139,15,100 ) ) ;
 	pen.setWidth ( 5 ) ;
 	pen.setCapStyle(Qt::RoundCap);
 	setPen ( pen ) ;
 	pen.setColor ( QColor ( 255,139,15 ) ) ;
-	setSymbol ( QwtSymbol ( QwtSymbol::Ellipse,pen.brush(), ( QPen ) pen.color(),QSize ( 5,5 ) ) ) ;
+	setSymbol ( new QwtSymbol ( QwtSymbol::Ellipse,pen.brush(), ( QPen ) pen.color(),QSize ( 5,5 ) ) ) ;
 }
 
 void specRange::pointMoved(const int& point, const double& x, const double& y)
@@ -34,10 +34,10 @@ void specRange::pointMoved(const int& point, const double& x, const double& y)
 
 void specRange::refreshPlotData()
 {
-	QwtArray<double> xarr, yarr ;
+	QVector<double> xarr, yarr ;
 	xarr << minValue() << maxValue() ;
 	yarr << yVal << yVal ;
-	setData(xarr,yarr) ;
+	setSamples(xarr,yarr) ;
 	((specPlot*) plot())->refreshRanges() ;
 }
 

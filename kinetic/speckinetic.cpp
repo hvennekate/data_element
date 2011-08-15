@@ -6,6 +6,7 @@
 #include <qwt_plot.h>
 #include "speckineticrange.h"
 #include <qwt_scale_div.h>
+#include <qwt_series_data.h>
 
 // TODO crash when merging data elements
 
@@ -62,9 +63,9 @@ void specKinetic::newRange(double min, double max)
 	refreshPlotData() ;
 }
 
-QwtArrayData specKinetic::averageData()
+QwtSeriesData<QPointF>* specKinetic::averageData()
 {
-	QwtArray<double> time, value ;
+	QVector<QPointF> kineticTrace  ;
 	double minNu = INFINITY, maxNu = -INFINITY ;
 	qDebug("size before comparison:  %d",data.size()) ;
 	for(QMap<double,QPair<double,double> >::iterator i = data.begin() ; i != data.end() ; i++)
@@ -100,8 +101,7 @@ QwtArrayData specKinetic::averageData()
 		}
 		i = j ;
 		qDebug(" final result:  %f",y);
-		time << t ;
-		value << y ;
+		kineticTrace << QPointF(t,y) ;
 // 		QPair<double, double> newValue ;
 // 		if( (i+1)!=data.end() && similar(i.key(), (i+1).key()) )
 // 		{
@@ -115,7 +115,7 @@ QwtArrayData specKinetic::averageData()
 // // 		QTextStream cout(stdout,QIODevice::WriteOnly) ;
 // // 		cout << "ty: " << newValue.first << "  " << newValue.second << endl ;
 	}
-	return QwtArrayData(time,value) ;
+	return new QwtPointSeriesData(kineticTrace) ;
 }
 
 QPair<double,double> specKinetic::mergeData(QMap<double,QPair<double, double> >::iterator& i)
@@ -262,7 +262,7 @@ void specKinetic::refreshPlotData()
 		setData(averageData()) ;
 	}
 	else
-		setData(QwtArrayData(QwtArray<double>(),QwtArray<double>())) ;
+		setSamples(QVector<double>(),QVector<double>()) ;
 // 	qDebug("replotting kinetics") ;
 	if(plot()) plot()->replot() ;
 // 	qDebug("done with kinetics") ;
@@ -332,8 +332,8 @@ void specKinetic::exportData(const QList<QPair<bool,QString> >& headerFormat, co
 		{
 			switch(dataFormat[i].first)
 			{
-				case spec::time: out << x(j) ; break ;
-				case spec::signal: out << y(j) ; break ;
+				case spec::time: out << sample(j).x() ; break ;
+				case spec::signal: out << sample(j).y() ; break ;
 			}
 			out << dataFormat[i].second ;
 		}

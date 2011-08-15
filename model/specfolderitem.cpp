@@ -1,6 +1,5 @@
 #include "specfolderitem.h"
 #include <QTextStream>
-#include <qwt_array.h>
 
 specFolderItem::specFolderItem(specFolderItem* par, QString description)
  : specModelItem(par, description), suspendRefresh(false)
@@ -67,17 +66,17 @@ void specFolderItem::refreshPlotData()
 { ///! @todo suspend frequent refreshes
 	if (suspendRefresh) return ;
 	qDebug("refreshing plot data %d",suspendRefresh)  ;
-	QwtArray<double> x, y ;
+	QVector<double> x, y ;
 	foreach(specModelItem* item, childrenList)
 	{
 		for (int i = 0 ; i < item->dataSize() ; i++)
 		{
-			x << item->x(i) ;
-			y << item->y(i) ;
+			x << item->sample(i).x() ;
+			y << item->sample(i).y() ;
 		}
 	}
 	processData(x,y) ;
-	setData(x,y) ;
+	setSamples(x,y) ;
 }
 
 void specFolderItem::removeChild(specModelItem* child)

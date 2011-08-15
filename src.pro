@@ -82,19 +82,20 @@ CONFIG += warn_on \
     thread \
     qt
 
-unix {
-INCLUDEPATH += . \
-    /usr/include/qwt
-LIBS += -lqwt \
-    -lcln \
-    -lginac
-}
-win32 {
-INCLUDEPATH += . \
-    C:/Qwt-5.2.1/include
-LIBS += -LC:/Qwt-5.2.1/lib \
-    -lqwt
-}
+#unix {
+#INCLUDEPATH += . \
+#    /usr/include/qwt
+#LIBS += -lqwt \
+#    -lcln \
+#    -lginac
+#}
+#win32 {
+#INCLUDEPATH += . \
+#    C:/Qwt-5.2.1/include
+#LIBS += -LC:/Qwt-5.2.1/lib \
+#    -lqwt
+#}
+CONFIG += qwt
 
 TARGET = data_element
 

@@ -20,6 +20,7 @@
 #include <QLineEdit>
 #include <QDialogButtonBox>
 #include <QLabel>
+#include <qwt_plot_directpainter.h>
 
 CanvasPicker::CanvasPicker ( specPlot *plot ) :
 		QObject ( plot ),
@@ -184,6 +185,7 @@ bool CanvasPicker::eventFilter ( QObject *object, QEvent *e )
 				d_selectedCurve = NULL ;
 				d_selectedPoint = -1 ;
 			}
+			qDebug("Done with event filter") ;
 			return true;
 		}
 		case QEvent::MouseMove:
@@ -292,7 +294,9 @@ void CanvasPicker::select ( const QPoint &pos )
 		}
 	}
 
+	qDebug("showing cursor") ;
 	showCursor ( false );
+	qDebug("done showing cursor") ;
 
 	if ( curve && dist < 10 ) // 10 pixels tolerance
 	{
@@ -302,6 +306,7 @@ void CanvasPicker::select ( const QPoint &pos )
 	}
 	lastSelected = d_selectedCurve ;
 
+	qDebug("done selecting") ;
 // 	d_selectedCurve->selectPoint ( d_selectedPoint ) ; // TODO create parent of both range and modelitem, must be child of QwtPlotCurve
 }
 
@@ -338,9 +343,9 @@ void CanvasPicker::moveBy ( int dx, int dy )
 		return;
 
 	const int x = plot()->transform ( d_selectedCurve->xAxis(),
-	                                  d_selectedCurve->x ( d_selectedPoint ) ) + dx;
+					  d_selectedCurve->sample( d_selectedPoint ).x() ) + dx;
 	const int y = plot()->transform ( d_selectedCurve->yAxis(),
-	                                  d_selectedCurve->y ( d_selectedPoint ) ) + dy;
+					  d_selectedCurve->sample( d_selectedPoint ).y() ) + dy;
 
 	move ( QPoint ( x, y ) );
 }
@@ -380,9 +385,11 @@ void CanvasPicker::move ( const QPoint &pos )
 		return;
 // 	QTextStream cout ( stdout,QIODevice::WriteOnly ) ;
 // 	cout << "Picker list size: " << plot->selectable->size() << endl ;
+	qDebug("moving point") ;
 	d_selectedCurve->pointMoved ( d_selectedPoint,
 	                              plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
 	                              plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ;
+	qDebug("emitting signal") ;
 	emit moved(d_selectedCurve) ;
 	/* 	if ( mode == spec::newZero ) // TODO
 		{
@@ -425,26 +432,28 @@ void CanvasPicker::move ( const QPoint &pos )
 // Hightlight the selected point
 void CanvasPicker::showCursor ( bool showIt )
 {
-	if ( !d_selectedCurve )
-		return;
 
-	const QwtSymbol symbol = d_selectedCurve->symbol();
+// TODO this seems to be buggy in Qwt 6.0.1 and 6.0.0:  Ther is always a trace behind the cursor.  Reimplement!
 
-	QwtSymbol newSymbol = symbol;
-	if ( showIt )
-		newSymbol.setBrush ( QColor ( 255-symbol.brush().color().red(),
-		                              255-symbol.brush().color().green(),
-		                              255-symbol.brush().color().blue() ) ) ;
+//	QwtSymbol *symbol = new QwtSymbol(*(d_selectedCurve->symbol()));
 
-	const bool doReplot = plot()->autoReplot();
+//	QwtSymbol *newSymbol = new QwtSymbol(*symbol) ;
+//	if ( showIt )
+//		newSymbol->setBrush ( QColor ( 255-symbol->brush().color().red(),
+//					      255-symbol->brush().color().green(),
+//					      255-symbol->brush().color().blue() ) ) ;
 
-	plot()->setAutoReplot ( false );
-	d_selectedCurve->setSymbol ( newSymbol );
+//	const bool doReplot = plot()->autoReplot();
 
-	d_selectedCurve->draw ( d_selectedPoint, d_selectedPoint );
+//	plot()->setAutoReplot ( false );
+//	d_selectedCurve->setSymbol ( newSymbol );
 
-	d_selectedCurve->setSymbol ( symbol );
-	plot()->setAutoReplot ( doReplot );
+////	d_selectedCurve->draw ( d_selectedPoint, d_selectedPoint );
+//	QwtPlotDirectPainter directPainter;
+//	directPainter.drawSeries(d_selectedCurve, d_selectedPoint, d_selectedPoint);
+
+//	d_selectedCurve->setSymbol ( symbol );
+//	plot()->setAutoReplot ( doReplot );
 }
 
 // Select the next/previous curve
@@ -523,8 +532,8 @@ void CanvasPicker::movePointExplicitly()
 	QDialog *query = new QDialog ;
 	query->setWindowTitle ( "Move point to value" ) ;
 	QGridLayout *layout = new QGridLayout ;
-	QLineEdit *xBox = new QLineEdit ( QString("%1").arg(curve->x (point) )),
-	*yBox = new QLineEdit ( QString("%1").arg(curve->y (point) )) ;
+	QLineEdit *xBox = new QLineEdit ( QString("%1").arg(curve->sample (point).x() )),
+	*yBox = new QLineEdit ( QString("%1").arg(curve->sample (point).y() )) ;
 	xBox->setValidator(new QDoubleValidator(xBox)) ;
 	yBox->setValidator(new QDoubleValidator(yBox)) ;
 	

@@ -54,7 +54,7 @@ bool specModelItem::changeDescriptor(QString key, QString value)
 void specModelItem::refreshPlotData()
 { }
 
-void specModelItem::processData(QwtArray<double> &x, QwtArray<double> &y) const
+void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 {
 	if (sortPlotData)
 	{
@@ -151,7 +151,7 @@ void specModelItem::exportData(const QList<QPair<bool,QString> >& headerFormat, 
 	out << endl ;
 }
 
-QwtArray<double> specModelItem::intensityData()
+QVector<double> specModelItem::intensityData()
 {
-	return QwtArray<double>() ;
+	return QVector<double>() ;
 }
