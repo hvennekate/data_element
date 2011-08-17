@@ -24,7 +24,8 @@ QMultiMap<double,QPair<double,double> >* specModelItem::kinetics(QList<specKinet
 	
 void specModelItem::setParent(specFolderItem* par)
 {
-	if (iparent) iparent->removeChild(this) ;
+	if (iparent)
+		iparent->removeChild(this) ;
 	iparent = par ;
 }
 

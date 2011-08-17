@@ -33,7 +33,12 @@ SOURCES += main.cpp \
     plot/speccanvasitem.cpp \
     spectral/specdataitem.cpp \
     spectral/specdatapoint.cpp \
-    spectral/specdataview.cpp
+    spectral/specdataview.cpp \
+    actionlib/specactionlibrary.cpp \
+    actionlib/specundocommand.cpp \
+    actionlib/specundoaction.cpp \
+    actionlib/specdeleteaction.cpp \
+    actionlib/specdeletecommand.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -68,7 +73,12 @@ HEADERS += cutbyintensitydialog.h \
     plot/speccanvasitem.h \
     spectral/specdataitem.h \
     spectral/specdatapoint.h \
-    spectral/specdataview.h
+    spectral/specdataview.h \
+    actionlib/specactionlibrary.h \
+    actionlib/specundocommand.h \
+    actionlib/specundoaction.h \
+    actionlib/specdeleteaction.h \
+    actionlib/specdeletecommand.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -100,4 +110,3 @@ CONFIG += qwt
 TARGET = data_element
 
 RESOURCES += icons/application.qrc
-
