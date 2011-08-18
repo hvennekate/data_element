@@ -78,7 +78,7 @@ void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 			while (i < x.size() && x[i] == xtemplate)
 				ysum += y[i++] ;
 			xt << xtemplate ;
-			yt << ysum/(i-j+1) ;
+			yt << ysum/(i-j) ;
 		}
 		x = xt ;// TODO simply swap the vectors!!!
 		y = yt ;

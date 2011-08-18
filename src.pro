@@ -38,7 +38,9 @@ SOURCES += main.cpp \
     actionlib/specundocommand.cpp \
     actionlib/specundoaction.cpp \
     actionlib/specdeleteaction.cpp \
-    actionlib/specdeletecommand.cpp
+    actionlib/specdeletecommand.cpp \
+    actionlib/specaddfolderaction.cpp \
+    actionlib/specaddfoldercommand.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -78,7 +80,9 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/specundocommand.h \
     actionlib/specundoaction.h \
     actionlib/specdeleteaction.h \
-    actionlib/specdeletecommand.h
+    actionlib/specdeletecommand.h \
+    actionlib/specaddfolderaction.h \
+    actionlib/specaddfoldercommand.h
 
 INCLUDEPATH += kinetic \
 	log \

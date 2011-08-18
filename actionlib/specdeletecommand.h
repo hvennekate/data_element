@@ -19,9 +19,6 @@ public:
 	void undo() ;
 	typedef QPair<specModelItem*,int> indexPair ;
 	static bool indexComp(const indexPair&, const indexPair&) ;
-signals:
-
-public slots:
 private:
 	bool sorted ;
 	void doIt(bool undo = false) ;

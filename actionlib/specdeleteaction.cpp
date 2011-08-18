@@ -4,6 +4,7 @@
 specDeleteAction::specDeleteAction(QObject *parent) :
     specUndoAction(parent)
 {
+	this->setIcon(QIcon::fromTheme("edit-delete"));
 }
 
 const std::type_info &specDeleteAction::possibleParent()
