@@ -3,18 +3,19 @@
 
 #include "specundocommand.h"
 #include "specmodel.h"
+#include "specgenealogy.h"
 
 class specAddFolderCommand : public specUndoCommand
 {
 public:
 	specAddFolderCommand(specUndoCommand *parent = 0);
-
-	void setModel(specModel*) ;
+	void setPosition(specGenealogy*) ;
 	void redo() ;
 	void undo() ;
 	bool ok() ;
 private:
 	specModel* model ;
+	specGenealogy* position ;
 
 };
 

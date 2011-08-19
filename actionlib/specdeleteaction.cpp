@@ -1,5 +1,6 @@
 #include "specdeleteaction.h"
 #include "specdeletecommand.h"
+#include "specgenealogy.h"
 
 specDeleteAction::specDeleteAction(QObject *parent) :
     specUndoAction(parent)
@@ -22,6 +23,7 @@ void specDeleteAction::execute()
 	qDebug("=== getting selection") ;
 	specModel *model = currentView->model() ;
 	model->eliminateChildren(indexes) ;
+	qSort(indexes) ;
 	qDebug("=== got pointers") ;
 	specDeleteCommand *command = new specDeleteCommand() ;
 	command->setModel(model) ;
@@ -32,6 +34,8 @@ void specDeleteAction::execute()
 	qDebug("=== cleared selection") ;
 	if (command->ok())
 		library->push(command) ;
+	else
+		delete command ;
 //		command->redo();
 	qDebug("=== pushed command onto stack") ;
 }

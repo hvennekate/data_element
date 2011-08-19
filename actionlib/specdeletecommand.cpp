@@ -22,14 +22,6 @@ void specDeleteCommand::doIt(bool undo)
 {
 	qDebug("--- signaling reset") ;
 	model->signalBeginReset();
-	// sort the items per parent
-	if (!sorted)
-	{
-		qDebug("--- sorting items") ;
-		for (dataHash::iterator i = data.begin() ; i != data.end() ; ++i)
-			qSort(i.value().begin(), i.value().end(), specDeleteCommand::indexComp) ;
-		sorted = true ;
-	}
 
 	// turn plot refresh of parents off
 	qDebug("--- halting refreshes") ;

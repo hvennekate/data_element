@@ -5,23 +5,27 @@ specAddFolderCommand::specAddFolderCommand(specUndoCommand* parent)
 {
 }
 
-
-void specAddFolderCommand::setModel(specModel *mod)
+void specAddFolderCommand::setPosition(specGenealogy *pos)
 {
-	model = mod ;
+	position = pos ;
 }
 
 bool specAddFolderCommand::ok()
 {
-	if (model) return true;
-	return false ;
+	return position->valid() ;
 }
 
 void specAddFolderCommand::redo()
 {
-	// create genealogy object!
+	specModel *model = position->model() ;
+	model->insertItems(QList<specModelItem*>() << position->pointer(),
+			   position->parent(),
+			   position->row()) ;
+
 }
 
 void specAddFolderCommand::undo()
 {
+	specModel *model = position->model() ;
+	model->removeRow(position->row(),position->parent()) ;
 }

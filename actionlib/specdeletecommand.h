@@ -20,7 +20,6 @@ public:
 	typedef QPair<specModelItem*,int> indexPair ;
 	static bool indexComp(const indexPair&, const indexPair&) ;
 private:
-	bool sorted ;
 	void doIt(bool undo = false) ;
 	specModel* model ;
 	typedef QHash<specFolderItem*,QVector<specDeleteCommand::indexPair> > dataHash ;
