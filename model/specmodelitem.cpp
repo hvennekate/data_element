@@ -6,6 +6,7 @@
 #include "speckinetic.h"
 #include <QTextStream>
 #include "speckineticrange.h"
+#include <QTime>
 
 specModelItem::specModelItem(specFolderItem* par, QString description)
 	: specCanvasItem(description), iparent(0), mergePlotData(true), sortPlotData(true)
@@ -23,7 +24,8 @@ QMultiMap<double,QPair<double,double> >* specModelItem::kinetics(QList<specKinet
 	
 void specModelItem::setParent(specFolderItem* par)
 {
-	if (iparent) iparent->removeChild(this) ;
+	if (iparent)
+		iparent->removeChild(this) ;
 	iparent = par ;
 }
 
@@ -54,8 +56,10 @@ bool specModelItem::changeDescriptor(QString key, QString value)
 void specModelItem::refreshPlotData()
 { }
 
-void specModelItem::processData(QwtArray<double> &x, QwtArray<double> &y) const
+void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 {
+	QTime timer ;
+	timer.start() ;
 	if (sortPlotData)
 	{
 		QMultiMap<double,double> sortedValues;
@@ -64,19 +68,20 @@ void specModelItem::processData(QwtArray<double> &x, QwtArray<double> &y) const
 		x = sortedValues.keys().toVector() ;
 		y = sortedValues.values().toVector() ;
 	}
+	QVector<double> xt, yt ;
 	if (mergePlotData)
 	{
 		for (int i = 0 ; i < x.size() ; i++)
 		{
-			int j ;
-			for (j = 1 ; i+1 < x.size() && x[i+1] == x[i]; j++)
-			{
-				y[i] += y[i+1] ;
-				x.remove(i+1) ;
-				y.remove(i+1) ;
-			}
-			y[i] /= j ;
+			int j = i ;
+			double ysum = 0, xtemplate = x[i] ;
+			while (i < x.size() && x[i] == xtemplate)
+				ysum += y[i++] ;
+			xt << xtemplate ;
+			yt << ysum/(i-j) ;
 		}
+		x = xt ;// TODO simply swap the vectors!!!
+		y = yt ;
 	}
 }
 
@@ -151,7 +156,7 @@ void specModelItem::exportData(const QList<QPair<bool,QString> >& headerFormat, 
 	out << endl ;
 }
 
-QwtArray<double> specModelItem::intensityData()
+QVector<double> specModelItem::intensityData()
 {
-	return QwtArray<double>() ;
+	return QVector<double>() ;
 }

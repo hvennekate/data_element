@@ -28,7 +28,7 @@ private:
 	
 	void updateData() ;
 	QMultiMap<double,QPair<double,double> > data ;
-	QwtArrayData averageData() ;
+	QwtSeriesData<QPointF>* averageData() ;
 	QPair<double,double> mergeData(QMap<double,QPair<double,double> >::iterator&) ;
 	bool similar(double,double) ;
 	void fetchIndices() ;

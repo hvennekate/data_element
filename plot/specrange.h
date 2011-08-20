@@ -2,10 +2,10 @@
 #define SPECRANGE_H
 
 #include "speccanvasitem.h"
-#include <qwt_double_interval.h>
+#include <qwt_interval.h>
 #include <names.h>
 
-class specRange : public specCanvasItem, public QwtDoubleInterval // TODO make private and channel/wrap required functionality
+class specRange : public specCanvasItem, public QwtInterval // TODO make private and channel/wrap required functionality
 {
 protected:
 	double yVal ;

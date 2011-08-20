@@ -17,10 +17,10 @@ specKineticRange::~specKineticRange()
 
 void specKineticRange::refreshPlotData()
 {// TODO maybe create different function which only contains call to parent
-	QwtArray<double> xarr, yarr ;
+	QVector<double> xarr, yarr ;
 	xarr << minValue() << maxValue() ;
 	yarr << yVal << yVal ;
-	setData(xarr,yarr) ;
+	setSamples(xarr,yarr) ;
 	if(plot()) plot()->replot() ;
 	if(parent) parent->refreshPlotData() ;
 }

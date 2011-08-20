@@ -26,7 +26,7 @@ class specModelItem : public specCanvasItem
 private:
 	specFolderItem* iparent ;
 protected:
-	void processData(QwtArray<double>&, QwtArray<double>&) const ;
+	void processData(QVector<double>&, QVector<double>&) const ;
 	// selectedPoints (3 Punkte fuer Korrekturen)
 protected:
 	virtual QDataStream& readFromStream(QDataStream&) =0 ;
@@ -65,7 +65,7 @@ public:
 	virtual QStringList descriptorKeys() const ;
 	virtual spec::descriptorFlags descriptorProperties(const QString& key) const ;
 	virtual void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
-	virtual QwtArray<double> intensityData() ;
+	virtual QVector<double> intensityData() ;
 	virtual int removeData(QList<specRange*>*) { refreshPlotData() ; return 0 ; }
 	virtual void movingAverage(int) {}
 	virtual void average(int) {}

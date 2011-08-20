@@ -36,10 +36,10 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 			items << item ;
 			item->attach(plot) ;
 			intensities << new QwtPlotCurve ;
-			QwtArray<double> xdat ;
+			QVector<double> xdat ;
 			for (int i = 0 ; i < item->dataSize() ; i++)
-				xdat << item->x(i) ;
-			intensities.last()->setData(xdat,item->intensityData()) ;
+				xdat << item->sample(i).x() ;
+			intensities.last()->setSamples(xdat,item->intensityData()) ;
 			intensities.last()->setYAxis(QwtPlot::yRight);
 			QPen pen = item->pen() ;
 			pen.setStyle(Qt::DashLine) ;
@@ -51,7 +51,7 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 	double y1min = INFINITY, y1max = -INFINITY;
 	foreach(specModelItem* item, items)
 	{
-		QwtDoubleRect boundaries = item->boundingRect() ;
+		QRectF boundaries = item->boundingRect() ;
 		y1min = qMin(y1min,boundaries.top()) ;
 		y1max = qMax(y1max,boundaries.bottom()) ;
 	}
