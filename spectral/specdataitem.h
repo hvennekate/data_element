@@ -11,12 +11,12 @@ struct specDataFilter{ // TODO Eventuell direkt in specDataItem integrieren oder
 	double xmin, xmax, ymin, ymax, offset, slope, factor ;
 	specDataFilter() : x(1), y(2), xmin(-INFINITY), xmax(INFINITY), ymin(-INFINITY), ymax(INFINITY), offset(0), slope(0), factor(1) {}
 	QVariant plotData(const QList<specDataPoint>&) const;
-	QwtArray<double> wnums(const QList<specDataPoint>&) const ;
-	QwtArray<double> ints(const QList<specDataPoint>&) const ;
-	QwtArray<double> times(const QList<specDataPoint>&) const ;
-	QwtArray<double> mints(const QList<specDataPoint>&) const ;
+	QVector<double> wnums(const QList<specDataPoint>&) const ;
+	QVector<double> ints(const QList<specDataPoint>&) const ;
+	QVector<double> times(const QList<specDataPoint>&) const ;
+	QVector<double> mints(const QList<specDataPoint>&) const ;
 	
-	bool addData(QList<specDataPoint>&, const QwtArray<double>&, const QwtArray<double>&, const QwtArray<double>&, const QwtArray<double>&) ;
+	bool addData(QList<specDataPoint>&, const QVector<double>&, const QVector<double>&, const QVector<double>&, const QVector<double>&) ;
 	void subMap(QList<specDataPoint>& data, const QMap<double,double>& toSub) ;
 	void addX(QList<specDataPoint>& data, const double& value) ;
 	private:
@@ -32,10 +32,10 @@ private:
 	QList<specDataPoint> data ;
 	specDataFilter filter ;
 	int addedItems ;
-	QwtArray<double> wnums() const ;
-	QwtArray<double> ints() const ;
-	QwtArray<double> mints() const ;
-	QwtArray<double> times() const ;
+	QVector<double> wnums() const ;
+	QVector<double> ints() const ;
+	QVector<double> mints() const ;
+	QVector<double> times() const ;
 protected:
 	QDataStream& readFromStream(QDataStream&) ;
 	QDataStream& writeToStream(QDataStream&) const ;

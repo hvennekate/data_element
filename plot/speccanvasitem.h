@@ -4,7 +4,7 @@
 #include <qwt_plot_curve.h>
 #include <QList>
 #include <QPair>
-#include <qwt_double_interval.h>
+#include <qwt_interval.h>
 #include "names.h"
 #include <QMenu>
 
@@ -15,7 +15,7 @@ class specCanvasItem : public QwtPlotCurve
 	public:
 		specCanvasItem(QString description="");
 		virtual void pointMoved(const int&, const double&, const double&) ;
-		virtual void applyRanges(QList<QwtDoubleInterval*>&) ;
+		virtual void applyRanges(QList<QwtInterval*>&) ;
 		virtual void refreshPlotData() =0;
 		virtual void scaleBy(const double&) {}
 		virtual void addToSlope(const double&) {}

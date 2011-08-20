@@ -28,10 +28,10 @@ void specDataFilter::reverseCorrection(double &t, double &wn, double &in) const
 	in = (in-offset-slope*wn)/factor ;
 }
 
-bool specDataFilter::addData(QList<specDataPoint>& toBeAppended, const QwtArray<double>& times, const QwtArray<double>& wnums, const QwtArray<double>& ints, const QwtArray<double>& mints)
+bool specDataFilter::addData(QList<specDataPoint>& toBeAppended, const QVector<double>& times, const QVector<double>& wnums, const QVector<double>& ints, const QVector<double>& mints)
 {
-	QwtArray<double>::size_type size = qMax(times.size(),qMax(wnums.size(),qMax(ints.size(),mints.size()))) ;
-	for (QwtArray<double>::size_type i = 0 ; i < size ; i++)
+	QVector<double>::size_type size = qMax(times.size(),qMax(wnums.size(),qMax(ints.size(),mints.size()))) ;
+	for (QVector<double>::size_type i = 0 ; i < size ; i++)
 	{
 		double t = times[i], w = wnums[i], j = ints[i], m = mints[i] ;
 		reverseCorrection(t,w,j) ;
@@ -60,9 +60,9 @@ QVariant specDataFilter::plotData(const QList<specDataPoint>& data) const
 	return alldata ;
 }
 
-QwtArray<double> specDataFilter::wnums(const QList<specDataPoint>& data) const
+QVector<double> specDataFilter::wnums(const QList<specDataPoint>& data) const
 {
-	QwtArray<double> retval ;
+	QVector<double> retval ;
 	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
 	{
 		double xVal = data[i][x], yVal = data[i][y], t = data[i][0] ;
@@ -73,9 +73,9 @@ QwtArray<double> specDataFilter::wnums(const QList<specDataPoint>& data) const
 	return retval ;
 }
 
-QwtArray<double> specDataFilter::mints(const QList<specDataPoint>& data) const
+QVector<double> specDataFilter::mints(const QList<specDataPoint>& data) const
 {
-	QwtArray<double> retval ;
+	QVector<double> retval ;
 	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
 	{
 		double xVal = data[i][x], yVal = data[i][y], t = data[i][0] ;
@@ -86,9 +86,9 @@ QwtArray<double> specDataFilter::mints(const QList<specDataPoint>& data) const
 	return retval ;
 }
 
-QwtArray<double> specDataFilter::ints(const QList<specDataPoint>& data) const
+QVector<double> specDataFilter::ints(const QList<specDataPoint>& data) const
 {
-	QwtArray<double> retval ;
+	QVector<double> retval ;
 	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
 	{
 		double xVal = data[i][x], yVal = data[i][y], t = data[i][0] ;
@@ -99,9 +99,9 @@ QwtArray<double> specDataFilter::ints(const QList<specDataPoint>& data) const
 	return retval ;
 }
 
-QwtArray<double> specDataFilter::times(const QList<specDataPoint>& data) const
+QVector<double> specDataFilter::times(const QList<specDataPoint>& data) const
 {
-	QwtArray<double> retval ;
+	QVector<double> retval ;
 	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
 	{
 		double xVal = data[i][x];
@@ -150,9 +150,9 @@ bool specDataItem::changeDescriptor(QString key, QString value)
 
 void specDataItem::refreshPlotData()
 {
-	QwtArray<double> x=filter.wnums(data), y=filter.ints(data);
+	QVector<double> x=filter.wnums(data), y=filter.ints(data);
 	processData(x,y) ;
-	setData(x,y) ;
+	setSamples(x,y) ;
 }
 
 QString specDataItem::descriptor(const QString &key) const
@@ -172,10 +172,10 @@ QStringList specDataItem::descriptorKeys() const
 	return (specModelItem::descriptorKeys() << description.keys()) ;
 }
 
-QwtArray<double> specDataItem::wnums() const { return filter.wnums(data) ; }
-QwtArray<double> specDataItem::ints() const { return filter.ints(data) ; }
-QwtArray<double> specDataItem::mints() const { return filter.mints(data) ; }
-QwtArray<double> specDataItem::times() const { return filter.times(data) ; }
+QVector<double> specDataItem::wnums() const { return filter.wnums(data) ; }
+QVector<double> specDataItem::ints() const { return filter.ints(data) ; }
+QVector<double> specDataItem::mints() const { return filter.mints(data) ; }
+QVector<double> specDataItem::times() const { return filter.times(data) ; }
 
 QDataStream& specDataItem::readFromStream(QDataStream& stream)
 {
@@ -302,7 +302,7 @@ QMultiMap<double,QPair<double,double> >* specDataItem::kinetics(QList<specKineti
 {
 // 	QTextStream cout(stdout,QIODevice::WriteOnly);
 	QMultiMap<double,QPair<double,double> > *kinetic = new QMultiMap<double,QPair<double,double> > ;
-	QwtArray<double> nu = wnums(), t = times(), sig = ints() ;
+	QVector<double> nu = wnums(), t = times(), sig = ints() ;
 	foreach (specKineticRange* range, ranges)
 	{
 		for (int i = 0 ; i < nu.size() ; i++)
@@ -367,14 +367,14 @@ void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, c
 	out << endl ;
 }
 
-QwtArray<double> specDataItem::intensityData()
+QVector<double> specDataItem::intensityData()
 {
 	return mints() ;
 }
 
 int specDataItem::removeData(QList<specRange *> *listpointer)
 {
-	QwtArray<double> wns = wnums() ;
+	QVector<double> wns = wnums() ;
 	int count = wns.size() ;
 	qDebug("data size before deletion: %d",data.size()) ;
 	for (int j = 0 ; j < listpointer->size() ; j++)
@@ -396,7 +396,7 @@ int specDataItem::removeData(QList<specRange *> *listpointer)
 
 void specDataItem::average(int num)
 {
-	QwtArray<double> times = filter.times(data), nus = filter.wnums(data), sigs = filter.ints(data), mints = filter.mints(data);
+	QVector<double> times = filter.times(data), nus = filter.wnums(data), sigs = filter.ints(data), mints = filter.mints(data);
 	data.clear();
 	for (int i = 0 ; i+num < times.size() ; i += num)
 	{
@@ -418,11 +418,9 @@ void specDataItem::average(int num)
 
 void specDataItem::movingAverage(int num)
 {
-	QwtArray<double> times = filter.times(data), nus = filter.wnums(data), sigs = filter.ints(data), mints = filter.mints(data);
+	QVector<double> times = filter.times(data), nus = filter.wnums(data), sigs = filter.ints(data), mints = filter.mints(data);
 	data.clear();
 	qDebug() << times << nus << sigs << mints ;
-	for (int i = 0 ; i < nus.size() ; i++)
-		qDebug() << "Plotdaten:" << QwtPlotCurve::x(i) << QwtPlotCurve::y(i) ;
 	for (int i = num ; i < times.size() - num ; i++)
 	{
 		double time = 0, nu = 0, sig = 0, mint = 0 ;

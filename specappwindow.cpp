@@ -10,9 +10,6 @@ specAppWindow::specAppWindow()
 	createMenus();
 	createToolBars();
 	restoreGeometry(settings.value("mainWindow/geometry").toByteArray()) ;
-// 	createStatusBar();
-//       
-// 	readSettings();
 }
 
 
@@ -22,18 +19,13 @@ specAppWindow::~specAppWindow()
 
 void specAppWindow::closeEvent(QCloseEvent* event)
 {
-	qDebug("ignoring event") ;
 	event->ignore() ;
 	bool allClosed = true ;
-	QObjectList docksToClose = children() ;
 	specPlotWidget* pointer ;
-	qDebug("checking children") ;
-	foreach(QObject* dock, docksToClose)
-		if(children().contains(dock) && (pointer = dynamic_cast<specPlotWidget*>(dock)))
+	foreach(QObject* dock, children())
+		if(pointer = dynamic_cast<specPlotWidget*>(dock)) //
 			allClosed = allClosed && pointer->close() ;
-	qDebug("accepting event") ;
 	event->setAccepted(allClosed) ;
-	qDebug("saving geometry") ;
 	settings.setValue("mainWindow/geometry",saveGeometry()) ;
 }
 

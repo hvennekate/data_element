@@ -7,8 +7,8 @@ class specZoomer : public QwtPlotZoomer
 {
 public:
 	specZoomer(QwtPlotCanvas *);
-	virtual QwtText trackerText(const QwtDoublePoint &pos) const ;
-	void changeZoomBase(const QwtDoubleRect&) ;
+	virtual QwtText trackerText(const QPointF &pos) const ;
+	void changeZoomBase(const QRectF&) ;
 	~specZoomer();
 
 };

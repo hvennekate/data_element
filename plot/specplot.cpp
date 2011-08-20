@@ -115,12 +115,12 @@ void specPlot::replot()
 	
 	highlightSelectable() ;
 	
-	QwtDoubleRect boundaries = allItems[0]->boundingRect() ; // DANGER: actually we must check, if the item plots on yLeft
+	QRectF boundaries = allItems[0]->boundingRect() ; // DANGER: actually we must check, if the item plots on yLeft
 	foreach(QwtPlotItem *item, allItems) // TODO omit this if fixing of axis is enabled
 	{
 		if(item->yAxis() == QwtPlot::yLeft)
 		{
-			QwtDoubleRect bnd = item->boundingRect() ;
+			QRectF bnd = item->boundingRect() ;
 			boundaries.setLeft(qMin(bnd.left(),boundaries.left())) ;
 			boundaries.setRight(qMax(bnd.right(),boundaries.right())) ;
 			boundaries.setBottom(qMax(bnd.bottom(),boundaries.bottom())) ;
@@ -132,7 +132,7 @@ void specPlot::replot()
 	double xOffset = boundaries.width()*.05, yOffset = boundaries.height()*.05, left, right, top, bottom ;
 	if (fixXAxisAction->isChecked())
 	{
-		QwtDoubleRect zoomBase = zoom->zoomBase() ;
+		QRectF zoomBase = zoom->zoomBase() ;
 		left = zoomBase.left() ;
 		right = zoomBase.right() ;
 	}
@@ -144,7 +144,7 @@ void specPlot::replot()
 	
 	if (fixYAxisAction->isChecked())
 	{
-		QwtDoubleRect zoomBase = zoom->zoomBase() ;
+		QRectF zoomBase = zoom->zoomBase() ;
 		top = zoomBase.top() ;
 		bottom = zoomBase.bottom() ;
 	}
@@ -277,14 +277,14 @@ void specPlot::highlightSelectable(bool highlight)
 {
 	if (selectable()) // TODO put highlight check outside for loop for performance reasons
 		foreach(specCanvasItem* pointer, *selectable())
-			pointer->setSymbol ( highlight ? QwtSymbol ( QwtSymbol::Ellipse,pointer->pen().brush(), ( QPen ) Qt::black, QSize ( 5,5 ) ) : QwtSymbol() ) ;
+			pointer->setSymbol ( highlight ? new QwtSymbol ( QwtSymbol::Ellipse,pointer->pen().brush(), ( QPen ) Qt::black, QSize ( 5,5 ) ) : 0 ) ;
 }
 
 void specPlot::refreshRanges()
 {
-	QList<QwtDoubleInterval*> rangeArray ;
+	QList<QwtInterval*> rangeArray ;
 	foreach(specCanvasItem* pointer, *ranges)
-		rangeArray << (QwtDoubleInterval*) ((specRange*) pointer) ;
+		rangeArray << (QwtInterval*) ((specRange*) pointer) ;
 	foreach(specCanvasItem* pointer, *ordinary)
 		pointer->applyRanges(rangeArray) ;
 	deleteZeroRangeAction->setEnabled(ranges->size()) ;

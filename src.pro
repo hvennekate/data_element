@@ -1,7 +1,5 @@
 include(prefix.pri)
 
-OTHER_FILES += prefix.pri
-
 SOURCES += main.cpp \
     cutbyintensitydialog.cpp \
     specappwindow.cpp \
@@ -35,7 +33,15 @@ SOURCES += main.cpp \
     plot/speccanvasitem.cpp \
     spectral/specdataitem.cpp \
     spectral/specdatapoint.cpp \
-    spectral/specdataview.cpp
+    spectral/specdataview.cpp \
+    actionlib/specactionlibrary.cpp \
+    actionlib/specundocommand.cpp \
+    actionlib/specundoaction.cpp \
+    actionlib/specdeleteaction.cpp \
+    actionlib/specdeletecommand.cpp \
+    actionlib/specaddfolderaction.cpp \
+    actionlib/specaddfoldercommand.cpp \
+    model/specgenealogy.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -70,7 +76,15 @@ HEADERS += cutbyintensitydialog.h \
     plot/speccanvasitem.h \
     spectral/specdataitem.h \
     spectral/specdatapoint.h \
-    spectral/specdataview.h
+    spectral/specdataview.h \
+    actionlib/specactionlibrary.h \
+    actionlib/specundocommand.h \
+    actionlib/specundoaction.h \
+    actionlib/specdeleteaction.h \
+    actionlib/specdeletecommand.h \
+    actionlib/specaddfolderaction.h \
+    actionlib/specaddfoldercommand.h \
+    model/specgenealogy.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -84,21 +98,21 @@ CONFIG += warn_on \
     thread \
     qt
 
-unix {
-INCLUDEPATH += . \
-    /usr/include/qwt
-LIBS += -lqwt \
-    -lcln \
-    -lginac
-}
-win32 {
-INCLUDEPATH += . \
-    C:/Qwt-5.2.1/include
-LIBS += -LC:/Qwt-5.2.1/lib \
-    -lqwt
-}
+#unix {
+#INCLUDEPATH += . \
+#    /usr/include/qwt
+#LIBS += -lqwt \
+#    -lcln \
+#    -lginac
+#}
+#win32 {
+#INCLUDEPATH += . \
+#    C:/Qwt-5.2.1/include
+#LIBS += -LC:/Qwt-5.2.1/lib \
+#    -lqwt
+#}
+CONFIG += qwt
 
 TARGET = data_element
 
 RESOURCES += icons/application.qrc
-

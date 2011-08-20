@@ -31,7 +31,6 @@ private:
 	specModelItem* root ;
 	QStringList descriptors ;
 	QList<spec::descriptorFlags> descriptorProperties ;
-	specModelItem* itemPointer(const QModelIndex&) const ;
 	void insertFromStream(QDataStream& stream, const QModelIndex& parent, int row) ;
 	bool getMergeCriteria(QList<QPair<QStringList::size_type, double> >&) ;
 	bool itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria) ;
@@ -45,7 +44,7 @@ public:
 	~specModel() ;
 	
 	// Own functions
-	
+	specModelItem* itemPointer(const QModelIndex&) const ;
 	bool isFolder(const QModelIndex&) const ;
 	void eliminateChildren(QModelIndexList&) const ;
 	virtual bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row=0) ;
@@ -84,6 +83,9 @@ public:
 	
 	friend QDataStream& operator<<(QDataStream&, specModel&);
 	friend QDataStream& operator>>(QDataStream&, specModel&);
+
+	void signalBeginReset() { beginResetModel() ; }
+	void signalEndReset() { endResetModel() ; }
 	
 	
 // //TODO	bool QAbstractItemModel::setHeaderData ( int section, Qt::Orientation orientation, const QVariant & value, int role = Qt::EditRole )

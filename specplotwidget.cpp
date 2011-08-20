@@ -88,6 +88,10 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	splitter->setOpaqueResize(false) ;
 	
 	layout -> addWidget(toolbar) ;
+	qDebug("adding undo toolbar") ;
+	actions = new specActionLibrary(this) ;
+	layout -> addWidget(actions->toolBar(items)) ;
+	qDebug("added undo toolbar") ;
 	layout -> addWidget(splitter)  ;
 	layout -> setContentsMargins(0,0,0,0) ;
 	content->setLayout(layout) ;
