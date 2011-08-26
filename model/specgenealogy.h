@@ -9,17 +9,17 @@ class specGenealogy
 private:
 	specModel* Model ;
 	QVector<int> indexes ;
-	specFolderItem* parent ;
+	specFolderItem* Parent ;
 	QList<specModelItem*> items ;
 	bool owning ;
 	void getItemPointers(const QList<specModelItem *> &) ;
 public:
-	specGenealogy(const QModelIndexList&);
-	specGenealogy(const QList<specModelItem*>&, specModel*) ;
-	specGenealogy(const QList<specModelItem*>&, int row, specFolderItem* parent, specModel*) ;
+	explicit specGenealogy(QModelIndexList&);
 	void takeItems() ;
 	void returnItems() ;
 	bool valid() ;
+	specModel* model() ;
+	specFolderItem* parent() ;
 	QDataStream& write(QDataStream&) ;
 	QDataStream& read(QDataStream&) ;
 };

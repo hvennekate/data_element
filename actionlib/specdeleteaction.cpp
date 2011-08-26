@@ -21,14 +21,8 @@ void specDeleteAction::execute()
 	specDataView *currentView = (specDataView*) parent() ;
 	QModelIndexList indexes = currentView->selectionModel()->selectedIndexes() ;
 	qDebug("=== getting selection") ;
-	specModel *model = currentView->model() ;
-	model->eliminateChildren(indexes) ;
-	qSort(indexes) ;
-	qDebug("=== got pointers") ;
 	specDeleteCommand *command = new specDeleteCommand() ;
-	command->setModel(model) ;
-	foreach(QModelIndex index, indexes)
-		command->addItem(model->itemPointer(index)) ;
+	command->setItems(indexes) ;
 	qDebug("=== prepared command") ;
 	currentView->selectionModel()->clearSelection();
 	qDebug("=== cleared selection") ;

@@ -1,5 +1,6 @@
 #include "specactionlibrary.h"
 #include "specdeleteaction.h"
+#include "specaddfolderaction.h"
 #include <QDebug>
 
 specActionLibrary::specActionLibrary(QObject *parent) :
@@ -43,6 +44,11 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		action->setLibrary(this);
 		bar->addAction(action) ;
 		qDebug("added delete action") ;
+		qDebug("Adding new folder action") ;
+		specAddFolderAction *addAction = new specAddFolderAction(target) ;
+		addAction->setLibrary(this) ;
+		bar->addAction(addAction) ;
+		qDebug("added addfolder action") ;
 		bar->addAction(undoStack->createUndoAction(target)) ;
 		qDebug("adding redo action") ;
 		bar->addAction(undoStack->createRedoAction(target)) ;
