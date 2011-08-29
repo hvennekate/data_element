@@ -15,13 +15,15 @@ private:
 	void getItemPointers(const QList<specModelItem *> &) ;
 public:
 	explicit specGenealogy(QModelIndexList&);
+	specGenealogy(specModel*, QDataStream&) ;
 	void takeItems() ;
 	void returnItems() ;
 	bool valid() ;
+	bool seekParent() ;
 	specModel* model() ;
 	specFolderItem* parent() ;
 	QDataStream& write(QDataStream&) ;
-	QDataStream& read(QDataStream&) ;
+	QDataStream& read(specModel*, QDataStream&) ;
 };
 
 #endif // SPECGENEALOGY_H

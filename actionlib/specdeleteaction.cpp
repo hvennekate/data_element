@@ -26,6 +26,9 @@ void specDeleteAction::execute()
 	qDebug("=== prepared command") ;
 	currentView->selectionModel()->clearSelection();
 	qDebug("=== cleared selection") ;
+
+	command->setParentWidget((QWidget*)parent());
+
 	if (command->ok())
 		library->push(command) ;
 	else

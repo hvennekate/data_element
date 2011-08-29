@@ -34,6 +34,8 @@ void specAddFolderAction::execute()
 	specAddFolderCommand *command = new specAddFolderCommand ;
 	command->setItems(QModelIndexList() << model->index(row,0,index)) ;
 
+	command->setParentWidget((QWidget*)parent()) ;
+
 	if (command->ok())
 		library->push(command) ;
 	else

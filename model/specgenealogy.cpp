@@ -85,10 +85,55 @@ specFolderItem* specGenealogy::parent()
 
 QDataStream &specGenealogy::write(QDataStream &out)
 {
+	out << indexes ;
+	out << qint8(owning) ;
+	out << qint32(items.size()) ;
+	if (owning)
+	{
+		for(int i = 0 ; i < items.size() ; ++i)
+			items[i]->writeOut(out) ;
+	}
 	return out ;
 }
 
-QDataStream &specGenealogy::read(QDataStream &in)
+specGenealogy::specGenealogy(specModel* mod, QDataStream &in)
 {
-	return in ;
+	qDebug("reading genealogy...") ;
+	Parent = 0 ;
+	Model = mod ;
+	in >> indexes ;
+	qint8 tempOwning ;
+	in >> tempOwning ;
+	owning = tempOwning ;
+	qint32 toRead ;
+	in >> toRead ;
+	if (owning)
+	{
+		qDebug("owning items") ;
+		specModelItem *pointer ;
+		for (int i = 0 ; i < toRead ; ++i)
+		{
+			in >> pointer ;
+			items << pointer ;
+		}
+	}
+	else
+	{
+		qDebug("not owning items") ;
+		seekParent() ;
+		for (int i = indexes.first() ; i < indexes.first()+toRead ; ++i)
+			items << Parent->child(i) ;
+	}
 }
+
+bool specGenealogy::seekParent()
+{
+	if (!Model) return false ;
+	QModelIndex parentIndex = QModelIndex() ;
+	for (int i = indexes.size()-1 ; i > 0 ; --i)
+		parentIndex = Model->index(indexes[i],0,parentIndex) ;
+	Parent = (specFolderItem*) Model->itemPointer(parentIndex) ;
+
+	return Parent ;
+}
+

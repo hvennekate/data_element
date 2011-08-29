@@ -1,5 +1,6 @@
 #include "specmanageitemscommand.h"
 #include <QDebug>
+#include <QAbstractItemView>
 
 specManageItemsCommand::specManageItemsCommand(specUndoCommand *parent) :
 	specUndoCommand(parent)
@@ -26,7 +27,7 @@ void specManageItemsCommand::setItems(QModelIndexList & indexes)
 
 bool specManageItemsCommand::ok()
 {
-	return ! items.isEmpty() ;
+	return parentWidget() && !items.isEmpty() ;
 }
 
 void specManageItemsCommand::prepare() // TODO make this the model's task
@@ -37,6 +38,9 @@ void specManageItemsCommand::prepare() // TODO make this the model's task
 	for(int i = 0 ; i < items.size() ; ++i)
 	{
 		qDebug() << items[i]->parent() ;
+		if (!items[i]->parent())
+			if (!items[i]->seekParent())
+				continue ;
 		items[i]->parent()->haltRefreshes(true) ;
 	}
 }
@@ -55,6 +59,7 @@ void specManageItemsCommand::finish()
 
 void specManageItemsCommand::take()
 {
+	if (!ok()) return ;
 	qDebug("preparing model and parents") ;
 	prepare() ;
 	qDebug("removing genealogies") ;
@@ -65,8 +70,34 @@ void specManageItemsCommand::take()
 
 void specManageItemsCommand::restore()
 {
+	if (!ok()) return ;
+	if (!parentWidget() || items.isEmpty()) return ;
 	prepare() ;
 	for(int i = 0 ; i < items.size() ; i++)
 		items[i]->returnItems();
 	finish() ;
+}
+
+QDataStream& specManageItemsCommand::write(QDataStream & out)
+{
+	out << qint32(items.size()) ;
+	for (int i = 0 ; i < items.size() ; ++i)
+		items[i]->write(out) ;
+	return out ;
+}
+
+QDataStream& specManageItemsCommand::read(QDataStream &in)
+{
+	qint32 toRead ;
+	in >> toRead ;
+	qDebug("reading manageItemsCommand") ;
+	qDebug() << "parent widget:" << parentWidget() ;
+	specModel* model = (specModel*) (((QAbstractItemView*) parentWidget())->model()) ;
+	for (int i = 0 ; i < toRead ; ++i)
+	{
+		qDebug() << "reading genealogy" << i << "of" << toRead ;
+		items << new specGenealogy(model,in) ;
+	}
+
+	return in ;
 }

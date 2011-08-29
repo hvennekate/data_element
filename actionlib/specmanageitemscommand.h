@@ -14,6 +14,8 @@ public:
 	explicit specManageItemsCommand(specUndoCommand *parent = 0);
 	bool ok() ;
 	void setItems(QModelIndexList&) ;
+	QDataStream& write(QDataStream &) ;
+	QDataStream& read(QDataStream &) ;
 protected:
 	void take() ;
 	void restore() ;
