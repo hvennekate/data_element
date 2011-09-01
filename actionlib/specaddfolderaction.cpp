@@ -3,8 +3,8 @@
 #include "specgenealogy.h"
 #include "specaddfoldercommand.h"
 
-specAddFolderAction::specAddFolderAction(QObject *parent) :
-    specUndoAction(parent)
+specAddFolderAction::specAddFolderAction(QObject *parent)
+	: specUndoAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("folder-new"));
 }
@@ -19,12 +19,23 @@ void specAddFolderAction::execute()
 {
 	specDataView *currentView = (specDataView*) parent() ;
 	specModel *model = currentView->model() ;
-	specModelItem *item = model->itemPointer(currentView->currentIndex()) ;
-	specGenealogy *position = ( item->isFolder() ?
-					   new specGenealogy(new specFolderItem(),item->children(),item,model) :
-					   new specGenealogy(new specFolderItem(),item->parent()->childNo(item),item->parent(),model)) ;
+	QModelIndex index = currentView->currentIndex() ;
+	specModelItem *item = model->itemPointer(index) ;
+	int row = 0 ;
+	qDebug("checking if item is folder") ;
+	if (!item->isFolder())
+	{
+		qDebug("item is not a folder") ;
+		row = index.row()+1 ;
+		index = index.parent() ;
+
+	}
+	if (! model->insertItems(QList<specModelItem*>() << new specFolderItem(), index, row)) return ;
 	specAddFolderCommand *command = new specAddFolderCommand ;
-	command->setPosition(position) ;
+	command->setItems(QModelIndexList() << model->index(row,0,index)) ;
+
+	command->setParentWidget((QWidget*)parent()) ;
+
 	if (command->ok())
 		library->push(command) ;
 	else

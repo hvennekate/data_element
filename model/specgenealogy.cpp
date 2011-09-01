@@ -1,78 +1,139 @@
 #include "specgenealogy.h"
 
-specGenealogy::specGenealogy(const QList<specModelItem *> &Items, specModel *mod)
-	: Model(mod)
-{
-	getItemPointers(Items) ;
-}
+//specGenealogy::specGenealogy(const QList<specModelItem *> &Items, specModel *mod)
+//	: Model(mod)
+//{
+//	getItemPointers(Items) ;
+//}
 
-specGenealogy::specGenealogy(const QModelIndexList &list)
-	: Model(mod)
+specGenealogy::specGenealogy(QModelIndexList &list)
+	: owning(false)
 {
+	qDebug("initializing genealogy") ;
 	QList<specModelItem*> Items ;
 	if (list.isEmpty()) return ;
-	specModel* model = list.first().model() ;
-	foreach(QModelIndex item, list)
-		if (item.model() == model)
-			Items << model->itemPointer(item) ;
-	getItemPointers(Items) ;
-}
+	QModelIndexList::iterator last = list.begin() ;
+	Model = (specModel*) last->model() ;
+	QModelIndex parentIndex= last->parent() ;
+	int next = last->row() ;
 
-void specGenealogy::getItemPointers(const QList<specModelItem *> &Items)
-{
-	if (Items.isEmpty())
-		return ;
-	items.clear();
-	indexes.clear() ;
-	specFolderItem *parent = Items.first()->parent() ;
-	int nextRow = parent->childNo(Items.first()) ;
-	for (int i = 0 ; i < Items.size() ; ++i)
+	// find iterator of end item
+	qDebug("finding end item") ;
+	while (	last != list.end() &&
+			last->parent() == parentIndex &&
+			last->row() == next)
 	{
-		specModelItem* pointer = Items[i] ;
-		if (pointer && pointer->parent() == parent && parent->childNo(pointer) == nextRow)
-		{
-			items << pointer ;
-			nextRow++ ;
-		}
+		next ++ ;
+		last ++ ;
 	}
 
-	indexes << parent->childNo(items.first()) ;
-	while (parent)
+	// getting pointers to items to put into our list
+	qDebug("adding items to own list") ;
+	for (QModelIndexList::iterator i = list.begin() ; i != last ; ++i)
+		items << Model->itemPointer(*i) ;
+
+	qDebug("retrieving indexes") ;
+	// getting index cascade and parent
+	QModelIndex item = list.first() ;
+	while(item.isValid())
 	{
-		indexes << parent->parent()->childNo(parent) ;
-		parent = parent->parent() ;
+		indexes << item.row() ;
+		item = item.parent() ;
 	}
+	Parent = items.first()->parent() ;
+
+	qDebug("removing indexes from list") ;
+	// rid the list of those entries we took
+	list.erase(list.begin(),last) ;
 }
 
 bool specGenealogy::valid()
 {
-	return Model && parent && !indexes.isEmpty() && !items.isEmpty() ;
+	return Model && Parent && !indexes.isEmpty() && !items.isEmpty() ;
 }
 
 
 void specGenealogy::takeItems()
 {
+	qDebug("starting to remove items") ;
 	if (owning) return ;
 	if (!valid()) return ;
+	qDebug("checks done") ;
 	foreach(specModelItem* item, items)
 		item->setParent(0) ;
 	owning = true ;
+	qDebug("done removing") ;
 }
 
 void specGenealogy::returnItems()
 {
 	if (!owning) return ;
 	if (!valid()) return ;
-	parent->addChildren(items,indexes.first()) ;
+	Parent->addChildren(items,indexes.first()) ;
 	owning = false ;
+}
+
+specModel* specGenealogy::model()
+{
+	return Model ;
+}
+
+specFolderItem* specGenealogy::parent()
+{
+	return Parent ;
 }
 
 QDataStream &specGenealogy::write(QDataStream &out)
 {
+	out << indexes ;
+	out << qint8(owning) ;
+	out << qint32(items.size()) ;
+	if (owning)
+	{
+		for(int i = 0 ; i < items.size() ; ++i)
+			items[i]->writeOut(out) ;
+	}
 	return out ;
 }
 
-QDataStream &specGenealogy::read(QDataStream &in)
+specGenealogy::specGenealogy(specModel* mod, QDataStream &in)
 {
-	return in ;
+	qDebug("reading genealogy...") ;
+	Parent = 0 ;
+	Model = mod ;
+	in >> indexes ;
+	qint8 tempOwning ;
+	in >> tempOwning ;
+	owning = tempOwning ;
+	qint32 toRead ;
+	in >> toRead ;
+	if (owning)
+	{
+		qDebug("owning items") ;
+		specModelItem *pointer ;
+		for (int i = 0 ; i < toRead ; ++i)
+		{
+			in >> pointer ;
+			items << pointer ;
+		}
+	}
+	else
+	{
+		qDebug("not owning items") ;
+		seekParent() ;
+		for (int i = indexes.first() ; i < indexes.first()+toRead ; ++i)
+			items << Parent->child(i) ;
+	}
 }
+
+bool specGenealogy::seekParent()
+{
+	if (!Model) return false ;
+	QModelIndex parentIndex = QModelIndex() ;
+	for (int i = indexes.size()-1 ; i > 0 ; --i)
+		parentIndex = Model->index(indexes[i],0,parentIndex) ;
+	Parent = (specFolderItem*) Model->itemPointer(parentIndex) ;
+
+	return Parent ;
+}
+

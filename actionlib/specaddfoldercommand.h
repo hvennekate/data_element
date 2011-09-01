@@ -1,22 +1,18 @@
 #ifndef SPECADDFOLDERCOMMAND_H
 #define SPECADDFOLDERCOMMAND_H
 
-#include "specundocommand.h"
+#include "specmanageitemscommand.h"
 #include "specmodel.h"
 #include "specgenealogy.h"
+#include "names.h"
 
-class specAddFolderCommand : public specUndoCommand
+class specAddFolderCommand : public specManageItemsCommand
 {
 public:
 	specAddFolderCommand(specUndoCommand *parent = 0);
-	void setPosition(specGenealogy*) ;
 	void redo() ;
 	void undo() ;
-	bool ok() ;
-private:
-	specModel* model ;
-	specGenealogy* position ;
-
+	int id() const { return spec::newFolderId ;}
 };
 
 #endif // SPECADDFOLDERCOMMAND_H
