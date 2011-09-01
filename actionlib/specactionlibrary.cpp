@@ -50,6 +50,21 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 	return new QToolBar(target) ;
 }
 
+void specActionLibrary::addDragDropPartner(specView* view)
+{
+	if (!partners.contains(view))
+		partners << view ;
+	view->setDropBuddy(this) ;
+}
+
+void specActionLibrary::dragDrop(QDropEvent *event, specView *destination)
+{
+	if (event->proposedAction() == Qt::MoveAction && event->source() == destination)
+	{
+
+	}
+}
+
 void specActionLibrary::addParent(QWidget *pointer)
 {
 	if (!parents.contains(pointer))

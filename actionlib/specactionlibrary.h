@@ -26,7 +26,8 @@ public:
 	QDataStream& read(QDataStream&) ;
 	void push(specUndoCommand*) ;
 	QWidget* parentId(int) ;
-
+	void addDragDropPartner(specView*) ;
+	void dragDrop(QDropEvent* event, specView* destination) ;
 signals:
 
 public slots:
@@ -34,6 +35,7 @@ public slots:
 private:
 	QUndoStack *undoStack ;
 	QVector<QWidget*> parents ;
+	QVector<specView*> partners;
 	void addParent(QWidget*) ;
 
 };

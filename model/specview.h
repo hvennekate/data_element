@@ -8,12 +8,16 @@
 #include <specmodel.h>
 #include <QMap>
 
+class specActionLibrary ;
+
 class specView : public QTreeView
 { // TODO turn into abstract class (add purely virtual function)
 Q_OBJECT
 private:
 	QMenu *itemContextMenu, *folderContextMenu ;
 	QAction *deleteAction, *newItemAction, *treeAction, *changePenAction, *mergeFolderAction, *mergeAction, *exportAction, *cutByIntensityAction, *averageAction, *movingAverageAction, *getSubtractionDataAction, *applySubtractionAction ;
+
+	specActionLibrary* dropBuddy ;
 	
 	void createContextMenus() ;
 	void createActions() ;
@@ -24,6 +28,7 @@ private slots:
 	void averageItems() ;
 protected:
 	void keyPressEvent(QKeyEvent*) ;
+	void dropEvent(QDropEvent *event) ;
 protected slots:
 	void columnMoved(int,int,int) ;
 public:
@@ -35,6 +40,7 @@ public:
 //	QList<specModelItem*> currentlySelected() ;
 	virtual QList<QAction*> actions() ;
 	QModelIndexList getSelection() ;
+	void setDropBuddy(specActionLibrary*) ;
 
 	signals:
 		void changed() ;
