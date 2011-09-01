@@ -59,11 +59,17 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	items   = new specDataView(this) ;
 	
 	qDebug("starting to read file") ;
-	if (onDisk->exists()) in >> *kineticWidget ;
+	if (onDisk->exists())
+	{
+		qDebug() << "filepos:" << onDisk->pos() ;
+		in >> *kineticWidget ;
+		qDebug() << "filepos:" << onDisk->pos() ;
+	}
 	
 	qDebug("read kinetic model") ;
 	
 	items->setModel(onDisk->exists() ? new specModel(in,items) : new specModel(items) ) ; // TODO employ >> operator
+	qDebug() << "filepos:" << onDisk->pos() ;
 	
 	qDebug("read both data and kinetics models") ;
 // 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
@@ -73,8 +79,6 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 // 	cout << "connected data model" << endl ;
 	kineticWidget->view()->model()->connectToPlot(plot) ;
 // 	cout << "connected data plot" << endl ;
-	in.unsetDevice() ;
-	onDisk->close() ;
 // 	setTitleBarWidget(new specDockTitle) ;
 	
 	createActions() ;
@@ -91,11 +95,18 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	qDebug("adding undo toolbar") ;
 	actions = new specActionLibrary(this) ;
 	layout -> addWidget(actions->toolBar(items)) ;
+	if (onDisk->exists())
+	{
+		qDebug() << "filepos:" << onDisk->pos() ;
+		actions->read(in) ;
+	}
 	qDebug("added undo toolbar") ;
 	layout -> addWidget(splitter)  ;
 	layout -> setContentsMargins(0,0,0,0) ;
 	content->setLayout(layout) ;
 	setWidget(content) ;
+	in.unsetDevice() ;
+	onDisk->close() ;
 	
 // TODO reconnect setFont() slot
 }
@@ -351,6 +362,8 @@ bool specPlotWidget::saveFile()
 	QDataStream out(onDisk) ;
 	out << *(kineticWidget) ;
 	out << *(items->model()) ;
+	qDebug() << "filepos:" << onDisk->pos() ;
+	actions->write(out) ;
 	out.unsetDevice() ;
 	onDisk->close() ;
 	return true ;

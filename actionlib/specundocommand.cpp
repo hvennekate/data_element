@@ -1,18 +1,17 @@
 #include "specundocommand.h"
 
 specUndoCommand::specUndoCommand(specUndoCommand *parent) :
-    QUndoCommand(parent)
+    QUndoCommand(parent),
+	pW(0)
 {
 }
 
-QDataStream& specUndoCommand::write(QDataStream& out)
+void specUndoCommand::setParentWidget(QWidget * par)
 {
-	return out ;
+	pW = par ;
 }
 
-QDataStream& specUndoCommand::read(QDataStream& in)
+QWidget* specUndoCommand::parentWidget()
 {
-	return in ;
+	return pW ;
 }
-
-
