@@ -102,13 +102,13 @@ CONFIG += warn_on \
     thread \
     qt
 
-#unix {
-#INCLUDEPATH += . \
-#    /usr/include/qwt
-#LIBS += -lqwt \
-#    -lcln \
-#    -lginac
-#}
+unix {
+INCLUDEPATH += . \
+    /usr/include/qwt
+LIBS += -lqwt \
+    -lcln \
+    -lginac
+}
 #win32 {
 #INCLUDEPATH += . \
 #    C:/Qwt-5.2.1/include

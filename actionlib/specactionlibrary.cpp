@@ -4,6 +4,7 @@
 #include <QDebug>
 #include "specaddfoldercommand.h"
 #include "specdeletecommand.h"
+#include "specmovecommand.h"
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
@@ -61,7 +62,13 @@ void specActionLibrary::dragDrop(QDropEvent *event, specView *destination)
 {
 	if (event->proposedAction() == Qt::MoveAction && event->source() == destination)
 	{
-
+		qDebug("starting move action") ;
+		QModelIndexList items = ((specView*) event->source())->selectionModel()->selectedIndexes() ;
+		specMoveCommand* command = new specMoveCommand(items, destination->indexAt(event->pos())) ;
+		command->setParentWidget(destination) ;
+		qDebug("done preparing move action") ;
+		undoStack->push(command) ;
+		event->acceptProposedAction();
 	}
 }
 
