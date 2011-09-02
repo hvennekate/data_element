@@ -14,6 +14,7 @@
 #include <QPair>
 #include <QItemSelection>
 #include <QMap>
+#include "actionlib/specactionlibrary.h"
 
 class specModel ;
 
@@ -23,6 +24,8 @@ QDataStream& operator>>(QDataStream& in, specModel& model) ;
 // TODO put these funktions into a sensible context
 bool lessThanIndex(const QModelIndex&, const QModelIndex&) ;
 int indexLevel(const QModelIndex& index) ;
+
+class specView ;
 
 class specModel : public QAbstractItemModel
 {
@@ -38,6 +41,9 @@ private:
 	QModelIndexList allChildren(const QModelIndex&) const ;
 	QStringList mime ;
 	QMap<double,double> subMap ;
+	specView* internalDrop ;
+	specActionLibrary* dropBuddy ;
+	bool dontDelete ;
 public:
 	specModel(QObject *par = 0) ;
 	specModel(QDataStream&, QObject *par = 0) ;
@@ -74,6 +80,8 @@ public:
 			    int role = Qt::DisplayRole) const;
 	
 // 	// Drag and drop:
+	void setInternalDrop(specView*) ;
+	void setDropBuddy(specActionLibrary*) ;
 	Qt::DropActions supportedDropActions() const ;
 	QStringList mimeTypes() const ;
 	void setMimeTypes(const QStringList&) ;
