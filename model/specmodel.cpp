@@ -675,3 +675,40 @@ void specModel::applySubMap(const QModelIndexList & indexList)
 	foreach(QModelIndex index, indexList)
 		itemPointer(index)->subMap(subMap) ;
 }
+
+specModelItem* specModel::itemPointer(const QVector<int> &indexes) const
+{
+	specModelItem* pointer = root ;
+	qDebug("getting pointer from index vector of size %d",indexes.size()) ;
+	for (int i =  indexes.size() - 1 ; i >= 0 ; --i)
+	{
+		qDebug("getting pointer %d",indexes[i]) ;
+		pointer = ((specFolderItem*) pointer)->child(indexes[i]) ;
+	}
+	qDebug("got pointer") ;
+	return pointer ;
+}
+
+QVector<int> specModel::hierarchy(specModelItem *item)
+{
+	QVector<int> retVal ;
+	specFolderItem *parent ;
+	while (parent = item->parent())
+	{
+		retVal << parent->childNo(item) ;
+		item = parent ;
+	}
+	return retVal ;
+}
+
+QVector<int> specModel::hierarchy(const QModelIndex &index)
+{
+	QVector<int> retVal ;
+	QModelIndex item = index ;
+	while (item.isValid())
+	{
+		retVal << item.row();
+		item = item.parent() ;
+	}
+	return retVal ;
+}

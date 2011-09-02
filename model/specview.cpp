@@ -182,7 +182,7 @@ void specView::keyPressEvent(QKeyEvent* event)
 
 specView::specView(QWidget* parent)
  : QTreeView(parent),
-   dropBuddy = 0
+   dropBuddy(0)
 {
 	createActions() ;
 	createContextMenus() ;

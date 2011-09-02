@@ -34,12 +34,7 @@ specGenealogy::specGenealogy(QModelIndexList &list)
 
 	qDebug("retrieving indexes") ;
 	// getting index cascade and parent
-	QModelIndex item = list.first() ;
-	while(item.isValid())
-	{
-		indexes << item.row() ;
-		item = item.parent() ;
-	}
+	indexes = Model->hierarchy(list.first()) ;
 	Parent = items.first()->parent() ;
 
 	qDebug("removing indexes from list") ;
@@ -129,10 +124,7 @@ specGenealogy::specGenealogy(specModel* mod, QDataStream &in)
 bool specGenealogy::seekParent()
 {
 	if (!Model) return false ;
-	QModelIndex parentIndex = QModelIndex() ;
-	for (int i = indexes.size()-1 ; i > 0 ; --i)
-		parentIndex = Model->index(indexes[i],0,parentIndex) ;
-	Parent = (specFolderItem*) Model->itemPointer(parentIndex) ;
+	Parent = (specFolderItem*) Model->itemPointer(indexes.mid(1)) ;
 
 	return Parent ;
 }

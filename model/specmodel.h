@@ -45,6 +45,9 @@ public:
 	
 	// Own functions
 	specModelItem* itemPointer(const QModelIndex&) const ;
+	specModelItem* itemPointer(const QVector<int>&) const ;
+	static QVector<int> hierarchy(specModelItem*) ;
+	static QVector<int> hierarchy(const QModelIndex&) ;
 	bool isFolder(const QModelIndex&) const ;
 	void eliminateChildren(QModelIndexList&) const ;
 	virtual bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row=0) ;
