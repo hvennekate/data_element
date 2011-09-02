@@ -6,7 +6,8 @@ specMoveCommand::specMoveCommand(QModelIndexList &sources, const QModelIndex &ta
 	: specUndoCommand(parent)
 {
 	number = 0 ;
-	targetIndex << row ;
+	targetIndex << row ;//< 0 ? 0 : row ; // TODO maybe change to last row.
+	qDebug("##### row %d",row) ;
 	targetIndex << specModel::hierarchy(target) ;
 	while(!sources.isEmpty())
 	{
@@ -35,9 +36,14 @@ void specMoveCommand::redo()
 	qDebug("got model") ;
 	model->signalBeginReset();
 	qDebug("getting target") ;
-	specModelItem* target = (specFolderItem*) model->itemPointer(targetIndex) ;
-	qDebug("verifying that target is a folder") ;
-	if (!target->isFolder()) target = target->parent() ;
+	specModelItem* target = (specFolderItem*) model->itemPointer(targetIndex.mid(1)) ;
+	qDebug("verifying that target is a folder %d",target) ;
+	if (!target->isFolder())
+	{
+		qDebug("not a folder") ;
+		target = target->parent() ;
+		qDebug("parent: %d",target) ;
+	}
 	qDebug("got target") ;
 	QList<specModelItem*> items ;
 	for (int i = 0 ; i < sourceIndexes.size() ; ++i)
@@ -58,27 +64,35 @@ void specMoveCommand::redo()
 	foreach(specFolderItem* parent, parents)
 		parent->haltRefreshes(true) ;
 	qDebug("halted parents") ;
+	if (targetIndex[0] < 0) targetIndex[0] = target->children() ;
 	((specFolderItem*) target)->addChildren(items,targetIndex[0]) ;
 	qDebug("moved items, resetting refreshes") ;
 	foreach(specFolderItem* parent, parents)
 		parent->haltRefreshes(false) ;
 	model->signalEndReset();
+	sourceIndex = model->hierarchy(target) ;
 	qDebug("done with move action") ;
 }
 
 void specMoveCommand::undo()
 {
 	if (!pW) return ;
+	qDebug("## getting model") ;
 	specModel* model = ((specView*) pW)->model() ; // TODO put into function
 	model->signalBeginReset();
-	specModelItem* target = (specFolderItem*)model->itemPointer(targetIndex) ;
+	qDebug("## getting target") ;
+	specModelItem* target = (specFolderItem*)model->itemPointer(sourceIndex) ;
+	qDebug("got target %d",target) ;
 	if (!target->isFolder()) target = target->parent() ;
-	QVector<specFolderItem*> parents ;
 	((specFolderItem*) target)->haltRefreshes(true) ;
+	qDebug("## getting parents and items") ;
+	QVector<specFolderItem*> parents ;
 	QList<specModelItem*> items ;
-	int row = targetIndex.first() ;
+	int row = targetIndex[0] ;
+	qDebug("## getting item pointers %d %d",target,row) ;
 	for (int i = 0 ; i < number ; ++i)
 		items << ((specFolderItem*) target)->child(i+row) ;
+	qDebug("## got items") ;
 	int count = 0 ;
 	for (int i = 0 ; i < sourceIndexes.size() ; ++i)
 	{
@@ -89,13 +103,17 @@ void specMoveCommand::undo()
 			parents << parent ;
 			parent->haltRefreshes(true) ;
 		}
+		qDebug("adding children count: %d row: %d from list pos: %d pointer: %d parent: %d",sourceIndexes[i].second,sourceIndexes[i].first[0],count,items[count],parent) ;
 		parent->addChildren(items.mid(count,sourceIndexes[i].second),
 				    sourceIndexes[i].first[0]) ;
+		count += sourceIndexes[i].second ;
+		qDebug("adding done") ;
 	}
-
+	qDebug("## moved items back") ;
 	foreach(specFolderItem* parent, parents)
 		parent->haltRefreshes(false) ;
 	((specFolderItem*) target)->haltRefreshes(false) ;
+	qDebug("## almost done") ;
 	model->signalEndReset();
 }
 

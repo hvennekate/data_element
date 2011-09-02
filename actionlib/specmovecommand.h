@@ -12,6 +12,7 @@ private:
 	QVector<QPair<QVector<int>, int > > sourceIndexes ;
 	int number ;
 	QVector<int> targetIndex ;
+	QVector<int> sourceIndex ;
 	QVector<int> getIndexVector(QModelIndex) ; // TODO make either separate class or static public function
 	void refreshPointers() ;
 public:
