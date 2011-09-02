@@ -11,8 +11,10 @@ class specActionLibrary ;
 #include <QUndoStack>
 #include "specundocommand.h"
 #include "specundoaction.h"
-#include "specdataview.h"
+#include "specview.h"
 #include <typeinfo>
+
+class specView ;
 
 class specActionLibrary : public QObject
 {
