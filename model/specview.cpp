@@ -181,8 +181,7 @@ void specView::keyPressEvent(QKeyEvent* event)
 }
 
 specView::specView(QWidget* parent)
- : QTreeView(parent),
-   dropBuddy(0)
+ : QTreeView(parent)
 {
 	createActions() ;
 	createContextMenus() ;
@@ -357,15 +356,10 @@ void specView::applySubMapToSelection()
 	model()->applySubMap(getSelection()) ;
 }
 
-void specView::setDropBuddy(specActionLibrary *lib)
-{
-	dropBuddy = lib ;
-}
-
 void specView::dropEvent(QDropEvent *event)
 {
-	if (!dropBuddy)
-		QTreeView::dropEvent(event) ;
-	else
-		dropBuddy->dragDrop(event,this) ;
+	qDebug("--- drop event received %d",this) ;
+	model()->setInternalDrop((event->source() == this && event->proposedAction() == Qt::MoveAction) ? this : 0) ;
+
+	QTreeView::dropEvent(event) ;
 }

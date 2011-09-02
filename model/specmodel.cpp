@@ -18,6 +18,7 @@
 #include "specdataitem.h"
 #include "exportdialog.h"
 #include <QTime>
+#include "actionlib/specmovecommand.h"
 // TODO replace isFolder() by addChildren(empty list,0)
 
 bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria)
@@ -347,7 +348,9 @@ specModelItem* specModel::itemPointer(const QModelIndex& index) const
 { return (index.isValid() && index.internalPointer() != 0 ? (specModelItem*) index.internalPointer() : root) ; } // TODO evtl. als operator= definieren.
 
 specModel::specModel(QObject *par)
-	: QAbstractItemModel(par), mime("application/spec.model.item")
+	: QAbstractItemModel(par), mime("application/spec.model.item"),
+	  internalDrop(0),
+	  dontDelete(false)
 {
 	root = new specFolderItem ;
 	descriptors += "" ;
@@ -537,6 +540,11 @@ bool specModel::removeRows(int position, int rows, const QModelIndex &parent)
 { // TODO check if index is valid?
 // 	if(!(position+rows <= rowCount(index))) return false ; maybe necessary...
 	if (position < 0 || rows < 1) return false ;
+	if (dontDelete)
+	{
+		dontDelete = false ;
+		return true ;
+	}
 	beginRemoveRows(parent, position, position+rows-1);
 // 	QList<specModelItem*> list = itemPointer(index)->takeChildren(position,rows) ;
 	QList<specModelItem*> list ;
@@ -552,11 +560,19 @@ bool specModel::removeRows(int position, int rows, const QModelIndex &parent)
 	return true ;
 }
 
+void specModel::setInternalDrop(specView* val)
+{
+	internalDrop = val ;
+}
+
 Qt::DropActions specModel::supportedDropActions() const
 { return Qt::CopyAction | Qt::MoveAction; }
 
 QStringList specModel::mimeTypes() const
-{ return mime ; }
+{
+	qDebug("### requested mime types %d",this) ;
+	return mime ;
+}
 
 void specModel::setMimeTypes(const QStringList& types)
 { mime = types ; }
@@ -584,6 +600,7 @@ void specModel::eliminateChildren(QModelIndexList& list) const
 
 QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 {
+	qDebug("### requested mime data %d",this) ;
 	QMimeData *mimeData = new QMimeData() ;
 	QByteArray encodedData ;
 	QDataStream stream(&encodedData,QIODevice::WriteOnly) ;
@@ -594,6 +611,8 @@ QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 // 	cout << "mimeData list size:  " << list.size() << endl ;
 	
 	qDebug("exporting %d items of mime",list.size()) ;
+	if (dropBuddy)
+		dropBuddy->setLastRequested(list) ;
 	foreach(QModelIndex index,list) // TODO eliminate children
 	{
 		qDebug("checking item") ;
@@ -613,11 +632,20 @@ QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 bool specModel::dropMimeData(const QMimeData *data,
      Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
+	qDebug("### dropped mime data %d",this) ;
 	if (action == Qt::IgnoreAction)
 		return true;
 
 	if (!data->hasFormat(mime.first()))
 		return false;
+
+	if (internalDrop && dropBuddy)
+	{
+		dropBuddy->moveInternally(parent,row,internalDrop) ;
+		internalDrop = 0 ;
+		dontDelete = true ;
+		return true ;
+	}
 	
 	QByteArray encodedData = data->data(mime.first()) ;
 	QDataStream stream(&encodedData, QIODevice::ReadOnly) ;
@@ -642,8 +670,10 @@ void specModel::insertFromStream(QDataStream& stream, const QModelIndex& parent,
 	insertItems(list,parent,row) ;
 }
 
-specModel::specModel(QDataStream& in,QObject *par) :
-		QAbstractItemModel(par), mime("application/spec.model.item") // TODO:  read mime type from stream
+specModel::specModel(QDataStream& in,QObject *par)
+	: QAbstractItemModel(par), mime("application/spec.model.item"), // TODO:  read mime type from stream
+	  internalDrop(false),
+	  dontDelete(false)
 {
 	root = new specFolderItem ;
 	descriptors += "" ;
@@ -711,4 +741,9 @@ QVector<int> specModel::hierarchy(const QModelIndex &index)
 		item = item.parent() ;
 	}
 	return retVal ;
+}
+
+void specModel::setDropBuddy(specActionLibrary *buddy)
+{
+	dropBuddy = buddy ;
 }

@@ -15,7 +15,7 @@ private:
 	QVector<int> getIndexVector(QModelIndex) ; // TODO make either separate class or static public function
 	void refreshPointers() ;
 public:
-	specMoveCommand(QModelIndexList& sources, const QModelIndex& target, specUndoCommand* parent=0) ;
+	specMoveCommand(QModelIndexList& sources, const QModelIndex& target, int row, specUndoCommand* parent=0) ;
 	explicit specMoveCommand(QDataStream&) ;
 	void redo() ;
 	void undo() ;

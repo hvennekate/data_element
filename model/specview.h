@@ -5,9 +5,11 @@
 #include <QMenu>
 #include <QAction>
 #include <QContextMenuEvent>
-#include <specmodel.h>
+#include "specmodel.h"
 #include <QMap>
 #include "actionlib/specactionlibrary.h"
+
+class specModel ;
 
 class specView : public QTreeView
 { // TODO turn into abstract class (add purely virtual function)
@@ -16,8 +18,6 @@ private:
 	QMenu *itemContextMenu, *folderContextMenu ;
 	QAction *deleteAction, *newItemAction, *treeAction, *changePenAction, *mergeFolderAction, *mergeAction, *exportAction, *cutByIntensityAction, *averageAction, *movingAverageAction, *getSubtractionDataAction, *applySubtractionAction ;
 
-	specActionLibrary* dropBuddy ;
-	
 	void createContextMenus() ;
 	void createActions() ;
 	void contextMenuEvent(QContextMenuEvent*) ;
@@ -39,7 +39,6 @@ public:
 //	QList<specModelItem*> currentlySelected() ;
 	virtual QList<QAction*> actions() ;
 	QModelIndexList getSelection() ;
-	void setDropBuddy(specActionLibrary*) ;
 
 	signals:
 		void changed() ;

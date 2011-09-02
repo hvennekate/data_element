@@ -2,11 +2,11 @@
 #include "specmodel.h"
 #include "specview.h"
 
-specMoveCommand::specMoveCommand(QModelIndexList &sources, const QModelIndex &target, specUndoCommand *parent)
+specMoveCommand::specMoveCommand(QModelIndexList &sources, const QModelIndex &target,int row, specUndoCommand *parent)
 	: specUndoCommand(parent)
 {
 	number = 0 ;
-//	targetIndex << row ;
+	targetIndex << row ;
 	targetIndex << specModel::hierarchy(target) ;
 	while(!sources.isEmpty())
 	{
