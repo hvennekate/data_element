@@ -12,9 +12,11 @@ class specActionLibrary ;
 #include "specundocommand.h"
 #include "specundoaction.h"
 #include "specview.h"
+#include "specmodel.h"
 #include <typeinfo>
 
 class specView ;
+class specModel ;
 
 class specActionLibrary : public QObject
 {
@@ -28,8 +30,9 @@ public:
 	QDataStream& read(QDataStream&) ;
 	void push(specUndoCommand*) ;
 	QWidget* parentId(int) ;
-	void addDragDropPartner(specView*) ;
-	void dragDrop(QDropEvent* event, specView* destination) ;
+	void addDragDropPartner(specModel*) ;
+	void setLastRequested(const QModelIndexList&) ;
+	void moveInternally(const QModelIndex&, int row, specView*) ;
 signals:
 
 public slots:
@@ -37,7 +40,8 @@ public slots:
 private:
 	QUndoStack *undoStack ;
 	QVector<QWidget*> parents ;
-	QVector<specView*> partners;
+	QVector<specModel*> partners;
+	QModelIndexList lastRequested ;
 	void addParent(QWidget*) ;
 
 };

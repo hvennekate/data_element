@@ -51,25 +51,11 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 	return new QToolBar(target) ;
 }
 
-void specActionLibrary::addDragDropPartner(specView* view)
+void specActionLibrary::addDragDropPartner(specModel* model)
 {
-	if (!partners.contains(view))
-		partners << view ;
-	view->setDropBuddy(this) ;
-}
-
-void specActionLibrary::dragDrop(QDropEvent *event, specView *destination)
-{
-	if (event->proposedAction() == Qt::MoveAction && event->source() == destination)
-	{
-		qDebug("starting move action") ;
-		QModelIndexList items = ((specView*) event->source())->selectionModel()->selectedIndexes() ;
-		specMoveCommand* command = new specMoveCommand(items, destination->indexAt(event->pos())) ;
-		command->setParentWidget(destination) ;
-		qDebug("done preparing move action") ;
-		undoStack->push(command) ;
-		event->acceptProposedAction();
-	}
+	if (!partners.contains(model))
+		partners << model ;
+	model->setDropBuddy(this) ;
 }
 
 void specActionLibrary::addParent(QWidget *pointer)
@@ -132,4 +118,16 @@ QDataStream& specActionLibrary::read(QDataStream &in)
 		((specUndoCommand*) undoStack->command(i))->read(in) ;
 	}
 	qDebug() << "reading undo commands done." ;
+}
+
+void specActionLibrary::setLastRequested(const QModelIndexList &list)
+{
+	lastRequested = list ;
+}
+
+void specActionLibrary::moveInternally(const QModelIndex &parent, int row, specView* target)
+{
+	specMoveCommand *command = new specMoveCommand(lastRequested,parent,row) ;
+	command->setParentWidget(target);
+	push(command) ;
 }
