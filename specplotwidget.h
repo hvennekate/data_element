@@ -14,6 +14,7 @@
 #include <QMenu>
 #include <specdocktitle.h>
 #include "speckineticwidget.h"
+#include "actionlib/specactionlibrary.h"
 
 class specPlotWidget : public QDockWidget
 {
@@ -33,6 +34,7 @@ private:
 		*toKineticAction,
    		*fromKineticAction,
      		*saveAsAction ;
+	specActionLibrary *actions ;
 		
 	specKineticWidget *kineticWidget ;
 	void createActions() ;

@@ -15,13 +15,13 @@ specZoomer::specZoomer(QwtPlotCanvas *canvas)
 	setTrackerPen(QColor(Qt::darkBlue)) ;
 }
 
-void specZoomer::changeZoomBase(const QwtDoubleRect& rect)
+void specZoomer::changeZoomBase(const QRectF& rect)
 {
 // 	qDebug("changing zoom base") ;
 	if(zoomStack()[0] == rect) return ;
-	QStack<QwtDoubleRect> stack = zoomStack() ; // TODO ueberarbeiten!
+	QStack<QRectF> stack = zoomStack() ; // TODO ueberarbeiten!
 	stack.remove(0) ;
-	for(QStack<QwtDoubleRect>::size_type i = 0 ; i < stack.size() ; i++)
+	for(QStack<QRectF>::size_type i = 0 ; i < stack.size() ; i++)
 		if (! rect.contains(stack[i]))
 			stack.remove(i--) ;
 	stack.prepend(rect) ;
@@ -31,7 +31,7 @@ void specZoomer::changeZoomBase(const QwtDoubleRect& rect)
 	if (saveIndex != zoomRectIndex()) zoom((int) saveIndex-zoomRectIndex()) ;
 }
 
-QwtText specZoomer::trackerText(const QwtDoublePoint &pos) const
+QwtText specZoomer::trackerText(const QPointF &pos) const
 {
 	QColor bg(Qt::white);
 #if QT_VERSION >= 0x040300
