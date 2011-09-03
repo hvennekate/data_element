@@ -119,10 +119,12 @@ void specMoveCommand::undo()
 
 QDataStream& specMoveCommand::write(QDataStream &out)
 {
+	out << sourceIndexes << number << targetIndex << sourceIndex ;
 	return out ;
 }
 
 QDataStream& specMoveCommand::read(QDataStream &in)
 {
+	in >> sourceIndexes >> number >> targetIndex >> sourceIndex ;
 	return in ;
 }
