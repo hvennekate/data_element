@@ -14,6 +14,7 @@
 #include <QPair>
 #include <QItemSelection>
 #include <QMap>
+#include "actionlib/specactionlibrary.h"
 
 class specModel ;
 
@@ -24,6 +25,8 @@ QDataStream& operator>>(QDataStream& in, specModel& model) ;
 bool lessThanIndex(const QModelIndex&, const QModelIndex&) ;
 int indexLevel(const QModelIndex& index) ;
 
+class specView ;
+
 class specModel : public QAbstractItemModel
 {
 	Q_OBJECT
@@ -31,7 +34,6 @@ private:
 	specModelItem* root ;
 	QStringList descriptors ;
 	QList<spec::descriptorFlags> descriptorProperties ;
-	specModelItem* itemPointer(const QModelIndex&) const ;
 	void insertFromStream(QDataStream& stream, const QModelIndex& parent, int row) ;
 	bool getMergeCriteria(QList<QPair<QStringList::size_type, double> >&) ;
 	bool itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria) ;
@@ -39,13 +41,19 @@ private:
 	QModelIndexList allChildren(const QModelIndex&) const ;
 	QStringList mime ;
 	QMap<double,double> subMap ;
+	specView* internalDrop ;
+	specActionLibrary* dropBuddy ;
+	bool dontDelete ;
 public:
 	specModel(QObject *par = 0) ;
 	specModel(QDataStream&, QObject *par = 0) ;
 	~specModel() ;
 	
 	// Own functions
-	
+	specModelItem* itemPointer(const QModelIndex&) const ;
+	specModelItem* itemPointer(const QVector<int>&) const ;
+	static QVector<int> hierarchy(specModelItem*) ;
+	static QVector<int> hierarchy(const QModelIndex&) ;
 	bool isFolder(const QModelIndex&) const ;
 	void eliminateChildren(QModelIndexList&) const ;
 	virtual bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row=0) ;
@@ -72,6 +80,8 @@ public:
 			    int role = Qt::DisplayRole) const;
 	
 // 	// Drag and drop:
+	void setInternalDrop(specView*) ;
+	void setDropBuddy(specActionLibrary*) ;
 	Qt::DropActions supportedDropActions() const ;
 	QStringList mimeTypes() const ;
 	void setMimeTypes(const QStringList&) ;
@@ -84,6 +94,9 @@ public:
 	
 	friend QDataStream& operator<<(QDataStream&, specModel&);
 	friend QDataStream& operator>>(QDataStream&, specModel&);
+
+	void signalBeginReset() { beginResetModel() ; }
+	void signalEndReset() { endResetModel() ; }
 	
 	
 // //TODO	bool QAbstractItemModel::setHeaderData ( int section, Qt::Orientation orientation, const QVariant & value, int role = Qt::EditRole )

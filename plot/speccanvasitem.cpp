@@ -22,7 +22,7 @@ void specCanvasItem::pointMoved(const int& no, const double& x, const double& y)
 	// Apply x correction if necessary.
 	if(mode & spec::shiftX)
 	{
-		moveXBy(x-QwtPlotCurve::x(no)) ;
+		moveXBy(x-QwtPlotCurve::sample(no).x()) ;
 		refreshPlotData() ; // Alternatively:  replace last element in Matrix with new x value.
 	}
 
@@ -33,13 +33,13 @@ void specCanvasItem::pointMoved(const int& no, const double& x, const double& y)
 		for (int i = 0 ; i < selectedPoints.size() ; i++) matrix << QList<double>() ;
 		if (mode & spec::scale)
 			for (int i = 0 ; i < selectedPoints.size(); i++)
-				matrix[i] << QwtPlotCurve::y(selectedPoints[i]) ;
+				matrix[i] << QwtPlotCurve::sample(selectedPoints[i]).y() ;
 		if (mode & spec::shift)
 			for (int i = 0 ; i < selectedPoints.size(); i++)
 				matrix[i] << 1. ;
 		if (mode & spec::slope)
 			for (int i = 0 ; i < selectedPoints.size(); i++)
-				matrix[i] << QwtPlotCurve::x(selectedPoints[i]) ;
+				matrix[i] << QwtPlotCurve::sample(selectedPoints[i]).x() ;
 		for (int i = 0 ; i < matrix.size() ; i++) // verringere, wenn noetig, die Spaltenzahl
 			while (matrix.size() < matrix[i].size())
 				matrix[i].takeLast() ;
@@ -47,9 +47,9 @@ void specCanvasItem::pointMoved(const int& no, const double& x, const double& y)
 			matrix.takeLast() ;
 
 		QList<double> yVals ;
-		yVals << y- (mode & spec::scale ? 0. : QwtPlotCurve::y(no)) ;
+		yVals << y- (mode & spec::scale ? 0. : QwtPlotCurve::sample(no).y()) ;
 		for (int i = 1 ; i < selectedPoints.size() && i < matrix.size() ; i++)
-			yVals << (mode & spec::scale ? QwtPlotCurve::y(selectedPoints[i]) : 0 ) ;
+			yVals << (mode & spec::scale ? QwtPlotCurve::sample(selectedPoints[i]).y() : 0 ) ;
 	
 		// do coefficient calculation
 		QList<double> coeffs = gaussjinv(matrix,yVals) ;
@@ -67,7 +67,7 @@ void specCanvasItem::pointMoved(const int& no, const double& x, const double& y)
 	plot()->replot() ;
 }
 
-void specCanvasItem::applyRanges(QList<QwtDoubleInterval*>& ranges)
+void specCanvasItem::applyRanges(QList<QwtInterval*>& ranges)
 {
 	QList<double> vector ;
 	QList<QList<double> > matrix ;
@@ -77,9 +77,9 @@ void specCanvasItem::applyRanges(QList<QwtDoubleInterval*>& ranges)
 	{
 		for (int j = 0 ; j < dataSize() ; j++)
 		{
-			if (ranges[i]->contains(x(j)))
+			if (ranges[i]->contains(sample(j).x()))
 			{
-				double x = QwtPlotCurve::x(j), y = QwtPlotCurve::y(j) ;
+				double x = QwtPlotCurve::sample(j).x(), y = QwtPlotCurve::sample(j).y() ;
 				vector[0] += y ;
 				vector[1] += y*x ;
 				matrix[0][0] += x ;
