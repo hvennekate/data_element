@@ -95,10 +95,15 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	qDebug("adding undo toolbar") ;
 	actions = new specActionLibrary(this) ;
 	layout -> addWidget(actions->toolBar(items)) ;
+
+
+
+
 	if (onDisk->exists())
 	{
 		qDebug() << "filepos:" << onDisk->pos() ;
 		actions->read(in) ;
+		items->read(in) ;
 	}
 	actions->addDragDropPartner(items->model()) ;
 	qDebug("added undo toolbar") ;
@@ -108,7 +113,6 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	setWidget(content) ;
 	in.unsetDevice() ;
 	onDisk->close() ;
-	
 // TODO reconnect setFont() slot
 }
 
@@ -365,6 +369,7 @@ bool specPlotWidget::saveFile()
 	out << *(items->model()) ;
 	qDebug() << "filepos:" << onDisk->pos() ;
 	actions->write(out) ;
+	items->write(out) ;
 	out.unsetDevice() ;
 	onDisk->close() ;
 	return true ;
