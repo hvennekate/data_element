@@ -104,6 +104,9 @@ QDataStream& specActionLibrary::read(QDataStream &in)
 		case spec::newFolderId :
 			command = new specAddFolderCommand ;
 			break ;
+		case spec::moveItemsId :
+			command = new specMoveCommand ;
+			break ;
 		}
 		if (!command) continue ;
 			command->setParentWidget(parents[parentId]) ;

@@ -3,7 +3,8 @@
 #include <QAbstractItemView>
 
 specManageItemsCommand::specManageItemsCommand(specUndoCommand *parent) :
-	specUndoCommand(parent)
+	specUndoCommand(parent),
+	items()
 {
 }
 
@@ -34,13 +35,14 @@ void specManageItemsCommand::prepare() // TODO make this the model's task
 {
 	qDebug("signalling begin reset") ;
 	items.first()->model()->signalBeginReset();
-	qDebug("halting refreshes") ;
+	qDebug("specManageItemsCommand:  halting refreshes %d", items.size())  ;
 	for(int i = 0 ; i < items.size() ; ++i)
 	{
-		qDebug() << items[i]->parent() ;
+		qDebug() << "manage items command: parent of genealogy: " << items[i]->parent() ;
 		if (!items[i]->parent())
 			if (!items[i]->seekParent())
 				continue ;
+		qDebug() << "manage items command: parent of genealogy: " << items[i]->parent() ;
 		items[i]->parent()->haltRefreshes(true) ;
 	}
 }
@@ -81,6 +83,7 @@ void specManageItemsCommand::restore()
 QDataStream& specManageItemsCommand::write(QDataStream & out)
 {
 	out << qint32(items.size()) ;
+	qDebug("###### written size of genealogy list: %d", items.size()) ;
 	for (int i = 0 ; i < items.size() ; ++i)
 		items[i]->write(out) ;
 	return out ;
@@ -90,14 +93,14 @@ QDataStream& specManageItemsCommand::read(QDataStream &in)
 {
 	qint32 toRead ;
 	in >> toRead ;
-	qDebug("reading manageItemsCommand") ;
-	qDebug() << "parent widget:" << parentWidget() ;
+	qDebug("reading manageItemsCommand.") ;
+	qDebug() << "parent widget:" << parentWidget() << "current size:" << items.size() ;
 	specModel* model = (specModel*) (((QAbstractItemView*) parentWidget())->model()) ;
 	for (int i = 0 ; i < toRead ; ++i)
 	{
-		qDebug() << "reading genealogy" << i << "of" << toRead ;
+		qDebug() << "###### reading genealogy" << i << "of" << toRead ;
 		items << new specGenealogy(model,in) ;
 	}
-
+	qDebug() << "##### read a total of" << items.size() ;
 	return in ;
 }

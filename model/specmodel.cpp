@@ -18,6 +18,7 @@
 #include "specdataitem.h"
 #include "exportdialog.h"
 #include <QTime>
+#include <QDebug>
 #include "actionlib/specmovecommand.h"
 // TODO replace isFolder() by addChildren(empty list,0)
 
@@ -709,7 +710,7 @@ void specModel::applySubMap(const QModelIndexList & indexList)
 specModelItem* specModel::itemPointer(const QVector<int> &indexes) const
 {
 	specModelItem* pointer = root ;
-	qDebug("getting pointer from index vector of size %d",indexes.size()) ;
+	qDebug() << "getting pointer from index vector of size " << indexes.size() << indexes ;
 	for (int i =  indexes.size() - 1 ; i >= 0 ; --i)
 	{
 		qDebug("getting pointer %d",indexes[i]) ;
@@ -746,4 +747,12 @@ QVector<int> specModel::hierarchy(const QModelIndex &index)
 void specModel::setDropBuddy(specActionLibrary *buddy)
 {
 	dropBuddy = buddy ;
+}
+
+QModelIndex specModel::index(const QVector<int> &ancestry) const
+{
+	QModelIndex returnIndex = QModelIndex() ;
+	for (int i = ancestry.size()-1 ; i >= 0 ; --i)
+		returnIndex = index(ancestry[i],0,returnIndex) ;
+	return returnIndex ;
 }

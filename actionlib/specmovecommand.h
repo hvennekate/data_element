@@ -17,9 +17,10 @@ private:
 	void refreshPointers() ;
 public:
 	specMoveCommand(QModelIndexList& sources, const QModelIndex& target, int row, specUndoCommand* parent=0) ;
-	explicit specMoveCommand(QDataStream&) ;
+	specMoveCommand(specUndoCommand* parent = 0) ;
 	void redo() ;
 	void undo() ;
+	int id() const { return spec::moveItemsId ; }
 	QDataStream& write(QDataStream &) ;
 	QDataStream& read(QDataStream &) ;
 };
