@@ -640,6 +640,7 @@ bool specModel::dropMimeData(const QMimeData *data,
 	if (!data->hasFormat(mime.first()))
 		return false;
 
+	row = (row != -1 ? row : rowCount(parent) );
 	if (internalDrop && dropBuddy)
 	{
 		dropBuddy->moveInternally(parent,row,internalDrop) ;
@@ -650,7 +651,6 @@ bool specModel::dropMimeData(const QMimeData *data,
 	
 	QByteArray encodedData = data->data(mime.first()) ;
 	QDataStream stream(&encodedData, QIODevice::ReadOnly) ;
-	row = (row != -1 ? row : rowCount(parent) );
 	qDebug("dropping mime from stream...") ;
 	while(!stream.atEnd())
 		insertFromStream(stream,parent,row++) ;
