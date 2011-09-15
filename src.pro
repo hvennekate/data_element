@@ -43,7 +43,8 @@ SOURCES += main.cpp \
     actionlib/specaddfoldercommand.cpp \
     model/specgenealogy.cpp \
     actionlib/specmanageitemscommand.cpp \
-    actionlib/specmovecommand.cpp
+    actionlib/specmovecommand.cpp \
+    actionlib/specimportspecaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -88,7 +89,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/specaddfoldercommand.h \
     model/specgenealogy.h \
     actionlib/specmanageitemscommand.h \
-    actionlib/specmovecommand.h
+    actionlib/specmovecommand.h \
+    actionlib/specimportspecaction.h
 
 INCLUDEPATH += kinetic \
 	log \
