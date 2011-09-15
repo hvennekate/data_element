@@ -12,7 +12,8 @@ private:
 	specFolderItem* Parent ;
 	QList<specModelItem*> items ;
 	bool owning ;
-	void getItemPointers(const QList<specModelItem *> &) ;
+	bool knowingParent ;
+	void getItemPointers() ;
 public:
 	explicit specGenealogy(QModelIndexList&);
 	specGenealogy(specModel*, QDataStream&) ;

@@ -28,6 +28,12 @@ specMoveCommand::specMoveCommand(QModelIndexList &sources, const QModelIndex &ta
 	}
 }
 
+specMoveCommand::specMoveCommand(specUndoCommand *parent)
+	:specUndoCommand(parent),
+	  number(0)
+{
+}
+
 void specMoveCommand::redo()
 {
 	qDebug("doing move action") ;
@@ -119,12 +125,14 @@ void specMoveCommand::undo()
 
 QDataStream& specMoveCommand::write(QDataStream &out)
 {
-	out << sourceIndexes << number << targetIndex << sourceIndex ;
+	out << sourceIndexes << qint32(number) << targetIndex << sourceIndex ;
 	return out ;
 }
 
 QDataStream& specMoveCommand::read(QDataStream &in)
 {
-	in >> sourceIndexes >> number >> targetIndex >> sourceIndex ;
+	qint32 dummy ;
+	in >> sourceIndexes >> dummy >> targetIndex >> sourceIndex ;
+	number = dummy ;
 	return in ;
 }
