@@ -7,7 +7,8 @@
 //}
 
 specGenealogy::specGenealogy(QModelIndexList &list)
-	: owning(false)
+	: owning(false),
+	  knowingParent(false)
 {
 	qDebug("initializing genealogy") ;
 	QList<specModelItem*> Items ;
@@ -54,6 +55,8 @@ void specGenealogy::takeItems()
 	if (owning) return ;
 	if (!valid()) return ;
 	qDebug("checks done") ;
+	if (!Parent)
+		seekParent() ;
 	foreach(specModelItem* item, items)
 		item->setParent(0) ;
 	owning = true ;
@@ -64,6 +67,8 @@ void specGenealogy::returnItems()
 {
 	if (!owning) return ;
 	if (!valid()) return ;
+	if (!Parent)
+		seekParent() ;
 	Parent->addChildren(items,indexes.first()) ;
 	owning = false ;
 }
@@ -92,6 +97,7 @@ QDataStream &specGenealogy::write(QDataStream &out)
 }
 
 specGenealogy::specGenealogy(specModel* mod, QDataStream &in)
+	: knowingParent(false)
 {
 	qDebug("reading genealogy...") ;
 	Parent = 0 ;
@@ -115,9 +121,9 @@ specGenealogy::specGenealogy(specModel* mod, QDataStream &in)
 	else
 	{
 		qDebug("not owning items") ;
-		seekParent() ;
-		for (int i = indexes.first() ; i < indexes.first()+toRead ; ++i)
-			items << Parent->child(i) ;
+		items.reserve(toRead);
+		for (int i = 0 ; i < toRead ; ++i)
+			items << 0 ;
 	}
 }
 
@@ -125,7 +131,14 @@ bool specGenealogy::seekParent()
 {
 	if (!Model) return false ;
 	Parent = (specFolderItem*) Model->itemPointer(indexes.mid(1)) ;
+	if (!owning)
+		getItemPointers();
 
 	return Parent ;
 }
 
+void specGenealogy::getItemPointers()
+{
+	for (int i = 0 ; i < items.size() ; ++i)
+		items[i] = Parent->child(i+indexes.first()) ;
+}
