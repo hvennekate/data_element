@@ -5,6 +5,7 @@
 #include "specaddfoldercommand.h"
 #include "specdeletecommand.h"
 #include "specmovecommand.h"
+#include "specimportspecaction.h"
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
@@ -41,10 +42,18 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		specAddFolderAction *addAction = new specAddFolderAction(target) ;
 		addAction->setLibrary(this) ;
 		bar->addAction(addAction) ;
+		qDebug("Adding import action") ;
+		specImportSpecAction * importAction = new specImportSpecAction(target) ;
+		importAction->setLibrary(this) ;
+		bar->addAction(importAction) ;
 		qDebug("added addfolder action") ;
-		bar->addAction(undoStack->createUndoAction(target)) ;
+		QAction *undoAction = undoStack->createUndoAction(target) ;
+		undoAction->setIcon(QIcon::fromTheme("undo")) ;
+		bar->addAction(undoAction) ;
 		qDebug("adding redo action") ;
-		bar->addAction(undoStack->createRedoAction(target)) ;
+		QAction *redoAction = undoStack->createRedoAction(target) ;
+		redoAction->setIcon(QIcon::fromTheme("redo")) ;
+		bar->addAction(redoAction) ;
 		qDebug("returning toolbar") ;
 		return bar ;
 	}

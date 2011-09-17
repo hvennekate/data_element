@@ -1,13 +1,17 @@
 #include "specimportspecaction.h"
+#include <QFileDialog>
+#include "utility-functions.h"
+#include "specaddfoldercommand.h"
+#include "specdataview.h"
 
 specImportSpecAction::specImportSpecAction(QObject *parent) :
     specUndoAction(parent)
 {
 }
 
-const std::type_info specImportSpecAction::possibleParent()
+const std::type_info &specImportSpecAction::possibleParent()
 {
-	return typeId(specView) ;
+	return typeid(specDataView) ;
 }
 
 void specImportSpecAction::execute()
@@ -25,6 +29,28 @@ void specImportSpecAction::execute()
 		index = index.parent() ;
 
 	}
-	if (! model->insertItems(QList<specModelItem*>() << new specFolderItem(), index, row)) return ;
 
+	QStringList fileNames = QFileDialog::getOpenFileNames(currentView,tr("Files to import")) ;
+	QList<specModelItem*> importedItems ;
+	for(int i = 0 ; i < fileNames.size() ; ++i)
+	{
+		QList<specModelItem*> (*importFunction)(QFile&) = fileFilter(fileNames[i]);
+		if (!importFunction) continue ;
+		QFile fileToImport(fileNames[i]) ;
+		fileToImport.open(QFile::ReadOnly | QFile::Text) ;
+		importedItems << importFunction(fileToImport) ;
+	}
+
+	if (! model->insertItems(importedItems, index, row)) return ;
+	specAddFolderCommand *command = new specAddFolderCommand ;
+	QModelIndexList newIndexes ;
+	for (int i = 0 ; i < importedItems.size() ; ++i)
+		newIndexes << model->index(row+i,0,index) ;
+	command->setItems(newIndexes) ;
+	command->setParentWidget(currentView) ;
+
+	if (command->ok())
+		library->push(command) ;
+	else
+		delete command ;
 }
