@@ -299,7 +299,7 @@ void specModel::importFile(QModelIndex index)
 	index = isFolder(index) ? index : parent(index) ;
 	QStringList fileNames = QFileDialog::getOpenFileNames();
 	timer.start() ;
-	if (fileNames.size())
+	if (fileNames.size())  //Haeh?
 	{
 		foreach(QString fileName, fileNames)
 		{
