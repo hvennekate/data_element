@@ -16,6 +16,7 @@ private:
 	void getItemPointers() ;
 public:
 	explicit specGenealogy(QModelIndexList&);
+	virtual ~specGenealogy() ;
 	specGenealogy(specModel*, QDataStream&) ;
 	void takeItems() ;
 	void returnItems() ;

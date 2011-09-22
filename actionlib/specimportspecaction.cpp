@@ -1,13 +1,14 @@
 #include "specimportspecaction.h"
+#include "specdataview.h"
 
 specImportSpecAction::specImportSpecAction(QObject *parent) :
     specUndoAction(parent)
 {
 }
 
-const std::type_info specImportSpecAction::possibleParent()
+const std::type_info& specImportSpecAction::possibleParent()
 {
-	return typeId(specView) ;
+	return typeid(specDataView) ;
 }
 
 void specImportSpecAction::execute()

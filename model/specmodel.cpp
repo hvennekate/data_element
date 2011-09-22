@@ -752,7 +752,18 @@ void specModel::setDropBuddy(specActionLibrary *buddy)
 QModelIndex specModel::index(const QVector<int> &ancestry) const
 {
 	QModelIndex returnIndex = QModelIndex() ;
-	for (int i = ancestry.size()-1 ; i >= 0 ; --i)
+	for (int i = ancestry.size()-1 ; i >= 0 ; --i) // TODO consider precaution if invalid at any stage
 		returnIndex = index(ancestry[i],0,returnIndex) ;
 	return returnIndex ;
+}
+
+QModelIndex specModel::index(const specModelItem *pointer) const
+{
+	// Test if item is indeed part of THIS model
+	specFolderItem *parent = pointer;
+	while (parent->parent()) parent = parent->parent() ;
+	if (parent != root) return QModelIndex() ;
+
+	// Generate genealogy to find parent
+	return index(hierarchy(pointer)) ;
 }

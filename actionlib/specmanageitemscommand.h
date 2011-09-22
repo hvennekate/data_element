@@ -12,6 +12,7 @@ class specManageItemsCommand : public specUndoCommand
 {
 public:
 	explicit specManageItemsCommand(specUndoCommand *parent = 0);
+	virtual ~specManageItemsCommand() ;
 	bool ok() ;
 	void setItems(QModelIndexList&) ;
 	QDataStream& write(QDataStream &) ;
