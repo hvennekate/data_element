@@ -20,8 +20,7 @@ private:
 	QVector<qint32> widths ;
 	QByteArray geometry ;
 	void purgeLists() ;
-	inline specModel* model() { return parent ? parent->model() : 0 }
-
+	inline specModel* model() { return parent ? parent->model() : 0 ; }
 public:
 	explicit specViewState(specView* Parent) ;
 	void setParent(specView* Parent) ;

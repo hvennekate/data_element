@@ -110,10 +110,16 @@ void specViewState::restoreState()
 
 QDataStream& specViewState::write(QDataStream &out)
 {
+	out << quint(0) << openFolders << selectedItems << hierarchyOfTopItem << hierarchyOfCurrentItem << widths << geometry ;
+	for (int i = 0 ; i < openFolders.size() ; ++i)
+		out << model()->hierarchy(openFolders[i]) ;
+	for (int i = 0 ; i < selectedItems.size() ; ++i)
+		out << model()->hierarchy(selectedItems[i]) ;
 	return out ;
 }
 
 QDataStream& specViewState::read(QDataStream &in)
 {
+
 	return in ;
 }
