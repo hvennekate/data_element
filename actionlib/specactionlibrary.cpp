@@ -42,9 +42,13 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		addAction->setLibrary(this) ;
 		bar->addAction(addAction) ;
 		qDebug("added addfolder action") ;
-		bar->addAction(undoStack->createUndoAction(target)) ;
+		QAction *undoAction = undoStack->createUndoAction(target) ;
+		undoAction->setIcon(QIcon::fromTheme("edit-undo"));
+		bar->addAction(undoAction) ;
 		qDebug("adding redo action") ;
-		bar->addAction(undoStack->createRedoAction(target)) ;
+		QAction *redoAction = undoStack->createRedoAction(target) ;
+		redoAction->setIcon(QIcon::fromTheme("edit-redo")) ;
+		bar->addAction(redoAction) ;
 		qDebug("returning toolbar") ;
 		return bar ;
 	}
