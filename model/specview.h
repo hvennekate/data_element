@@ -8,8 +8,10 @@
 #include "specmodel.h"
 #include <QMap>
 #include "actionlib/specactionlibrary.h"
+#include "specviewstate.h"
 
 class specModel ;
+
 
 class specView : public QTreeView
 { // TODO turn into abstract class (add purely virtual function)

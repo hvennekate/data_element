@@ -142,3 +142,12 @@ void specGenealogy::getItemPointers()
 	for (int i = 0 ; i < items.size() ; ++i)
 		items[i] = Parent->child(i+indexes.first()) ;
 }
+
+
+specGenealogy::~specGenealogy()
+{
+	indexes.clear();
+	if(owning)
+		foreach(specModelItem* item, items)
+			delete item ;
+}
