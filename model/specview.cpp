@@ -183,6 +183,7 @@ void specView::keyPressEvent(QKeyEvent* event)
 specView::specView(QWidget* parent)
  : QTreeView(parent)
 {
+	setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
 	createActions() ;
 	createContextMenus() ;
 	
