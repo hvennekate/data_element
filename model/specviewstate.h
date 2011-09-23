@@ -4,8 +4,9 @@
 #include <QVector>
 #include "specmodel.h"
 #include <QByteArray>
-
+#include "specview.h"
 class specView ;
+class specModel ;
 
 class specViewState
 {
@@ -21,6 +22,7 @@ private:
 	QByteArray geometry ;
 	void purgeLists() ;
 	inline specModel* model() { return parent ? parent->model() : 0 ; }
+	specModelItem* hierarchyPointer(const QVector<int>&) ;
 public:
 	explicit specViewState(specView* Parent) ;
 	void setParent(specView* Parent) ;
