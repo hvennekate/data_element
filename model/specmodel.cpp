@@ -484,7 +484,8 @@ QVariant specModel::data(const QModelIndex &index, int role) const
 	switch(role)
 	{
 		case Qt::DecorationRole :
-			return index.column() ? QVariant() : pointer->decoration() ;
+//			return index.column() ? QVariant() : pointer->decoration() ;
+			return pointer->indicator(descriptors[index.column()]) ;
 // 			return index.column() != 0 ? QVariant() : QIcon(pointer->isFolder() ? ":/folder.png" : (pointer->isSysEntry() ? ":/sys_message.png" : (pointer->isLogEntry() ? ":/log_message.png" : ":/data.png"))) ;
 		case Qt::DisplayRole :
 			if (index.column() < columnCount(index))
@@ -724,7 +725,7 @@ QVector<int> specModel::hierarchy(specModelItem *item)
 {
 	QVector<int> retVal ;
 	specFolderItem *parent ;
-	while (parent = item->parent())
+	while ((parent = item->parent()))
 	{
 		retVal << parent->childNo(item) ;
 		item = parent ;
@@ -757,10 +758,10 @@ QModelIndex specModel::index(const QVector<int> &ancestry) const
 	return returnIndex ;
 }
 
-QModelIndex specModel::index(const specModelItem *pointer) const
+QModelIndex specModel::index(specModelItem *pointer) const
 {
+	specModelItem* parent = pointer ;
 	// Test if item is indeed part of THIS model
-	specFolderItem *parent = pointer;
 	while (parent->parent()) parent = parent->parent() ;
 	if (parent != root) return QModelIndex() ;
 

@@ -1,4 +1,4 @@
-#include "specview.h"
+#include "specviewstate.h"
 
 specViewState::specViewState(specView *Parent)
 {
@@ -32,10 +32,10 @@ void specViewState::getState()
 	int columnCount = model()->columnCount(QModelIndex()) ;
 	qDebug("++++ getting column widths %d",columnCount) ;
 	for (int i = 0 ; i < columnCount ; ++i)
-		widths << columnWidth(i) ;
+		widths << parent->columnWidth(i) ;
 
 	qDebug("+++++ getting selection") ;
-	QModelIndexList selectionList = selectionModel()->selectedRows() ;
+	QModelIndexList selectionList = parent->selectionModel()->selectedRows() ;
 	for (int i = 0 ; i < selectionList.size() ; ++i)
 		selectedItems << model()->itemPointer(selectionList[i]) ;
 
@@ -44,8 +44,8 @@ void specViewState::getState()
 	while (item.isValid())
 	{
 		qDebug() << "+++++ Hierarchy: " << model()->hierarchy(item) << model()->rowCount(item.parent()) ;
-		if (isExpanded(item))
-			openFolders << model()->itemPointer(item) ;
+		if (parent->isExpanded(item))
+			openFolders << (specFolderItem*) model()->itemPointer(item) ;
 		// go into if directory
 		if (model()->rowCount(item))
 			item = model()->index(0,0,item) ;
@@ -62,7 +62,7 @@ void specViewState::getState()
 
 	qDebug("+++++ getting current") ;
 	// get current index
-	currentItem = model()->hierarchy(currentIndex()) ;
+	currentItem = model()->itemPointer(parent->currentIndex()) ;
 	hierarchyOfCurrentItem = model()->hierarchy(currentItem) ;
 
 	qDebug("+++++ getting topmost item") ;
@@ -73,9 +73,21 @@ void specViewState::getState()
 
 }
 
+specModelItem* specViewState::hierarchyPointer(const QVector<int> &hierarchy)
+{
+	specModelItem* pointer = 0 ;
+	int start = 0 ;
+	while (start < hierarchy.size() && ! (pointer = model()->itemPointer(hierarchy.mid(start++)))) ;
+	return pointer ;
+}
+
 void specViewState::restoreState()
 {
 	if (!parent) return ;
+
+
+	currentTopItem = hierarchyPointer(hierarchyOfTopItem) ;
+	currentItem = hierarchyPointer(hierarchyOfCurrentItem) ;
 
 	qDebug("+++++ restoring view") ;
 
@@ -84,7 +96,7 @@ void specViewState::restoreState()
 	// restore column widths
 	qDebug("restoring column widths") ;
 	for (int i = 0 ; i < widths.size() ; ++i)
-		setColumnWidth(i,widths[i]) ;
+		parent->setColumnWidth(i,widths[i]) ;
 
 	// restore expanded folders
 	qDebug("+++++ restoring expanded %d",openFolders.size()) ;
@@ -92,25 +104,36 @@ void specViewState::restoreState()
 		parent->expand(model()->index(openFolders[i])) ;
 
 	// restore selection
-	qDebug("+++++ restoring selection") ;
+	qDebug("+++++ restoring selection %d",selectedItems.size()) ;
 	QItemSelection selectedIndexes ;
 	for (int i = 0 ; i < selectedItems.size() ; ++i)
 	{
 		QModelIndex index = model()->index(selectedItems[i]) ;
 		selectedIndexes.select(index,index) ;
 	}
+	qDebug("passing selection to model") ;
 	parent->selectionModel()->select(selectedIndexes,QItemSelectionModel::Select) ;
 
 	// restore current index
-	parent->selectionModel()->setCurrentIndex(model()->index(current),QItemSelectionModel::Current) ;
+	qDebug() << "++++++ current index: " ;
+	if (currentItem)
+		parent->selectionModel()->setCurrentIndex(model()->index(currentItem),QItemSelectionModel::Current) ;
+	qDebug() << "++++++ restored current item" ;
 
 	//scroll to topmost item
-	parent->scrollTo(model()->index(currentTopItem),QAbstractItemView::PositionAtTop) ;
+	if (currentTopItem)
+		parent->scrollTo(model()->index(currentTopItem),QAbstractItemView::PositionAtTop) ;
 }
 
 QDataStream& specViewState::write(QDataStream &out)
 {
-	out << quint(0) << openFolders << selectedItems << hierarchyOfTopItem << hierarchyOfCurrentItem << widths << geometry ;
+	out << quint8(0)
+	    << quint32(openFolders.size())
+	    << quint32(selectedItems.size())
+	    << hierarchyOfTopItem
+	    << hierarchyOfCurrentItem
+	    << widths
+	    << geometry ;
 	for (int i = 0 ; i < openFolders.size() ; ++i)
 		out << model()->hierarchy(openFolders[i]) ;
 	for (int i = 0 ; i < selectedItems.size() ; ++i)
@@ -120,6 +143,36 @@ QDataStream& specViewState::write(QDataStream &out)
 
 QDataStream& specViewState::read(QDataStream &in)
 {
+	quint8 version ;
+	quint32 openFoldersSize ;
+	quint32 selectedItemsSize ;
+	in >> version
+	   >> openFoldersSize
+	   >> selectedItemsSize
+	   >> hierarchyOfTopItem
+	   >> hierarchyOfCurrentItem
+	   >> widths
+	   >> geometry ;
+	openFolders.resize(openFoldersSize) ;
+	selectedItems.resize(selectedItemsSize);
+	QVector<int> hierarchy ;
+	if (!model())
+	{
+		purgeLists();
+		return in ; // TODO cause error here.
+	}
 
+	for (int i = 0 ; i < openFolders.size() ; ++i)
+	{
+		in >> hierarchy ;
+		openFolders[i] = (specFolderItem*) model()->itemPointer(hierarchy) ;
+	}
+	for (int i = 0 ; i < selectedItems.size() ; ++i)
+	{
+		in >> hierarchy ;
+		selectedItems[i] = model()->itemPointer(hierarchy) ;
+	}
+
+	// TODO maybe implicit restore
 	return in ;
 }

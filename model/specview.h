@@ -8,9 +8,9 @@
 #include "specmodel.h"
 #include <QMap>
 #include "actionlib/specactionlibrary.h"
-#include "specviewstate.h"
 
 class specModel ;
+class specViewState ;
 
 
 class specView : public QTreeView
@@ -19,6 +19,7 @@ Q_OBJECT
 private:
 	QMenu *itemContextMenu, *folderContextMenu ;
 	QAction *deleteAction, *newItemAction, *treeAction, *changePenAction, *mergeFolderAction, *mergeAction, *exportAction, *cutByIntensityAction, *averageAction, *movingAverageAction, *getSubtractionDataAction, *applySubtractionAction ;
+	specViewState *state ;
 
 	void createContextMenus() ;
 	void createActions() ;
@@ -41,7 +42,7 @@ public:
 //	QList<specModelItem*> currentlySelected() ;
 	virtual QList<QAction*> actions() ;
 	QModelIndexList getSelection() ;
-	QDataStream &write(QDataStream&) const ;
+	QDataStream &write(QDataStream&) ;
 	QDataStream &read(QDataStream&) ;
 
 	signals:
@@ -57,6 +58,8 @@ public slots:
 	void currentlySelectedToSubMap() ;
 	void applySubMapToSelection() ;
 	void exportItems() ;
+	void prepareReset() ;
+	void resetDone() ;
 };
 
 #endif

@@ -11,6 +11,7 @@
 #include "cutbyintensitydialog.h"
 #include <QSpinBox>
 #include <QDialogButtonBox>
+#include "specviewstate.h"
 using std::min ;
 using std::max ;
 
@@ -365,82 +366,35 @@ void specView::dropEvent(QDropEvent *event)
 	QTreeView::dropEvent(event) ;
 }
 
-QDataStream& specView::write(QDataStream &out) const
+QDataStream& specView::write(QDataStream &out)
 {
-	out << qint32(1) ;
-	QVector<qint32> widths ;
-	int columnCount = model()->columnCount(QModelIndex()) ;
-	qDebug("++++ getting column widths %d",columnCount) ;
-	for (int i = 0 ; i < columnCount ; ++i)
-		widths << columnWidth(i) ;
-	QVector<QVector<int> > selection ;
-	qDebug("+++++ getting selection") ;
-	QModelIndexList selectionList = selectionModel()->selectedRows() ;
-	for (int i = 0 ; i < selectionList.size() ; ++i)
-		selection << model()->hierarchy(selectionList[i]) ;
-	QVector<QVector<int> > expanded;
-	qDebug("+++++ getting expanded") ;
-	QModelIndex item = model()->index(0,0,QModelIndex()) ;
-	while (item.isValid())
-	{
-		qDebug() << "+++++ Hierarchy: " << model()->hierarchy(item) << model()->rowCount(item.parent()) ;
-		if (isExpanded(item))
-			expanded << model()->hierarchy(item) ;
-		// go into if directory
-		if (model()->rowCount(item))
-			item = model()->index(0,0,item) ;
-		// go up if reached last item
-		else //if (model()->rowCount(item.parent()) == item.row()+1)
-		{
-			// if last item go up.
-			while (model()->rowCount(item.parent()) == item.row()+1 && item.isValid())
-				item = item.parent() ;
-			// go to next
-			item = item.sibling(item.row()+1,0);
-		}
-	}
-	qDebug("+++++ getting current") ;
-	// get current index
-	QVector<int> current = model()->hierarchy(currentIndex()) ;
-	qDebug("+++++ writing view") ;
-	// write all state info
-	out << widths << selection << expanded << current ;
-	return out ;
+	out << qint8(0) ;
+	specViewState state(this) ;
+	state.getState();
+	return state.write(out) ;
 }
 
 QDataStream& specView::read(QDataStream &in)
 {
-	qint32 version ;
+	qint8 version ;
 	in >> version ;
-	QVector<qint32> widths ;
-	QVector<QVector<int> > selection, expanded ;
-	QVector<int> current ;
-	in >> widths >> selection >> expanded >> current ;
-	if (!model()) return in ;
-
-	qDebug("+++++ restoring view") ;
-	// restore column widths
-	qDebug("restoring column widths") ;
-	for (int i = 0 ; i < widths.size() ; ++i)
-		setColumnWidth(i,widths[i]) ;
-	// restore expanded folders
-	qDebug("+++++ restoring expanded %d",expanded.size()) ;
-	for (int i = 0 ; i < expanded.size() ; ++i)
-	{
-		expand(model()->index(expanded[i])) ;
-	model()->setData(model()->index(expanded[i]),"expanded") ;
-	}
-	// restore selection
-	qDebug("+++++ restoring selection") ;
-	QItemSelection selectedIndexes ;
-	for (int i = 0 ; i < selection.size() ; ++i)
-	{
-		QModelIndex index = model()->index(selection[i]) ;
-		selectedIndexes.select(index,index) ;
-	}
-	selectionModel()->select(selectedIndexes,QItemSelectionModel::Select) ;
-	// restore current index
-	selectionModel()->setCurrentIndex(model()->index(current),QItemSelectionModel::Current) ;
+	specViewState state(this) ;
+	state.read(in) ;
+	state.restoreState();
 	return in ;
 }
 
+void specView::prepareReset()
+{
+	state = new specViewState(this) ;
+	state->getState();
+	qDebug("====== saving state");
+}
+
+void specView::resetDone()
+{
+	if (!state) return ;
+	qDebug("======= reconstructing state") ;
+	state->restoreState();
+	delete state ;
+}

@@ -1,8 +1,12 @@
 #include "specdescriptor.h"
+#include <QRegExp>
+#include <QDebug>
 
 QDataStream& operator<<(QDataStream& out, const specDescriptor& desc)
 {
 	out << desc.contentValue << (int) desc.properties ;
+	if (desc.currentLine != QString())
+		out << desc.currentLine ;
 	qDebug("out desc props: %d %d",(int)desc.properties, desc.isEditable()) ;
 	return out ;
 }
@@ -13,27 +17,42 @@ QDataStream& operator>>(QDataStream& in , specDescriptor& desc)
 	in  >> desc.contentValue >> prop ;
 	desc.properties = (spec::descriptorFlags) prop ;
 	qDebug("in desc props: %d %d",(int) desc.properties, desc.isEditable()) ;
+	if (desc.contentValue.contains(QRegExp("\n")))
+		in >> desc.currentLine ;
 	return in ;
 }
 
 
 specDescriptor::specDescriptor(QString cont, spec::descriptorFlags prop)
-{ properties = prop ; contentValue = cont ; }
+	: currentLine(QString()),
+	  properties(prop)
+{
+	(*this) = cont ;
+}
 
 specDescriptor::specDescriptor(double d)
-{ properties = spec::numeric ; contentValue.setNum(d) ;}
+	: currentLine(QString()),
+	  properties(spec::numeric)
+{
+	(*this) = d ;
+}
 
 double specDescriptor::numericValue() const
 { return contentValue.toDouble() ; }
 
 QString specDescriptor::content() const
-{ return contentValue ; }
+{
+	if (currentLine == QString())
+		return contentValue ;
+	else
+		return currentLine ;
+}
 
 bool specDescriptor::setContent(const QString& string)
 {
 	if (isEditable())
 	{
-		contentValue = string ;
+		(*this) = string ;
 		return true ;
 	}
 	return false ;
@@ -43,7 +62,7 @@ bool specDescriptor::setContent(const double& number)
 {
 	if (isNumeric() && isEditable())
 	{
-		contentValue.setNum(number) ;
+		(*this) = number ;
 		return true ;
 	}
 	return false ;
@@ -60,14 +79,20 @@ spec::descriptorFlags specDescriptor::flags() const
 
 specDescriptor& specDescriptor::operator=(const double& val)
 {
-	contentValue.setNum(val) ;
-//	setContent(val) ;
+	(*this) = QString("%1").arg(val) ;
+	properties |= spec::numeric ;
 	return *this ;
 }
 
 specDescriptor& specDescriptor::operator=(const QString& val)
 {
 	contentValue = val ;
-//	setContent(val) ;
+	if (val.contains(QRegExp("\n")))
+		currentLine = val.section(QRegExp("\n"),0,0) ;
+	else
+		currentLine = QString() ;
+	qDebug() << "----------Multiline:" << val.contains(QRegExp("\n")) << currentLine ;
+
+	qDebug() << "------------desc: " << val << currentLine ;
 	return *this ;
 }

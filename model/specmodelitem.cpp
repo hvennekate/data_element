@@ -93,6 +93,14 @@ QString specModelItem::descriptor(const QString &key) const
 
 bool specModelItem::isFolder() const { return false ;}
 
+QIcon specModelItem::indicator(const QString& Descriptor) const
+{
+	if (Descriptor == "") return decoration() ;
+	if (descriptor(Descriptor).contains(QRegExp("\n")))
+		return QIcon::fromTheme("go-down") ;
+	return QIcon() ;
+}
+
 QIcon specModelItem::decoration() const { return QIcon() ; }
 
 bool specModelItem::addChild(specModelItem *child, QList<specModelItem*>::size_type position)
