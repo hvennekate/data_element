@@ -53,7 +53,7 @@ public:
 	specModelItem* itemPointer(const QModelIndex&) const ;
 	specModelItem* itemPointer(const QVector<int>&) const ;
 	QModelIndex index(const QVector<int>&) const ;
-	QModelIndex index(const specModelItem*) const ;
+	QModelIndex index(specModelItem*) const ;
 	static QVector<int> hierarchy(specModelItem*) ;
 	static QVector<int> hierarchy(const QModelIndex&) ;
 	bool isFolder(const QModelIndex&) const ;
@@ -97,8 +97,8 @@ public:
 	friend QDataStream& operator<<(QDataStream&, specModel&);
 	friend QDataStream& operator>>(QDataStream&, specModel&);
 
-	void signalBeginReset() { beginResetModel() ; }
-	void signalEndReset() { endResetModel() ; }
+	void signalBeginReset() { beginResetModel() ; } // TODO just emit from whereever this function is called
+	void signalEndReset() { endResetModel() ; } // TODO just emit from whereever this function is called
 	
 	
 // //TODO	bool QAbstractItemModel::setHeaderData ( int section, Qt::Orientation orientation, const QVariant & value, int role = Qt::EditRole )

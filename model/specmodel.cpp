@@ -724,7 +724,7 @@ QVector<int> specModel::hierarchy(specModelItem *item)
 {
 	QVector<int> retVal ;
 	specFolderItem *parent ;
-	while (parent = item->parent())
+	while ((parent = item->parent()))
 	{
 		retVal << parent->childNo(item) ;
 		item = parent ;
@@ -757,10 +757,10 @@ QModelIndex specModel::index(const QVector<int> &ancestry) const
 	return returnIndex ;
 }
 
-QModelIndex specModel::index(const specModelItem *pointer) const
+QModelIndex specModel::index(specModelItem *pointer) const
 {
+	specModelItem* parent = pointer ;
 	// Test if item is indeed part of THIS model
-	specFolderItem *parent = pointer;
 	while (parent->parent()) parent = parent->parent() ;
 	if (parent != root) return QModelIndex() ;
 

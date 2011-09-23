@@ -96,8 +96,12 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	actions = new specActionLibrary(this) ;
 	layout -> addWidget(actions->toolBar(items)) ;
 
-
-
+	actions->addDragDropPartner(items->model()) ;
+	qDebug("added undo toolbar") ;
+	layout -> addWidget(splitter)  ;
+	layout -> setContentsMargins(0,0,0,0) ;
+	content->setLayout(layout) ;
+	setWidget(content) ;
 
 	if (onDisk->exists())
 	{
@@ -105,12 +109,7 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 		actions->read(in) ;
 		items->read(in) ;
 	}
-	actions->addDragDropPartner(items->model()) ;
-	qDebug("added undo toolbar") ;
-	layout -> addWidget(splitter)  ;
-	layout -> setContentsMargins(0,0,0,0) ;
-	content->setLayout(layout) ;
-	setWidget(content) ;
+
 	in.unsetDevice() ;
 	onDisk->close() ;
 // TODO reconnect setFont() slot
@@ -395,6 +394,9 @@ void specPlotWidget::setConnections()
 	connect(items->selectionModel(),SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(currentChanged(const QModelIndex&, const QModelIndex&))) ;
 	connect(plot->picker(),SIGNAL(moved(specCanvasItem*)),kineticWidget->view()->model(),SLOT(conditionalUpdate(specCanvasItem*))) ;
 // 	connect(plot->picker(),SIGNAL(rangesModified(QList<specRange*>*)),items,SLOT(newZeroRanges(QList<specRange*>*))) ;
+
+	connect(items->model(),SIGNAL(modelAboutToBeReset()),items,SLOT(prepareReset())) ;
+	connect(items->model(),SIGNAL(modelReset()),items,SLOT(resetDone())) ;
 }
 
 #include <QPainter>
