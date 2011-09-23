@@ -60,6 +60,7 @@ public:
 	virtual void refreshPlotData() ;
 	/*! Try to set data whose \f$\nu\f$ value is in \a ranges to zero by applying some correction (preferrably by subtracting a linear function previously fit to the data concerned).*/
 	virtual QIcon decoration() const ;
+	QIcon indicator(const QString&) const ;
 	virtual bool addChild(specModelItem *child, QList<specModelItem*>::size_type position) ;
 	virtual bool addChildren(QList<specModelItem*> list, QList<specModelItem*>::size_type position) ;
 	virtual QStringList descriptorKeys() const ;

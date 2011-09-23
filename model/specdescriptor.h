@@ -12,6 +12,7 @@ QDataStream& operator>>(QDataStream&, specDescriptor&);
 class specDescriptor{ //make inline
 private:
 	QString contentValue ;
+	QString currentLine ;
 	spec::descriptorFlags properties ;
 public:
 	specDescriptor(QString cont="", spec::descriptorFlags prop = spec::def) ;
