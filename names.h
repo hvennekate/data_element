@@ -28,6 +28,7 @@ namespace spec{
 	enum value{ time=0, wavenumber=1, signal=2, maxInt=3 } ;
 
 	enum undoActionIds{ deleteId = 10, newFolderId = 11, moveItemsId = 12 } ;
+	enum itemRoles { activeLineRole = 50, fullContentRole = 51 } ;
 }
 
 #endif

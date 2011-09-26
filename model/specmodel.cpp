@@ -492,7 +492,11 @@ QVariant specModel::data(const QModelIndex &index, int role) const
 				return pointer->descriptor(descriptors[index.column()]) ;
 			return "" ;
 		case Qt::ForegroundRole :
-			return itemPointer(index)->brush() ;
+			return pointer->brush() ;
+		case spec::fullContentRole :
+			return pointer->descriptor(descriptors[index.column()],true) ;
+		case Qt::ToolTipRole :
+			return pointer->descriptor(descriptors[index.column()],true) ;
 // 		case 32 : // TODO replace in namespace
 // 			return pointer->plotData() ;
 	}
@@ -507,13 +511,15 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 		switch(role)
 		{
 			case Qt::EditRole :
-		 		changed =  itemPointer(index)->changeDescriptor(descriptors[index.column()], value.toString()) ; break ;
+				changed =  itemPointer(index)->changeDescriptor(descriptors[index.column()], value.toString()) ; break ;
 			case Qt::ForegroundRole :
 				itemPointer(index)->setPen(value.value<QPen>()) ;
 				changed = true ;
 				break ;
 			case 33 :
 				changed = true ; itemPointer(index)->mergePlotData = value.toBool() ; break ;
+			case spec::activeLineRole :
+				changed = itemPointer(index)->setActiveLine(descriptors[index.column()], value.toInt()) ; break ;
 		}
 	}
 	if (changed) emit dataChanged(index,index) ;

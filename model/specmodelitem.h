@@ -51,11 +51,12 @@ public:
 	/*! Is this item a folder? */
 	virtual bool isFolder() const ;
 	/*! Return value of descriptor \a key */
-	virtual QString descriptor(const QString &key) const ;
+	virtual QString descriptor(const QString &key, bool full=false) const ;
 	/*! Is the descriptor \a key editable?*/
 	virtual bool isEditable(QString key) const ;
 	/*! Set descriptor \a key 's value to  \a value. */
 	virtual bool changeDescriptor(QString key, QString value) ; // TODO add changeDescriptor(key,specDescriptor)
+	virtual bool setActiveLine(const QString&, int) ;
 	/*! Regenerate data used for plotting. */
 	virtual void refreshPlotData() ;
 	/*! Try to set data whose \f$\nu\f$ value is in \a ranges to zero by applying some correction (preferrably by subtracting a linear function previously fit to the data concerned).*/
