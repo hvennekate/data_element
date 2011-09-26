@@ -157,7 +157,7 @@ void specView::keyPressEvent(QKeyEvent* event)
 		setCurrentIndex(QModelIndex()) ;
 	}
 	
-	if (event->key() == Qt::Key_A && event->modifiers() == Qt::ControlModifier)
+	else if (event->key() == Qt::Key_A && event->modifiers() == Qt::ControlModifier)
 	{
 		qDebug("Checking if folder") ;
 		QModelIndex index = currentIndex() ;
@@ -177,8 +177,9 @@ void specView::keyPressEvent(QKeyEvent* event)
 		qDebug("done selecting") ;
 	}
 	
-	if (event->key() == Qt::Key_Delete)
+	else if (event->key() == Qt::Key_Delete)
 		deleteAction->trigger() ;
+	else QTreeView::keyPressEvent(event) ;
 }
 
 specView::specView(QWidget* parent)

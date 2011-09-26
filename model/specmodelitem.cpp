@@ -53,6 +53,11 @@ bool specModelItem::changeDescriptor(QString key, QString value)
 	return false ;
 }
 
+bool specModelItem::setActiveLine(const QString&, int)
+{
+	return false ;
+}
+
 void specModelItem::refreshPlotData()
 { }
 
@@ -85,7 +90,7 @@ void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 	}
 }
 
-QString specModelItem::descriptor(const QString &key) const
+QString specModelItem::descriptor(const QString &key, bool full) const
 {
 	if (key == "") return QwtPlotCurve::title().text() ;
 	return QString() ;
@@ -96,7 +101,7 @@ bool specModelItem::isFolder() const { return false ;}
 QIcon specModelItem::indicator(const QString& Descriptor) const
 {
 	if (Descriptor == "") return decoration() ;
-	if (descriptor(Descriptor).contains(QRegExp("\n")))
+	if (descriptor(Descriptor,true).contains(QRegExp("\n")))
 		return QIcon::fromTheme("go-down") ;
 	return QIcon() ;
 }

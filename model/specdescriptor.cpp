@@ -40,9 +40,9 @@ specDescriptor::specDescriptor(double d)
 double specDescriptor::numericValue() const
 { return contentValue.toDouble() ; }
 
-QString specDescriptor::content() const
+QString specDescriptor::content(bool full) const
 {
-	if (currentLine == QString())
+	if (currentLine == QString() || full )
 		return contentValue ;
 	else
 		return currentLine ;
@@ -56,6 +56,18 @@ bool specDescriptor::setContent(const QString& string)
 		return true ;
 	}
 	return false ;
+}
+
+bool specDescriptor::setActiveLine(int line)
+{
+	int lineCount = 0 ;
+	int lastNewLine = 0 ;
+	while ((lastNewLine = 1+ contentValue.indexOf(QRegExp("\n"),lastNewLine) ))
+		lineCount ++ ;
+	if (line > lineCount)
+		return false ;
+	currentLine = contentValue.section(QRegExp("\n"),line,line) ;
+	return true ;
 }
 
 bool specDescriptor::setContent(const double& number)
@@ -83,6 +95,7 @@ specDescriptor& specDescriptor::operator=(const double& val)
 	properties |= spec::numeric ;
 	return *this ;
 }
+
 
 specDescriptor& specDescriptor::operator=(const QString& val)
 {

@@ -148,6 +148,16 @@ bool specDataItem::changeDescriptor(QString key, QString value)
 	return true ;
 }
 
+bool specDataItem::setActiveLine(const QString& key, int line)
+{
+	if (key == "")
+		return specModelItem::setActiveLine(key,line) ;
+	if (description.contains(key))
+		return description[key].setActiveLine(line) ;
+
+	return false ;
+}
+
 void specDataItem::refreshPlotData()
 {
 	QVector<double> x=filter.wnums(data), y=filter.ints(data);
@@ -155,12 +165,12 @@ void specDataItem::refreshPlotData()
 	setSamples(x,y) ;
 }
 
-QString specDataItem::descriptor(const QString &key) const
+QString specDataItem::descriptor(const QString &key, bool full) const
 {
-	if (key == "") return specModelItem::descriptor(key) ;
+	if (key == "") return specModelItem::descriptor(key, full) ;
 	
 	if (description.contains(key))
-		return description[key].content() ;
+		return description[key].content(full) ;
 	
 	return "" ;
 }
