@@ -43,6 +43,7 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 : QDockWidget(QFileInfo(fileName).fileName(), parent)
 {
 	kineticWidget = new specKineticWidget(QString(),this) ;
+
 	onDisk  = new QFile() ;
 	changeFileName(fileName) ;
 	QDataStream in ;
@@ -80,6 +81,25 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	kineticWidget->view()->model()->connectToPlot(plot) ;
 // 	cout << "connected data plot" << endl ;
 // 	setTitleBarWidget(new specDockTitle) ;
+
+	// TODO outsource... clean-up for log widget ... title for log dock window
+	logWidget = new QDockWidget("Logs",parent) ;
+	QWidget *logContent = new QWidget(logWidget) ;
+	logWidget->setFloating(true) ;
+	logs = new specLogView(logWidget) ;
+	logs->setModel(new specLogModel(items->model(),logs));
+	QToolBar *logToolbar = new QToolBar(logWidget) ;
+	foreach(QAction* pointer, logs->actions())
+		logToolbar->addAction(pointer) ;
+
+	QVBoxLayout *logLayout = new QVBoxLayout ;
+	logLayout->addWidget(logToolbar) ;
+	logLayout->addWidget(logs) ;
+	logContent->setLayout(logLayout);
+	logWidget->setWidget(logContent);
+
+	//
+
 	
 	createActions() ;
 	createToolbars();
@@ -95,8 +115,6 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	qDebug("adding undo toolbar") ;
 	actions = new specActionLibrary(this) ;
 	layout -> addWidget(actions->toolBar(items)) ;
-
-	logs = new specLogView(this) ;
 
 	actions->addDragDropPartner(items->model()) ;
 	qDebug("added undo toolbar") ;
@@ -169,6 +187,10 @@ void specPlotWidget::createActions()
 	kineticsAction->setParent(this) ;
 	kineticsAction->setShortcut(tr("Ctrl+K")) ;
 	kineticsAction->setStatusTip(tr("Kinetikfenster anzeigen")) ;
+
+	logAction = logWidget->toggleViewAction() ;
+	logAction->setText(tr("Log-Fenster")) ;
+	logAction->setParent(this) ;
 	
 	toKineticAction = new QAction(QIcon(":/toKinetic.png"), tr("Add to current kinetic"), this) ;
 	toKineticAction ->setStatusTip(tr("To current kinetic")) ;
@@ -287,6 +309,7 @@ void specPlotWidget::createToolbars()
 // 	toolbar-> addAction(addZeroRangeAction);
 // 	toolbar-> addAction(deleteZeroRangeAction);
 // 	toolbar-> addAction(individualZeroAction);
+	toolbar->addAction(logAction) ;
 	toolbar-> addAction(kineticsAction) ;
 	toolbar-> addAction(toKineticAction) ;
 	toolbar-> addAction(fromKineticAction) ;
