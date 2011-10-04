@@ -38,7 +38,7 @@ public:
 	~specView();
 	
 	specModel* model () const ;
-	void setModel(specModel*) ;
+	void setModel(specModel*) ; // TODO make virtual or find better solution!
 //	QList<specModelItem*> currentlySelected() ;
 	virtual QList<QAction*> actions() ;
 	QModelIndexList getSelection() ;

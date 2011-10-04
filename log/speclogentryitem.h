@@ -21,7 +21,7 @@ public:
 	QStringList descriptorKeys() const ;
 	QIcon decoration() const ;
 	spec::descriptorFlags descriptorProperties ( const QString& key ) const ;
-	QString descriptor ( const QString &key ) const ;
+	QString descriptor ( const QString &key, bool full) const ;
 };
 
 #endif

@@ -96,6 +96,8 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	actions = new specActionLibrary(this) ;
 	layout -> addWidget(actions->toolBar(items)) ;
 
+	logs = new specLogView(this) ;
+
 	actions->addDragDropPartner(items->model()) ;
 	qDebug("added undo toolbar") ;
 	layout -> addWidget(splitter)  ;
@@ -109,6 +111,7 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 		actions->read(in) ;
 		items->read(in) ;
 	}
+
 
 	in.unsetDevice() ;
 	onDisk->close() ;
