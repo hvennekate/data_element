@@ -100,10 +100,7 @@ specDescriptor& specDescriptor::operator=(const double& val)
 specDescriptor& specDescriptor::operator=(const QString& val)
 {
 	contentValue = val ;
-	if (val.contains(QRegExp("\n")))
-		currentLine = val.section(QRegExp("\n"),0,0) ;
-	else
-		currentLine = QString() ;
+	currentLine = val.contains(QRegExp("\n")) ? val.section(QRegExp("\n"),0,0) : val ;
 	qDebug() << "----------Multiline:" << val.contains(QRegExp("\n")) << currentLine ;
 
 	qDebug() << "------------desc: " << val << currentLine ;

@@ -15,6 +15,8 @@
 #include <specdocktitle.h>
 #include "speckineticwidget.h"
 #include "actionlib/specactionlibrary.h"
+#include "log/speclogview.h"
+#include "log/speclogmodel.h"
 
 class specPlotWidget : public QDockWidget
 {
@@ -26,6 +28,7 @@ private:
 	QVBoxLayout* layout ;
 	specPlot* plot ;
 	specDataView* items ;
+	specLogView* logs ;
 	QToolBar* toolbar ;
 	QSplitter* splitter;
 	QFile* onDisk ;

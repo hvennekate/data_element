@@ -1,5 +1,6 @@
 #include "speclogentryitem.h"
 
+
 specLogEntryItem::specLogEntryItem ( QHash<QString,specDescriptor> desc, specFolderItem* par, QString tag)
  : specFolderItem(par, tag), description(desc)
 {
@@ -42,12 +43,15 @@ spec::descriptorFlags specLogEntryItem::descriptorProperties(const QString& key)
 	return description[key].flags() ;
 }
 
-QString specLogEntryItem::descriptor(const QString &key) const
+QString specLogEntryItem::descriptor(const QString &key, bool full) const
 {
 	if (key == "")
 		return specModelItem::descriptor(key) ;
 	if (description.contains(key))
-		return description[key].content() ;
+	{
+		qDebug() << "##### returning descriptor: " << description[key].content() ;
+		return description[key].content(full) ;
+	}
 	return specFolderItem::descriptor(key) ;
 }
 
