@@ -4,9 +4,7 @@
 
 QDataStream& operator<<(QDataStream& out, const specDescriptor& desc)
 {
-	out << desc.contentValue << (int) desc.properties ;
-	if (desc.currentLine != QString())
-		out << desc.currentLine ;
+	out << desc.contentValue << desc.currentLine << (int) desc.properties ;
 	qDebug("out desc props: %d %d",(int)desc.properties, desc.isEditable()) ;
 	return out ;
 }
@@ -14,11 +12,8 @@ QDataStream& operator<<(QDataStream& out, const specDescriptor& desc)
 QDataStream& operator>>(QDataStream& in , specDescriptor& desc) 
 {
 	int prop ;
-	in  >> desc.contentValue >> prop ;
+	in  >> desc.contentValue >> desc.currentLine >> prop ;
 	desc.properties = (spec::descriptorFlags) prop ;
-	qDebug("in desc props: %d %d",(int) desc.properties, desc.isEditable()) ;
-	if (desc.contentValue.contains(QRegExp("\n")))
-		in >> desc.currentLine ;
 	return in ;
 }
 

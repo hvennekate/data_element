@@ -36,8 +36,10 @@ private:
 		*kineticsAction,
 		*toKineticAction,
    		*fromKineticAction,
-     		*saveAsAction ;
+		*saveAsAction,
+		*logAction ;
 	specActionLibrary *actions ;
+	QDockWidget *logWidget ;
 		
 	specKineticWidget *kineticWidget ;
 	void createActions() ;

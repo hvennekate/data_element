@@ -12,6 +12,7 @@
 #include <QSpinBox>
 #include <QDialogButtonBox>
 #include "specviewstate.h"
+#include <QClipboard>
 using std::min ;
 using std::max ;
 
@@ -176,9 +177,7 @@ void specView::keyPressEvent(QKeyEvent* event)
 		selectionModel()->select(newSelection,QItemSelectionModel::Select) ;
 		qDebug("done selecting") ;
 	}
-	
-	else if (event->key() == Qt::Key_Delete)
-		deleteAction->trigger() ;
+
 	else QTreeView::keyPressEvent(event) ;
 }
 
