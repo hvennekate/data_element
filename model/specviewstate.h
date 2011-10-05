@@ -19,7 +19,6 @@ private:
 	QVector<int> hierarchyOfTopItem ;
 	QVector<int> hierarchyOfCurrentItem ;
 	QVector<qint32> widths ;
-	QByteArray geometry ;
 	void purgeLists() ;
 	inline specModel* model() { return parent ? parent->model() : 0 ; }
 	specModelItem* hierarchyPointer(const QVector<int>&) ;

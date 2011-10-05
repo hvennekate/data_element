@@ -7,6 +7,7 @@
 #include <QTextStream>
 #include "speckineticrange.h"
 #include <QTime>
+#include <QDebug>
 
 specModelItem::specModelItem(specFolderItem* par, QString description)
 	: specCanvasItem(description), iparent(0), mergePlotData(true), sortPlotData(true)
@@ -74,9 +75,11 @@ void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 		y = sortedValues.values().toVector() ;
 	}
 	QVector<double> xt, yt ;
+	qDebug() << "processing:" << x ;
+
 	if (mergePlotData)
 	{
-		for (int i = 0 ; i < x.size() ; i++)
+		for (int i = 0 ; i < x.size() ; i)
 		{
 			int j = i ;
 			double ysum = 0, xtemplate = x[i] ;
@@ -88,6 +91,7 @@ void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 		x = xt ;// TODO simply swap the vectors!!!
 		y = yt ;
 	}
+	qDebug() << "processing:" << x ;
 }
 
 QString specModelItem::descriptor(const QString &key, bool full) const
@@ -141,6 +145,8 @@ QDataStream& operator>>(QDataStream& stream, specModelItem*& pointer)
 			>> pointer->mergePlotData >> pointer->sortPlotData >> title >> pen ;
 	pointer->QwtPlotCurve::setTitle(title) ;
 	pointer->setPen(pen) ;
+	qDebug()<< "merge from copy:" << pointer->mergePlotData ;
+	pointer->refreshPlotData();
 	return stream ;
 }
 
@@ -150,6 +156,7 @@ QDataStream& specModelItem::writeOut(QDataStream& stream) const
 // 	cout << "called operator<<" << endl ;
 	return (writeToStream(stream)
 			<< mergePlotData << sortPlotData << QwtPlotCurve::title().text() << pen()) ;
+	qDebug()<< "merge from original:" << mergePlotData ;
 }
 
 spec::descriptorFlags specModelItem::descriptorProperties(const QString& key) const

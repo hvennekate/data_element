@@ -160,8 +160,11 @@ bool specDataItem::setActiveLine(const QString& key, int line)
 
 void specDataItem::refreshPlotData()
 {
+	qDebug() << "wnumsplot: " << wnums() << ints() ;
 	QVector<double> x=filter.wnums(data), y=filter.ints(data);
+	qDebug() << "collected data:" << x ;
 	processData(x,y) ;
+	qDebug() << "processed:" << x << "merge:" << mergePlotData ;
 	setSamples(x,y) ;
 }
 
@@ -211,9 +214,10 @@ QDataStream& specDataItem::readFromStream(QDataStream& stream)
 		qDebug("reading descriptor: \"%s\"",key.data()) ;
 		stream >> description[key] ;
 	}
-	refreshPlotData() ;
+//	refreshPlotData() ;
 // 	cout << "done reading data item." << endl ;
-	qDebug("from stream is editable via this: %d", this->isEditable(""));
+	qDebug("///////////// from stream is editable via this: %d", this->isEditable(""));
+	qDebug() << "////////// wnums: " << wnums() << ints() ;
 	return stream;
 }
 
