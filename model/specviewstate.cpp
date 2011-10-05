@@ -19,15 +19,12 @@ void specViewState::purgeLists()
 	currentItem = 0 ;
 	hierarchyOfTopItem.clear();
 	widths.clear();
-	geometry.clear();
 }
 
 void specViewState::getState()
 {
 	if (!parent) return ;
 	purgeLists();
-
-	geometry = parent->saveGeometry() ;
 
 	int columnCount = model()->columnCount(QModelIndex()) ;
 	qDebug("++++ getting column widths %d",columnCount) ;
@@ -91,8 +88,6 @@ void specViewState::restoreState()
 
 	qDebug("+++++ restoring view") ;
 
-	parent->restoreGeometry(geometry) ;
-
 	// restore column widths
 	qDebug("restoring column widths") ;
 	for (int i = 0 ; i < widths.size() ; ++i)
@@ -132,8 +127,7 @@ QDataStream& specViewState::write(QDataStream &out)
 	    << quint32(selectedItems.size())
 	    << hierarchyOfTopItem
 	    << hierarchyOfCurrentItem
-	    << widths
-	    << geometry ;
+	    << widths ;
 	for (int i = 0 ; i < openFolders.size() ; ++i)
 		out << model()->hierarchy(openFolders[i]) ;
 	for (int i = 0 ; i < selectedItems.size() ; ++i)
@@ -151,8 +145,7 @@ QDataStream& specViewState::read(QDataStream &in)
 	   >> selectedItemsSize
 	   >> hierarchyOfTopItem
 	   >> hierarchyOfCurrentItem
-	   >> widths
-	   >> geometry ;
+	   >> widths ;
 	openFolders.resize(openFoldersSize) ;
 	selectedItems.resize(selectedItemsSize);
 	QVector<int> hierarchy ;

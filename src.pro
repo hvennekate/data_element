@@ -47,7 +47,10 @@ SOURCES += main.cpp \
     actionlib/specimportspecaction.cpp \
     model/specviewstate.cpp \
     log/speclogmodel.cpp \
-    log/speclogview.cpp
+    log/speclogview.cpp \
+    actionlib/speccopyaction.cpp \
+    actionlib/specpasteaction.cpp \
+    actionlib/speccutaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -96,7 +99,10 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/specimportspecaction.h \
     model/specviewstate.h \
     log/speclogmodel.h \
-    log/speclogview.h
+    log/speclogview.h \
+    actionlib/speccopyaction.h \
+    actionlib/specpasteaction.h \
+    actionlib/speccutaction.h
 
 INCLUDEPATH += kinetic \
 	log \
