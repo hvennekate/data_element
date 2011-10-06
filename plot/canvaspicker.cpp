@@ -390,7 +390,7 @@ void CanvasPicker::move ( const QPoint &pos )
 	                              plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
 	                              plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ;
 	qDebug("emitting signal") ;
-	emit moved(d_selectedCurve) ;
+	emit moved(d_selectedCurve) ; // TODO remove this signal
 	/* 	if ( mode == spec::newZero ) // TODO
 		{
 			( ( specRange* ) d_selectedCurve )->pointMoved ( mode, d_selectedPoint,
