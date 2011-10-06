@@ -50,11 +50,12 @@ public:
 	int removeData(QList<specRange*>*) ;
 	QMultiMap<double,QPair<double,double> >* kinetics(QList<specKineticRange*>) const;
 	/*! Return value of descriptor \a key. */
-	QString descriptor(const QString &key) const ;
+	QString descriptor(const QString &key, bool full =true) const ;
 	/*! Is the descriptor \a key editable?*/
 	bool isEditable(QString key) const ;
 	/*! Set descriptor \a key 's value to  \a value. */
 	bool changeDescriptor(QString key, QString value) ;
+	bool setActiveLine(const QString &, int) ;
 	/*! Regenerate data used for plotting. @todo maybe not use spectrum function??? */
 	void refreshPlotData() ;
 	/*! Try to set data whose \f$\nu\f$ value is in \a ranges to zero by applying some correction (preferrably by subtracting a linear function previously fit to the data concerned).*/

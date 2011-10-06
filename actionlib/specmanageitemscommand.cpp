@@ -104,3 +104,8 @@ QDataStream& specManageItemsCommand::read(QDataStream &in)
 	qDebug() << "##### read a total of" << items.size() ;
 	return in ;
 }
+
+specManageItemsCommand::~specManageItemsCommand()
+{
+	clear() ;
+}

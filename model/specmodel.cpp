@@ -299,7 +299,7 @@ void specModel::importFile(QModelIndex index)
 	index = isFolder(index) ? index : parent(index) ;
 	QStringList fileNames = QFileDialog::getOpenFileNames();
 	timer.start() ;
-	if (fileNames.size())
+	if (fileNames.size())  //Haeh?
 	{
 		foreach(QString fileName, fileNames)
 		{
@@ -484,14 +484,19 @@ QVariant specModel::data(const QModelIndex &index, int role) const
 	switch(role)
 	{
 		case Qt::DecorationRole :
-			return index.column() ? QVariant() : pointer->decoration() ;
+//			return index.column() ? QVariant() : pointer->decoration() ;
+			return pointer->indicator(descriptors[index.column()]) ;
 // 			return index.column() != 0 ? QVariant() : QIcon(pointer->isFolder() ? ":/folder.png" : (pointer->isSysEntry() ? ":/sys_message.png" : (pointer->isLogEntry() ? ":/log_message.png" : ":/data.png"))) ;
 		case Qt::DisplayRole :
 			if (index.column() < columnCount(index))
 				return pointer->descriptor(descriptors[index.column()]) ;
 			return "" ;
 		case Qt::ForegroundRole :
-			return itemPointer(index)->brush() ;
+			return pointer->brush() ;
+		case spec::fullContentRole :
+			return pointer->descriptor(descriptors[index.column()],true) ;
+		case Qt::ToolTipRole :
+			return pointer->descriptor(descriptors[index.column()],true) ;
 // 		case 32 : // TODO replace in namespace
 // 			return pointer->plotData() ;
 	}
@@ -506,13 +511,15 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 		switch(role)
 		{
 			case Qt::EditRole :
-		 		changed =  itemPointer(index)->changeDescriptor(descriptors[index.column()], value.toString()) ; break ;
+				changed =  itemPointer(index)->changeDescriptor(descriptors[index.column()], value.toString()) ; break ;
 			case Qt::ForegroundRole :
 				itemPointer(index)->setPen(value.value<QPen>()) ;
 				changed = true ;
 				break ;
 			case 33 :
 				changed = true ; itemPointer(index)->mergePlotData = value.toBool() ; break ;
+			case spec::activeLineRole :
+				changed = itemPointer(index)->setActiveLine(descriptors[index.column()], value.toInt()) ; break ;
 		}
 	}
 	if (changed) emit dataChanged(index,index) ;
@@ -724,7 +731,7 @@ QVector<int> specModel::hierarchy(specModelItem *item)
 {
 	QVector<int> retVal ;
 	specFolderItem *parent ;
-	while (parent = item->parent())
+	while ((parent = item->parent()))
 	{
 		retVal << parent->childNo(item) ;
 		item = parent ;
@@ -752,7 +759,18 @@ void specModel::setDropBuddy(specActionLibrary *buddy)
 QModelIndex specModel::index(const QVector<int> &ancestry) const
 {
 	QModelIndex returnIndex = QModelIndex() ;
-	for (int i = ancestry.size()-1 ; i >= 0 ; --i)
+	for (int i = ancestry.size()-1 ; i >= 0 ; --i) // TODO consider precaution if invalid at any stage
 		returnIndex = index(ancestry[i],0,returnIndex) ;
 	return returnIndex ;
+}
+
+QModelIndex specModel::index(specModelItem *pointer) const
+{
+	specModelItem* parent = pointer ;
+	// Test if item is indeed part of THIS model
+	while (parent->parent()) parent = parent->parent() ;
+	if (parent != root) return QModelIndex() ;
+
+	// Generate genealogy to find parent
+	return index(hierarchy(pointer)) ;
 }

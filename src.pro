@@ -43,7 +43,17 @@ SOURCES += main.cpp \
     actionlib/specaddfoldercommand.cpp \
     model/specgenealogy.cpp \
     actionlib/specmanageitemscommand.cpp \
-    actionlib/specmovecommand.cpp
+    actionlib/specmovecommand.cpp \
+    actionlib/specimportspecaction.cpp \
+    model/specviewstate.cpp \
+    log/speclogmodel.cpp \
+    log/speclogview.cpp \
+    actionlib/speccopyaction.cpp \
+    actionlib/specpasteaction.cpp \
+    actionlib/speccutaction.cpp \
+    actionlib/specmodifydatacommand.cpp \
+    plot/specspectrumplot.cpp \
+    actionlib/specplotmovecommand.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -88,7 +98,17 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/specaddfoldercommand.h \
     model/specgenealogy.h \
     actionlib/specmanageitemscommand.h \
-    actionlib/specmovecommand.h
+    actionlib/specmovecommand.h \
+    actionlib/specimportspecaction.h \
+    model/specviewstate.h \
+    log/speclogmodel.h \
+    log/speclogview.h \
+    actionlib/speccopyaction.h \
+    actionlib/specpasteaction.h \
+    actionlib/speccutaction.h \
+    actionlib/specmodifydatacommand.h \
+    plot/specspectrumplot.h \
+    actionlib/specplotmovecommand.h
 
 INCLUDEPATH += kinetic \
 	log \

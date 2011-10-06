@@ -10,6 +10,8 @@
 #include "actionlib/specactionlibrary.h"
 
 class specModel ;
+class specViewState ;
+
 
 class specView : public QTreeView
 { // TODO turn into abstract class (add purely virtual function)
@@ -17,6 +19,7 @@ Q_OBJECT
 private:
 	QMenu *itemContextMenu, *folderContextMenu ;
 	QAction *deleteAction, *newItemAction, *treeAction, *changePenAction, *mergeFolderAction, *mergeAction, *exportAction, *cutByIntensityAction, *averageAction, *movingAverageAction, *getSubtractionDataAction, *applySubtractionAction ;
+	specViewState *state ;
 
 	void createContextMenus() ;
 	void createActions() ;
@@ -35,11 +38,11 @@ public:
 	~specView();
 	
 	specModel* model () const ;
-	void setModel(specModel*) ;
+	void setModel(specModel*) ; // TODO make virtual or find better solution!
 //	QList<specModelItem*> currentlySelected() ;
 	virtual QList<QAction*> actions() ;
 	QModelIndexList getSelection() ;
-	QDataStream &write(QDataStream&) const ;
+	QDataStream &write(QDataStream&) ;
 	QDataStream &read(QDataStream&) ;
 
 	signals:
@@ -55,6 +58,8 @@ public slots:
 	void currentlySelectedToSubMap() ;
 	void applySubMapToSelection() ;
 	void exportItems() ;
+	void prepareReset() ;
+	void resetDone() ;
 };
 
 #endif
