@@ -1,35 +1,51 @@
 #include "specdelegate.h"
-#include <QLineEdit>
 #include <QModelIndex>
 #include <QTextStream>
+#include <QTextEdit>
+#include "names.h"
 
 specDelegate::specDelegate(QObject *parent)
  : QItemDelegate(parent)
 {
 }
 
+bool specDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
+{
+	qDebug("Editor event") ;
+	return QItemDelegate::editorEvent(event,model,option,index) ;
+}
+
 QWidget* specDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	QLineEdit *editor = new QLineEdit(parent) ;
-	editor->setFrame(false) ;
-// 	QRect geometry = editor->geometry() ;
-// 	geometry.setWidth(geometry.width()-parent->iconSize()) ;
-// 	geometry.setX(geometry.x()-parent->iconSize()) ;
+	QTextEdit *editor = new QTextEdit(parent) ;
+//	editor->setFrame(false) ;
+	editor->setAcceptRichText(false) ;
+	editor->setLineWrapMode(QTextEdit::NoWrap) ;
+	editor->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	editor->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	return editor ;
 }
 
 void specDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
-	((QLineEdit*) editor)->setText(index.model()->data(index, Qt::DisplayRole).toString()) ;
+	((QTextEdit*) editor)->setText(index.model()->data(index, spec::fullContentRole).toString()) ;
 }
 
 void specDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-	model->setData(index,((QLineEdit*) editor)->text(),Qt::EditRole) ;
+	qDebug("setting model data") ;
+	int activeLine = 0 ;
+	int lastNewLine = ((QTextEdit*) editor)->textCursor().position() ;
+	while ((lastNewLine = ((QTextEdit*) editor)->toPlainText().lastIndexOf(QRegExp("\n"),lastNewLine) - 1) > -1)
+		++ activeLine;
+	model->setData(index,((QTextEdit*) editor)->toPlainText(),Qt::EditRole) ;
+	if (activeLine != 0)
+		model->setData(index,activeLine,spec::activeLineRole) ;
 }
 
 void specDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+	qDebug("updating editor geometry") ;
 	QRect geom = option.rect ;
 	if(!index.column()) // TODO :  Improve!!
 		geom.setX(geom.x()+option.decorationSize.width()+3) ;

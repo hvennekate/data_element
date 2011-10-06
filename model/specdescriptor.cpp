@@ -1,8 +1,10 @@
 #include "specdescriptor.h"
+#include <QRegExp>
+#include <QDebug>
 
 QDataStream& operator<<(QDataStream& out, const specDescriptor& desc)
 {
-	out << desc.contentValue << (int) desc.properties ;
+	out << desc.contentValue << desc.currentLine << (int) desc.properties ;
 	qDebug("out desc props: %d %d",(int)desc.properties, desc.isEditable()) ;
 	return out ;
 }
@@ -10,40 +12,64 @@ QDataStream& operator<<(QDataStream& out, const specDescriptor& desc)
 QDataStream& operator>>(QDataStream& in , specDescriptor& desc) 
 {
 	int prop ;
-	in  >> desc.contentValue >> prop ;
+	in  >> desc.contentValue >> desc.currentLine >> prop ;
 	desc.properties = (spec::descriptorFlags) prop ;
-	qDebug("in desc props: %d %d",(int) desc.properties, desc.isEditable()) ;
 	return in ;
 }
 
 
 specDescriptor::specDescriptor(QString cont, spec::descriptorFlags prop)
-{ properties = prop ; contentValue = cont ; }
+	: currentLine(QString()),
+	  properties(prop)
+{
+	(*this) = cont ;
+}
 
 specDescriptor::specDescriptor(double d)
-{ properties = spec::numeric ; contentValue.setNum(d) ;}
+	: currentLine(QString()),
+	  properties(spec::numeric)
+{
+	(*this) = d ;
+}
 
 double specDescriptor::numericValue() const
 { return contentValue.toDouble() ; }
 
-QString specDescriptor::content() const
-{ return contentValue ; }
+QString specDescriptor::content(bool full) const
+{
+	if (currentLine == QString() || full )
+		return contentValue ;
+	else
+		return currentLine ;
+}
 
 bool specDescriptor::setContent(const QString& string)
 {
 	if (isEditable())
 	{
-		contentValue = string ;
+		(*this) = string ;
 		return true ;
 	}
 	return false ;
+}
+
+bool specDescriptor::setActiveLine(int line)
+{
+	int lineCount = 0 ;
+	int lastNewLine = 0 ;
+	while ((lastNewLine = 1+ contentValue.indexOf(QRegExp("\n"),lastNewLine) ))
+		lineCount ++ ;
+	if (line > lineCount)
+		return false ;
+	currentLine = contentValue.section(QRegExp("\n"),line,line) ;
+	return true ;
 }
 
 bool specDescriptor::setContent(const double& number)
 {
 	if (isNumeric() && isEditable())
 	{
-		contentValue.setNum(number) ;
+		(*this) = number ;
 		return true ;
 	}
 	return false ;
@@ -60,14 +86,18 @@ spec::descriptorFlags specDescriptor::flags() const
 
 specDescriptor& specDescriptor::operator=(const double& val)
 {
-	contentValue.setNum(val) ;
-//	setContent(val) ;
+	(*this) = QString("%1").arg(val) ;
+	properties |= spec::numeric ;
 	return *this ;
 }
+
 
 specDescriptor& specDescriptor::operator=(const QString& val)
 {
 	contentValue = val ;
-//	setContent(val) ;
+	currentLine = val.contains(QRegExp("\n")) ? val.section(QRegExp("\n"),0,0) : val ;
+	qDebug() << "----------Multiline:" << val.contains(QRegExp("\n")) << currentLine ;
+
+	qDebug() << "------------desc: " << val << currentLine ;
 	return *this ;
 }
