@@ -50,7 +50,10 @@ SOURCES += main.cpp \
     log/speclogview.cpp \
     actionlib/speccopyaction.cpp \
     actionlib/specpasteaction.cpp \
-    actionlib/speccutaction.cpp
+    actionlib/speccutaction.cpp \
+    actionlib/specmodifydatacommand.cpp \
+    plot/specspectrumplot.cpp \
+    actionlib/specplotmovecommand.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -102,7 +105,10 @@ HEADERS += cutbyintensitydialog.h \
     log/speclogview.h \
     actionlib/speccopyaction.h \
     actionlib/specpasteaction.h \
-    actionlib/speccutaction.h
+    actionlib/speccutaction.h \
+    actionlib/specmodifydatacommand.h \
+    plot/specspectrumplot.h \
+    actionlib/specplotmovecommand.h
 
 INCLUDEPATH += kinetic \
 	log \

@@ -28,15 +28,15 @@ specGenealogy::specGenealogy(QModelIndexList &list)
 		last ++ ;
 	}
 
-	// getting pointers to items to put into our list
-	qDebug("adding items to own list") ;
+	// getting pointers to Items to put into our list
+	qDebug("adding Items to own list") ;
 	for (QModelIndexList::iterator i = list.begin() ; i != last ; ++i)
-		items << Model->itemPointer(*i) ;
+		Items << Model->itemPointer(*i) ;
 
 	qDebug("retrieving indexes") ;
 	// getting index cascade and parent
 	indexes = Model->hierarchy(list.first()) ;
-	Parent = items.first()->parent() ;
+	Parent = Items.first()->parent() ;
 
 	qDebug("removing indexes from list") ;
 	// rid the list of those entries we took
@@ -45,19 +45,19 @@ specGenealogy::specGenealogy(QModelIndexList &list)
 
 bool specGenealogy::valid()
 {
-	return Model && Parent && !indexes.isEmpty() && !items.isEmpty() ;
+	return Model && Parent && !indexes.isEmpty() && !Items.isEmpty() ;
 }
 
 
 void specGenealogy::takeItems()
 {
-	qDebug("starting to remove items") ;
+	qDebug("starting to remove Items") ;
 	if (owning) return ;
 	if (!valid()) return ;
 	qDebug("checks done") ;
 	if (!Parent)
 		seekParent() ;
-	foreach(specModelItem* item, items)
+	foreach(specModelItem* item, Items)
 		item->setParent(0) ;
 	owning = true ;
 	qDebug("done removing") ;
@@ -69,7 +69,7 @@ void specGenealogy::returnItems()
 	if (!valid()) return ;
 	if (!Parent)
 		seekParent() ;
-	Parent->addChildren(items,indexes.first()) ;
+	Parent->addChildren(Items,indexes.first()) ;
 	owning = false ;
 }
 
@@ -87,11 +87,11 @@ QDataStream &specGenealogy::write(QDataStream &out)
 {
 	out << indexes ;
 	out << qint8(owning) ;
-	out << qint32(items.size()) ;
+	out << qint32(Items.size()) ;
 	if (owning)
 	{
-		for(int i = 0 ; i < items.size() ; ++i)
-			items[i]->writeOut(out) ;
+		for(int i = 0 ; i < Items.size() ; ++i)
+			Items[i]->writeOut(out) ;
 	}
 	return out ;
 }
@@ -110,20 +110,20 @@ specGenealogy::specGenealogy(specModel* mod, QDataStream &in)
 	in >> toRead ;
 	if (owning)
 	{
-		qDebug("owning items") ;
+		qDebug("owning Items") ;
 		specModelItem *pointer ;
 		for (int i = 0 ; i < toRead ; ++i)
 		{
 			in >> pointer ;
-			items << pointer ;
+			Items << pointer ;
 		}
 	}
 	else
 	{
-		qDebug("not owning items") ;
-		items.reserve(toRead);
+		qDebug("not owning Items") ;
+		Items.reserve(toRead);
 		for (int i = 0 ; i < toRead ; ++i)
-			items << 0 ;
+			Items << 0 ;
 	}
 }
 
@@ -139,8 +139,8 @@ bool specGenealogy::seekParent()
 
 void specGenealogy::getItemPointers()
 {
-	for (int i = 0 ; i < items.size() ; ++i)
-		items[i] = Parent->child(i+indexes.first()) ;
+	for (int i = 0 ; i < Items.size() ; ++i)
+		Items[i] = Parent->child(i+indexes.first()) ;
 }
 
 
@@ -148,6 +148,11 @@ specGenealogy::~specGenealogy()
 {
 	indexes.clear();
 	if(owning)
-		foreach(specModelItem* item, items)
+		foreach(specModelItem* item, Items)
 			delete item ;
+}
+
+const QList<specModelItem*>& specGenealogy::items() const
+{
+	return Items ;
 }
