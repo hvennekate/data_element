@@ -57,6 +57,7 @@ public:
 // 	void haveZeroRanges(bool) ;
 signals:
 	void moved(specCanvasItem*) ;
+	void pointMoved(specCanvasItem*, int, double, double) ;
 };
 
 #endif

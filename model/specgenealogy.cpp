@@ -156,3 +156,17 @@ const QList<specModelItem*>& specGenealogy::items() const
 {
 	return Items ;
 }
+
+bool specGenealogy::operator ==(const specGenealogy& other)
+{
+	bool returnValue = true ;
+	if (other.Items().size() != Items.size()) return false ;
+	for (int i = 0 ; i < Items.size() ; ++i)
+		returnValue = returnValue && (Items[i] == other.Items[i]) ;
+	return returnValue ;
+}
+
+bool specGenealogy::operator !=(const specGenealogy& other)
+{
+	return !(*this == other) ;
+}
