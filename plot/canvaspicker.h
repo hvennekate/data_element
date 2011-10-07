@@ -19,7 +19,6 @@ class CanvasPicker: public QObject
 {
     Q_OBJECT
 private:
-// 	QList<specCanvasItem*> selectable ;
 	void select(const QPoint &);
 	void move(const QPoint &);
 	void moveBy(int dx, int dy);
@@ -29,32 +28,17 @@ private:
 	void shiftCurveCursor(bool up);
 	void movePointExplicitly() ;
 	specPlot *plot() { return (specPlot *)parent(); }
-//     const QwtPlot *plot() const { return (QwtPlot *)parent(); }
 
 	specCanvasItem *d_selectedCurve, *lastSelected;
 	int d_selectedPoint;
-// 	spec::moveMode mode ;
-// 	QList<specRange*> ranges;
-// 	QList<specRange*>::size_type selectedRange ;
-// 	void setRange() ;
+
 public:
-	CanvasPicker(specPlot *plot);
+	explicit CanvasPicker(specPlot *plot);
 	virtual bool eventFilter(QObject *, QEvent *);
 
 	virtual bool event(QEvent *);
 	specCanvasItem* current() ;
-// 	void setSelectable(QList<specCanvasItem*>) ;
-// 	bool removeItem(specCanvasItem*) ;
-// 	void removeAll() ;
-// 	void setMoveMode(spec::moveMode) ;
-// 	void enableMoveMode(spec::moveMode) ;
-// 	void disableMoveMode(spec::moveMode) ;
-// public slots:
-// 	void addRange() ;
-// 	void deleteRange() ;
-// signals:
-// 	void rangesModified(QList<specRange*>*) ;
-// 	void haveZeroRanges(bool) ;
+
 signals:
 	void moved(specCanvasItem*) ;
 	void pointMoved(specCanvasItem*, int, double, double) ;

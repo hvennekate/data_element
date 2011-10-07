@@ -13,7 +13,6 @@ specPlot::specPlot(QWidget *parent)
 	: canBeSelected(NULL), QwtPlot(parent), select(false)
 {
 	setAutoReplot(false) ;
-	pick  = new CanvasPicker(this) ;
 	zoom  = new specZoomer(this->canvas()) ;
 	ranges = new QList<specCanvasItem*> ;
 	ordinary = new QList<specCanvasItem*> ;
@@ -61,7 +60,6 @@ specPlot::specPlot(QWidget *parent)
 	refreshMoveMode() ;
 }
 
-CanvasPicker *specPlot::picker() { return pick ;}
 specZoomer   *specPlot::zoomer() { return zoom ;}
 
 void specPlot::changeTitle()
@@ -259,12 +257,12 @@ void specPlot::addRange()
 
 void specPlot::deleteRange()
 {
-	if(picker()->current() && ranges->indexOf(picker()->current()) >= 0)
-		delete ranges->takeAt(ranges->indexOf(picker()->current())) ;
-	else if(picker()->current() && selectRanges->indexOf(picker()->current()) >= 0)
-		delete selectRanges->takeAt(selectRanges->indexOf(picker()->current())) ;
-	else if(picker()->current() && kineticRanges->indexOf(picker()->current()) >= 0)
-		delete kineticRanges->takeAt(kineticRanges->indexOf(picker()->current())) ;
+//	if(picker()->current() && ranges->indexOf(picker()->current()) >= 0)
+//		delete ranges->takeAt(ranges->indexOf(picker()->current())) ;
+//	else if(picker()->current() && selectRanges->indexOf(picker()->current()) >= 0)
+//		delete selectRanges->takeAt(selectRanges->indexOf(picker()->current())) ;
+//	else if(picker()->current() && kineticRanges->indexOf(picker()->current()) >= 0)
+//		delete kineticRanges->takeAt(kineticRanges->indexOf(picker()->current())) ;
 	refreshRanges() ;
 }
 

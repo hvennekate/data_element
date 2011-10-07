@@ -51,7 +51,6 @@ SOURCES += main.cpp \
     actionlib/speccopyaction.cpp \
     actionlib/specpasteaction.cpp \
     actionlib/speccutaction.cpp \
-    actionlib/specmodifydatacommand.cpp \
     plot/specspectrumplot.cpp \
     actionlib/specplotmovecommand.cpp
 
@@ -106,7 +105,6 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/speccopyaction.h \
     actionlib/specpasteaction.h \
     actionlib/speccutaction.h \
-    actionlib/specmodifydatacommand.h \
     plot/specspectrumplot.h \
     actionlib/specplotmovecommand.h
 

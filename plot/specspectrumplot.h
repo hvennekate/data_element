@@ -6,7 +6,7 @@
 #include <QList>
 #include <QActionGroup>
 #include "actionlib/specactionlibrary.h"
-#include "specmodel.h"
+#include "specview.h"
 
 class specSpectrumPlot : public specPlot
 {
@@ -17,12 +17,12 @@ private:
 	CanvasPicker *picker ;
 	specActionLibrary *undoPartner ;
 	QHash<specCanvasItem*, QList<int> > pointHash ;
-	specModel *model ;
+	specView *view ;
 public:
 	explicit specSpectrumPlot(QWidget *parent = 0);
-	QActionGroup *actions() { return correctionActions ; }
-	void setModel(specModel* mod) { model = mod ; }
-
+	QList<QAction*> actions() { return correctionActions->actions() ; }
+	void setView(specView* mod) { view = mod ; }
+	void setUndoPartner(specActionLibrary* lib) { undoPartner = lib ; }
 signals:
 
 private slots:

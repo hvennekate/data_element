@@ -54,7 +54,7 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	}
 	content = new QWidget ;
 	layout  = new QVBoxLayout ;
-	plot    = new specPlot ;
+	plot    = new specSpectrumPlot ;
 	plot->setMinimumHeight(100) ;
 	
 	items   = new specDataView(this) ;
@@ -70,6 +70,8 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	qDebug("read kinetic model") ;
 	
 	items->setModel(onDisk->exists() ? new specModel(in,items) : new specModel(items) ) ; // TODO employ >> operator
+	plot->setView(items) ;
+	qDebug("model: %d",items->model()) ;
 	qDebug() << "filepos:" << onDisk->pos() ;
 	
 	qDebug("read both data and kinetics models") ;
@@ -117,6 +119,7 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	layout -> addWidget(actions->toolBar(items)) ;
 
 	actions->addDragDropPartner(items->model()) ;
+	plot->setUndoPartner(actions) ;
 	qDebug("added undo toolbar") ;
 	layout -> addWidget(splitter)  ;
 	layout -> setContentsMargins(0,0,0,0) ;
@@ -418,7 +421,7 @@ void specPlotWidget::setConnections()
 {
 	connect(items->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),this,SLOT(selectionChanged(const QItemSelection&, const QItemSelection&))) ;
 	connect(items->selectionModel(),SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(currentChanged(const QModelIndex&, const QModelIndex&))) ;
-	connect(plot->picker(),SIGNAL(moved(specCanvasItem*)),kineticWidget->view()->model(),SLOT(conditionalUpdate(specCanvasItem*))) ;
+//	connect(plot->picker(),SIGNAL(moved(specCanvasItem*)),kineticWidget->view()->model(),SLOT(conditionalUpdate(specCanvasItem*))) ;
 // 	connect(plot->picker(),SIGNAL(rangesModified(QList<specRange*>*)),items,SLOT(newZeroRanges(QList<specRange*>*))) ;
 
 	connect(items->model(),SIGNAL(modelAboutToBeReset()),items,SLOT(prepareReset())) ;
