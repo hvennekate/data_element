@@ -19,7 +19,6 @@ class specPlot : public QwtPlot
 		QList<specCanvasItem*>* ordinary ;
 		QList<specCanvasItem*>* kineticRanges ;
 		QList<specCanvasItem*>* selectRanges ;
-		CanvasPicker *pick ;
 		specZoomer   *zoom ;
 		bool scaleX, scaleY ;
 		void contextMenuEvent ( QContextMenuEvent* ) ;
@@ -43,9 +42,8 @@ class specPlot : public QwtPlot
 		QList<specCanvasItem*>* selectable() ;
 		specPlot ( QWidget *parent=NULL );
 		~specPlot();
-		CanvasPicker *picker() ;
 		specZoomer   *zoomer() ;
-		QList<QAction*> actions() ;
+		virtual QList<QAction*> actions() ;
 		spec::moveMode moveMode() ;
 		void refreshRanges() ;
 	signals:

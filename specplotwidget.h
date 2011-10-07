@@ -2,7 +2,7 @@
 #define SPECPLOTWIDGET_H
 
 #include <QDockWidget>
-#include "specplot.h"
+#include "specspectrumplot.h"
 #include <QVBoxLayout>
 #include "specdataview.h"
 #include <QString>
@@ -26,7 +26,7 @@ private:
 // public:
 	QWidget* content ;
 	QVBoxLayout* layout ;
-	specPlot* plot ;
+	specSpectrumPlot* plot ;
 	specDataView* items ;
 	specLogView* logs ;
 	QToolBar* toolbar ;

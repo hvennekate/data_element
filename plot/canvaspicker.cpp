@@ -63,36 +63,12 @@ CanvasPicker::CanvasPicker ( specPlot *plot ) :
 	QWhatsThis::add ( canvas, text );
 #endif
 
-	shiftCurveCursor ( true );
+//	shiftCurveCursor ( true );  // What is this good for?  Happy debugging?!
+	qDebug("CanvasPicker::CanvasPicker %d", d_selectedCurve) ;
 }
 
 specCanvasItem* CanvasPicker::current()
 { return lastSelected ; }
-
-// void CanvasPicker::addItem ( specCanvasItem* toAdd )
-// {
-// 	selectable += toAdd ;
-// 	if (mode != spec::none && mode != spec::newZero)
-// 	toAdd->setSymbol ( QwtSymbol ( QwtSymbol::Ellipse,toAdd->pen().brush(), ( QPen ) Qt::black, QSize ( 5,5 ) ) ) ;
-// }
-
-// bool CanvasPicker::removeItem ( specCanvasItem* toRemove )
-// {
-// 	if ( d_selectedCurve == toRemove ) d_selectedCurve = NULL ;
-// 	if ( selectable.contains ( toRemove ) )
-// 	{
-// 		selectable.removeAt ( selectable.indexOf ( toRemove ) ) ;
-// 		toRemove->setSymbol ( QwtSymbol() ) ;
-// 		return true ;
-// 	}
-// 	return false ;
-// }
-
-// void CanvasPicker::removeAll()
-// {
-// 	foreach ( specCanvasItem* toRemove, selectable )
-// 	removeItem ( toRemove ) ;
-// }
 
 bool CanvasPicker::event ( QEvent *e )
 {
@@ -103,45 +79,6 @@ bool CanvasPicker::event ( QEvent *e )
 	}
 	return QObject::event ( e );
 }
-
-/* void CanvasPicker::setRange()
-{
-	if (mode == spec::newZero && selectedRange >= 0)
-	{
-		double min = ranges[selectedRange]->minValue(),
-			max= ranges[selectedRange]->maxValue();
-		QDialog *dialog = new QDialog ;
-		QGridLayout *layout = new QGridLayout ;
-		QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel) ;
-		QLineEdit *minEdit = new QLineEdit(QString("%1").arg(min)),
-				*maxEdit = new QLineEdit(QString("%1").arg(max)) ; // TODO validator einsetzen!
-		specMinMaxValidator* minValidator = new specMinMaxValidator(minEdit) ;
-		specMinMaxValidator* maxValidator = new specMinMaxValidator(maxEdit) ;
-// 		minValidator->setMax(maxEdit->text()) ;
-// 		maxValidator->setMin(minEdit->text()) ;
-		minEdit->setValidator(minValidator) ;
-		maxEdit->setValidator(maxValidator) ;
-// 		connect(maxEdit,SIGNAL(textChanged(const QString&)),minValidator,SLOT(setMax(const QString&))) ;
-// 		connect(minEdit,SIGNAL(textChanged(const QString&)),maxValidator,SLOT(setMin(const QString&))) ;
-		QLabel *minLabel = new QLabel(tr("Minimum:")), *maxLabel = new QLabel(tr("Maximum:")) ;
-		layout->addWidget(minLabel,0,0) ;
-		layout->addWidget(maxLabel,1,0) ;
-		layout->addWidget(minEdit, 0,1) ;
-		layout->addWidget(maxEdit, 1,1) ;
-		layout->addWidget(buttons,2,0,1,2);
-		dialog->setLayout(layout) ;
-		connect(buttons,SIGNAL(accepted()),dialog,SLOT(accept())) ;
-		connect(buttons,SIGNAL(rejected()),dialog,SLOT(reject())) ;
-		dialog->exec() ;
-		if (dialog->result())
-		{
-			ranges[selectedRange]->pointMoved(mode, 0, minEdit->text().toDouble(),0) ;
-			ranges[selectedRange]->pointMoved(mode, 1, maxEdit->text().toDouble(),0) ;
-			emit rangesModified(&ranges) ;
-			plot()->replot() ;
-		}
-	}
-}  */
 
 bool CanvasPicker::eventFilter ( QObject *object, QEvent *e )
 {
@@ -170,8 +107,8 @@ bool CanvasPicker::eventFilter ( QObject *object, QEvent *e )
 		}
 		case QEvent::MouseButtonPress:
 		{
-			qDebug("trying to select item") ;
 			select ( ( ( QMouseEvent * ) e )->pos() );
+			qDebug("selected item %d %d",d_selectedCurve, d_selectedPoint) ;
 			if(((QMouseEvent*)e)->button() == Qt::RightButton && d_selectedCurve)
 			{
 				qDebug("calling for contextMenu") ;
@@ -270,14 +207,16 @@ bool CanvasPicker::eventFilter ( QObject *object, QEvent *e )
 
 void CanvasPicker::select ( const QPoint &pos )
 {
+	qDebug("CanvasPicker::select") ;
 	specCanvasItem *curve = NULL;
 	double dist = 10e10;
 	int index = -1;
-//     const QwtPlotItemList& itmList = plot()->itemList();
+	const QwtPlotItemList& itmList = plot()->itemList();
 	d_selectedCurve = NULL;
 	d_selectedPoint = -1;
-	if ( ! plot()->selectable() ) return ;
-	for ( QList<specCanvasItem*>::iterator it = plot()->selectable()->begin(); it != plot()->selectable()->end(); ++it )
+//	if ( plot()->itemList().isEmpty() ) return ;
+
+	for ( QwtPlotItemIterator it = plot()->itemList().begin(); it != plot()->itemList().end(); ++it )
 	{
 		if ( ( *it )->rtti() == QwtPlotCurve::Rtti_PlotCurve )
 		{
@@ -310,28 +249,6 @@ void CanvasPicker::select ( const QPoint &pos )
 // 	d_selectedCurve->selectPoint ( d_selectedPoint ) ; // TODO create parent of both range and modelitem, must be child of QwtPlotCurve
 }
 
-/* void CanvasPicker::setMoveMode ( spec::moveMode newMode )
-{
-	if ( ( mode = newMode ) == spec::none || mode == spec::newZero )
-		foreach ( specModelItem* changeSymbol, selectable ) // TODO maybe purge selectable list
-		changeSymbol->setSymbol ( QwtSymbol() );// TODO clear selected point in Canvas Picker
-	else
-	{
-		foreach ( specModelItem* changeSymbol, selectable )
-		changeSymbol->setSymbol ( QwtSymbol ( QwtSymbol::Ellipse,changeSymbol->pen().brush(), ( QPen ) Qt::black, QSize ( 5,5 ) ) ) ; // TODO point size from settings
-	}
-	if ( mode != spec::newZero )
-		while ( ranges.size() )
-		{
-			ranges.first()->detach() ;
-			delete ranges.takeFirst() ;
-		}
-	selectedRange = -1 ;
-}*/
-
-// void CanvasPicker::enableMoveMode ( spec::moveMode newMode ) { setMoveMode ( ( spec::moveMode ) ( mode | newMode ) ) ; }
-
-// void CanvasPicker::disableMoveMode ( spec::moveMode newMode ) { setMoveMode ( ( spec::moveMode ) ( mode & ~newMode ) ) ; }
 
 // Move the selected point
 void CanvasPicker::moveBy ( int dx, int dy )
@@ -383,8 +300,7 @@ void CanvasPicker::move ( const QPoint &pos )
 {
 	if ( !d_selectedCurve )
 		return;
-// 	QTextStream cout ( stdout,QIODevice::WriteOnly ) ;
-// 	cout << "Picker list size: " << plot->selectable->size() << endl ;
+
 	qDebug("moving point") ;
 	emit pointMoved(d_selectedCurve,d_selectedPoint,
 			plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
@@ -462,6 +378,7 @@ void CanvasPicker::showCursor ( bool showIt )
 // Select the next/previous curve
 void CanvasPicker::shiftCurveCursor ( bool up )
 {
+	qDebug("CanvasPicker::shiftCurveCursor") ;
 	QwtPlotItemIterator it;
 
 	const QwtPlotItemList &itemList = plot()->itemList();

@@ -1,15 +1,19 @@
 #include "specspectrumplot.h"
 #include "actionlib/specplotmovecommand.h"
 #include "actionlib/specplotmovecommand.h"
+#include "utility-functions.h"
 
 specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	specPlot(parent),
-	model(0)
+	view(0),
+	picker(0)
 {
-	offsetAction  = new QAction(QIcon(":/offset.png"), "Offset", this) ;
-	offlineAction = new QAction(QIcon(":/offline.png"), "Slope",this) ;
-	scaleAction   = new QAction(QIcon(":/scale.png"),"Scale", this) ;
-	shiftAction   = new QAction(QIcon(":/shift.png"),"shift x",this) ;
+	correctionActions = new QActionGroup(this) ;
+	correctionActions->setExclusive(false);
+	offsetAction  = new QAction(QIcon(":/offset.png"), "Offset", correctionActions) ;
+	offlineAction = new QAction(QIcon(":/offline.png"), "Slope",correctionActions) ;
+	scaleAction   = new QAction(QIcon(":/scale.png"),"Scale", correctionActions) ;
+	shiftAction   = new QAction("shift x",correctionActions) ;
 
 	correctionActions->addAction(offsetAction) ;
 	correctionActions->addAction(offlineAction) ;
@@ -29,26 +33,34 @@ void specSpectrumPlot::correctionsChanged()
 	if (!checked)
 	{
 		// TODO unset highlighting
+		qDebug("removing picker") ;
 		if (picker)
 		{
 			delete picker ;
 			picker = 0 ;
 		}
 		pointHash.clear();
-		// TODO merge undo stack actions
+		// TODO merge undo stack actions -- dangerous:  consider other actions might have been performed meanwhile
+//		disconnect(undoPartner,SIGNAL(stackChanged()),this,SLOT(replot())) ;
 	}
 	else
 	{
-		picker = new CanvasPicker(this) ;
-		connect(picker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)),this,SLOT(pointMoved(specCanvasItem*,int,double,double))) ;
+		if (!picker)
+		{
+			qDebug("installing picker") ;
+			picker = new CanvasPicker(this) ;
+			connect(picker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this,SLOT(pointMoved(specCanvasItem*,int,double,double))) ;
+		}
+//		connect(undoPartner,SIGNAL(stackChanged()),this,SLOT(replot())) ;
 		// TODO set highlighting
 	}
 }
 
 void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double y)
 {
-	if (!model) return ;
+	if (!view) return ;
 	// get reference to point list from point hash (in order to re-use old code below)
+	qDebug("processing moved point") ;
 	QList<int>& selectedPoints = pointHash[item] ;
 	// Add new Point to list.
 	selectedPoints.prepend(selectedPoints.contains(no) ? selectedPoints.takeAt(selectedPoints.indexOf(no)) : no) ;
@@ -62,6 +74,7 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 
 	// compute other corrections:
 	// TODO rewrite code for GSL
+	qDebug("creating matrix") ;
 	QList<QList<double> > matrix ;
 	for (int i = 0 ; i < selectedPoints.size() ; i++) matrix << QList<double>() ;
 	if (scaleAction->isChecked())
@@ -79,6 +92,8 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 	while(matrix[0].size() < matrix.size()) // verringere, wenn noetig, die Zeilenzahl
 		matrix.takeLast() ;
 
+	qDebug("computing coeffs") ;
+	QList<double> coeffs ;
 	if (!matrix.isEmpty())
 	{
 		QList<double> yVals ;
@@ -87,15 +102,17 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 			yVals << (scaleAction->isChecked() ? item->sample(selectedPoints[i]).y() : 0 ) ;
 
 		// do coefficient calculation
-		QList<double> coeffs = gaussjinv(matrix,yVals) ;
+		coeffs = gaussjinv(matrix,yVals) ;
 	}
 
-	double scale = scaleAction->isChecked() ? coeffs.takeFirst() : 1. ,
-	       offset= offsetAction->isChecked()? coeffs.takeFirst() : 0. ,
-	       offline=offlineAction->isChecked()?coeffs.takeFirst() : 0. ;
+	double scale = scaleAction->isChecked() && !coeffs.isEmpty() ? coeffs.takeFirst() : 1. ,
+	       offset= offsetAction->isChecked()&& !coeffs.isEmpty() ? coeffs.takeFirst() : 0. ,
+	       offline=offlineAction->isChecked()&&!coeffs.isEmpty() ?coeffs.takeFirst() : 0. ;
 
+	qDebug("pushing new move command %f %f %f %f",shift,offset,offline,scale) ;
 	specPlotMoveCommand *command = new specPlotMoveCommand ;
-	command->setItem(model->index(item)) ;
+	command->setItem(view->model()->index( (specModelItem*) item)) ; // TODO do dynamic cast first!!
 	command->setCorrections(shift,offset,offline,scale) ;
+	command->setParentWidget(view) ;
 	undoPartner->push(command) ;
 }

@@ -11,7 +11,6 @@ specGenealogy::specGenealogy(QModelIndexList &list)
 	  knowingParent(false)
 {
 	qDebug("initializing genealogy") ;
-	QList<specModelItem*> Items ;
 	if (list.isEmpty()) return ;
 	QModelIndexList::iterator last = list.begin() ;
 	Model = (specModel*) last->model() ;
@@ -41,10 +40,12 @@ specGenealogy::specGenealogy(QModelIndexList &list)
 	qDebug("removing indexes from list") ;
 	// rid the list of those entries we took
 	list.erase(list.begin(),last) ;
+	qDebug("items list size: %d  Validity: %d %d %d %d",Items.size(), Model, Parent, !indexes.isEmpty(), !Items.isEmpty()) ;
 }
 
 bool specGenealogy::valid()
 {
+	qDebug("Validity: %d %d %d %d", Model, Parent, !indexes.isEmpty(), !Items.isEmpty()) ;
 	return Model && Parent && !indexes.isEmpty() && !Items.isEmpty() ;
 }
 
@@ -160,7 +161,7 @@ const QList<specModelItem*>& specGenealogy::items() const
 bool specGenealogy::operator ==(const specGenealogy& other)
 {
 	bool returnValue = true ;
-	if (other.Items().size() != Items.size()) return false ;
+	if (other.Items.size() != Items.size()) return false ;
 	for (int i = 0 ; i < Items.size() ; ++i)
 		returnValue = returnValue && (Items[i] == other.Items[i]) ;
 	return returnValue ;
