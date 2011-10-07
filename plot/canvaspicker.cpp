@@ -386,9 +386,12 @@ void CanvasPicker::move ( const QPoint &pos )
 // 	QTextStream cout ( stdout,QIODevice::WriteOnly ) ;
 // 	cout << "Picker list size: " << plot->selectable->size() << endl ;
 	qDebug("moving point") ;
-	d_selectedCurve->pointMoved ( d_selectedPoint,
-	                              plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
-	                              plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ;
+	emit pointMoved(d_selectedCurve,d_selectedPoint,
+			plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
+			plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ;
+//	d_selectedCurve->pointMoved ( d_selectedPoint,
+//	                              plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
+//	                              plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ;
 	qDebug("emitting signal") ;
 	emit moved(d_selectedCurve) ; // TODO remove this signal
 	/* 	if ( mode == spec::newZero ) // TODO

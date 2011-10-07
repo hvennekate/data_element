@@ -27,6 +27,9 @@ public:
 	const QList<specModelItem*>& items() const ;
 	QDataStream& write(QDataStream&) ;
 	QDataStream& read(specModel*, QDataStream&) ;
+
+	bool operator==(const specGenealogy& other) ;
+	bool operator!=(const specGenealogy& other) ;
 };
 
 #endif // SPECGENEALOGY_H
