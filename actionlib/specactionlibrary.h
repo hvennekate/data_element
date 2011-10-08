@@ -34,6 +34,7 @@ public:
 	void setLastRequested(const QModelIndexList&) ;
 	void moveInternally(const QModelIndex&, int row, specView*) ;
 signals:
+	void stackChanged() ;
 
 public slots:
 

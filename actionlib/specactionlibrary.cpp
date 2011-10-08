@@ -8,11 +8,13 @@
 #include "speccopyaction.h"
 #include "specpasteaction.h"
 #include "speccutaction.h"
+#include "specplotmovecommand.h"
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
 {
 	undoStack = new QUndoStack ;
+	connect(undoStack,SIGNAL(indexChanged(int)),this,SIGNAL(stackChanged())) ;
 	qDebug("***** action library initialized") ;
 	qDebug() << undoStack ;
 }
@@ -114,8 +116,8 @@ QDataStream& specActionLibrary::read(QDataStream &in)
 	{
 		qint32 id, parentId ;
 		in >> id >> parentId ;
-		qDebug() << "Id: " << id << "Parent: " << parentId ;
-		specUndoCommand* command ;
+		qDebug() << "Id: " << id << "Parent: " << parentId << parents[parentId] ;
+		specUndoCommand* command = 0 ;
 		switch(id)
 		{
 		case spec::deleteId :
@@ -127,9 +129,13 @@ QDataStream& specActionLibrary::read(QDataStream &in)
 		case spec::moveItemsId :
 			command = new specMoveCommand ;
 			break ;
+		case spec::movePlotId :
+			command = new specPlotMoveCommand ;
+			break ;
 		}
 		if (!command) continue ;
-			command->setParentWidget(parents[parentId]) ;
+		command->setParentWidget(parents[parentId]) ;
+		qDebug() << "pushing read in command onto stack" << command ;
 		undoStack->push(command) ;
 		qDebug() << "pushed command.  Stack size: " << undoStack->count() ;
 	}
