@@ -5,22 +5,29 @@
 #include <QHash>
 #include <QList>
 #include <QActionGroup>
+#include "actionlib/specactionlibrary.h"
+#include "specview.h"
 
 class specSpectrumPlot : public specPlot
 {
 	Q_OBJECT
 private:
-	QAction *offsetAction, *offlineAction, *scaleAction ;
+	QAction *offsetAction, *offlineAction, *scaleAction, *shiftAction ;
 	QActionGroup *correctionActions ;
-	CanvasPicker *oldPicker ; // TODO remove
+	CanvasPicker *picker ;
+	specActionLibrary *undoPartner ;
+	QHash<specCanvasItem*, QList<int> > pointHash ;
+	specView *view ;
 public:
 	explicit specSpectrumPlot(QWidget *parent = 0);
-	QActionGroup *actions() { return correctionActions ; }
-
+	QList<QAction*> actions() { return correctionActions->actions() ; }
+	void setView(specView* mod) { view = mod ; }
+	void setUndoPartner(specActionLibrary* lib) { undoPartner = lib ; }
 signals:
 
 private slots:
 	void correctionsChanged() ;
+	void pointMoved(specCanvasItem*,int point, double x, double y) ;
 
 };
 
