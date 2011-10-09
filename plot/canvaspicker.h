@@ -28,16 +28,23 @@ private:
 	void shiftCurveCursor(bool up);
 	void movePointExplicitly() ;
 	specPlot *plot() { return (specPlot *)parent(); }
+	QList<specCanvasItem*> selectable ;
+	void highlightSelectable(bool) ;
 
 	specCanvasItem *d_selectedCurve, *lastSelected;
 	int d_selectedPoint;
 
 public:
 	explicit CanvasPicker(specPlot *plot);
+	~CanvasPicker() ;
 	virtual bool eventFilter(QObject *, QEvent *);
 
 	virtual bool event(QEvent *);
 	specCanvasItem* current() ;
+	void addSelectable(QList<specCanvasItem*>&) ;
+	void addSelectable(specCanvasItem*) ;
+	void removeSelectable(QList<specCanvasItem*>&) ;
+	void removeSelectable(specCanvasItem*) ;
 
 signals:
 	void moved(specCanvasItem*) ;
