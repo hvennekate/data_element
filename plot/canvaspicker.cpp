@@ -216,7 +216,7 @@ void CanvasPicker::select ( const QPoint &pos )
 	d_selectedPoint = -1;
 //	if ( plot()->itemList().isEmpty() ) return ;
 
-	for ( QwtPlotItemIterator it = plot()->itemList().begin(); it != plot()->itemList().end(); ++it )
+	for ( QList<specCanvasItem*>::iterator it = selectable.begin(); it != selectable.end(); ++it )
 	{
 		if ( ( *it )->rtti() == QwtPlotCurve::Rtti_PlotCurve )
 		{
@@ -379,41 +379,33 @@ void CanvasPicker::showCursor ( bool showIt )
 void CanvasPicker::shiftCurveCursor ( bool up )
 {
 	qDebug("CanvasPicker::shiftCurveCursor") ;
-	QwtPlotItemIterator it;
+	QList<specCanvasItem*>::iterator it;
 
-	const QwtPlotItemList &itemList = plot()->itemList();
-
-	QwtPlotItemList curveList;
-	for ( it = itemList.begin(); it != itemList.end(); ++it )
-	{
-		if ( ( *it )->rtti() == QwtPlotCurve::Rtti_PlotCurve )
-			curveList += *it;
-	}
-	if ( curveList.isEmpty() )
+	if ( selectable.isEmpty() )
 		return;
 
 	it = curveList.begin();
 
 	if ( d_selectedCurve )
 	{
-		for ( it = curveList.begin(); it != curveList.end(); ++it )
+		for ( it = selectable.begin(); it != selectable.end(); ++it )
 		{
 			if ( d_selectedCurve == *it )
 				break;
 		}
-		if ( it == curveList.end() ) // not found
-			it = curveList.begin();
+		if ( it == selectable.end() ) // not found
+			it = selectable.begin();
 
 		if ( up )
 		{
 			++it;
-			if ( it == curveList.end() )
-				it = curveList.begin();
+			if ( it == selectable.end() )
+				it = selectable.begin();
 		}
 		else
 		{
-			if ( it == curveList.begin() )
-				it = curveList.end();
+			if ( it == selectable.begin() )
+				it = selectable.end();
 			--it;
 		}
 	}
@@ -469,4 +461,49 @@ void CanvasPicker::movePointExplicitly()
 	query->setLayout(layout) ;
 	if(query->exec() == QDialog::Accepted)
 		curve->pointMoved(point, xBox->text().toDouble(), yBox->text().toDouble()) ;
+}
+
+void CanvasPicker::highlightSelectable(bool highlight)
+{
+	// TODO enable highlighting on selectable items
+}
+
+void CanvasPicker::addSelectable(specCanvasItem *item)
+{
+	QList<specCanvasItem*> list ;
+	list << item ;
+	addSelectable(list) ;
+}
+
+void CanvasPicker::removeSelectable(specCanvasItem *)
+{
+	QList<specCanvasItem*> list ;
+	list << item ;
+	removeSelectable(list) ;
+}
+
+void CanvasPicker::addSelectable(QList<specCanvasItem *> &list)
+{
+	selectable << list ;
+//	foreach(specCanvasItem* item, list)  // TODO consider this version.
+//		if (!list.contains(item))
+//			list << item ;
+	highlightSelectable(true) ;
+	plot()->replot();
+}
+
+void CanvasPicker::removeSelectable(QList<specCanvasItem *> &list)
+{
+	highlightSelectable(false) ;
+	foreach(specCanvasItem* item, list)
+		selectable.removeOne(item) ;
+	highlightSelectable(true) ;
+	plot()->replot() ;
+}
+
+CanvasPicker::~CanvasPicker()
+{
+	highlightSelectable(false) ;
+	selectable.clear();
+	plot()->replot();
 }

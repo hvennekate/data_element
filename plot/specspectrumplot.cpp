@@ -23,16 +23,62 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	connect(correctionActions,SIGNAL(triggered(QAction*)),this,SLOT(correctionsChanged())) ;
 	foreach(QAction *action, correctionActions->actions())
 		action->setCheckable(true) ;
+
+	alignmentActions = new QActionGroup(this) ;
+	alignmentActions->setExclusive(false) ;
+	setReferenceAction = new QAction("set reference",alignmentActions) ;
+	alignWithReferenceAction = new QAction("align",alignmentActions) ;
+	alignWithReferenceAction->setCheckable() ;
+	alignWithReferenceAction->setChecked(false) ;
+	addRangeAction = new QAction("new range",alignmentActions) ;
+	removeRangeAction = new QAction("delete range",alignmentActions) ;
+	noSlopeAction = new QAction("no slope",alignmentActions) ;
+	noSlopeAction->setCheckable() ;
+	noSlopeAction->setChecked(false) ;
+
+	alignmentActions->addAction(setReferenceAction) ;
+	alignmentActions->addAction(alignWithReferenceAction) ;
+	alignmentActions->addAction(addRangeAction) ;
+	alignmentActions->addAction(removeRangeAction) ;
+	alignmentActions->addAction(noSlopeAction) ;
+
+
+	connect(alignmentActions,SIGNAL(triggered(QAction*)),this,SLOT(alignmentChanged(QAction*))) ;
 }
 
-void specSpectrumPlot::correctionsChanged()
+void specSpectrumPlot::alignmentChanged(QAction *action)
+{
+	if (action == setReferenceAction)
+	{
+	}
+	else if (action == alignWithReferenceAction)
+	{
+		correctionActions->setDisabled(alignWithReferenceAction->isChecked());
+		// TODO disable/enable highlighting of ranges or plots  ...
+		// !alignWithReferenceAction->isChecked() && correctionsChecked()
+		// or maybe simply call correctionsChanged()
+	}
+	else if (action == addRangeAction)
+	{
+
+	}
+	else if (action == )
+		;
+}
+
+bool specSpectrumPlot::correctionChecked()
 {
 	bool checked = false ;
 	foreach(QAction *action, correctionActions->actions())
 		checked = checked || action->isChecked() ;
-	if (!checked)
+	return checked ;
+}
+
+void specSpectrumPlot::correctionsChanged()
+{
+	if (!correctionChecked() || !correctionActions->isEnabled())
 	{
-		// TODO unset highlighting
+		// TODO unset highlighting -- should be done by picker...
 		qDebug("removing picker") ;
 		if (picker)
 		{
