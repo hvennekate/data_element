@@ -25,6 +25,9 @@ class specCanvasItem : public QwtPlotCurve
 		void setLineWidth() ;
 		~specCanvasItem();
 
+		int rtti() const { return spec::canvasItem ; }
+		void highlight(bool highlight) ;
+
 };
 
 #endif

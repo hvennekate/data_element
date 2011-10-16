@@ -18,13 +18,14 @@ private:
 	CanvasPicker *picker ;
 	specActionLibrary *undoPartner ;
 	QHash<specCanvasItem*, QList<int> > pointHash ;
+	QList<specRange*> zeroRanges ;
 	specView *view ;
 
 	bool correctionChecked() ;
 
 public:
 	explicit specSpectrumPlot(QWidget *parent = 0);
-	QList<QAction*> actions() { return correctionActions->actions() ; }
+	QList<QAction*> actions() { return QList<QAction*>() << correctionActions->actions() << alignmentActions->actions() ; }
 	void setView(specView* mod) { view = mod ; }
 	void setUndoPartner(specActionLibrary* lib) { undoPartner = lib ; }
 signals:
@@ -33,6 +34,7 @@ private slots:
 	void correctionsChanged() ;
 	void alignmentChanged(QAction*) ;
 	void pointMoved(specCanvasItem*,int point, double x, double y) ;
+	void applyZeroRanges(specCanvasItem*,int point, double x, double y) ;
 
 };
 

@@ -3,6 +3,7 @@
 #include "specplot.h"
 #include <QTextStream>
 #include <QInputDialog>
+#include <qwt_symbol.h>
 
 specCanvasItem::specCanvasItem( QString description)
 		: QwtPlotCurve(description)
@@ -130,3 +131,8 @@ void specCanvasItem::setLineWidth()
 
 QMenu* specCanvasItem::contextMenu()
 { return 0 ;} // TODO
+
+void specCanvasItem::highlight(bool highlight)
+{
+	setSymbol(highlight ? (new QwtSymbol(QwtSymbol::Ellipse,brush(),pen(),QSize(5,5))) : (new QwtSymbol()));
+}
