@@ -17,6 +17,7 @@ public:
 
 	QMenu* contextMenu() ;
 	void refreshPlotData();
+	int rtti() const { return spec::kineticRange ; }
 	friend QDataStream& operator<<(QDataStream&, const specKineticRange&);
 	friend QDataStream& operator>>(QDataStream&, specKineticRange&);
 };

@@ -13,6 +13,7 @@ public:
 	specRange ( double,double );
 	void pointMoved ( const int&, const double&, const double& ) ;
 	virtual void refreshPlotData() ;
+	int rtti() const { return spec::zeroRange ; }
 	~specRange();
 
 };

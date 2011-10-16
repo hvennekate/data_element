@@ -38,7 +38,7 @@ void specRange::refreshPlotData()
 	xarr << minValue() << maxValue() ;
 	yarr << yVal << yVal ;
 	setSamples(xarr,yarr) ;
-	((specPlot*) plot())->refreshRanges() ;
+//	((specPlot*) plot())->refreshRanges() ; // TODO check if this works for kinetics also
 }
 
 specRange::~specRange()

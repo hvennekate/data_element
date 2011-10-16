@@ -72,6 +72,8 @@ public:
 	virtual void movingAverage(int) {}
 	virtual void average(int) {}
 	virtual void subMap(const QMap<double,double>&) {}
+
+	int rtti() const { return spec::spectrum ; }
 	
 	friend QDataStream& operator>>(QDataStream&, specModelItem*&) ;
 	QDataStream& writeOut(QDataStream&) const;
