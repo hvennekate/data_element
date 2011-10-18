@@ -27,7 +27,7 @@ namespace spec{
 	enum separator{ nosep=0, space=1, tab=2, newline=3 } ;
 	enum value{ time=0, wavenumber=1, signal=2, maxInt=3 } ;
 
-	enum undoActionIds{ deleteId = 10, newFolderId = 11, moveItemsId = 12, modifyDataId = 13, movePlotId = 14 } ;
+	enum undoActionIds{ deleteId = 10, newFolderId = 11, moveItemsId = 12, modifyDataId = 13, movePlotId = 14, multiMoveId = 15 } ;
 	enum itemRoles { activeLineRole = 50, fullContentRole = 51 } ;
 
 	enum rtti {canvasItem = 1001, spectrum = 1010, zeroRange = 1020, kineticCurve = 1030, kineticRange = 1040 } ;

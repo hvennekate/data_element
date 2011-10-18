@@ -1,12 +1,19 @@
 #include "specspectrumplot.h"
 #include "actionlib/specplotmovecommand.h"
-#include "actionlib/specplotmovecommand.h"
+#include "actionlib/specmultiplotmovecommand.h"
 #include "utility-functions.h"
+#include <QBuffer>
+#include "qwt/qwt_plot_renderer.h"
+#include <qwt_scale_div.h>
+#include <QDialog>
+#include <QVBoxLayout>
+#include <QLabel>
 
 specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	specPlot(parent),
 	view(0),
-	picker(0)
+	picker(0),
+	reference(0)
 {
 	correctionActions = new QActionGroup(this) ;
 	correctionActions->setExclusive(false);
@@ -36,6 +43,15 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	noSlopeAction->setCheckable(true) ;
 	noSlopeAction->setChecked(false) ;
 
+
+	QImage image(":/add.png") ;
+	QByteArray byteArray ;
+	QBuffer buffer(&byteArray) ;
+	buffer.open(QIODevice::WriteOnly) ;
+	image.save(&buffer,"PNG") ;
+
+	setReferenceAction->setToolTip(QString("test<b>fett</b> <img src=\"data:image/png;base64,%1\"></img>").arg(QString(buffer.data().toBase64())));
+
 	alignmentActions->addAction(setReferenceAction) ;
 	alignmentActions->addAction(alignWithReferenceAction) ;
 	alignmentActions->addAction(addRangeAction) ;
@@ -46,10 +62,88 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	connect(alignmentActions,SIGNAL(triggered(QAction*)),this,SLOT(alignmentChanged(QAction*))) ;
 }
 
+QList<specDataItem*> specSpectrumPlot::folderContent(specModelItem *folder)
+{
+	QList<specDataItem*> content ;
+	if (dynamic_cast<specDataItem*>(folder))
+		content << (specDataItem*) folder ;
+	for (int i = 0 ; i < folder->children() ; ++i)
+	{
+		specModelItem* item = ((specFolderItem*)folder)->child(i) ;
+		if (dynamic_cast<specDataItem*>(item))
+			content << (specDataItem*) item ;
+		else if (item->isFolder())
+			content << folderContent((specFolderItem*) item) ;
+	}
+	return content ;
+}
+
 void specSpectrumPlot::alignmentChanged(QAction *action)
 {
 	if (action == setReferenceAction)
 	{
+		if (reference) delete reference ;
+		QModelIndexList referenceItems = view->getSelection() ;
+
+		// convert indexes to pointers
+		QList<specDataItem*> referenceDataItems ;
+		for(int i = 0 ; i < referenceItems.size() ; ++i)
+			referenceDataItems << folderContent(view->model()->itemPointer(referenceItems[i])) ;
+		if (referenceDataItems.isEmpty())
+		{
+			reference = 0 ;
+			return ;
+		}
+		reference = new specDataItem(QList<specDataPoint>(),QHash<QString,specDescriptor>()) ;
+		for (int i = 0 ; i < referenceDataItems.size() ; ++i)
+			reference->operator +=(*(referenceDataItems[i])) ;
+		reference->flatten();
+		reference->setPen(QPen(Qt::red));
+
+		// build tooltip
+		QwtPlot toolTipPlot ;
+		toolTipPlot.setAutoDelete(false) ;
+		reference->attach(&toolTipPlot) ;
+		toolTipPlot.replot();
+		QwtScaleDiv *scaleDiv = toolTipPlot.axisScaleDiv(QwtPlot::xBottom) ; // this does not seem to work as intended...
+		QList<double> ticks = scaleDiv->ticks(QwtScaleDiv::MajorTick) ;
+		QList<double> newTicks ;
+		newTicks << ticks.first() ;
+		newTicks << ticks[ticks.size()/2] ;
+		newTicks << ticks.last() ;
+		scaleDiv->setTicks(QwtScaleDiv::MajorTick,newTicks) ;
+
+		scaleDiv = toolTipPlot.axisScaleDiv(QwtPlot::yLeft) ; // TODO outsource to new function
+		ticks = scaleDiv->ticks(QwtScaleDiv::MajorTick) ;
+		newTicks.clear(); ;
+		newTicks << ticks.first() ;
+		newTicks << ticks[ticks.size()/2] ;
+		newTicks << ticks.last() ;
+		scaleDiv->setTicks(QwtScaleDiv::MajorTick,newTicks) ;
+
+		toolTipPlot.replot();
+
+		QImage plotImage(200,100,QImage::Format_ARGB32) ;
+		QwtPlotRenderer renderer ;
+		renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, true);
+		renderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground,true) ;
+		renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, false);
+		renderer.renderTo(&toolTipPlot,plotImage) ;
+
+		QDialog newDialog ;
+		newDialog.setLayout(new QVBoxLayout) ;
+		QLabel *newLabel =new QLabel(&newDialog) ;
+		newLabel->setPixmap(QPixmap::fromImage(plotImage)) ;
+		newDialog.layout()->addWidget(newLabel);
+		newDialog.exec() ;
+
+		QByteArray byteArray ;
+		QBuffer buffer(&byteArray) ;
+		buffer.open(QIODevice::WriteOnly) ;
+		plotImage.save(&buffer,"PNG") ;
+
+		setReferenceAction->setToolTip(QString("Momentane Referenz:<br><img src=\"data:image/png;base64,%1\"></img>").arg(QString(buffer.data().toBase64())));
+
 	}
 	else if (action == alignWithReferenceAction)
 	{
@@ -191,7 +285,8 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* item,int point, double ne
 	((specRange*) item)->pointMoved(point,newX,newY) ;
 	QwtPlotItemList zeroRanges = itemList(spec::zeroRange) ;
 	QwtPlotItemList spectra = itemList(spec::spectrum) ; // TODO roll back previous undo command if it was of the same kind and merge with what is to come.
-	specUndoCommand *zeroCommand = new specUndoCommand ; // TODO establish extra class
+	specMultiPlotMoveCommand *zeroCommand = new specMultiPlotMoveCommand ; // TODO establish extra class
+	zeroCommand->setParentWidget(view) ;
 	for (int i = 0 ; i < spectra.size() ; ++i)
 	{
 		QList<QPointF> pointsInRange ;
