@@ -504,8 +504,7 @@ void CanvasPicker::removeSelectable(QList<specCanvasItem *> &list)
 		d_selectedCurve = 0 ;
 		d_selectedPoint = -1 ;
 	}
-	foreach(specCanvasItem* item, list)
-		selectable.removeOne(item) ;
+	qDebug() << "Owning: " << owning << "list size:" << list.size() ;
 	if (owning)
 	{
 		foreach(specCanvasItem* item, list)
@@ -514,6 +513,9 @@ void CanvasPicker::removeSelectable(QList<specCanvasItem *> &list)
 			delete item ;
 		}
 	}
+	foreach(specCanvasItem* item, list)
+		selectable.removeOne(item) ;
+
 	highlightSelectable(true) ;
 	plot()->replot() ;
 }
@@ -530,7 +532,5 @@ void CanvasPicker::removeSelected()
 
 CanvasPicker::~CanvasPicker()
 {
-	highlightSelectable(false) ;
-	selectable.clear();
-	plot()->replot();
+	removeSelectable(selectable);
 }

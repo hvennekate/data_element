@@ -80,7 +80,7 @@ void specManageItemsCommand::restore()
 	finish() ;
 }
 
-QDataStream& specManageItemsCommand::write(QDataStream & out)
+QDataStream& specManageItemsCommand::write(QDataStream & out) const
 {
 	out << qint32(items.size()) ;
 	qDebug("###### written size of genealogy list: %d", items.size()) ;

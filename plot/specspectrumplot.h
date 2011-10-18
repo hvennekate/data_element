@@ -20,8 +20,11 @@ private:
 	QHash<specCanvasItem*, QList<int> > pointHash ;
 	QList<specRange*> zeroRanges ;
 	specView *view ;
+	specDataItem *reference ;
 
 	bool correctionChecked() ;
+
+	QList<specDataItem*> folderContent(specModelItem*) ;
 
 public:
 	explicit specSpectrumPlot(QWidget *parent = 0);

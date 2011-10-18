@@ -12,8 +12,8 @@ public:
 //	virtual void redo() = 0;
 //	virtual void undo() = 0;
 
-	virtual QDataStream& write(QDataStream& out) { return out ; }
-	virtual QDataStream& read(QDataStream& in) {return in ; }
+	virtual QDataStream& write(QDataStream& out) const = 0 ;
+	virtual QDataStream& read(QDataStream& in) = 0 ;
 	void setParentWidget(QWidget*) ;
 	QWidget *parentWidget() ;
 signals:

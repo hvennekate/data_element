@@ -45,10 +45,11 @@ void specPlotMoveCommand::undo()
 	}
 }
 
-bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
+
+bool specPlotMoveCommand::copy(const specPlotMoveCommand * ot)
 {
 	qDebug("trying merge of move commands") ;
-	specPlotMoveCommand *other = (specPlotMoveCommand*) ot ;
+	const specPlotMoveCommand *other = (const specPlotMoveCommand*) ot ;
 	qDebug("merging...") ;
 	if (! (this->items && other->items)) return false ;
 	if (*(other->items) != *(this->items)) return false ;
@@ -59,11 +60,15 @@ bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
 	return true ;
 }
 
+bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
+{
+	return copy((const specPlotMoveCommand*) ot) ;
+}
+
 void specPlotMoveCommand::setItem(QModelIndex index)
 {
 	if (items) delete items ;
 	items = new specGenealogy(QModelIndexList() << index) ;
-	qDebug("initialized genealogy %d %d",items->valid(),index.isValid()) ;
 }
 
 void specPlotMoveCommand::setCorrections(double xShift, double yOffset, double ySlope, double yScale)
@@ -74,7 +79,7 @@ void specPlotMoveCommand::setCorrections(double xShift, double yOffset, double y
 	scale = yScale ;
 }
 
-QDataStream& specPlotMoveCommand::write(QDataStream &out)
+QDataStream& specPlotMoveCommand::write(QDataStream &out) const
 {
 	out << slope << offset << scale << shift ;
 	return items->write(out) ;
@@ -87,4 +92,9 @@ QDataStream& specPlotMoveCommand::read(QDataStream &in)
 		delete items ;
 	items = new specGenealogy(((specView*) parentWidget())->model(),in) ;
 	return in ;
+}
+
+bool specPlotMoveCommand::itemsMatch(specPlotMoveCommand *other)
+{
+	return *(other->items) == *items ;
 }

@@ -15,7 +15,7 @@ public:
 	virtual ~specManageItemsCommand() ;
 	bool ok() ;
 	void setItems(QModelIndexList&) ;
-	QDataStream& write(QDataStream &) ;
+	QDataStream& write(QDataStream &) const ;
 	QDataStream& read(QDataStream &) ;
 protected:
 	void take() ;

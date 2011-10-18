@@ -123,7 +123,7 @@ void specMoveCommand::undo()
 	model->signalEndReset();
 }
 
-QDataStream& specMoveCommand::write(QDataStream &out)
+QDataStream& specMoveCommand::write(QDataStream &out) const
 {
 	out << sourceIndexes << qint32(number) << targetIndex << sourceIndex ;
 	return out ;
