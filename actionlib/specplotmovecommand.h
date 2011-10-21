@@ -17,8 +17,11 @@ public:
 	void setItem(QModelIndex) ;
 	void setCorrections(double xShift, double yOffset, double ySlope, double yScale) ;
 	int id() const { return spec::movePlotId ;}
+	bool itemsMatch(specPlotMoveCommand* other) ;
 
-	QDataStream& write(QDataStream &out) ;
+	bool copy(const specPlotMoveCommand*) ;
+
+	QDataStream& write(QDataStream &out) const ;
 	QDataStream& read(QDataStream &in) ;
 };
 

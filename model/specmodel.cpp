@@ -610,7 +610,8 @@ QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 {
 	qDebug("### requested mime data %d",this) ;
 	QMimeData *mimeData = new QMimeData() ;
-	QByteArray encodedData ;
+	QByteArray encodedData, textData ;
+	QTextStream textStream(&textData, QIODevice::WriteOnly) ;
 	QDataStream stream(&encodedData,QIODevice::WriteOnly) ;
 	QModelIndexList list = indices ;
 	qDebug("originally in list: %d",list.size()) ;
@@ -621,6 +622,17 @@ QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 	qDebug("exporting %d items of mime",list.size()) ;
 	if (dropBuddy)
 		dropBuddy->setLastRequested(list) ;
+	// For text export
+	QList<QPair<bool,QString> > headerFormat ;
+	headerFormat << QPair<bool,QString>(false,"")
+			<< QPair<bool,QString>(true,"\n")
+			<< QPair<bool,QString>(true,"Time/ps\tWavenumbers/cm-1\tSignal/DmOD\tmax. Int.") ;
+	QList<QPair<spec::value,QString> > dataFormat ;
+	dataFormat << QPair<spec::value,QString>(spec::time,"\t")
+			<< QPair<spec::value,QString>(spec::wavenumber,"\t")
+			<< QPair<spec::value,QString>(spec::signal,"\t")
+			<< QPair<spec::value,QString>(spec::maxInt,"\n") ;
+
 	foreach(QModelIndex index,list) // TODO eliminate children
 	{
 		qDebug("checking item") ;
@@ -628,11 +640,13 @@ QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 		{
 			qDebug("writing item") ;
 			itemPointer(index)->writeOut(stream) ;
+			itemPointer(index)->exportData(headerFormat, dataFormat, textStream);
 		}
 	}
 	
 // 	qDebug("setting mime data") ;
 	mimeData->setData(mime.first(),encodedData) ;
+	mimeData->setData("text/plain",textData) ;
 // 	qDebug("returning mime data") ;
 	return mimeData ;
 }

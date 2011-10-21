@@ -54,6 +54,8 @@ public:
 	void newRange(double min=INFINITY, double max=INFINITY) ;
 	void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
 	QModelIndexList connectedData() ;
+
+	int rtti() const { return spec::kineticCurve ; }
 };
 
 #endif

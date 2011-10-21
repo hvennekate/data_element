@@ -21,11 +21,13 @@
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <qwt_plot_directpainter.h>
+#include <QDebug>
 
 CanvasPicker::CanvasPicker ( specPlot *plot ) :
 		QObject ( plot ),
 		d_selectedCurve ( NULL ),
-		d_selectedPoint ( -1 ) //,
+		d_selectedPoint ( -1 ),
+		owning(false)
 //     mode(spec::none)
 {
 	QwtPlotCanvas *canvas = plot->canvas();
@@ -218,8 +220,8 @@ void CanvasPicker::select ( const QPoint &pos )
 
 	for ( QList<specCanvasItem*>::iterator it = selectable.begin(); it != selectable.end(); ++it )
 	{
-		if ( ( *it )->rtti() == QwtPlotCurve::Rtti_PlotCurve )
-		{
+//		if ( ( *it )->rtti() == QwtPlotCurve::Rtti_PlotCurve ) // TODO do we need an adapted version?
+//		{
 			specCanvasItem *c = ( specCanvasItem* ) ( *it );
 
 			double d;
@@ -230,7 +232,7 @@ void CanvasPicker::select ( const QPoint &pos )
 				index = idx;
 				dist = d;
 			}
-		}
+//		}
 	}
 
 	qDebug("showing cursor") ;
@@ -384,7 +386,7 @@ void CanvasPicker::shiftCurveCursor ( bool up )
 	if ( selectable.isEmpty() )
 		return;
 
-	it = curveList.begin();
+	it = selectable.begin();
 
 	if ( d_selectedCurve )
 	{
@@ -466,6 +468,8 @@ void CanvasPicker::movePointExplicitly()
 void CanvasPicker::highlightSelectable(bool highlight)
 {
 	// TODO enable highlighting on selectable items
+	for (int i = 0 ; i < selectable.size() ; ++i)
+		selectable[i]->highlight(highlight) ;
 }
 
 void CanvasPicker::addSelectable(specCanvasItem *item)
@@ -475,7 +479,7 @@ void CanvasPicker::addSelectable(specCanvasItem *item)
 	addSelectable(list) ;
 }
 
-void CanvasPicker::removeSelectable(specCanvasItem *)
+void CanvasPicker::removeSelectable(specCanvasItem *item)
 {
 	QList<specCanvasItem*> list ;
 	list << item ;
@@ -495,15 +499,38 @@ void CanvasPicker::addSelectable(QList<specCanvasItem *> &list)
 void CanvasPicker::removeSelectable(QList<specCanvasItem *> &list)
 {
 	highlightSelectable(false) ;
+	if (list.contains(d_selectedCurve))
+	{
+		d_selectedCurve = 0 ;
+		d_selectedPoint = -1 ;
+	}
+	qDebug() << "Owning: " << owning << "list size:" << list.size() ;
+	if (owning)
+	{
+		foreach(specCanvasItem* item, list)
+		{
+			item->detach();
+			delete item ;
+		}
+	}
 	foreach(specCanvasItem* item, list)
 		selectable.removeOne(item) ;
+
 	highlightSelectable(true) ;
 	plot()->replot() ;
 }
 
+void CanvasPicker::removeSelected()
+{
+	if (d_selectedCurve)
+	{
+		QList<specCanvasItem*> toRemove ;
+		toRemove << d_selectedCurve ;
+		removeSelectable(toRemove) ;
+	}
+}
+
 CanvasPicker::~CanvasPicker()
 {
-	highlightSelectable(false) ;
-	selectable.clear();
-	plot()->replot();
+	removeSelectable(selectable);
 }

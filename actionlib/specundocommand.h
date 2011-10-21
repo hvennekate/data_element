@@ -9,11 +9,11 @@ protected:
 	QWidget *pW ;
 public:
 	explicit specUndoCommand(specUndoCommand *parent = 0);
-	virtual void redo() = 0 ;
-	virtual void undo() = 0 ;
+//	virtual void redo() = 0;
+//	virtual void undo() = 0;
 
-	virtual QDataStream& write(QDataStream&) = 0 ;
-	virtual QDataStream& read(QDataStream&) = 0 ;
+	virtual QDataStream& write(QDataStream& out) const = 0 ;
+	virtual QDataStream& read(QDataStream& in) = 0 ;
 	void setParentWidget(QWidget*) ;
 	QWidget *parentWidget() ;
 signals:
