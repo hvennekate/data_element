@@ -6,6 +6,8 @@
 #include <qwt_scale_div.h>
 #include "speckineticrange.h"
 #include <qwt_symbol.h>
+#include <textEditor/specsimpletextedit.h>
+#include <QVBoxLayout>
 
 // TODO solve the myth of autoscaleaxis...
 
@@ -76,6 +78,17 @@ void specPlot::changeXLabel()
 	QString newTitle = QInputDialog::getText((QWidget*) this,tr("New x-axis label"),tr("New x-axis label:"), QLineEdit::Normal,title().text(),&ok) ;
 	if (ok)
 		setAxisTitle(QwtPlot::xBottom,newTitle) ;
+}
+
+void specPlot::changeTextLabel()
+{
+	QString oldText ;
+	QDialog textDialog ; // TODO subclass this
+	specSimpleTextEdit *textEdit = new specSimpleTextEdit(this) ;
+	textDialog.setLayout(new QVBoxLayout(&textDialog)) ;
+	textEdit->setText(oldText) ;
+	textDialog.layout()->addWidget(textEdit) ;
+	textDialog.layout()->addWidget();
 }
 
 void specPlot::changeYLabel()
