@@ -80,7 +80,7 @@ QList<specDataItem*> specSpectrumPlot::folderContent(specModelItem *folder)
 
 void specSpectrumPlot::alignmentChanged(QAction *action)
 {
-	if (action == setReferenceAction)
+	if (action == setReferenceAction) // turn this into an undo command.
 	{
 		if (reference) delete reference ;
 		QModelIndexList referenceItems = view->getSelection() ;
