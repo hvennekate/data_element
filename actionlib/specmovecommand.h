@@ -21,7 +21,7 @@ public:
 	void redo() ;
 	void undo() ;
 	int id() const { return spec::moveItemsId ; }
-	QDataStream& write(QDataStream &) ;
+	QDataStream& write(QDataStream &) const ;
 	QDataStream& read(QDataStream &) ;
 };
 
