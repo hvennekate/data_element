@@ -53,7 +53,8 @@ SOURCES += main.cpp \
     actionlib/speccutaction.cpp \
     plot/specspectrumplot.cpp \
     actionlib/specplotmovecommand.cpp \
-    actionlib/specmultiplotmovecommand.cpp
+	actionlib/specmultiplotmovecommand.cpp \
+	textEditor/specsimpletextedit.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -108,7 +109,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/speccutaction.h \
     plot/specspectrumplot.h \
     actionlib/specplotmovecommand.h \
-    actionlib/specmultiplotmovecommand.h
+	actionlib/specmultiplotmovecommand.h \
+	textEditor/specsimpletextedit.h
 
 INCLUDEPATH += kinetic \
 	log \
