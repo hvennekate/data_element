@@ -50,6 +50,7 @@ class specPlot : public QwtPlot
 		void changed() ;
 	public slots :
 		void replot() ;
+		void changeTextLabel() ;
 		void changeTitle() ;
 		void changeXLabel();
 		void changeYLabel();
