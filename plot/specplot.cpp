@@ -8,6 +8,7 @@
 #include <qwt_symbol.h>
 #include <textEditor/specsimpletextedit.h>
 #include <QVBoxLayout>
+#include <QDialogButtonBox>
 
 // TODO solve the myth of autoscaleaxis...
 
@@ -24,17 +25,17 @@ specPlot::specPlot(QWidget *parent)
 	titleAction = new QAction(QIcon(":/changetitle.png"), tr("&Titel ändern..."), this);
 	titleAction->setShortcut(tr("Ctrl+T"));
 	titleAction->setStatusTip(tr("Change the plot's title"));
-	connect(titleAction, SIGNAL(triggered()), this, SLOT(changeTitle())) ;
+	connect(titleAction, SIGNAL(triggered()), this, SLOT(changeTextLabel())) ;
 	
 	xlabelAction = new QAction(QIcon(":/changexlabel.png"), tr("&x-Achsenbeschriftung ändern..."), this);
 	xlabelAction->setShortcut(tr("Ctrl+X"));
 	xlabelAction->setStatusTip(tr("Change the plot's x-label"));
-	connect(xlabelAction, SIGNAL(triggered()), this, SLOT(changeXLabel())) ;
+	connect(xlabelAction, SIGNAL(triggered()), this, SLOT(changeTextLabel())) ;
 	
 	ylabelAction = new QAction(QIcon(":/changeylabel.png"), tr("&y-Achsenbeschriftung ändern..."), this);
 	ylabelAction->setShortcut(tr("Ctrl+Y"));
 	ylabelAction->setStatusTip(tr("Change the plot's y-label"));
-	connect(ylabelAction, SIGNAL(triggered()), this, SLOT(changeYLabel())) ;
+	connect(ylabelAction, SIGNAL(triggered()), this, SLOT(changeTextLabel())) ;
 	
 	fixYAxisAction = new QAction(QIcon(":/fixyaxis.png"), tr("&y-Achsenskalierung fixieren"), this);
 	fixYAxisAction->setShortcut(tr("Ctrl+y"));
@@ -64,38 +65,63 @@ specPlot::specPlot(QWidget *parent)
 
 specZoomer   *specPlot::zoomer() { return zoom ;}
 
-void specPlot::changeTitle()
+void specPlot::changeTitle(QString newTitle)
 {
-	bool ok = false ; // TODO: QTextEdit
-	QString newTitle = QInputDialog::getText((QWidget*) this,tr("New plot title"),tr("New plot title:"), QLineEdit::Normal,title().text(),&ok) ;
-	if (ok)
+//	bool ok = false ; // TODO: QTextEdit
+//	QString newTitle = QInputDialog::getText((QWidget*) this,tr("New plot title"),tr("New plot title:"), QLineEdit::Normal,title().text(),&ok) ;
+//	if (ok)
 		setTitle(newTitle) ;
 }
 
-void specPlot::changeXLabel()
+void specPlot::changeXLabel(QString newTitle)
 {
-	bool ok = false ; // TODO: QTextEdit
-	QString newTitle = QInputDialog::getText((QWidget*) this,tr("New x-axis label"),tr("New x-axis label:"), QLineEdit::Normal,title().text(),&ok) ;
-	if (ok)
+//	bool ok = false ; // TODO: QTextEdit
+//	QString newTitle = QInputDialog::getText((QWidget*) this,tr("New x-axis label"),tr("New x-axis label:"), QLineEdit::Normal,title().text(),&ok) ;
+//	if (ok)
 		setAxisTitle(QwtPlot::xBottom,newTitle) ;
 }
 
 void specPlot::changeTextLabel()
 {
-	QString oldText ;
+	qDebug("testing sender") ;
+	if (sender() != titleAction && sender() != xlabelAction && sender() != ylabelAction) return ;
+	QString oldText = (sender() == titleAction ? title().text() :
+						  (sender() == xlabelAction ? axisTitle(QwtPlot::xBottom) : axisTitle(QwtPlot::yLeft))).text() ;
+	qDebug() << "old text:" << oldText ;
+	///// First Try  TODO change into in-place editor
 	QDialog textDialog ; // TODO subclass this
 	specSimpleTextEdit *textEdit = new specSimpleTextEdit(this) ;
 	textDialog.setLayout(new QVBoxLayout(&textDialog)) ;
 	textEdit->setText(oldText) ;
 	textDialog.layout()->addWidget(textEdit) ;
-	textDialog.layout()->addWidget();
+	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal,&textDialog) ;
+	textDialog.layout()->addWidget(buttonBox) ;
+
+	if (sender() == titleAction)
+		connect(textEdit,SIGNAL(contentChanged(QString)),this,SLOT(changeTitle(QString))) ;
+	else if (sender() == xlabelAction)
+		connect(textEdit,SIGNAL(contentChanged(QString)),this,SLOT(changeXLabel(QString))) ;
+	else if (sender() == ylabelAction)
+		connect(textEdit,SIGNAL(contentChanged(QString)),this,SLOT(changeYLabel(QString))) ;
+	connect(buttonBox,SIGNAL(accepted()),&textDialog,SLOT(accept())) ;
+	connect(buttonBox,SIGNAL(rejected()),&textDialog,SLOT(reject())) ;
+
+	if (QDialog::Rejected == textDialog.exec())
+	{
+		if (sender() == titleAction)
+			changeTitle(oldText) ;
+		if (sender() == xlabelAction)
+			changeXLabel(oldText) ;
+		if (sender() == ylabelAction)
+			changeYLabel(oldText) ;
+	}
 }
 
-void specPlot::changeYLabel()
+void specPlot::changeYLabel(QString newTitle)
 {
-	bool ok = false ; // TODO: QTextEdit
-	QString newTitle = QInputDialog::getText((QWidget*) this,tr("New y-axis label"),tr("New y-axis label:"), QLineEdit::Normal,title().text(),&ok) ;
-	if (ok)
+//	bool ok = false ; // TODO: QTextEdit
+//	QString newTitle = QInputDialog::getText((QWidget*) this,tr("New y-axis label"),tr("New y-axis label:"), QLineEdit::Normal,title().text(),&ok) ;
+//	if (ok)
 		setAxisTitle(QwtPlot::yLeft,newTitle) ;
 }
 

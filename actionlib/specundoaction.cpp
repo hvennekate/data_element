@@ -7,6 +7,7 @@ specUndoAction::specUndoAction(QObject *parent) :
 
 void specUndoAction::gotTrigger()
 {
+	if (!parent()) return ;
 	execute() ;
 }
 

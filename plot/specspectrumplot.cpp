@@ -8,6 +8,7 @@
 #include <QDialog>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <qwt_scale_draw.h>
 
 specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	specPlot(parent),
@@ -105,25 +106,30 @@ void specSpectrumPlot::alignmentChanged(QAction *action)
 		toolTipPlot.setAutoDelete(false) ;
 		reference->attach(&toolTipPlot) ;
 		toolTipPlot.replot();
-		QwtScaleDiv *scaleDiv = toolTipPlot.axisScaleDiv(QwtPlot::xBottom) ; // this does not seem to work as intended...
-		QList<double> ticks = scaleDiv->ticks(QwtScaleDiv::MajorTick) ;
-		QList<double> newTicks ;
-		newTicks << ticks.first() ;
-		newTicks << ticks[ticks.size()/2] ;
-		newTicks << ticks.last() ;
-		scaleDiv->setTicks(QwtScaleDiv::MajorTick,newTicks) ;
 
-		scaleDiv = toolTipPlot.axisScaleDiv(QwtPlot::yLeft) ; // TODO outsource to new function
-		ticks = scaleDiv->ticks(QwtScaleDiv::MajorTick) ;
-		newTicks.clear(); ;
-		newTicks << ticks.first() ;
-		newTicks << ticks[ticks.size()/2] ;
-		newTicks << ticks.last() ;
-		scaleDiv->setTicks(QwtScaleDiv::MajorTick,newTicks) ;
+		QFont font = axisFont(QwtPlot::xBottom) ;
+		font.setPixelSize(8) ;
+		toolTipPlot.setAxisFont(QwtPlot::xBottom,font);
+		toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setSpacing(2) ;
+		toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick,4) ;
+		toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MediumTick,3) ;
+		toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick,2) ;
+
+		font = axisFont(QwtPlot::yLeft) ;
+		qDebug() << "old size:" << font.pixelSize() ;
+		font.setPixelSize(8) ;
+		qDebug() << "new size:" << font.pixelSize() ;
+		toolTipPlot.setAxisFont(QwtPlot::yLeft,font) ;
+		toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setSpacing(2) ;
+		toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MajorTick,4) ;
+		toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MediumTick,3) ;
+		toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MinorTick,2) ;
 
 		toolTipPlot.replot();
 
 		QImage plotImage(200,100,QImage::Format_ARGB32) ;
+		plotImage.fill(0);
+
 		QwtPlotRenderer renderer ;
 		renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, true);
 		renderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground,true) ;
