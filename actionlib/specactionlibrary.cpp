@@ -9,6 +9,7 @@
 #include "specpasteaction.h"
 #include "speccutaction.h"
 #include "specplotmovecommand.h"
+#include "changeplotstyleaction.h"
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
@@ -67,9 +68,23 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		QAction *redoAction = undoStack->createRedoAction(target) ;
 		redoAction->setIcon(QIcon::fromTheme("edit-redo")) ;
 		bar->addAction(redoAction) ;
+
+		changePlotStyleAction *styleAction = new changePlotStyleAction(target) ;
+		styleAction->setLibrary(this) ;
+		bar->addAction(styleAction) ;
+
 		qDebug("returning toolbar") ;
 		return bar ;
 	}
+	else if (dynamic_cast<specPlot*>(target))
+	{
+		qDebug("0000000 adding plot toolbar");
+		QToolBar *bar = new QToolBar(target) ;
+
+
+		return bar ;
+	}
+
 	return new QToolBar(target) ;
 }
 

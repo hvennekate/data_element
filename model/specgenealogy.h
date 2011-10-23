@@ -25,7 +25,7 @@ public:
 	specModel* model() ;
 	specFolderItem* parent() ;
 	const QList<specModelItem*>& items() const ;
-	QDataStream& write(QDataStream&) ;
+	QDataStream& write(QDataStream&) const ;
 	QDataStream& read(specModel*, QDataStream&) ;
 
 	bool operator==(const specGenealogy& other) ;
