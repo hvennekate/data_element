@@ -117,6 +117,7 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	qDebug("adding undo toolbar") ;
 	actions = new specActionLibrary(this) ;
 	layout -> addWidget(actions->toolBar(items)) ;
+	layout -> addWidget(actions->toolBar(plot)) ;
 
 	actions->addDragDropPartner(items->model()) ;
 	plot->setUndoPartner(actions) ;

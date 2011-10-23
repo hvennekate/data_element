@@ -84,7 +84,7 @@ specFolderItem* specGenealogy::parent()
 	return Parent ;
 }
 
-QDataStream &specGenealogy::write(QDataStream &out)
+QDataStream &specGenealogy::write(QDataStream &out) const
 {
 	out << indexes ;
 	out << qint8(owning) ;
