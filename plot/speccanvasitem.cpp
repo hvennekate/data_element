@@ -136,3 +136,48 @@ void specCanvasItem::highlight(bool highlight)
 {
 	setSymbol(highlight ? (new QwtSymbol(QwtSymbol::Ellipse,brush(),pen(),QSize(5,5))) : (new QwtSymbol()));
 }
+
+QColor specCanvasItem::penColor()
+{
+	qDebug() << "old pen color:" << pen().color() ;
+	return pen().color() ;
+}
+
+void specCanvasItem::setPenColor(const QColor& newColor)
+{
+	qDebug() << "new pen color:" << newColor ;
+	QPen newPen(pen());
+	newPen.setColor(newColor);
+	setPen(newPen) ;
+}
+
+int specCanvasItem::symbolStyle()
+{
+	return symbol() ? symbol()->style() : -2 ;
+}
+
+void specCanvasItem::setSymbolStyle(const int& newStyle)
+{
+	if (newStyle == -2)
+	{
+		setSymbol(0) ;
+		return ;
+	}
+	QwtSymbol *newSymbol = symbol() ? (new QwtSymbol(*symbol())) : (new QwtSymbol()) ;
+	newSymbol->setStyle(QwtSymbol::Style(newStyle)) ;
+	setSymbol(newSymbol) ;
+}
+
+QColor specCanvasItem::symbolPenColor()
+{
+	return symbol()->pen().color() ;
+}
+
+void specCanvasItem::setSymbolPenColor(const QColor& newColor)
+{
+	QwtSymbol *newSymbol = new QwtSymbol(*symbol()) ;
+	QPen newPen = newSymbol->pen() ;
+	newPen.setColor(newColor) ;
+	newSymbol->setPen(newPen) ;
+	setSymbol(newSymbol) ;
+}

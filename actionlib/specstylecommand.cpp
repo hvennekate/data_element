@@ -1,11 +1,15 @@
 #include "specstylecommand.h"
+#include <qwt_symbol.h>
 
-specStyleCommand::specStyleCommand(specUndoCommand *parent )
-	: specUndoCommand(parent)
+
+specStyleCommandImplTemplate
+specStyleCommandImplFuncTemplate::specStyleCommandImplementation(specUndoCommand *parent )
+	: specStyleCommand(parent)
 {
 }
 
-void specStyleCommand::setItems(QModelIndexList items)
+specStyleCommandImplTemplate
+void specStyleCommandImplFuncTemplate::setItems(QModelIndexList items)
 {
 
 	//	for (int i = 0 ; i < items.size() ; ++i)
@@ -33,9 +37,12 @@ void specStyleCommand::setItems(QModelIndexList items)
 	}
 
 	saveStyles(Genealogies) ;
+
+	qDebug() << "styles: " << oldProperties << newProperty ;
 }
 
-void specStyleCommand::redo()
+specStyleCommandImplTemplate
+void specStyleCommandImplFuncTemplate::redo()
 {
 	specPlot *plot = 0 ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
@@ -48,7 +55,8 @@ void specStyleCommand::redo()
 	plot->replot();
 }
 
-void specStyleCommand::undo()
+specStyleCommandImplTemplate
+void specStyleCommandImplFuncTemplate::undo()
 {
 	specPlot *plot = 0 ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
@@ -62,21 +70,71 @@ void specStyleCommand::undo()
 
 }
 
-QDataStream& specStyleCommand::write(QDataStream &out) const
+specStyleCommandImplTemplate
+QDataStream& specStyleCommandImplFuncTemplate::write(QDataStream &out) const
 {
 	out << quint32(Genealogies.size()) ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
 		Genealogies[i].write(out) ;
+	out << newProperty << oldProperties ;
 	return out ;
 }
 
-QDataStream& specStyleCommand::read(QDataStream &in)
+specStyleCommandImplTemplate
+QDataStream& specStyleCommandImplFuncTemplate::read(QDataStream &in)
 {
 	quint32 size ;
 	specModel* model = ((specView*) parentWidget())->model() ;
 	in >> size ;
 	for (int i = 0 ; i < size ; ++i)
 		Genealogies << specGenealogy(model,in) ;
+	in >> newProperty >> oldProperties ;
 	return in ;
 }
 
+specStyleCommandImplTemplate
+void specStyleCommandImplFuncTemplate::applyStyle(const specGenealogy &genealogy, int propertyIndex)
+{
+	property prop = (propertyIndex < 0 || !(propertyIndex < oldProperties.size())) ? newProperty : oldProperties[propertyIndex] ;
+	QList<specModelItem*> items = genealogy.items() ;
+	for (int j = 0 ; j < items.size() ; ++j)
+		(items[j]->*setProperty)(prop) ;
+}
+
+specStyleCommandImplTemplate
+int specStyleCommandImplFuncTemplate::styleNo(specCanvasItem *item)
+{
+	property prop = (item->*getProperty)() ;
+	if (!oldProperties.contains(prop))
+		oldProperties << prop ;
+	return oldProperties.indexOf(prop) ;
+}
+
+specStyleCommandImplTemplate
+void specStyleCommandImplFuncTemplate::saveStyles(const QList<specGenealogy> & list)
+{
+	oldProperties.clear();
+
+	for (int i = 0 ; i < list.size() ; ++i)
+		oldProperties << (list[i].items().first()->*getProperty)() ;
+}
+
+specStyleCommandImplTemplate
+void specStyleCommandImplFuncTemplate::obtainStyle(specCanvasItem *item)
+{
+	newProperty = (item->*getProperty)();
+	qDebug() << "getting property from: " << item << newProperty << "original:" << (item->*getProperty)() ;
+}
+
+specStyleCommand *generateStyleCommand(spec::undoActionIds id)
+{
+	switch (id)
+	{
+	case spec::penColorId :
+		return new specStyleCommandImplementation<QColor, &specCanvasItem::penColor, &specCanvasItem::setPenColor, spec::penColorId> ;
+	case spec::symbolStyleId :
+		return new specStyleCommandImplementation<int, &specCanvasItem::symbolStyle, &specCanvasItem::setSymbolStyle, spec::symbolStyleId > ;
+	case spec::symbolPenColorId :
+		return new specStyleCommandImplementation<QColor, &specCanvasItem::symbolPenColor, &specCanvasItem::setSymbolPenColor, spec::symbolPenColorId > ;
+	}
+}
