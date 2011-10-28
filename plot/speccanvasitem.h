@@ -7,6 +7,7 @@
 #include <qwt_interval.h>
 #include "names.h"
 #include <QMenu>
+#include <qwt_symbol.h>
 
 class specCanvasItem : public QwtPlotCurve
 {
@@ -27,6 +28,13 @@ class specCanvasItem : public QwtPlotCurve
 
 		int rtti() const { return spec::canvasItem ; }
 		void highlight(bool highlight) ;
+
+		QColor penColor() ;
+		void setPenColor(const QColor&) ;
+		int symbolStyle() ;
+		void setSymbolStyle(const int&) ;
+		QColor symbolPenColor() ;
+		void setSymbolPenColor(const QColor&) ;
 
 };
 
