@@ -56,7 +56,9 @@ SOURCES += main.cpp \
 	actionlib/specmultiplotmovecommand.cpp \
 	textEditor/specsimpletextedit.cpp \
     actionlib/changeplotstyleaction.cpp \
-    actionlib/specstylecommand.cpp
+    actionlib/specstylecommand.cpp \
+    actionlib/spectreeaction.cpp \
+    actionlib/specmulticommand.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -114,7 +116,9 @@ HEADERS += cutbyintensitydialog.h \
 	actionlib/specmultiplotmovecommand.h \
 	textEditor/specsimpletextedit.h \
     actionlib/changeplotstyleaction.h \
-    actionlib/specstylecommand.h
+    actionlib/specstylecommand.h \
+    actionlib/spectreeaction.h \
+    actionlib/specmulticommand.h
 
 INCLUDEPATH += kinetic \
 	log \

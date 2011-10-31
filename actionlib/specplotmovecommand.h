@@ -19,8 +19,6 @@ public:
 	int id() const { return spec::movePlotId ;}
 	bool itemsMatch(specPlotMoveCommand* other) ;
 
-	bool copy(const specPlotMoveCommand*) ;
-
 	QDataStream& write(QDataStream &out) const ;
 	QDataStream& read(QDataStream &in) ;
 };

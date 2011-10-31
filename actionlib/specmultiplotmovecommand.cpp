@@ -28,7 +28,7 @@ bool specMultiPlotMoveCommand::mergeWith(const QUndoCommand *other)
 	if (!itemsMatch) return false ;
 
 	for (int i = 0 ; i < childCount() ; ++i)
-		((specPlotMoveCommand*) child(i))->copy((const specPlotMoveCommand*) other->child(i)) ;
+		((specPlotMoveCommand*) child(i))->mergeWith((const specPlotMoveCommand*) other->child(i)) ;
 
 	return true ;
 }

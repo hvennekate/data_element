@@ -32,7 +32,8 @@ namespace spec{
 			  symbolStyleId      = 5002,
 			  symbolSizeId       = 5003,
 			  symbolPenColorId   = 5004,
-			  symbolBrushColorId = 5005} ;
+			  symbolBrushColorId = 5005,
+			  multiCommandId        =10000} ;
 	enum itemRoles { activeLineRole = 50, fullContentRole = 51 } ;
 
 	enum rtti {canvasItem = 1001, spectrum = 1010, zeroRange = 1020, kineticCurve = 1030, kineticRange = 1040 } ;
