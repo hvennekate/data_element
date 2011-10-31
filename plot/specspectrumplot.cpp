@@ -1,6 +1,6 @@
 #include "specspectrumplot.h"
 #include "actionlib/specplotmovecommand.h"
-#include "actionlib/specmultiplotmovecommand.h"
+#include "actionlib/specmulticommand.h"
 #include "utility-functions.h"
 #include <QBuffer>
 #include "qwt/qwt_plot_renderer.h"
@@ -291,7 +291,7 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* item,int point, double ne
 	((specRange*) item)->pointMoved(point,newX,newY) ;
 	QwtPlotItemList zeroRanges = itemList(spec::zeroRange) ;
 	QwtPlotItemList spectra = itemList(spec::spectrum) ; // TODO roll back previous undo command if it was of the same kind and merge with what is to come.
-	specMultiPlotMoveCommand *zeroCommand = new specMultiPlotMoveCommand ; // TODO establish extra class
+	specMultiCommand *zeroCommand = new specMultiCommand ;
 	zeroCommand->setParentWidget(view) ;
 	for (int i = 0 ; i < spectra.size() ; ++i)
 	{

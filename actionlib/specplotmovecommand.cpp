@@ -89,7 +89,7 @@ QDataStream& specPlotMoveCommand::read(QDataStream &in)
 	return in ;
 }
 
-bool specPlotMoveCommand::itemsMatch(specPlotMoveCommand *other)
+bool specPlotMoveCommand::mergeable(const specUndoCommand *other)
 {
-	return *(other->items) == *items ;
+	return *(((specPlotMoveCommand*) other)->items) == *items ;
 }

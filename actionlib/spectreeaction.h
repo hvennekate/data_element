@@ -14,7 +14,10 @@ protected:
 	void execute() ;
 
 private:
-
+	QVector<QPair<specFolderItem*,QModelIndexList> > moveTargets ;
+	void treeFolder(specFolderItem* folder, QModelIndexList& list, const QString& descriptor) ;
+	specView *view ;
+	specModel *model ;
 };
 
 #endif // SPECTREEACTION_H
