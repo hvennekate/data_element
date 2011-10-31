@@ -46,7 +46,7 @@ void specPlotMoveCommand::undo()
 }
 
 
-bool specPlotMoveCommand::copy(const specPlotMoveCommand * ot)
+bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
 {
 	qDebug("trying merge of move commands") ;
 	const specPlotMoveCommand *other = (const specPlotMoveCommand*) ot ;
@@ -58,11 +58,6 @@ bool specPlotMoveCommand::copy(const specPlotMoveCommand * ot)
 	scale *= other->scale ;
 	shift += other->shift ;
 	return true ;
-}
-
-bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
-{
-	return copy((const specPlotMoveCommand*) ot) ;
 }
 
 void specPlotMoveCommand::setItem(QModelIndex index)
