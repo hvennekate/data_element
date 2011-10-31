@@ -53,7 +53,6 @@ SOURCES += main.cpp \
     actionlib/speccutaction.cpp \
     plot/specspectrumplot.cpp \
     actionlib/specplotmovecommand.cpp \
-	actionlib/specmultiplotmovecommand.cpp \
 	textEditor/specsimpletextedit.cpp \
     actionlib/changeplotstyleaction.cpp \
     actionlib/specstylecommand.cpp \
@@ -113,7 +112,6 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/speccutaction.h \
     plot/specspectrumplot.h \
     actionlib/specplotmovecommand.h \
-	actionlib/specmultiplotmovecommand.h \
 	textEditor/specsimpletextedit.h \
     actionlib/changeplotstyleaction.h \
     actionlib/specstylecommand.h \

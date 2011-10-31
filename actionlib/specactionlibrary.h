@@ -33,6 +33,8 @@ public:
 	void addDragDropPartner(specModel*) ;
 	void setLastRequested(const QModelIndexList&) ;
 	void moveInternally(const QModelIndex&, int row, specView*) ;
+
+	static specUndoCommand* commandById(int id, specUndoCommand* parent = 0) ;
 signals:
 	void stackChanged() ;
 
