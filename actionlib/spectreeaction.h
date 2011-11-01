@@ -14,8 +14,8 @@ protected:
 	void execute() ;
 
 private:
-	QVector<QPair<specFolderItem*,QModelIndexList> > moveTargets ;
-	void treeFolder(specFolderItem* folder, QModelIndexList& list, const QString& descriptor) ;
+	QVector<QPair<specFolderItem*,QModelIndexList> > moveTargets ;  // TODO do this differently (i.e. not modify this vector quite as often)
+	void treeFolder(int index , const QString& descriptor) ;
 	specView *view ;
 	specModel *model ;
 };
