@@ -14,8 +14,9 @@ void specTreeAction::execute()
 	specMultiCommand *command = new specMultiCommand ;
 	command->setParentWidget(view) ;
 
-	view = (specView*) parentWidget() ;
-	model = view->model() ;
+	specView *view = (specView*) parentWidget() ;
+	specModel *model = view->model() ;
+	QVector<QPair<specFolderItem*,QList<specModelItem*> > > moveTargets ;
 
 	// getting header strings
 	int columnCount = model->columnCount(QModelIndex()) ;
@@ -24,7 +25,6 @@ void specTreeAction::execute()
 		headers << model->headerData(i,Qt::Horizontal).toString() ;
 
 	// preparing new tree directories
-	moveTargets.clear();
 	moveTargets << QPair<specFolderItem*,QList<specModelItem*> >(new specFolderItem(),model->pointerList(view->getSelection())) ;
 	qDebug() << "headers" << headers << "indexes:" << moveTargets ;
 

@@ -1,17 +1,18 @@
-#ifndef SPECTREEACTION_H
-#define SPECTREEACTION_H
+#ifndef SPECMERGEACTION_H
+#define SPECMERGEACTION_H
 
 #include "specundoaction.h"
-#include "model/specview.h"
+#include "specview.h"
 
-class specTreeAction : public specUndoAction
+class specMergeAction : public specUndoAction
 {
-	Q_OBJECT
+    Q_OBJECT
 public:
 	explicit specTreeAction(QObject *parent = 0);
 	const std::type_info& possibleParent() { return typeid(specView) ; }
 protected:
 	void execute() ;
+
 };
 
-#endif // SPECTREEACTION_H
+#endif // SPECMERGEACTION_H
