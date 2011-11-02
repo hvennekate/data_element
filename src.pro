@@ -57,7 +57,8 @@ SOURCES += main.cpp \
     actionlib/changeplotstyleaction.cpp \
     actionlib/specstylecommand.cpp \
     actionlib/spectreeaction.cpp \
-    actionlib/specmulticommand.cpp
+    actionlib/specmulticommand.cpp \
+    actionlib/specmergeaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -116,7 +117,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/changeplotstyleaction.h \
     actionlib/specstylecommand.h \
     actionlib/spectreeaction.h \
-    actionlib/specmulticommand.h
+    actionlib/specmulticommand.h \
+    actionlib/specmergeaction.h
 
 INCLUDEPATH += kinetic \
 	log \
