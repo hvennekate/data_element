@@ -17,22 +17,44 @@ void specTreeAction::execute()
 	view = (specView*) parentWidget() ;
 	model = view->model() ;
 
-	// prepare move hierarchy
+	// getting header strings
 	int columnCount = model->columnCount(QModelIndex()) ;
 	QStringList headers ;
 	for (int i = 0 ; i < columnCount ; ++i)
 		headers << model->headerData(i,Qt::Horizontal).toString() ;
+
+	// preparing new tree directories
 	moveTargets.clear();
-	moveTargets << QPair<specFolderItem*,QModelIndexList>(new specFolderItem,view->getSelection()) ;
+	moveTargets << QPair<specFolderItem*,QList<specModelItem*> >(new specFolderItem(),model->pointerList(view->getSelection())) ;
 	qDebug() << "headers" << headers << "indexes:" << moveTargets ;
 
-	int end = moveTargets.size() ;
 	for (int i = 0 ; i < headers.size() ; ++i)
 	{
-		QString sortBy = headers[i] ;
+		QString sortBy = headers[i] ; // always tree all folders except the ones produce by the current treeing step
+		int end = moveTargets.size() ;
 		for (int j = 0 ; j != end ; ++j)
-			treeFolder(j,sortBy) ;
-		end = moveTargets.size() ;
+		{
+			specFolderItem *folder = moveTargets[j].first ; // folder to operate on
+			QList<specModelItem*> items = moveTargets[j].second ; // item list to operatate on
+			QMap<QString,QList<specModelItem*> > subLists ;
+			// create new lists of objects with equal descriptors
+			for (int k = 0 ; k < items.size() ; ++k)
+				subLists[items[k]->descriptor(sortBy,true)] << items[k] ;
+			// remove lists with just one or all objects (all objects => just one sublist)
+			for (QMap<QString,QList<specModelItem*> >::iterator k = subLists.begin() ; k != subLists.end() ; ++k)
+				if (k.value().size() == 1 || subLists.size() == 1)
+					subLists.erase(k) ;
+			// create new folders and remove their children from old parent
+			for (QMap<QString,QList<specModelItem*> >::iterator k = subLists.begin() ; k != subLists.end() ; ++k)
+			{
+				for (int l = 0 ; l < k.value().size() ; ++l)
+					items.removeAll(k.value()[l]) ;
+				moveTargets << QPair<specFolderItem*, QList<specModelItem*> >(new specFolderItem(folder,k.key()), k.value()) ;
+				folder->addChild(moveTargets.last().first,folder->children()) ;
+			}
+			// putting left-over items back to old parent
+			moveTargets[j].second = items ;
+		}
 	}
 
 	// TODO produce more generic code with addFolderAction
@@ -46,39 +68,23 @@ void specTreeAction::execute()
 		row = index.row()+1 ;
 		index = index.parent() ;
 	}
-	if (! model->insertItems(QList<specModelItem*>() << new specFolderItem(), index, row)) return ;
+	if (! model->insertItems(QList<specModelItem*>() << moveTargets.first().first, index, row)) return ;
 	specAddFolderCommand *insertion = new specAddFolderCommand(command) ;
 	insertion->setItems(QModelIndexList() << model->index(row,0,index)) ;
-	insertion->setParentWidget((QWidget*)parent()) ;
+	insertion->setParentWidget(parentWidget()) ;
 	qDebug() << moveTargets ;
 
-	for (int i = 0 ; i < moveTargets.size() ; ++i)
-		new specMoveCommand(moveTargets[i].second,model->index(moveTargets[i].first),0,command) ;
-
 	library->push(command);
-}
 
-void specTreeAction::treeFolder(int index, const QString &descriptor)
-{
-	specFolderItem *folder = moveTargets[index].first ;
-	QModelIndexList& sourceList = moveTargets[index].second ;
-	qDebug() << "%%%%%% sorting by" << descriptor ;
-	QMap<QString,QModelIndexList> subLists ;
-	// create new lists of objects with equal descriptors
-	for (int i = 0 ; i < sourceList.size() ; ++i)
-		subLists[model->itemPointer(sourceList[i])->descriptor(descriptor,true)] << sourceList[i] ;
-	qDebug() << "created new lists" << subLists ;
-	// remove lists with just one or all objects
-	for (QMap<QString,QModelIndexList>::iterator i = subLists.begin() ; i != subLists.end() ; ++i)
-		if (i.value().size() == 1 || subLists.size() == 1)
-			subLists.erase(i) ;
-	qDebug() << "removed superfluous lists" << subLists ;
-	// create new folders
-	for (QMap<QString,QModelIndexList>::iterator i = subLists.begin() ; i != subLists.end() ; ++i)
+	for (int i = 0 ; i < moveTargets.size() ; ++i)
 	{
-		for (int j = 0 ; j < i.value().size() ; ++j)
-			moveTargets[index].second.removeAt(sourceList.indexOf(i.value()[j])) ;
-		moveTargets << QPair<specFolderItem*,QModelIndexList>(new specFolderItem(folder,i.key()), i.value());
+		if (moveTargets[i].second.isEmpty())
+			continue ;
+		QModelIndexList targets = model->indexList(moveTargets[i].second) ;
+		QModelIndex parent = model->index(moveTargets[i].first) ;
+		qDebug() << "parent: " << parent << "target list:" << targets ;
+		specMoveCommand *moveCommand = new specMoveCommand(targets,parent,0,command) ;
+		moveCommand->setParentWidget(parentWidget());
+		moveCommand->redo();
 	}
-	qDebug() << "created new folders" << subLists ;
 }

@@ -788,3 +788,19 @@ QModelIndex specModel::index(specModelItem *pointer) const
 	// Generate genealogy to find parent
 	return index(hierarchy(pointer)) ;
 }
+
+QList<specModelItem*> specModel::pointerList(const QModelIndexList &indexes) const
+{
+	QList<specModelItem*> returnList ;
+	for(int i = 0 ; i < indexes.size() ; ++i)
+		returnList << itemPointer(indexes[i]) ;
+	return returnList ;
+}
+
+QModelIndexList specModel::indexList(const QList<specModelItem *>& pointers) const
+{
+	QModelIndexList returnList ;
+	for (int i = 0 ; i < pointers.size() ; ++i)
+		returnList << index(pointers[i]) ;
+	return returnList ;
+}
