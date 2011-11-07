@@ -4,11 +4,10 @@
 #include <QVBoxLayout>
 #include <QDebug>
 #include "specgenealogy.h"
-#include "speclinecolorcommand.h"
 #include <QColorDialog>
 #include <qwt_symbol.h>
 #include <QPainter>
-#include "specchangesymbolcommand.h"
+#include "specstylecommand.h"
 
 changePlotStyleAction::changePlotStyleAction(QObject *parent) :
     specUndoAction(parent)
@@ -49,45 +48,41 @@ void changePlotStyleAction::execute()
 
 	if (items.isEmpty()) return ;
 
-	specStyleCommand *newCommand = new specLineColorCommand ;
-	newCommand->setParentWidget(view) ;
-	newCommand->setItems(items) ;
-	library->push(newCommand) ;
+//	specStyleCommand *newCommand = new specLineColorCommand ;
+//	newCommand->setParentWidget(view) ;
+//	newCommand->setItems(items) ;
+//	library->push(newCommand) ;
 }
 
 void changePlotStyleAction::actionTriggered()
 {
 	qDebug("////////////style action");
 	specView *view = (specView*) parent() ;
-	if (sender() == lineColorAction)
+	specStyleCommand *newCommand = 0 ;
+	QObject *source = sender() ;
+	specDataItem item(QList<specDataPoint>(),QHash<QString,specDescriptor>(),0,"") ;
+	if (source == lineColorAction)
 	{
-		qDebug("triggered slave action") ;
-		qDebug() << lineColorAction << sender() ;
-		specLineColorCommand *newCommand = new specLineColorCommand ;
-
+		qDebug("new pen color command") ;
+		newCommand = generateStyleCommand(spec::penColorId) ;
 		QColor color = QColorDialog::getColor() ;
 		if (!color.isValid()) return ;
-
-		newCommand->setParentWidget(view) ;
-		newCommand->setItems(view->getSelection()) ;
-		specModelItem *sample = view->model()->itemPointer(view->getSelection().first()) ;
-		QPen pen = sample->pen() ;
-		pen.setColor(color) ;
-		sample->setPen(pen) ;
-		newCommand->setStyle(sample) ;
-		library->push(newCommand) ;
+		item.setPenColor(color) ;
 	}
-	else if (symbolActions.contains((QAction*) sender()))
+	else if (symbolActions.contains((QAction*) source))
 	{
-		qDebug("symbol action triggered") ;
-		specChangeSymbolCommand *newCommand = new specChangeSymbolCommand ;
-		newCommand->setParentWidget(view) ;
-		newCommand->setItems(view->getSelection()) ;
-		specModelItem *sample = view->model()->itemPointer(view->getSelection().first()) ;
-		sample->setSymbol(new QwtSymbol(QwtSymbol::Style(symbolActions.indexOf((QAction*) sender())),
-										sample->brush(),sample->pen(),QSize(5,5))) ; // TODO: change
-		newCommand->setStyle(sample) ;
-		library->push(newCommand);
+		qDebug("new symbol id") ;
+		newCommand = generateStyleCommand(spec::symbolStyleId) ;
+		qDebug("setting style of item %d", symbolActions.indexOf((QAction*) source) ) ;
+		item.setSymbolStyle(QwtSymbol::Style(symbolActions.indexOf((QAction*) source))) ;
 	}
+	else return ;
+
+	qDebug() << "commiting style" << &item ;
+	newCommand->obtainStyle(&item) ;
+	qDebug("committing action") ;
+	newCommand->setParentWidget(view) ;
+	newCommand->setItems(view->getSelection()) ;
+	library->push(newCommand) ;
 }
 
