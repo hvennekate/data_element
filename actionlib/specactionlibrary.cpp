@@ -10,6 +10,8 @@
 #include "speccutaction.h"
 #include "specplotmovecommand.h"
 #include "changeplotstyleaction.h"
+#include "spectreeaction.h"
+#include "specmulticommand.h"
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
@@ -60,6 +62,10 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		specCutAction *cutAction = new specCutAction(target) ;
 		cutAction->setLibrary(this) ;
 		bar->addAction(cutAction) ;
+
+		specTreeAction *treeAction = new specTreeAction(target) ;
+		treeAction->setLibrary(this) ;
+		bar->addAction(treeAction) ;
 
 		QAction *undoAction = undoStack->createUndoAction(target) ;
 		undoAction->setIcon(QIcon::fromTheme("edit-undo"));
@@ -122,6 +128,25 @@ QDataStream& specActionLibrary::write(QDataStream &out)
 		((specUndoCommand*) undoStack->command(i))->write(out) ;
 }
 
+specUndoCommand *specActionLibrary::commandById(int id, specUndoCommand* parent)
+{
+	switch(id)
+	{
+	case spec::deleteId :
+		return new specDeleteCommand(parent) ;
+	case spec::newFolderId :
+		return new specAddFolderCommand(parent) ;
+	case spec::moveItemsId :
+		return new specMoveCommand(parent) ;
+	case spec::movePlotId :
+		return new specPlotMoveCommand(parent) ;
+	case spec::multiCommandId :
+		return new specMultiCommand(parent) ;
+	default:
+		return 0 ;
+	}
+}
+
 QDataStream& specActionLibrary::read(QDataStream &in)
 {
 	qint32 num, position ;
@@ -132,22 +157,7 @@ QDataStream& specActionLibrary::read(QDataStream &in)
 		qint32 id, parentId ;
 		in >> id >> parentId ;
 		qDebug() << "Id: " << id << "Parent: " << parentId << parents[parentId] ;
-		specUndoCommand* command = 0 ;
-		switch(id)
-		{
-		case spec::deleteId :
-			command = new specDeleteCommand ;
-			break ;
-		case spec::newFolderId :
-			command = new specAddFolderCommand ;
-			break ;
-		case spec::moveItemsId :
-			command = new specMoveCommand ;
-			break ;
-		case spec::movePlotId :
-			command = new specPlotMoveCommand ;
-			break ;
-		}
+		specUndoCommand *command = commandById(id) ;
 		if (!command) continue ;
 		command->setParentWidget(parents[parentId]) ;
 		qDebug() << "pushing read in command onto stack" << command ;
