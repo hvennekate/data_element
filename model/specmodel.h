@@ -50,12 +50,14 @@ public:
 	~specModel() ;
 	
 	// Own functions
-	specModelItem* itemPointer(const QModelIndex&) const ;
-	specModelItem* itemPointer(const QVector<int>&) const ;
+	specModelItem* itemPointer(const QModelIndex&) const;
+	specModelItem* itemPointer(const QVector<int>&) const;
 	QModelIndex index(const QVector<int>&) const ;
 	QModelIndex index(specModelItem*) const ;
 	static QVector<int> hierarchy(specModelItem*) ;
 	static QVector<int> hierarchy(const QModelIndex&) ;
+	QList<specModelItem*> pointerList(const QModelIndexList&) const ;
+	QModelIndexList indexList(const QList<specModelItem*>&) const ;
 	bool isFolder(const QModelIndex&) const ;
 	void eliminateChildren(QModelIndexList&) const ;
 	virtual bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row=0) ;

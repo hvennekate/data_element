@@ -43,7 +43,7 @@ void specMoveCommand::redo()
 	model->signalBeginReset();
 	qDebug("getting target") ;
 	specModelItem* target = (specFolderItem*) model->itemPointer(targetIndex.mid(1)) ;
-	qDebug("verifying that target is a folder %d",target) ;
+	qDebug() << "verifying that target is a folder %d" << target << targetIndex ;
 	if (!target->isFolder())
 	{
 		qDebug("not a folder") ;
