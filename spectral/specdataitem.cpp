@@ -416,6 +416,29 @@ int specDataItem::removeData(QList<specRange *> *listpointer)
 	return count-wns.size() ;
 }
 
+QVector<specDataPoint> specDataItem::removeData(QVector<int> &indexes)
+{
+	QVector<int> sortedIndexes = indexes ;
+	qSort(sortedIndexes) ; // TODO do better, maybe no reference
+	for (int i = sortedIndexes.size()-1 ; i >= 0 ; --i)
+		data.takeAt(sortedIndexes[i]) ;
+	refreshPlotData();
+}
+
+QVector<specDataPoint> specDataItem::getData(const QVector<int> &)
+{
+	QVector<specDataPoint> desiredData(indexes.size()) ;
+	for (int i = 0 ; i < indexes.size() ; ++i)
+		desiredData[i] = data[indexes[i]] ;
+	return desiredData ;
+}
+
+void specDataItem::insertData(const QVector<specDataPoint> &newData)
+{
+	data << newData ;
+	refreshPlotData();
+}
+
 void specDataItem::average(int num)
 {
 	QVector<double> times = filter.times(data), nus = filter.wnums(data), sigs = filter.ints(data), mints = filter.mints(data);
