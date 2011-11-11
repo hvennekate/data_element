@@ -48,6 +48,9 @@ public:
 	~specDataItem();
 
 	int removeData(QList<specRange*>*) ;
+	void removeData(QVector<int>&) ;
+	QVector<specDataPoint> getData(const QVector<int>&) ;
+	void insertData(const QVector<specDataPoint>&) ;
 	QMultiMap<double,QPair<double,double> >* kinetics(QList<specKineticRange*>) const;
 	/*! Return value of descriptor \a key. */
 	QString descriptor(const QString &key, bool full =true) const ;

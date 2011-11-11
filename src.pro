@@ -58,7 +58,10 @@ SOURCES += main.cpp \
     actionlib/specstylecommand.cpp \
     actionlib/spectreeaction.cpp \
     actionlib/specmulticommand.cpp \
-    actionlib/specmergeaction.cpp
+    actionlib/specmergeaction.cpp \
+    actionlib/specremovedatacommand.cpp \
+    actionlib/specmanagedatacommand.cpp \
+    actionlib/specinsertdatacommand.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -118,7 +121,10 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/specstylecommand.h \
     actionlib/spectreeaction.h \
     actionlib/specmulticommand.h \
-    actionlib/specmergeaction.h
+    actionlib/specmergeaction.h \
+    actionlib/specremovedatacommand.h \
+    actionlib/specmanagedatacommand.h \
+    actionlib/specinsertdatacommand.h
 
 INCLUDEPATH += kinetic \
 	log \
