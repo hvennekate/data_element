@@ -115,7 +115,9 @@ QVector<double> specDataFilter::times(const QList<specDataPoint>& data) const
 
 
 specDataItem::specDataItem(QList<specDataPoint> dat, QHash<QString,specDescriptor> desc, specFolderItem* par, QString description)
-	:specModelItem(par,description), data(dat), description(desc), addedItems(1)
+	: specModelItem(par,description),
+	  data(dat),
+	  description(desc)
 {
 }
 
@@ -166,6 +168,13 @@ void specDataItem::refreshPlotData()
 	processData(x,y) ;
 	qDebug() << "processed:" << x << "merge:" << mergePlotData ;
 	setSamples(x,y) ;
+}
+
+specDataItem::specDataItem(const specDataItem &other)
+	: description(other.description),
+	  data(other.data),
+	  filter(other.filter)
+{
 }
 
 QString specDataItem::descriptor(const QString &key, bool full) const
@@ -244,7 +253,6 @@ specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 {// TODO : merge descriptors
 	qDebug("Descriptor is editable before: %d",this->isEditable("")) ;
 	qDebug("Descriptor is editable other : %d",toAdd.isEditable("")) ;
-	filter.addData(data, toAdd.times(),toAdd.wnums(),toAdd.ints(),toAdd.mints()) ;
 	qDebug("merging descriptors") ;
 	for(QStringList::size_type i = 0 ; i < toAdd.description.keys().size() ; i++)
 	{
@@ -252,7 +260,10 @@ specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 		if (description.keys().contains(key))
 		{
 			if (description[key].isNumeric())
-				description[key] = description[key].numericValue() + toAdd.description[key].numericValue() ;
+			{
+				double total = data.size() + toAdd.data.size() ;
+				description[key] = description[key].numericValue()*data.size()/total + toAdd.description[key].numericValue()*toAdd.data.size()/total ;
+			}
 			else if (!descriptor(key).contains(toAdd.descriptor(key)))
 				description[key] = descriptor(key).append(", ").append(toAdd.descriptor(key)) ;
 		}
@@ -261,7 +272,8 @@ specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 	}
 	if (!descriptor("").contains(toAdd.descriptor("")) )
 		changeDescriptor("",toAdd.descriptor("").prepend(descriptor("").isEmpty() ?"" : descriptor("").append(", ")) ) ;
-	addedItems ++ ;
+	// merging actual data
+	filter.addData(data, toAdd.times(),toAdd.wnums(),toAdd.ints(),toAdd.mints()) ;
 	return (*this) ;
 }
 
@@ -298,10 +310,6 @@ void specDataItem::flatten(bool timeAverage, bool oneTime)
 		for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
 			data[i].t = time ;
 	}
-	foreach(QString descriptorLabel, descriptorKeys())
-		if (descriptorProperties(descriptorLabel) & spec::numeric)
-			description[descriptorLabel] = description[descriptorLabel].numericValue() /(double) addedItems ;
-	addedItems = 1 ;
 	refreshPlotData() ;
 }
 

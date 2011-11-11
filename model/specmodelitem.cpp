@@ -25,6 +25,7 @@ QMultiMap<double,QPair<double,double> >* specModelItem::kinetics(QList<specKinet
 	
 void specModelItem::setParent(specFolderItem* par)
 {
+	qDebug() << descriptor("Zeit") << this << "current parent:" << iparent << "new parent:" << par;
 	if (par == iparent)
 		return ;
 	if (iparent)
@@ -77,7 +78,6 @@ void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 		y = sortedValues.values().toVector() ;
 	}
 	QVector<double> xt, yt ;
-	qDebug() << "processing:" << x ;
 
 	if (mergePlotData)
 	{
@@ -93,7 +93,6 @@ void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 		x = xt ;// TODO simply swap the vectors!!!
 		y = yt ;
 	}
-	qDebug() << "processing:" << x ;
 }
 
 QString specModelItem::descriptor(const QString &key, bool full) const
