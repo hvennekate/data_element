@@ -25,6 +25,7 @@ class specModelItem : public specCanvasItem
 {
 private:
 	specFolderItem* iparent ;
+	void detachChild(specModelItem* child) ;
 protected:
 	void processData(QVector<double>&, QVector<double>&) const ;
 	// selectedPoints (3 Punkte fuer Korrekturen)
