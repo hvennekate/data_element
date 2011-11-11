@@ -25,12 +25,20 @@ QMultiMap<double,QPair<double,double> >* specModelItem::kinetics(QList<specKinet
 	
 void specModelItem::setParent(specFolderItem* par)
 {
-	qDebug() << descriptor("Zeit") << this << "current parent:" << iparent << "new parent:" << par;
 	if (par == iparent)
 		return ;
 	if (iparent)
 		iparent->removeChild(this) ;
+	if (!par) // TODO review and maybe find better place
+		detachChild(this) ;
 	iparent = par ;
+}
+
+void specModelItem::detachChild(specModelItem* child) // TODO review and maybe find better place
+{
+	child->detach();
+	for (int i = 0 ; i < child->children() ; ++i)
+		detachChild	(((specFolderItem*) child)->child(i)) ;
 }
 
 specFolderItem* specModelItem::parent() const
