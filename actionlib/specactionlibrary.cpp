@@ -12,6 +12,7 @@
 #include "changeplotstyleaction.h"
 #include "spectreeaction.h"
 #include "specmulticommand.h"
+#include "specmergeaction.h"
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
@@ -67,9 +68,14 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		treeAction->setLibrary(this) ;
 		bar->addAction(treeAction) ;
 
+		specMergeAction *mergeAction = new specMergeAction(target) ;
+		mergeAction->setLibrary(this) ;
+		bar->addAction(mergeAction) ;
+
 		QAction *undoAction = undoStack->createUndoAction(target) ;
 		undoAction->setIcon(QIcon::fromTheme("edit-undo"));
 		bar->addAction(undoAction) ;
+
 		qDebug("adding redo action") ;
 		QAction *redoAction = undoStack->createRedoAction(target) ;
 		redoAction->setIcon(QIcon::fromTheme("edit-redo")) ;

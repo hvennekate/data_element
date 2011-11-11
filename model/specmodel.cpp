@@ -32,15 +32,15 @@ bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QLi
 	{
 		QStringList::size_type descriptor = criteria[i].first ;
 		double tolerance = criteria[i].second ;
-		if (descriptorProperties[descriptor] & spec::numeric)
+		if (DescriptorProperties[descriptor] & spec::numeric)
 		{
-			double a = itemPointer(first)->descriptor(descriptors[descriptor]).toDouble(),
-				b = itemPointer(second)->descriptor(descriptors[descriptor]).toDouble() ;
+			double a = itemPointer(first)->descriptor(Descriptors[descriptor]).toDouble(),
+				b = itemPointer(second)->descriptor(Descriptors[descriptor]).toDouble() ;
 			equal &= b-tolerance <= a && a <= b+tolerance ;
 		}
 		else
-			equal &= itemPointer(first)->descriptor(descriptors[descriptor]) ==
-				itemPointer(second)->descriptor(descriptors[descriptor]) ;
+			equal &= itemPointer(first)->descriptor(Descriptors[descriptor]) ==
+				itemPointer(second)->descriptor(Descriptors[descriptor]) ;
 	}
 	return equal ;
 }
@@ -54,11 +54,11 @@ bool specModel::getMergeCriteria(QList<QPair<QStringList::size_type, double> >& 
 	QGridLayout *descriptorLayout = new QGridLayout ;
 	QVBoxLayout *dialogLayout = new QVBoxLayout ;
 	//TODO Label fuer tolerance ...
-	for(QStringList::size_type i = 0 ; i < descriptors.size() ; i++)
+	for(QStringList::size_type i = 0 ; i < Descriptors.size() ; i++)
 	{
-		descriptorLayout->addWidget(new QCheckBox(descriptors[i]),i,0) ;
+		descriptorLayout->addWidget(new QCheckBox(Descriptors[i]),i,0) ;
 // 		((QCheckBox*) descriptorLayout->itemAt(descriptorLayout->count()-1)->widget())->setCheckState(Qt::Checked) ;
-		if(descriptorProperties[i] & spec::numeric)
+		if(DescriptorProperties[i] & spec::numeric)
 		{
 			QLineEdit *validatorLine = new QLineEdit("0") ;
 			validatorLine->setValidator(new QDoubleValidator(validatorLine)) ;
@@ -82,7 +82,7 @@ bool specModel::getMergeCriteria(QList<QPair<QStringList::size_type, double> >& 
 		descriptorLayout->getItemPosition(i, &row, &column, &rowspan, &columnspan) ;
 		if (column == 0 && ((QCheckBox*) descriptorLayout->itemAt(i)->widget())->checkState() == Qt::Checked)
 			toCompare << qMakePair(row,
-				descriptorProperties[row] & spec::numeric ?
+				DescriptorProperties[row] & spec::numeric ?
 						((QLineEdit*) descriptorLayout->itemAt(i+1)->widget())->text().toDouble() : 0.) ;
 	}
 	
@@ -92,7 +92,7 @@ bool specModel::getMergeCriteria(QList<QPair<QStringList::size_type, double> >& 
 bool specModel::exportData(QModelIndexList& list)
 {
 	QFile *exportFile = new QFile(QFileDialog::getSaveFileName(0,"File name","","ASCII files (*.asc)")) ;
-	exportDialog *exportFormat = new exportDialog(&descriptors) ;
+	exportDialog *exportFormat = new exportDialog(&Descriptors) ;
 	if ( exportFile->fileName() == "" || ! exportFormat->exec() ) return false ;
 	exportFile->open(QIODevice::WriteOnly | QIODevice::Text) ;
 	QTextStream out(exportFile) ;
@@ -143,6 +143,16 @@ QModelIndexList specModel::allChildren(const QModelIndex& parent) const
 	for (int i = 0 ; i < rowCount(parent) ; i++)
 		list << this->index(i,0,parent) ;
 	return list ;
+}
+
+const QStringList& specModel::descriptors() const
+{
+	return Descriptors ;
+}
+
+const QList<spec::descriptorFlags>& specModel::descriptorProperties() const
+{
+	return DescriptorProperties ;
 }
 
 QModelIndexList specModel::merge(QModelIndexList& list, const QList<QPair<QStringList::size_type, double> >& criteria)
@@ -282,10 +292,10 @@ QModelIndexList specModel::merge(QModelIndexList& list, const QList<QPair<QStrin
 bool specModel::buildTree(const QModelIndex& parent) // outsource to folderItem (pass list of descriptors)
 {
 	int col = parent.column() ;
-	if(col >= descriptors.size()) return false ;
+	if(col >= Descriptors.size()) return false ;
 	if(itemPointer(parent)->isFolder()) return false ;
 // 	itemPointer(parent)->setAutoReplot(false) ;
-	((specFolderItem*) itemPointer(parent))->buildTree(descriptors) ;
+	((specFolderItem*) itemPointer(parent))->buildTree(Descriptors) ;
 // 	itemPointer(parent)->setAutoReplot(true) ;
 	return true ;
 }
@@ -317,9 +327,9 @@ void specModel::importFile(QModelIndex index)
 QDataStream& operator<<(QDataStream& out, specModel& model)
 {
 	qDebug("---writing model") ;
-	out << (qint32) model.descriptors.size() ;
-	for( int i =0 ; i < model.descriptors.size() ; i++)
-		out << model.descriptors[i] << (quint8) model.descriptorProperties[i] ;
+	out << (qint32) model.Descriptors.size() ;
+	for( int i =0 ; i < model.Descriptors.size() ; i++)
+		out << model.Descriptors[i] << (quint8) model.DescriptorProperties[i] ;
 	return model.root->writeOut(out) ;
 } // TODO save column widths --> on plotwidget level!
 
@@ -327,8 +337,8 @@ QDataStream& operator>>(QDataStream& in, specModel& model)
 {
 	qDebug("Reading model") ;
 	delete model.root ;
-	model.descriptors.clear() ;
-	model.descriptorProperties.clear() ;
+	model.Descriptors.clear() ;
+	model.DescriptorProperties.clear() ;
 // 	cout << "---reading  model" << endl ;
 	quint32 descriptorsSize;
 	quint8  prop ;
@@ -336,9 +346,9 @@ QDataStream& operator>>(QDataStream& in, specModel& model)
 // 	cout << "---descriptors: " << descriptorsSize << endl ;
 	for (int i = 0 ; i < descriptorsSize ; i++)
 	{
-		model.descriptors.append(QString()) ;
-		in >> model.descriptors.last() >> prop ;
-		model.descriptorProperties.append((spec::descriptorFlags) prop) ;
+		model.Descriptors.append(QString()) ;
+		in >> model.Descriptors.last() >> prop ;
+		model.DescriptorProperties.append((spec::descriptorFlags) prop) ;
 // 		cout << "---read descriptor " << i << ":  " << model.descriptors.last() << "  Properties: " << model.descriptorProperties.last() << endl ;
 	}
 	qDebug("reading root item") ;
@@ -354,22 +364,22 @@ specModel::specModel(QObject *par)
 	  dontDelete(false)
 {
 	root = new specFolderItem ;
-	descriptors += "" ;
-	descriptorProperties += spec::editable ;
+	Descriptors += "" ;
+	DescriptorProperties += spec::editable ;
 }
 
 specModel::~specModel()
 {
 	delete root ;
-	descriptors.clear() ;
-	descriptorProperties.clear() ;
+	Descriptors.clear() ;
+	DescriptorProperties.clear() ;
 }
 
 bool specModel::setHeaderData (int section,Qt::Orientation orientation,const QVariant & value,int role)
 {
 	if (role == Qt::EditRole)
 	{
-		descriptors.replace(section,value.toString()) ;
+		Descriptors.replace(section,value.toString()) ;
 		emit headerDataChanged(Qt::Horizontal,section,section) ;
 		emit headerDataChanged(Qt::Vertical  ,section,section) ;
 		return true ;
@@ -377,7 +387,7 @@ bool specModel::setHeaderData (int section,Qt::Orientation orientation,const QVa
 	
 	if (role == 34) // TODO introduce in names.h
 	{
-		descriptorProperties[section] = (spec::descriptorFlags) value.toInt() ;
+		DescriptorProperties[section] = (spec::descriptorFlags) value.toInt() ;
 		return true ;
 	}
 	return false;
@@ -388,8 +398,8 @@ bool specModel::insertColumns (int column,int count,const QModelIndex & parent)
 	emit beginInsertColumns(parent,column,column+count-1) ;
 	for (QStringList::size_type i = 0 ; i < count ; i++)
 	{
-		descriptors.insert(column+i,"") ;
-		descriptorProperties.insert(column+i,spec::def) ;
+		Descriptors.insert(column+i,"") ;
+		DescriptorProperties.insert(column+i,spec::def) ;
 	}
 	emit endInsertColumns() ;
 	return true ;
@@ -399,8 +409,8 @@ bool specModel::removeColumns (int column,int count,const QModelIndex & parent)
 	emit beginRemoveColumns(parent,column,column+count-1) ;
 	for (QStringList::size_type i = 0 ; i < count ; i++)
 	{
-		descriptors.removeAt(column) ;
-		descriptorProperties.removeAt(column) ;
+		Descriptors.removeAt(column) ;
+		DescriptorProperties.removeAt(column) ;
 	}
 	emit endRemoveColumns() ;
 	return true ;
@@ -416,7 +426,7 @@ bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int 
 	{
 		for (QStringList::size_type j = 0 ; j < list[i]->descriptorKeys().size() ; j++)
 		{
-			if (!descriptors.contains(list[i]->descriptorKeys()[j]))
+			if (!Descriptors.contains(list[i]->descriptorKeys()[j]))
 			{
 				insertColumns(columnCount(parent),1,parent) ;
 				setHeaderData(columnCount(parent)-1,Qt::Horizontal,list[i]->descriptorKeys()[j]) ;
@@ -442,7 +452,7 @@ bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int 
 	return retVal ;
 }
 
-int specModel::columnCount(const QModelIndex &parent) const {return descriptors.size() ;}
+int specModel::columnCount(const QModelIndex &parent) const {return Descriptors.size() ;}
 int specModel::rowCount(const QModelIndex& parent) const
 { return itemPointer(parent)->children() ; }
 
@@ -467,7 +477,7 @@ Qt::ItemFlags specModel::flags(const QModelIndex &index) const
 		return Qt::ItemIsEnabled | Qt::ItemIsDropEnabled ;
 	
 	Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index) | ( itemPointer(index)->isFolder() ? Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled : Qt::ItemIsDragEnabled);
-	if (itemPointer(index)->isEditable(descriptors[index.column()]))
+	if (itemPointer(index)->isEditable(Descriptors[index.column()]))
 		return  defaultFlags | Qt::ItemIsEditable ;
 	return QAbstractItemModel::flags(index) ;
 }
@@ -485,18 +495,18 @@ QVariant specModel::data(const QModelIndex &index, int role) const
 	{
 		case Qt::DecorationRole :
 //			return index.column() ? QVariant() : pointer->decoration() ;
-			return pointer->indicator(descriptors[index.column()]) ;
+			return pointer->indicator(Descriptors[index.column()]) ;
 // 			return index.column() != 0 ? QVariant() : QIcon(pointer->isFolder() ? ":/folder.png" : (pointer->isSysEntry() ? ":/sys_message.png" : (pointer->isLogEntry() ? ":/log_message.png" : ":/data.png"))) ;
 		case Qt::DisplayRole :
 			if (index.column() < columnCount(index))
-				return pointer->descriptor(descriptors[index.column()]) ;
+				return pointer->descriptor(Descriptors[index.column()]) ;
 			return "" ;
 		case Qt::ForegroundRole :
 			return pointer->brush() ;
 		case spec::fullContentRole :
-			return pointer->descriptor(descriptors[index.column()],true) ;
+			return pointer->descriptor(Descriptors[index.column()],true) ;
 		case Qt::ToolTipRole :
-			return pointer->descriptor(descriptors[index.column()],true) ;
+			return pointer->descriptor(Descriptors[index.column()],true) ;
 // 		case 32 : // TODO replace in namespace
 // 			return pointer->plotData() ;
 	}
@@ -511,7 +521,7 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 		switch(role)
 		{
 			case Qt::EditRole :
-				changed =  itemPointer(index)->changeDescriptor(descriptors[index.column()], value.toString()) ; break ;
+				changed =  itemPointer(index)->changeDescriptor(Descriptors[index.column()], value.toString()) ; break ;
 			case Qt::ForegroundRole :
 				itemPointer(index)->setPen(value.value<QPen>()) ;
 				changed = true ;
@@ -519,7 +529,7 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 			case 33 :
 				changed = true ; itemPointer(index)->mergePlotData = value.toBool() ; break ;
 			case spec::activeLineRole :
-				changed = itemPointer(index)->setActiveLine(descriptors[index.column()], value.toInt()) ; break ;
+				changed = itemPointer(index)->setActiveLine(Descriptors[index.column()], value.toInt()) ; break ;
 		}
 	}
 	if (changed) emit dataChanged(index,index) ;
@@ -531,7 +541,7 @@ QVariant specModel::headerData(int section, Qt::Orientation orientation,
 {
 	if (role != Qt::DisplayRole)
 		return QVariant();
-	return descriptors[section] ;
+	return Descriptors[section] ;
 }
 
 // bool specModel::insertRows(int position, int rows, const QModelIndex &parent) // TODO remove this function entirely as it is not known beforehand, what type of item is to be added and parent class is purely virtual.
@@ -698,8 +708,8 @@ specModel::specModel(QDataStream& in,QObject *par)
 	  dontDelete(false)
 {
 	root = new specFolderItem ;
-	descriptors += "" ;
-	descriptorProperties += spec::editable ;
+	Descriptors += "" ;
+	DescriptorProperties += spec::editable ;
 	in >> *this ;
 	qDebug("done reading model") ;
 }

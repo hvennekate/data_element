@@ -11,9 +11,6 @@ specTreeAction::specTreeAction(QObject *parent) :
 
 void specTreeAction::execute()
 {
-	specMultiCommand *command = new specMultiCommand ;
-	command->setParentWidget(view) ;
-
 	specView *view = (specView*) parentWidget() ;
 	specModel *model = view->model() ;
 	QVector<QPair<specFolderItem*,QList<specModelItem*> > > moveTargets ;
@@ -69,6 +66,10 @@ void specTreeAction::execute()
 		index = index.parent() ;
 	}
 	if (! model->insertItems(QList<specModelItem*>() << moveTargets.first().first, index, row)) return ;
+	specMultiCommand *command = new specMultiCommand ;
+	command->setParentWidget(view) ;
+	command->setMergeable(false) ;
+
 	specAddFolderCommand *insertion = new specAddFolderCommand(command) ;
 	insertion->setItems(QModelIndexList() << model->index(row,0,index)) ;
 	insertion->setParentWidget(parentWidget()) ;

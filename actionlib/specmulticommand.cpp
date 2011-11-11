@@ -2,8 +2,14 @@
 #include "specactionlibrary.h"
 
 specMultiCommand::specMultiCommand(specUndoCommand* parent)
-	: specUndoCommand(parent)
+	: specUndoCommand(parent),
+	  mayMerge(true)
 {
+}
+
+void specMultiCommand::setMergeable(bool mergeable)
+{
+	mayMerge = mergeable ;
 }
 
 void specMultiCommand::redo()
@@ -18,7 +24,7 @@ void specMultiCommand::undo()
 
 QDataStream& specMultiCommand::write(QDataStream &out) const
 {
-	out << qint32(childCount()) ;
+	out << mayMerge << qint32(childCount()) ;
 	for (int i = 0 ; i < childCount() ; ++i)
 		((const specUndoCommand*) child(i))->write(out) ;
 }
@@ -26,7 +32,7 @@ QDataStream& specMultiCommand::write(QDataStream &out) const
 QDataStream& specMultiCommand::read(QDataStream &in)
 {
 	qint32 children, id ;
-	in >> children ;
+	in >> mayMerge >> children ;
 
 	for (int i = 0 ; i < children ; ++i)
 	{
@@ -39,6 +45,9 @@ QDataStream& specMultiCommand::read(QDataStream &in)
 
 bool specMultiCommand::mergeWith(const QUndoCommand *other)
 {
+	if (!mayMerge)
+		return false ;
+	qDebug() << "merging multi command" ;
 	const specMultiCommand *command = (const specMultiCommand*) other ;
 	if (other->childCount() != childCount()) return false ;
 	bool mergeable = true ;
@@ -53,6 +62,5 @@ bool specMultiCommand::mergeWith(const QUndoCommand *other)
 
 	for (int i = 0 ; i < childCount() ; ++i)
 		((specUndoCommand*) child(i))->mergeWith((const specUndoCommand*) other->child(i)) ;
-
 	return true ;
 }

@@ -55,9 +55,10 @@ void specGenealogy::takeItems()
 	qDebug("starting to remove Items") ;
 	if (owning) return ;
 	if (!valid()) return ;
-	qDebug("checks done") ;
+	qDebug() << "before parent search" << Parent ;
 	if (!Parent)
 		seekParent() ;
+	qDebug() << "checks done" << Parent ;
 	foreach(specModelItem* item, Items)
 		item->setParent(0) ;
 	owning = true ;

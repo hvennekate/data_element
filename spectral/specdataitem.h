@@ -31,7 +31,6 @@ private:
 	QHash<QString,specDescriptor> description ;
 	QList<specDataPoint> data ;
 	specDataFilter filter ;
-	int addedItems ;
 	QVector<double> wnums() const ;
 	QVector<double> ints() const ;
 	QVector<double> mints() const ;
@@ -44,6 +43,7 @@ public:
 	specDataItem(QList<specDataPoint> data, // TODO change to reference/pointer
 		     QHash<QString,specDescriptor> description, // TODO change to reference/pointer
 		     specFolderItem* par=0, QString tag="");
+	specDataItem(const specDataItem&) ;
 	/*! Standard destructor.*/
 	~specDataItem();
 

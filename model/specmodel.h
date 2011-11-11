@@ -32,8 +32,8 @@ class specModel : public QAbstractItemModel
 	Q_OBJECT
 private:
 	specModelItem* root ;
-	QStringList descriptors ;
-	QList<spec::descriptorFlags> descriptorProperties ;
+	QStringList Descriptors ;
+	QList<spec::descriptorFlags> DescriptorProperties ;
 	void insertFromStream(QDataStream& stream, const QModelIndex& parent, int row) ;
 	bool getMergeCriteria(QList<QPair<QStringList::size_type, double> >&) ;
 	bool itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria) ;
@@ -63,6 +63,8 @@ public:
 	virtual bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row=0) ;
 	void fillSubMap(const QModelIndexList&) ;
 	void applySubMap(const QModelIndexList&) ;
+	const QStringList& descriptors() const ;
+	const QList<spec::descriptorFlags> & descriptorProperties() const;
 	
 	// QAbstractItemModel virtual functions:
 	
