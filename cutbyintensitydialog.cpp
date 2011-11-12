@@ -9,6 +9,7 @@ cutByIntensityDialog::cutByIntensityDialog(QWidget *parent) :
 	newRange = new QPushButton("new range",this) ;
 	deleteRange = new QPushButton("delete range",this) ;
 	buttons = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel,Qt::Horizontal,this) ;
+	picker = new CanvasPicker(plot) ;
 
 	layout->addWidget(plot) ;
 	layout->addWidget(newRange) ;
@@ -20,11 +21,15 @@ cutByIntensityDialog::cutByIntensityDialog(QWidget *parent) :
 	plot->enableAxis(QwtPlot::yRight,true) ;
 	plot->setAxisScale(QwtPlot::yRight,0,33e3) ;
 	plot->setAutoReplot(false) ;
+	plot->setAutoDelete(true) ;
+
+	picker->setOwning() ;
 
 	connect(deleteRange,SIGNAL(clicked()),plot,SLOT(deleteRange())) ;
 	connect(newRange,SIGNAL(clicked()),this,SLOT(addRange())) ;
 	connect(buttons,SIGNAL(accepted()),this,SLOT(accept())) ;
 	connect(buttons,SIGNAL(rejected()),this,SLOT(reject())) ;
+	connect(picker, SIGNAL(pointMoved(specCanvasItem*,int,double,double)),this,SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
 }
 
 void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
@@ -34,17 +39,23 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 		if (!items.contains(item))
 		{
 			items << item ;
-			item->attach(plot) ;
-			intensities << new QwtPlotCurve ;
-			QVector<double> xdat ;
+			QwtPlotCurve *intensity = new QwtPlotCurve ;
+			QwtPlotCurve *dataCurve = new QwtPlotCurve ;
+			QVector<double> xdat, ydat ;
 			for (int i = 0 ; i < item->dataSize() ; i++)
+			{
 				xdat << item->sample(i).x() ;
-			intensities.last()->setSamples(xdat,item->intensityData()) ;
-			intensities.last()->setYAxis(QwtPlot::yRight);
+				ydat << item->sample(i).y() ;
+			}
+			intensity->setSamples(xdat,item->intensityData()) ;
+			dataCurve->setSamples(xdat,ydat); ;
+			intensity->setYAxis(QwtPlot::yRight);
 			QPen pen = item->pen() ;
+			dataCurve->setPen(pen) ;
 			pen.setStyle(Qt::DashLine) ;
-			intensities.last()->setPen(pen) ;
-			intensities.last()->attach(plot) ;
+			intensity->setPen(pen) ;
+			dataCurve->attach(plot) ;
+			intensity->attach(plot) ;
 		}
 	}
 
@@ -70,7 +81,15 @@ void cutByIntensityDialog::performDeletion()
 		ranges->append((specRange*) selectable->at(i)) ;
 	foreach(specModelItem* item, items)
 		item->removeData(ranges) ;
-	delete ranges ;
+}
+
+QList<specRange*> cutByIntensityDialog::ranges() // TODO create access function in canvas picker
+{
+	QList<specCanvasItem*>* selectable = plot->selectable() ;
+	QList<specRange*> allRanges ;
+	for (int i = 0 ; i < selectable->size() ; i++)
+		allRanges.append((specRange*) selectable->at(i)) ;
+	return allRanges ;
 }
 
 void cutByIntensityDialog::addRange()
@@ -78,10 +97,16 @@ void cutByIntensityDialog::addRange()
 	double min = plot->axisScaleDiv(QwtPlot::xBottom)->lowerBound(), max = plot->axisScaleDiv(QwtPlot::xBottom)->upperBound() ;
 	specRange* range = new specSelectRange(min-.1*(max-min),max+.1*(max-min)) ;
 	range->attach(plot) ;
-	plot->refreshRanges();
+	picker->addSelectable(range) ;
+//	plot->refreshRanges();
 }
 cutByIntensityDialog::~cutByIntensityDialog()
 {
-	for (int i = 0 ; i < items.size() ; i++)
-		items[i]->detach();
+	delete picker ;
+}
+
+void cutByIntensityDialog::rangeModified(specCanvasItem *range, int point, double newX, double newY)
+{
+	range->pointMoved(point,newX,newY);
+	plot->replot();
 }

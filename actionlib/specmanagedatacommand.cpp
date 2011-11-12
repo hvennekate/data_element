@@ -8,7 +8,8 @@ specManageDataCommand::specManageDataCommand(specUndoCommand *parent)
 
 void specManageDataCommand::setItem(const QModelIndex& index, const QVector<int>& dataIndexes)
 {
-	specDataItem *pointer = dynamic_cast<specDataItem*>(specModel::itemPointer(index)) ;
+	if (!parentWidget()) return ; // TODO dynamic cast
+	specDataItem *pointer = dynamic_cast<specDataItem*>(((specView*) parentWidget())->model()->itemPointer(index)) ;
 	if (!pointer)
 	{
 		toTake.clear();
@@ -28,17 +29,23 @@ void specManageDataCommand::take()
 {
 	if (!item)
 		return ;
-	((specDataItem*) (item->items().first()))->removeData(toTake) ;
+	specDataItem *pointer = ((specDataItem*) (item->items().first())) ;
+	pointer->removeData(toTake) ;
+	if (pointer->plot())
+		pointer->plot()->replot();
 }
 
 void specManageDataCommand::insert()
 {
 	if (!item)
 		return ;
-	((specDataItem*) (item->items().first()))->insertData(taken) ;
+	specDataItem *pointer = ((specDataItem*) (item->items().first())) ;
+	pointer->insertData(taken) ;
+	if (pointer->plot())
+		pointer->plot()->replot();
 }
 
-QDataStrem& specManageDataCommand::write(QDataStream &out) const
+QDataStream& specManageDataCommand::write(QDataStream &out) const
 {
 	return item->write(out) << toTake << taken ;
 }

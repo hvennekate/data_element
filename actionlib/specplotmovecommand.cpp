@@ -22,7 +22,7 @@ void specPlotMoveCommand::redo()
 		item->addToSlope(slope) ;
 		item->refreshPlotData();
 		if (item->plot())
-			item->plot()->replot();
+			item->plot()->replot(); // TODO performance
 	}
 }
 

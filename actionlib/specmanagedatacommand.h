@@ -13,7 +13,7 @@ private:
 	QVector<int> toTake ;
 	QVector<specDataPoint> taken ;
 public:
-	specRemoveDataCommand(specUndoCommand *parent = 0) ;
+	specManageDataCommand(specUndoCommand *parent = 0) ;
 	void setItem(const QModelIndex&, const QVector<int>&) ;
 
 	bool ok() ;
