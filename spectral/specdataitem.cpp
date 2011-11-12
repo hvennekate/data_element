@@ -117,7 +117,7 @@ QVector<double> specDataFilter::times(const QList<specDataPoint>& data) const
 specDataItem::specDataItem(QList<specDataPoint> dat, QHash<QString,specDescriptor> desc, specFolderItem* par, QString description)
 	: specModelItem(par,description),
 	  data(dat),
-	  description(desc)
+	  description(desc) // TODO copy QwtPlotCurve properties
 {
 }
 
@@ -416,7 +416,7 @@ int specDataItem::removeData(QList<specRange *> *listpointer)
 	return count-wns.size() ;
 }
 
-QVector<specDataPoint> specDataItem::removeData(QVector<int> &indexes)
+void specDataItem::removeData(QVector<int> &indexes)
 {
 	QVector<int> sortedIndexes = indexes ;
 	qSort(sortedIndexes) ; // TODO do better, maybe no reference
@@ -425,7 +425,7 @@ QVector<specDataPoint> specDataItem::removeData(QVector<int> &indexes)
 	refreshPlotData();
 }
 
-QVector<specDataPoint> specDataItem::getData(const QVector<int> &)
+QVector<specDataPoint> specDataItem::getData(const QVector<int> &indexes)
 {
 	QVector<specDataPoint> desiredData(indexes.size()) ;
 	for (int i = 0 ; i < indexes.size() ; ++i)
@@ -435,7 +435,8 @@ QVector<specDataPoint> specDataItem::getData(const QVector<int> &)
 
 void specDataItem::insertData(const QVector<specDataPoint> &newData)
 {
-	data << newData ;
+	data << newData.toList() ; // TODO performance, filter
+	qSort(data) ;
 	refreshPlotData();
 }
 

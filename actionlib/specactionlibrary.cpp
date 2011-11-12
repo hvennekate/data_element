@@ -13,6 +13,7 @@
 #include "spectreeaction.h"
 #include "specmulticommand.h"
 #include "specmergeaction.h"
+#include "specremovedataaction.h"
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
@@ -71,6 +72,10 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		specMergeAction *mergeAction = new specMergeAction(target) ;
 		mergeAction->setLibrary(this) ;
 		bar->addAction(mergeAction) ;
+
+		specRemoveDataAction *removeDataAction = new specRemoveDataAction(target) ;
+		removeDataAction->setLibrary(this) ;
+		bar->addAction(removeDataAction) ;
 
 		QAction *undoAction = undoStack->createUndoAction(target) ;
 		undoAction->setIcon(QIcon::fromTheme("edit-undo"));
