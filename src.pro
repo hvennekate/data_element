@@ -62,7 +62,12 @@ SOURCES += main.cpp \
     actionlib/specremovedatacommand.cpp \
     actionlib/specmanagedatacommand.cpp \
     actionlib/specinsertdatacommand.cpp \
-    actionlib/specremovedataaction.cpp
+    actionlib/specremovedataaction.cpp \
+    actionlib/specaveragedataaction.cpp \
+    actionlib/specexchangedatacommand.cpp \
+    model/specsvgitem.cpp \
+    actionlib/specaddsvgitem.cpp \
+    actionlib/specprintplotaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -126,7 +131,12 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/specremovedatacommand.h \
     actionlib/specmanagedatacommand.h \
     actionlib/specinsertdatacommand.h \
-    actionlib/specremovedataaction.h
+    actionlib/specremovedataaction.h \
+    actionlib/specaveragedataaction.h \
+    actionlib/specexchangedatacommand.h \
+    model/specsvgitem.h \
+    actionlib/specaddsvgitem.h \
+    actionlib/specprintplotaction.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -158,3 +168,5 @@ CONFIG += qwt
 TARGET = data_element
 
 RESOURCES += icons/application.qrc
+
+QT += svg

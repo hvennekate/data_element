@@ -9,6 +9,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <qwt_scale_draw.h>
+#include "actionlib/specprintplotaction.h"
 
 specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	specPlot(parent),
@@ -22,6 +23,7 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	offlineAction = new QAction(QIcon(":/offline.png"), "Slope",correctionActions) ;
 	scaleAction   = new QAction(QIcon(":/scale.png"),"Scale", correctionActions) ;
 	shiftAction   = new QAction("shift x",correctionActions) ;
+	printAction   = new specPrintPlotAction(this) ;
 
 	correctionActions->addAction(offsetAction) ;
 	correctionActions->addAction(offlineAction) ;
@@ -243,28 +245,31 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 
 	// compute other corrections:
 	// TODO rewrite code for GSL
-	qDebug("creating matrix") ;
-	QList<QList<double> > matrix ;
-	for (int i = 0 ; i < selectedPoints.size() ; i++) matrix << QList<double>() ;
-	if (scaleAction->isChecked())
-		for (int i = 0 ; i < selectedPoints.size(); i++)
-			matrix[i] << item->sample(selectedPoints[i]).y() ;
-	if (offsetAction->isChecked())
-		for (int i = 0 ; i < selectedPoints.size(); i++)
-			matrix[i] << 1. ;
-	if (offlineAction->isChecked())
-		for (int i = 0 ; i < selectedPoints.size(); i++)
-			matrix[i] << item->sample(selectedPoints[i]).x()+shift ;
-	for (int i = 0 ; i < matrix.size() ; i++) // verringere, wenn noetig, die Spaltenzahl
-		while (matrix.size() < matrix[i].size())
-			matrix[i].takeLast() ;
-	while(matrix[0].size() < matrix.size()) // verringere, wenn noetig, die Zeilenzahl
-		matrix.takeLast() ;
 
+
+	double scale = 1, offset = 0, offline = 0 ;
 	qDebug("computing coeffs") ;
-	QList<double> coeffs ;
-	if (!matrix.isEmpty())
+	if (scaleAction->isChecked() || offsetAction->isChecked() || offlineAction->isChecked())
 	{
+		qDebug("creating matrix") ;
+		QList<QList<double> > matrix ;
+		for (int i = 0 ; i < selectedPoints.size() ; i++) matrix << QList<double>() ;
+		if (scaleAction->isChecked())
+			for (int i = 0 ; i < selectedPoints.size(); i++)
+				matrix[i] << item->sample(selectedPoints[i]).y() ;
+		if (offsetAction->isChecked())
+			for (int i = 0 ; i < selectedPoints.size(); i++)
+				matrix[i] << 1. ;
+		if (offlineAction->isChecked())
+			for (int i = 0 ; i < selectedPoints.size(); i++)
+				matrix[i] << item->sample(selectedPoints[i]).x()+shift ;
+		for (int i = 0 ; i < matrix.size() ; i++) // verringere, wenn noetig, die Spaltenzahl
+			while (matrix.size() < matrix[i].size())
+				matrix[i].takeLast() ;
+		while(matrix[0].size() < matrix.size()) // verringere, wenn noetig, die Zeilenzahl
+			matrix.takeLast() ;
+
+		QList<double> coeffs ;
 		QList<double> yVals ;
 		yVals << y- (scaleAction->isChecked() ? 0. : item->sample(no).y()) ; // TODO verify!
 		for (int i = 1 ; i < selectedPoints.size() && i < matrix.size() ; i++)
@@ -272,12 +277,11 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 
 		// do coefficient calculation
 		coeffs = gaussjinv(matrix,yVals) ;
+
+		scale = scaleAction->isChecked() && !coeffs.isEmpty() ? coeffs.takeFirst() : 1. ,
+		offset= offsetAction->isChecked()&& !coeffs.isEmpty() ? coeffs.takeFirst() : 0. ,
+		offline=offlineAction->isChecked()&&!coeffs.isEmpty() ?coeffs.takeFirst() : 0. ;
 	}
-
-	double scale = scaleAction->isChecked() && !coeffs.isEmpty() ? coeffs.takeFirst() : 1. ,
-	       offset= offsetAction->isChecked()&& !coeffs.isEmpty() ? coeffs.takeFirst() : 0. ,
-	       offline=offlineAction->isChecked()&&!coeffs.isEmpty() ?coeffs.takeFirst() : 0. ;
-
 	qDebug("pushing new move command %f %f %f %f",shift,offset,offline,scale) ;
 	specPlotMoveCommand *command = new specPlotMoveCommand ;
 	command->setItem(view->model()->index( (specModelItem*) item)) ; // TODO do dynamic cast first!!

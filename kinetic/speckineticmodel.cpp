@@ -39,9 +39,12 @@ void printAncestry(QModelIndex index)
 
 void specKineticModel::connectToModel(specModel* model)
 {
-// 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
+	qDebug("connecting to kinetic model to main model") ;
 	connectedModel = model ;
+	qDebug() << "checking row count" << itemPointer(QModelIndex()) ;
+	qDebug() << "number of children:" << itemPointer(QModelIndex())->children() ;
 	if (!rowCount(QModelIndex())) return ;
+	qDebug("doing connection to kinetic model") ;
 	QModelIndex index = specModel::index(0,0,QModelIndex()) ;
 	while (index != QModelIndex())
 	{

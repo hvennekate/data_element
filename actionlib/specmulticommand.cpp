@@ -27,6 +27,7 @@ QDataStream& specMultiCommand::write(QDataStream &out) const
 	out << mayMerge << qint32(childCount()) ;
 	for (int i = 0 ; i < childCount() ; ++i)
 		((const specUndoCommand*) child(i))->write(out) ;
+	return out ;
 }
 
 QDataStream& specMultiCommand::read(QDataStream &in)
@@ -41,6 +42,7 @@ QDataStream& specMultiCommand::read(QDataStream &in)
 		command->setParentWidget(parentWidget()) ;
 		command->read(in) ;
 	}
+	return in ;
 }
 
 bool specMultiCommand::mergeWith(const QUndoCommand *other)
@@ -48,7 +50,7 @@ bool specMultiCommand::mergeWith(const QUndoCommand *other)
 	if (!mayMerge)
 		return false ;
 	qDebug() << "merging multi command" ;
-	const specMultiCommand *command = (const specMultiCommand*) other ;
+//	const specMultiCommand *command = (const specMultiCommand*) other ;
 	if (other->childCount() != childCount()) return false ;
 	bool mergeable = true ;
 	for (int i = 0 ; i < childCount() ; ++i)

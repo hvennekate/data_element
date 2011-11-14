@@ -416,7 +416,7 @@ int specDataItem::removeData(QList<specRange *> *listpointer)
 	return count-wns.size() ;
 }
 
-void specDataItem::removeData(QVector<int> &indexes)
+void specDataItem::removeData(const QVector<int> &indexes)
 {
 	QVector<int> sortedIndexes = indexes ;
 	qSort(sortedIndexes) ; // TODO do better, maybe no reference
@@ -425,17 +425,27 @@ void specDataItem::removeData(QVector<int> &indexes)
 	refreshPlotData();
 }
 
-QVector<specDataPoint> specDataItem::getData(const QVector<int> &indexes)
+const QList<specDataPoint>& specDataItem::allData()
 {
-	QVector<specDataPoint> desiredData(indexes.size()) ;
+	return data ;
+}
+
+QList<specDataPoint> specDataItem::getData(const QVector<int> &indexes)
+{
+	QList<specDataPoint> desiredData ;
 	for (int i = 0 ; i < indexes.size() ; ++i)
-		desiredData[i] = data[indexes[i]] ;
+		desiredData << data[indexes[i]] ;
 	return desiredData ;
 }
 
-void specDataItem::insertData(const QVector<specDataPoint> &newData)
+void specDataItem::clearData()
 {
-	data << newData.toList() ; // TODO performance, filter
+	data.clear();
+}
+
+void specDataItem::insertData(const QList<specDataPoint> &newData)
+{
+	data << newData ; // TODO performance, filter
 	qSort(data) ;
 	refreshPlotData();
 }

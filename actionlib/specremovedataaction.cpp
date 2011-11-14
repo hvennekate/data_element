@@ -27,24 +27,23 @@ void specRemoveDataAction::execute()
 
 	foreach(QModelIndex index, indexes)
 	{
-		specRemoveDataCommand *command = new specRemoveDataCommand(groupCommand) ;
+		specDataItem *item = dynamic_cast<specDataItem*>(view->model()->itemPointer(index)) ;
+		if (!item) continue ;
 		QVector<int> dataPoints ;
-		specModelItem *item = view->model()->itemPointer(index) ;
 		for (int i = 0 ; i < item->dataSize() ; ++i)
 		{
 			for (int j = 0 ; j < ranges.size() ; ++j)
 			{
-				if (ranges[j]->contains(item->data()->sample(i).x()))
+				if (ranges[j]->contains(item->sample(i).x()))
 				{
 					dataPoints << i ;
 					break ;
 				}
 			}
 		}
+		specRemoveDataCommand *command = new specRemoveDataCommand(groupCommand) ;
 		command->setParentWidget(view) ;
 		command->setItem(index,dataPoints) ;
-		if (!command->ok())
-			delete command ; // TODO check if this is ok without telling parent
 	}
 
 	delete dialog ;

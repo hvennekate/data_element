@@ -33,6 +33,7 @@ bool specFolderItem::addChildren(QList<specModelItem*> list, QList<specModelItem
 	
 QList<specModelItem*>::size_type specFolderItem::children() const
 {
+//	qDebug("checking children list size") ;
 	return childrenList.size() ;
 }
 

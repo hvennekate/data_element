@@ -75,13 +75,12 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	qDebug() << "filepos:" << onDisk->pos() ;
 	
 	qDebug("read both data and kinetics models") ;
-// 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
 	
-// 	cout << "connecting to model" << endl ;
-	kineticWidget->view()->model()->connectToModel(items->model()) ;
-// 	cout << "connected data model" << endl ;
+	qDebug() << "connecting to model" << kineticWidget->view()->model() << endl ;
+	kineticWidget->view()->model()->connectToModel(items->model()) ; // TODO mysterious crashes here.
+	qDebug() << "connected data model" << endl ;
 	kineticWidget->view()->model()->connectToPlot(plot) ;
-// 	cout << "connected data plot" << endl ;
+	qDebug() << "connected data plot" << endl ;
 // 	setTitleBarWidget(new specDockTitle) ;
 
 	// TODO outsource... clean-up for log widget ... title for log dock window
@@ -100,7 +99,7 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	logContent->setLayout(logLayout);
 	logWidget->setWidget(logContent);
 
-	//
+	qDebug("creating actions, toolbars, connections") ;
 
 	
 	createActions() ;
