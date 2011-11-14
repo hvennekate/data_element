@@ -40,6 +40,7 @@ specKineticWidget::specKineticWidget(QString title, QWidget *parent)
 	
 	items->setModel(new specKineticModel(items)) ;
 	items->model()->setMimeTypes(QStringList("application/spec.kinetic.item")) ;
+	qDebug() << "Kinetic model" << items->model() ;
 	
 	splitter->setOrientation(Qt::Vertical) ;
 	splitter->addWidget(plot) ;

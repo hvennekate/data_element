@@ -22,6 +22,8 @@ class specCanvasItem : public QwtPlotCurve
 		virtual void addToSlope(const double&) {}
 		virtual void moveYBy(const double&) {}
 		virtual void moveXBy(const double&) {}
+		virtual void attach(QwtPlot *plot) { QwtPlotCurve::attach(plot) ; }
+		virtual void detach() { attach(0) ; }
 		virtual QMenu* contextMenu() ;
 		void setLineWidth() ;
 		~specCanvasItem();

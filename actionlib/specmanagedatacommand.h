@@ -11,9 +11,9 @@ class specManageDataCommand : public specUndoCommand
 private:
 	specGenealogy *item ;
 	QVector<int> toTake ;
-	QVector<specDataPoint> taken ;
+	QList<specDataPoint> taken ;
 public:
-	specManageDataCommand(specUndoCommand *parent = 0) ;
+	explicit specManageDataCommand(specUndoCommand *parent = 0) ; // TOOD make all of these explicit
 	void setItem(const QModelIndex&, const QVector<int>&) ;
 
 	bool ok() ;

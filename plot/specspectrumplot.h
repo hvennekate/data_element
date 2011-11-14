@@ -7,12 +7,13 @@
 #include <QActionGroup>
 #include "actionlib/specactionlibrary.h"
 #include "specview.h"
+#include "actionlib/specundoaction.h"
 
 class specSpectrumPlot : public specPlot
 {
 	Q_OBJECT
 private:
-	QAction *offsetAction, *offlineAction, *scaleAction, *shiftAction ;
+	QAction *offsetAction, *offlineAction, *scaleAction, *shiftAction, *printAction ;
 	QAction *setReferenceAction, *alignWithReferenceAction, *addRangeAction, *removeRangeAction, *noSlopeAction ;
 	QActionGroup *correctionActions, *alignmentActions ;
 	CanvasPicker *picker ;
@@ -28,9 +29,9 @@ private:
 
 public:
 	explicit specSpectrumPlot(QWidget *parent = 0);
-	QList<QAction*> actions() { return QList<QAction*>() << correctionActions->actions() << alignmentActions->actions() ; }
+	QList<QAction*> actions() { return QList<QAction*>() << correctionActions->actions() << alignmentActions->actions() << printAction ; }
 	void setView(specView* mod) { view = mod ; }
-	void setUndoPartner(specActionLibrary* lib) { undoPartner = lib ; }
+	void setUndoPartner(specActionLibrary* lib) { qDebug("setting action lib") ; undoPartner = lib ; ((specUndoAction*) printAction)->setLibrary(lib);}
 signals:
 
 private slots:

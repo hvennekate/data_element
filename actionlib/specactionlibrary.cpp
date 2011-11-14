@@ -14,6 +14,8 @@
 #include "specmulticommand.h"
 #include "specmergeaction.h"
 #include "specremovedataaction.h"
+#include "specaveragedataaction.h"
+#include "specaddsvgitem.h"
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
@@ -77,6 +79,14 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		removeDataAction->setLibrary(this) ;
 		bar->addAction(removeDataAction) ;
 
+		specAverageDataAction *averageAction = new specAverageDataAction(target) ;
+		averageAction->setLibrary(this) ;
+		bar->addAction(averageAction) ;
+
+		specAddSVGItemAction *SVGAction = new specAddSVGItemAction(target) ;
+		SVGAction->setLibrary(this) ;
+		bar->addAction(SVGAction) ;
+
 		QAction *undoAction = undoStack->createUndoAction(target) ;
 		undoAction->setIcon(QIcon::fromTheme("edit-undo"));
 		bar->addAction(undoAction) ;
@@ -137,6 +147,7 @@ QDataStream& specActionLibrary::write(QDataStream &out)
 	}
 	for (int i = 0 ; i < undoStack->count() ; ++i)
 		((specUndoCommand*) undoStack->command(i))->write(out) ;
+	return out ;
 }
 
 specUndoCommand *specActionLibrary::commandById(int id, specUndoCommand* parent)
@@ -183,6 +194,7 @@ QDataStream& specActionLibrary::read(QDataStream &in)
 		((specUndoCommand*) undoStack->command(i))->read(in) ;
 	}
 	qDebug() << "reading undo commands done." ;
+	return in ;
 }
 
 void specActionLibrary::setLastRequested(const QModelIndexList &list)

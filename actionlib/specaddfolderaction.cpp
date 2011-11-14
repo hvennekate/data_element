@@ -22,7 +22,7 @@ void specAddFolderAction::execute()
 	QModelIndex index = currentView->currentIndex() ;
 	specModelItem *item = model->itemPointer(index) ;
 	int row = 0 ;
-	qDebug("checking if item is folder") ;
+	qDebug() << "checking if item is folder" << item << index ;
 	if (!item->isFolder())
 	{
 		qDebug("item is not a folder") ;
