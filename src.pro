@@ -67,7 +67,8 @@ SOURCES += main.cpp \
     actionlib/specexchangedatacommand.cpp \
     model/specsvgitem.cpp \
     actionlib/specaddsvgitem.cpp \
-    actionlib/specprintplotaction.cpp
+    actionlib/specprintplotaction.cpp \
+    actionlib/specresizesvgcommand.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -136,7 +137,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/specexchangedatacommand.h \
     model/specsvgitem.h \
     actionlib/specaddsvgitem.h \
-    actionlib/specprintplotaction.h
+    actionlib/specprintplotaction.h \
+    actionlib/specresizesvgcommand.h
 
 INCLUDEPATH += kinetic \
 	log \

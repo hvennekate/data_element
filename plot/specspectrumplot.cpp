@@ -10,12 +10,15 @@
 #include <QLabel>
 #include <qwt_scale_draw.h>
 #include "actionlib/specprintplotaction.h"
+#include "specsvgitem.h"
+#include "actionlib/specresizesvgcommand.h"
 
 specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	specPlot(parent),
 	view(0),
 	picker(0),
-	reference(0)
+	reference(0),
+	SVGpicker(0)
 {
 	correctionActions = new QActionGroup(this) ;
 	correctionActions->setExclusive(false);
@@ -24,6 +27,7 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	scaleAction   = new QAction(QIcon(":/scale.png"),"Scale", correctionActions) ;
 	shiftAction   = new QAction("shift x",correctionActions) ;
 	printAction   = new specPrintPlotAction(this) ;
+	modifySVGs    = new QAction("Modify SVGs",this) ;
 
 	correctionActions->addAction(offsetAction) ;
 	correctionActions->addAction(offlineAction) ;
@@ -33,6 +37,7 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	connect(correctionActions,SIGNAL(triggered(QAction*)),this,SLOT(correctionsChanged())) ;
 	foreach(QAction *action, correctionActions->actions())
 		action->setCheckable(true) ;
+	modifySVGs->setCheckable(true) ;
 
 	alignmentActions = new QActionGroup(this) ;
 	alignmentActions->setExclusive(false) ;
@@ -63,6 +68,7 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 
 
 	connect(alignmentActions,SIGNAL(triggered(QAction*)),this,SLOT(alignmentChanged(QAction*))) ;
+	connect(modifySVGs,SIGNAL(triggered(bool)),this,SLOT(modifyingSVGs(bool))) ;
 }
 
 QList<specDataItem*> specSpectrumPlot::folderContent(specModelItem *folder)
@@ -219,7 +225,8 @@ void specSpectrumPlot::correctionsChanged()
 			QList<specCanvasItem*> items ;
 			QwtPlotItemList onPlot = itemList(spec::spectrum) ;
 			foreach(QwtPlotItem* item, onPlot)
-				items << (specCanvasItem*) item ;
+				items << dynamic_cast<specDataItem*>(item) ;
+			items.removeAll(0) ;
 			picker->addSelectable(items);
 		}
 //		connect(undoPartner,SIGNAL(stackChanged()),this,SLOT(replot())) ;
@@ -358,4 +365,70 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* item,int point, double ne
 	}
 	undoPartner->push(zeroCommand) ;
 	replot() ;
+}
+
+void specSpectrumPlot::modifyingSVGs(const bool &modify)
+{
+	if (SVGpicker)
+	{
+		disconnect(SVGpicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)),this,SLOT(resizeSVG(specCanvasItem*,int,double,double))) ;
+		delete SVGpicker ;
+		SVGpicker = 0 ;
+	}
+	if (!modify) return ;
+
+	SVGpicker = new CanvasPicker(this) ;
+	QList<specCanvasItem*> SVGitems ;
+
+	foreach(QwtPlotItem *item, itemList())
+		SVGitems << dynamic_cast<specSVGItem*>(item) ;
+	SVGitems.removeAll(0) ;
+	SVGpicker->addSelectable(SVGitems) ;
+	connect(SVGpicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)),this,SLOT(resizeSVG(specCanvasItem*,int,double,double))) ;
+}
+
+void specSpectrumPlot::resizeSVG(specCanvasItem *item, int point, double x, double y)
+{
+	specSVGItem *pointer = dynamic_cast<specSVGItem*>(item) ;
+	if (!pointer || !view || !undoPartner) return ;
+	QRectF bounds = pointer->boundingRect() ;
+	double aspectRatio = bounds.width()/bounds.height() ;
+	QPoint newPoint(x,y) ;
+
+	switch (point)
+	{
+	case specSVGItem::center :
+		bounds.moveCenter(QPoint(x,y)); ; break ;
+	case specSVGItem::left :
+		bounds.setLeft(x) ; break ;
+	case specSVGItem::right :
+		bounds.setRight(x) ; break ;
+	case specSVGItem::top :
+		bounds.setTop(y) ; break ;
+	case specSVGItem::bottom :
+		bounds.setBottom(y) ; break ;
+	case specSVGItem::topLeft :
+		bounds.setTopLeft(newPoint) ; break ;
+	case specSVGItem::topRight :
+		bounds.setTopRight(newPoint) ; break ;
+	case specSVGItem::bottomLeft :
+		bounds.setBottomLeft(newPoint) ; break ;
+	case specSVGItem::bottomRight :
+		bounds.setBottomRight(newPoint); break ;
+	}
+	bounds = bounds.normalized() ;
+	double newAspect = bounds.width()/bounds.height() ;
+	if (newAspect < aspectRatio && (point == specSVGItem::topLeft || point == specSVGItem::bottomLeft))
+		bounds.setLeft(bounds.right()-bounds.height()*aspectRatio) ;
+	else if (newAspect < aspectRatio && (point == specSVGItem::topRight || point == specSVGItem::bottomRight))
+		bounds.setRight(bounds.left()+bounds.height()*aspectRatio) ;
+	else if (newAspect > aspectRatio && (point == specSVGItem::topRight || point == specSVGItem::topLeft))
+		bounds.setTop(bounds.bottom()-bounds.width()/aspectRatio) ;
+	else if (newAspect > aspectRatio && (point == specSVGItem::bottomLeft || point == specSVGItem::bottomRight))
+		bounds.setBottom(bounds.top()+bounds.width()/aspectRatio) ;
+
+	specResizeSVGcommand *command = new specResizeSVGcommand ;
+	command->setParentWidget(this) ;
+	command->setItem(view->model()->index(pointer),bounds) ;
+	undoPartner->push(command) ;
 }

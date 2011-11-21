@@ -15,8 +15,9 @@ class specSpectrumPlot : public specPlot
 private:
 	QAction *offsetAction, *offlineAction, *scaleAction, *shiftAction, *printAction ;
 	QAction *setReferenceAction, *alignWithReferenceAction, *addRangeAction, *removeRangeAction, *noSlopeAction ;
+	QAction *modifySVGs ;
 	QActionGroup *correctionActions, *alignmentActions ;
-	CanvasPicker *picker ;
+	CanvasPicker *picker, *SVGpicker ;
 	specActionLibrary *undoPartner ;
 	QHash<specCanvasItem*, QList<int> > pointHash ;
 	QList<specRange*> zeroRanges ;
@@ -29,7 +30,7 @@ private:
 
 public:
 	explicit specSpectrumPlot(QWidget *parent = 0);
-	QList<QAction*> actions() { return QList<QAction*>() << correctionActions->actions() << alignmentActions->actions() << printAction ; }
+	QList<QAction*> actions() { return QList<QAction*>() << correctionActions->actions() << alignmentActions->actions() << printAction << modifySVGs; }
 	void setView(specView* mod) { view = mod ; }
 	void setUndoPartner(specActionLibrary* lib) { qDebug("setting action lib") ; undoPartner = lib ; ((specUndoAction*) printAction)->setLibrary(lib);}
 signals:
@@ -39,7 +40,8 @@ private slots:
 	void alignmentChanged(QAction*) ;
 	void pointMoved(specCanvasItem*,int point, double x, double y) ;
 	void applyZeroRanges(specCanvasItem*,int point, double x, double y) ;
-
+	void resizeSVG(specCanvasItem*, int point, double x, double y) ;
+	void modifyingSVGs(const bool&) ;
 };
 
 #endif // SPECSPECTRUMPLOT_H

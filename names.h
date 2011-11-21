@@ -31,6 +31,7 @@ namespace spec{
 				  removeDataId   = 20,
 				  insertDataId   = 21,
 				  exchangeDataId = 22,
+				  resizeSVGId    = 23,
 			  penColorId         = 5001,
 			  symbolStyleId      = 5002,
 			  symbolSizeId       = 5003,
