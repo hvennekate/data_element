@@ -3,7 +3,7 @@
 
 #include "specmanagedatacommand.h"
 
-class specRemoveDataCommand : public specManageDataCommand
+class specRemoveDataCommand : public specManageDataCommand  // TODO get new parent for this type of command.
 {
 public:
 	specRemoveDataCommand(specUndoCommand *parent = 0) ;

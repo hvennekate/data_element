@@ -29,7 +29,7 @@ class specCanvasItem : public QwtPlotCurve
 		~specCanvasItem();
 
 		int rtti() const { return spec::canvasItem ; }
-		void highlight(bool highlight) ;
+		virtual void highlight(bool highlight) ;
 
 		QColor penColor() ;
 		void setPenColor(const QColor&) ;
