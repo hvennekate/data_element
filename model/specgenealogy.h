@@ -18,6 +18,7 @@ public:
 	explicit specGenealogy(QModelIndexList&);
 	virtual ~specGenealogy() ;
 	specGenealogy(specModel*, QDataStream&) ;
+	void setModel(specModel* model) ;
 	void takeItems() ;
 	void returnItems() ;
 	bool valid() ;
