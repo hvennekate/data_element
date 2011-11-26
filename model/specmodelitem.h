@@ -16,6 +16,7 @@
 class specModelItem ;
 class specFolderItem ;
 class specKineticRange ;
+class specMetaItem ;
 
 QDataStream& operator>>(QDataStream&, specModelItem*&) ;
 // QDataStream& operator<<(QDataStream&, specModelItem*&) ;
@@ -26,6 +27,8 @@ class specModelItem : public specCanvasItem
 private:
 	specFolderItem* iparent ;
 	void detachChild(specModelItem* child) ;
+	bool dataValid ;
+	QList<specMetaItem*> clients ;
 protected:
 	void processData(QVector<double>&, QVector<double>&) const ;
 	// selectedPoints (3 Punkte fuer Korrekturen)
@@ -33,6 +36,10 @@ protected:
 	virtual QDataStream& readFromStream(QDataStream&) =0 ;
 	virtual QDataStream& writeToStream(QDataStream&) const =0 ;
 public:
+	virtual void revalidate() { dataValid = true ; }
+	inline void invalidate() { dataValid = false ; }
+	void connectClient(specMetaItem* clnt) ;
+	void disconnectClient(specMetaItem* clnt) ;
 	/*! Merge/sort plot data when rebuilding it.  Mainly applies to both specFolderItem and specDataItem.  Both are enabled by default. */
 	bool mergePlotData, sortPlotData ;
 	

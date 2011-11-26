@@ -99,3 +99,13 @@ void specMetaItem::revalidate()
 	// TODO do some more checks on valid items etc.
 	setData(filter->data(items)) ;
 }
+
+void specMetaItem::refreshPointers(const QHash<specModelItem *, specModelItem *> &mapping)
+{
+	invalidate() ;
+	QList<specModelItem*> newPointers ;
+	foreach(specModelItem* pointer, items)
+		newPointers << mapping[pointer] ;
+	newPointers.removeAll(0) ;
+	items = newPointers ;
+}

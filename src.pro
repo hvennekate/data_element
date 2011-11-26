@@ -70,7 +70,8 @@ SOURCES += main.cpp \
     actionlib/specprintplotaction.cpp \
     actionlib/specresizesvgcommand.cpp \
     kinetic/specmetafilter.cpp \
-    kinetic/specmetaitem.cpp
+    kinetic/specmetaitem.cpp \
+    kinetic/specdescriptordescriptorfilter.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -142,7 +143,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/specprintplotaction.h \
     actionlib/specresizesvgcommand.h \
     kinetic/specmetafilter.h \
-    kinetic/specmetaitem.h
+    kinetic/specmetaitem.h \
+    kinetic/specdescriptordescriptorfilter.h
 
 INCLUDEPATH += kinetic \
 	log \

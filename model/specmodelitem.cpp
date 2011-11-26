@@ -8,6 +8,7 @@
 #include "speckineticrange.h"
 #include <QTime>
 #include <QDebug>
+#include "kinetic/specmetaitem.h"
 
 specModelItem::specModelItem(specFolderItem* par, QString description)
 	: specCanvasItem(description), iparent(0), mergePlotData(true), sortPlotData(true)
@@ -188,4 +189,22 @@ void specModelItem::exportData(const QList<QPair<bool,QString> >& headerFormat, 
 QVector<double> specModelItem::intensityData()
 {
 	return QVector<double>() ;
+}
+
+void specModelItem::connectClient(specMetaItem *clnt)
+{
+	if (!clients.contains(clnt))
+	{
+		clnt->connectServer(this) ;
+		clients << clnt ;
+	}
+}
+
+void specModelItem::disconnectClient(specMetaItem *clnt)
+{
+	if (clients.contains(clnt))
+	{
+		clnt->disconnectServer(this) ;
+		clients.removeOne(clnt) ;
+	}
 }
