@@ -139,6 +139,11 @@ bool specGenealogy::seekParent()
 	return Parent ;
 }
 
+void specGenealogy::setModel(specModel *model)
+{
+	Model = model ;
+}
+
 void specGenealogy::getItemPointers()
 {
 	for (int i = 0 ; i < Items.size() ; ++i)
