@@ -11,6 +11,7 @@ private:
 	specMetaItem *parent ;
 public:
 	explicit specMetaFilter(specMetaItem* parent = 0) ;
+	void setParent(specMetaItem *parent) ;
 	virtual QStringList variables() { return QStringList() ; }
 	virtual QStringList variableValues() { return QVector<double>() ; }
 	virtual void setVariableValue(const QString&, int index) { ; }
