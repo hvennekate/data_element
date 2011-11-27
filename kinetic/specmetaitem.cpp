@@ -2,7 +2,6 @@
 
 specMetaItem::specMetaItem(specFolderItem *par, QString description)
 	: specModelItem(par,description),
-	  model(0),
 	  filter(0)
 {
 }
@@ -23,14 +22,6 @@ QDataStream &specMetaItem::writeToStream(QDataStream &out) const
 QDataStream &specMetaItem::readFromStream(QDataStream &in)
 {
 	return in ;
-}
-
-void specMetaItem::setModel(specModel *Model)
-{
-	model = Model ;
-	for (int i = 0 ; i < items.size() ; ++i)
-		items[i]->setModel(model) ;
-	invalidate() ;
 }
 
 QList<specGenealogy*> specMetaItem::purgeConnections()
@@ -101,7 +92,7 @@ void specMetaItem::revalidate()
 }
 
 void specMetaItem::refreshPointers(const QHash<specModelItem *, specModelItem *> &mapping)
-{
+{// TODO this could be problematic with 32bit vs. 64bit systems...
 	invalidate() ;
 	QList<specModelItem*> newPointers ;
 	foreach(specModelItem* pointer, items)

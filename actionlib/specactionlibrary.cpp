@@ -16,6 +16,7 @@
 #include "specremovedataaction.h"
 #include "specaveragedataaction.h"
 #include "specaddsvgitem.h"
+#include "specnewmetaitemaction.h"
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
@@ -107,8 +108,24 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 	{
 		qDebug("0000000 adding plot toolbar");
 		QToolBar *bar = new QToolBar(target) ;
+		return bar ;
+	}
+	else if (dynamic_cast<specMetaView*>(target))
+	{
+		qDebug("0000000 adding meta view toolbar") ;
+		QToolBar *bar = new QToolBar(target) ;
 
+		specDeleteAction *deleteAction = new specDeleteAction(target) ;
+		deleteAction->setLibrary(this) ;
+		bar->addAction(deleteAction) ;
 
+		specAddFolderAction *addFolderAction = new specAddFolderAction(target) ;
+		addFolderAction->setLibrary(this) ;
+		bar->addAction(addFolderAction) ;
+
+		specNewMetaItemAction *newMetaAction = new specNewMetaItemAction(target) ;
+		newMetaAction->setLibrary(this) ;
+		bar->addAction(newMetaAction) ;
 		return bar ;
 	}
 
