@@ -156,7 +156,7 @@ QDataStream& operator>>(QDataStream& stream, specModelItem*& pointer)
 	pointer->QwtPlotCurve::setTitle(title) ;
 	pointer->setPen(pen) ;
 	qDebug()<< "merge from copy:" << pointer->mergePlotData ;
-	pointer->refreshPlotData();
+	pointer->invalidate();
 	return stream ;
 }
 

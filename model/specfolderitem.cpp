@@ -27,7 +27,7 @@ bool specFolderItem::addChildren(QList<specModelItem*> list, QList<specModelItem
 		list[i]->setParent(this) ;
 		childrenList.insert(position+i, list[i]) ;
 	}
-	refreshPlotData() ;
+	invalidate(); ;
 	return true ;
 }
 	
@@ -89,7 +89,7 @@ void specFolderItem::refreshPlotData()
 void specFolderItem::removeChild(specModelItem* child)
 {
 	childrenList.removeAt(childrenList.indexOf(child)) ;
-	refreshPlotData() ; ///! @todo move this to view/plotwidget (suspend frequent refreshes) -- maybe removeChildren instead
+	invalidate(); ; ///! @todo move this to view/plotwidget (suspend frequent refreshes) -- maybe removeChildren instead
 }
 
 QDataStream& specFolderItem::readFromStream(QDataStream& stream)
@@ -175,7 +175,7 @@ void specFolderItem::buildTree(QStringList descriptors)
 	// Maybe the remaining criteria are usable for some tree-building...
 	buildTree(descriptors) ;
 	suspendRefresh = false ;
-	refreshPlotData() ;
+	invalidate(); ;
 }
 
 specModelItem* specFolderItem::child(QList<specModelItem*>::size_type i) const
@@ -196,42 +196,35 @@ spec::descriptorFlags specFolderItem::descriptorProperties(const QString& key) c
 void specFolderItem::scaleBy(const double& factor)
 {
 	foreach(specModelItem* child, childrenList)
-	{
 		child->scaleBy(factor) ;
-		child->refreshPlotData() ;
-	}
+	invalidate(); // TODO include this in child's function
 }
 
 void specFolderItem::addToSlope(const double& offset)
 {
 
 	foreach(specModelItem* child, childrenList)
-	{
 		child->addToSlope(offset) ;
-		child->refreshPlotData() ;
-	}
+	invalidate();
 }
 
 void specFolderItem::moveYBy(const double& offset)
 {
 	foreach(specModelItem* child, childrenList)
-	{
 		child->moveYBy(offset) ;
-		child->refreshPlotData();
-	}
+	invalidate();
 }
 
 void specFolderItem::moveXBy(const double& offset)
 {
 	foreach(specModelItem* child, childrenList)
-	{
 		child->moveXBy(offset) ;
-		child->refreshPlotData();
-	}
+	invalidate();
 }
 
 void specFolderItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out)
 {
+	revalidate();
 	for (int i = 0 ; i < headerFormat.size() ; i++)
 		out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
 	out << endl ;
@@ -249,7 +242,7 @@ void specFolderItem::exportData(const QList<QPair<bool,QString> >& headerFormat,
 // 	}
 }
 
-void specFolderItem::haltRefreshes(bool halt)
+void specFolderItem::haltRefreshes(bool halt) // TODO redundant
 {
 	qDebug("called suspend refresh %d %d",halt,children()) ;
 	suspendRefresh = halt ;

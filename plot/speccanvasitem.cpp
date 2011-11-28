@@ -25,6 +25,7 @@ void specCanvasItem::pointMoved(const int& no, const double& x, const double& y)
 	{
 		moveXBy(x-QwtPlotCurve::sample(no).x()) ;
 		refreshPlotData() ; // Alternatively:  replace last element in Matrix with new x value.
+		// Deprecated
 	}
 
 	if(mode != spec::shiftX)
@@ -64,8 +65,8 @@ void specCanvasItem::pointMoved(const int& no, const double& x, const double& y)
 			addToSlope(coeffs.takeFirst()) ;
 	}
 	
-	refreshPlotData() ;
-	plot()->replot() ;
+	refreshPlotData() ; // Deprecated
+	plot()->replot() ; // Deprecated
 }
 
 void specCanvasItem::applyRanges(QList<QwtInterval*>& ranges)
@@ -105,7 +106,7 @@ void specCanvasItem::applyRanges(QList<QwtInterval*>& ranges)
 // 		cout << "Correction:  " << correction[1] << "  " << correction[0] << endl ;
 		moveYBy(-correction[1]) ;
 		addToSlope(-correction[0]) ;
-		refreshPlotData() ;
+		refreshPlotData() ;  // Dying code, therefore we'll let this one pass
 	}
 }
 

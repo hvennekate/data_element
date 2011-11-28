@@ -147,7 +147,7 @@ specModelItem* readJCAMPBlock(QTextStream& in)
 		foreach(specModelItem *child, children)
 			delete child ;
 	}
-	item->refreshPlotData() ;
+	item->invalidate();
 	return item ;
 }
 
@@ -363,7 +363,7 @@ QList<specModelItem*> readHVFile(QFile& file)
 			headerItems["nu"] = specDescriptor((dataPoints[i].nu+dataPoints[i+31].nu)/2.) ;
 			specData += new specDataItem(dataPoints.mid(i,32),headerItems) ;
 			specData.last()->mergePlotData = false ;
-			specData.last()->refreshPlotData() ;
+			specData.last()->invalidate(); ;
 		}
 	}
 	return specData ;
@@ -479,7 +479,7 @@ QList<specModelItem*> readPEFile(QFile& file)
 	while(!in.atEnd() && (buffer = in.readLine().split(QRegExp("\\s+"))).size() >1)
 		dataPoints += specDataPoint(0,buffer[0].toDouble(),buffer[1].toDouble(),0) ;
 	specData += new specDataItem(dataPoints,headerItems) ;
-	specData.last()->refreshPlotData() ;
+	specData.last()->invalidate();
 	return specData ;
 }
 
