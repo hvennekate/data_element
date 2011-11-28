@@ -14,6 +14,7 @@ class specActionLibrary ;
 #include "specview.h"
 #include "specmodel.h"
 #include <typeinfo>
+#include "specplot.h"
 
 class specView ;
 class specModel ;
@@ -33,13 +34,11 @@ public:
 	void addDragDropPartner(specModel*) ;
 	void setLastRequested(const QModelIndexList&) ;
 	void moveInternally(const QModelIndex&, int row, specView*) ;
+	void addPlot(specPlot*) ;
 
 	static specUndoCommand* commandById(int id, specUndoCommand* parent = 0) ;
 signals:
 	void stackChanged() ;
-
-public slots:
-
 private:
 	QUndoStack *undoStack ;
 	QVector<QWidget*> parents ;

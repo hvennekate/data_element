@@ -232,3 +232,8 @@ void specActionLibrary::moveInternally(const QModelIndex &parent, int row, specV
 	command->setParentWidget(target);
 	push(command) ;
 }
+
+void specActionLibrary::addPlot(specPlot *plot)
+{
+	connect(this,SIGNAL(stackChanged()),plot,SLOT(replot())) ;
+}
