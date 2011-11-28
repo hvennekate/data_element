@@ -20,7 +20,7 @@ void specNewMetaItemAction::execute()
 	if (!parent()) return ;
 	specMetaView *view = (specMetaView*) parent() ;
 	specMetaModel *model = view->model() ;
-	QModelIndex index = currentView->currentIndex() ;
+	QModelIndex index = view->currentIndex() ;
 	specModelItem *item = model->itemPointer(index) ;
 	int row = 0 ;
 	qDebug() << "checking if item is folder" << item << index ;
@@ -32,17 +32,17 @@ void specNewMetaItemAction::execute()
 
 	}
 
-	specMetaItem *item = new specMetaItem ;
-	specDescriptorDescriptorFilter *filter = new specDescriptorDescriptorFilter(item) ;
+	specMetaItem *pointer = new specMetaItem ;
+	specDescriptorDescriptorFilter *filter = new specDescriptorDescriptorFilter(pointer) ;
 	filter->setXDescriptor("Zeit") ;
 	filter->setYDescriptor("nu") ;
-	if (! model->insertItems(QList<specModelItem*>() << item, index,row))
+	if (! model->insertItems(QList<specModelItem*>() << pointer, index,row))
 	{
-		delete item ;
+		delete pointer ;
 		return ;
 	}
 	specAddFolderCommand *command = new specAddFolderCommand ;
-	command->setItems(QModelIndexList() << model->index(item)) ;
+	command->setItems(QModelIndexList() << model->index(pointer)) ;
 	command->setParentWidget((QWidget*) parent()) ;
 
 	if (command->ok())

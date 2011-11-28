@@ -77,9 +77,9 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	qDebug("read both data and kinetics models") ;
 	
 	qDebug() << "connecting to model" << kineticWidget->view()->model() << endl ;
-	kineticWidget->view()->model()->connectToModel(items->model()) ; // TODO mysterious crashes here.
+//	kineticWidget->view()->model()->connectToModel(items->model()) ; // TODO mysterious crashes here.
 	qDebug() << "connected data model" << endl ;
-	kineticWidget->view()->model()->connectToPlot(plot) ;
+//	kineticWidget->view()->model()->connectToPlot(plot) ;
 	qDebug() << "connected data plot" << endl ;
 // 	setTitleBarWidget(new specDockTitle) ;
 
@@ -117,8 +117,10 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	actions = new specActionLibrary(this) ;
 	layout -> addWidget(actions->toolBar(items)) ;
 	layout -> addWidget(actions->toolBar(plot)) ;
+	layout -> addWidget(actions->toolBar(kineticWidget->view()));
 
 	actions->addDragDropPartner(items->model()) ;
+	actions->addDragDropPartner(kineticWidget->view()->model()) ;
 	plot->setUndoPartner(actions) ;
 	qDebug("added undo toolbar") ;
 	layout -> addWidget(splitter)  ;
@@ -205,20 +207,22 @@ void specPlotWidget::createActions()
 }
 
 void specPlotWidget::toKinetic()
-{ kineticWidget->view()->addToCurrent(items->getSelection()) ; }
+{
+//	kineticWidget->view()->addToCurrent(items->getSelection()) ;
+}
 
 void specPlotWidget::fromKinetic()
 {
-	specKinetic *pointer = dynamic_cast<specKinetic*>((specModelItem*) kineticWidget->view()->currentIndex().internalPointer()) ;
-	if (pointer)
-	{
-		items->selectionModel()->select(QModelIndex(),QItemSelectionModel::Clear) ;
-		QItemSelection newSelection ;
-		QModelIndexList list = pointer->connectedData() ;
-		foreach(QModelIndex index, list)
-			newSelection.select(index,index.model()->index(index.row(),index.model()->columnCount(index.parent())-1,index.parent())) ;
-		items->selectionModel()->select(newSelection,QItemSelectionModel::Select) ;
-	}
+//	specKinetic *pointer = dynamic_cast<specKinetic*>((specModelItem*) kineticWidget->view()->currentIndex().internalPointer()) ;
+//	if (pointer)
+//	{
+//		items->selectionModel()->select(QModelIndex(),QItemSelectionModel::Clear) ;
+//		QItemSelection newSelection ;
+//		QModelIndexList list = pointer->connectedData() ;
+//		foreach(QModelIndex index, list)
+//			newSelection.select(index,index.model()->index(index.row(),index.model()->columnCount(index.parent())-1,index.parent())) ;
+//		items->selectionModel()->select(newSelection,QItemSelectionModel::Select) ;
+//	}
 }
 
 void specPlotWidget::newKinetics()

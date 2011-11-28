@@ -7,7 +7,7 @@ class specMetaModel : public specModel
 {
 	Q_OBJECT
 private:
-	QHash<specModelItem*,specModelItem*> generate
+//	QHash<specModelItem*,specModelItem*> generate // TODO
 public:
 	explicit specMetaModel(QObject *parent = 0);
 	~specMetaModel() ;

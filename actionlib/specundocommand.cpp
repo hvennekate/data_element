@@ -11,7 +11,7 @@ void specUndoCommand::setParentWidget(QWidget * par)
 	pW = par ;
 }
 
-QWidget* specUndoCommand::parentWidget()
+QWidget* specUndoCommand::parentWidget() const
 {
 	return pW ;
 }

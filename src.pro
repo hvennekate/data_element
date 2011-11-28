@@ -74,7 +74,11 @@ SOURCES += main.cpp \
     kinetic/specdescriptordescriptorfilter.cpp \
     kinetic/specmetamodel.cpp \
     kinetic/specmetaview.cpp \
-    actionlib/specnewmetaitemaction.cpp
+    actionlib/specnewmetaitemaction.cpp \
+    actionlib/specmanageconnectionscommand.cpp \
+    actionlib/specaddconnectionscommand.cpp \
+    actionlib/specdeleteconnectionscommand.cpp \
+    actionlib/specaddconnectionsaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -150,7 +154,11 @@ HEADERS += cutbyintensitydialog.h \
     kinetic/specdescriptordescriptorfilter.h \
     kinetic/specmetamodel.h \
     kinetic/specmetaview.h \
-    actionlib/specnewmetaitemaction.h
+    actionlib/specnewmetaitemaction.h \
+    actionlib/specmanageconnectionscommand.h \
+    actionlib/specaddconnectionscommand.h \
+    actionlib/specdeleteconnectionscommand.h \
+    actionlib/specaddconnectionsaction.h
 
 INCLUDEPATH += kinetic \
 	log \
