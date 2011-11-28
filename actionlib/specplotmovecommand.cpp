@@ -20,9 +20,6 @@ void specPlotMoveCommand::redo()
 		item->scaleBy(scale) ; // TODO prevent scaling by zero.
 		item->moveYBy(offset) ;
 		item->addToSlope(slope) ;
-		item->refreshPlotData();
-		if (item->plot())
-			item->plot()->replot(); // TODO performance
 	}
 }
 
@@ -39,9 +36,6 @@ void specPlotMoveCommand::undo()
 		item->moveYBy(-offset) ;
 		item->scaleBy(1./scale) ;
 		item->moveXBy(-shift) ;
-		item->refreshPlotData();
-		if (item->plot())
-			item->plot()->replot();
 	}
 }
 

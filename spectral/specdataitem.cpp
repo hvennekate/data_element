@@ -280,7 +280,7 @@ specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 void specDataItem::subMap(const QMap<double, double>& map)
 {
 	filter.subMap(data, map) ;
-	refreshPlotData() ;
+	invalidate() ;
 }
 
 void specDataItem::flatten(bool timeAverage, bool oneTime)
@@ -310,7 +310,7 @@ void specDataItem::flatten(bool timeAverage, bool oneTime)
 		for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
 			data[i].t = time ;
 	}
-	refreshPlotData() ;
+	invalidate() ;
 }
 
 spec::descriptorFlags specDataItem::descriptorProperties(const QString& key) const
@@ -346,17 +346,25 @@ void specDataItem::scaleBy(const double& mul)
 	filter.slope  *= mul ;
 	filter.factor *= mul ;
 	filter.offset *= mul ;
+	invalidate();
 }
 
 void specDataItem::addToSlope(const double& off)
-{ filter.slope += off ; }
+{
+	filter.slope += off ;
+	invalidate();
+}
 
 void specDataItem::moveYBy(const double& off)
-{ filter.offset += off ;}
+{
+	filter.offset += off ;
+	invalidate();
+}
 
 void specDataItem::moveXBy(const double & value)
 {
 	filter.addX(data,value) ;
+	invalidate();
 }
 
 void specDataFilter::addX(QList<specDataPoint> &data, const double &value)
@@ -367,6 +375,7 @@ void specDataFilter::addX(QList<specDataPoint> &data, const double &value)
 
 void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out)
 {
+	revalidate();
 	QVector<double> t = times(), w = wnums(), s = ints(), m = mints() ;
 	
 	for (int i = 0 ; i < headerFormat.size() ; i++)
@@ -411,7 +420,7 @@ int specDataItem::removeData(QList<specRange *> *listpointer)
 			}
 		}
 	}
-	refreshPlotData() ;
+	invalidate() ;
 	qDebug("data size after deletion: %d",data.size()) ;
 	return count-wns.size() ;
 }
@@ -422,7 +431,7 @@ void specDataItem::removeData(const QVector<int> &indexes)
 	qSort(sortedIndexes) ; // TODO do better, maybe no reference
 	for (int i = sortedIndexes.size()-1 ; i >= 0 ; --i)
 		data.takeAt(sortedIndexes[i]) ;
-	refreshPlotData();
+	invalidate();
 }
 
 const QList<specDataPoint>& specDataItem::allData()
@@ -447,7 +456,7 @@ void specDataItem::insertData(const QList<specDataPoint> &newData)
 {
 	data << newData ; // TODO performance, filter
 	qSort(data) ;
-	refreshPlotData();
+	invalidate();
 }
 
 void specDataItem::average(int num)
@@ -469,7 +478,7 @@ void specDataItem::average(int num)
 	filter.offset = 0. ;
 	filter.slope  = 0. ;
 	filter.factor = 1.0;
-	refreshPlotData() ;
+	invalidate() ;
 }
 
 void specDataItem::movingAverage(int num)
@@ -495,5 +504,5 @@ void specDataItem::movingAverage(int num)
 	filter.offset = 0. ;
 	filter.slope  = 0. ;
 	filter.factor = 1.0;
-	refreshPlotData() ;
+	invalidate() ;
 }
