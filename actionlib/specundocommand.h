@@ -16,7 +16,7 @@ public:
 	virtual QDataStream& read(QDataStream& in) = 0 ;
 	virtual bool mergeable(const specUndoCommand* other) { Q_UNUSED(other) ; return true ; }
 	void setParentWidget(QWidget*) ;
-	QWidget *parentWidget() ;
+	QWidget *parentWidget() const ;
 signals:
 
 public slots:

@@ -365,7 +365,9 @@ specModel::specModel(QObject *par)
 {
 	qDebug("initializing model") ;
 	root = new specFolderItem ;
+	qDebug("new root item") ;
 	Descriptors += "" ;
+	qDebug("new descriptor") ;
 	DescriptorProperties += spec::editable ;
 	qDebug() << "Model root item:" << root ;
 }

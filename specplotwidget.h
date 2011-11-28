@@ -63,8 +63,7 @@ public:
     specPlotWidget(const QString& fileName = "", QWidget *parent = 0);
 
     ~specPlotWidget();
-
-    
+	specView* mainView() { return items ; } // TODO dangerous
 public slots :
 	void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) ; // TODO consider making these private
 	void setFont() ;

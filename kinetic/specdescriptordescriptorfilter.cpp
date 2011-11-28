@@ -12,13 +12,13 @@ QStringList specDescriptorDescriptorFilter::variables()
 
 void specDescriptorDescriptorFilter::setXDescriptor(const QString &desc)
 {
-	if (parent) parent->invalidate();
+	if (getParent()) getParent()->invalidate();
 	xDescriptor = desc ;
 }
 
-void specDescriptorDescriptorFilter::setYDescriptor(const QString &)
+void specDescriptorDescriptorFilter::setYDescriptor(const QString &desc)
 {
-	if (parent) parent->invalidate();
+	if (getParent()) getParent()->invalidate();
 	yDescriptor = desc ;
 }
 

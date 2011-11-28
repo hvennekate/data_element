@@ -1,4 +1,5 @@
 #include "specmetaitem.h"
+#include "specplot.h"
 
 specMetaItem::specMetaItem(specFolderItem *par, QString description)
 	: specModelItem(par,description),
@@ -10,7 +11,7 @@ specPlot *specMetaItem::itemPlot()
 {
 	for (int i = 0 ; i < items.size() ; ++i)
 		if (items[i]->plot())
-			return items[i]->plot() ;
+			return ((specPlot*) (items[i]->plot())) ;
 	return 0 ;
 }
 
@@ -24,7 +25,7 @@ QDataStream &specMetaItem::readFromStream(QDataStream &in)
 	return in ;
 }
 
-QList<specGenealogy*> specMetaItem::purgeConnections()
+QList<specModelItem*> specMetaItem::purgeConnections()
 {
 	QList<specModelItem*> list = items ;
 	while(!items.isEmpty())
@@ -81,14 +82,6 @@ void specMetaItem::attach(QwtPlot *plot)
 
 void specMetaItem::revalidate()
 {
-	if (!filter)
-	{
-		setData(0); // TODO is this allowed?
-		return ;
-	}
-
-	// TODO do some more checks on valid items etc.
-	setData(filter->data(items)) ;
 }
 
 void specMetaItem::refreshPointers(const QHash<specModelItem *, specModelItem *> &mapping)
@@ -99,4 +92,17 @@ void specMetaItem::refreshPointers(const QHash<specModelItem *, specModelItem *>
 		newPointers << mapping[pointer] ;
 	newPointers.removeAll(0) ;
 	items = newPointers ;
+}
+
+void specMetaItem::refreshPlotData()
+{
+	if (!filter)
+	{
+		setData(0); // TODO is this allowed?
+		return ;
+	}
+	// TODO do some more checks on valid items etc.
+	foreach(specModelItem *item, items)
+		item->revalidate();
+	setData(filter->data(items)) ;
 }

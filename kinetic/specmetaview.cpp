@@ -11,7 +11,7 @@ specMetaView::~specMetaView()
 
 void specMetaView::setModel(specMetaModel *mod)
 {
-	specView::setModel(mod) ;
+	specView::setModel((specModel*) mod) ;
 }
 
 specMetaModel *specMetaView::model() const

@@ -17,6 +17,8 @@
 #include "specaveragedataaction.h"
 #include "specaddsvgitem.h"
 #include "specnewmetaitemaction.h"
+#include "kinetic/specmetaview.h"
+#include "specaddconnectionsaction.h"
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
@@ -126,6 +128,11 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		specNewMetaItemAction *newMetaAction = new specNewMetaItemAction(target) ;
 		newMetaAction->setLibrary(this) ;
 		bar->addAction(newMetaAction) ;
+
+		specAddConnectionsAction *addConnectionsAction = new specAddConnectionsAction(target) ;
+		addConnectionsAction->setLibrary(this) ;
+		bar->addAction(addConnectionsAction) ;
+
 		return bar ;
 	}
 

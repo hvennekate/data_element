@@ -36,8 +36,8 @@ protected:
 	virtual QDataStream& readFromStream(QDataStream&) =0 ;
 	virtual QDataStream& writeToStream(QDataStream&) const =0 ;
 public:
-	virtual void revalidate() { dataValid = true ; }
-	inline void invalidate() { dataValid = false ; }
+	void revalidate() ;
+	void invalidate() ;
 	void connectClient(specMetaItem* clnt) ;
 	void disconnectClient(specMetaItem* clnt) ;
 	/*! Merge/sort plot data when rebuilding it.  Mainly applies to both specFolderItem and specDataItem.  Both are enabled by default. */
@@ -66,7 +66,7 @@ public:
 	virtual bool changeDescriptor(QString key, QString value) ; // TODO add changeDescriptor(key,specDescriptor)
 	virtual bool setActiveLine(const QString&, int) ;
 	/*! Regenerate data used for plotting. */
-	virtual void refreshPlotData() ;
+	virtual void refreshPlotData() ; // TODO make private/protected
 	/*! Try to set data whose \f$\nu\f$ value is in \a ranges to zero by applying some correction (preferrably by subtracting a linear function previously fit to the data concerned).*/
 	virtual QIcon decoration() const ;
 	QIcon indicator(const QString&) const ;

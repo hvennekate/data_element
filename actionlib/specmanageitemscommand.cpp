@@ -91,6 +91,7 @@ QDataStream& specManageItemsCommand::write(QDataStream & out) const
 
 QDataStream& specManageItemsCommand::read(QDataStream &in)
 {
+	clear() ;
 	qint32 toRead ;
 	in >> toRead ;
 	qDebug("reading manageItemsCommand.") ;

@@ -197,6 +197,12 @@ void specPlot::replot()
 	boundaries.setBottom(bottom);//*/
 	
 	zoom->changeZoomBase(boundaries) ;
+
+	specModelItem *pointer = 0 ; // TODO find a more concise version.
+	foreach(QwtPlotItem *item, allItems)
+		if(pointer = dynamic_cast<specModelItem*>(item))
+			pointer->revalidate();
+
 	QwtPlot::replot() ;
 }
 

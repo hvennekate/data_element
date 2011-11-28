@@ -208,3 +208,17 @@ void specModelItem::disconnectClient(specMetaItem *clnt)
 		clients.removeOne(clnt) ;
 	}
 }
+
+void specModelItem::invalidate()
+{
+	dataValid = false ;
+	foreach(specMetaItem *client, clients) // TODO consider tying to the condition that item has been valid before
+		client->invalidate();
+}
+
+void specModelItem::revalidate()
+{
+	if (dataValid) return ;
+	refreshPlotData();
+}
+

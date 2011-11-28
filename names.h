@@ -32,6 +32,8 @@ namespace spec{
 				  insertDataId   = 21,
 				  exchangeDataId = 22,
 				  resizeSVGId    = 23,
+				  newConnectionsId = 30,
+				  deleteConnectionsId = 31,
 			  penColorId         = 5001,
 			  symbolStyleId      = 5002,
 			  symbolSizeId       = 5003,
