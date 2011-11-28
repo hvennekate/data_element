@@ -31,6 +31,8 @@ protected:
 public:
 	specKineticWidget ( QString, QWidget *parent = 0 );
 	~specKineticWidget();
+
+	specPlot *internalPlot() { return plot ; }
 	
 	specMetaView *view() ;
 	

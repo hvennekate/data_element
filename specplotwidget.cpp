@@ -138,6 +138,9 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 
 	in.unsetDevice() ;
 	onDisk->close() ;
+
+	actions->addPlot(plot) ;
+	actions->addPlot(kineticWidget->internalPlot()) ;
 // TODO reconnect setFont() slot
 }
 
