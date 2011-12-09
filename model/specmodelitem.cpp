@@ -195,9 +195,11 @@ void specModelItem::connectClient(specMetaItem *clnt)
 {
 	if (!clients.contains(clnt))
 	{
-		clnt->connectServer(this) ;
+		qDebug() << "connecting client" << clnt << this ;
 		clients << clnt ;
+		clnt->connectServer(this) ;
 	}
+	qDebug() << "done connecting client" ;
 }
 
 void specModelItem::disconnectClient(specMetaItem *clnt)
