@@ -48,9 +48,11 @@ bool specMetaItem::connectServer(specModelItem *server)
 {
 	if (items.contains(server))
 		return false ;
-	server->connectClient(this) ;
+	qDebug() << "connectiong server" << server << this;
 	items << server ;
+	server->connectClient(this) ;
 	invalidate() ;
+	qDebug() << "done connecting server" << this ;
 	return true ;
 }
 
