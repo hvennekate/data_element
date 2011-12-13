@@ -58,9 +58,13 @@ bool specMetaItem::connectServer(specModelItem *server)
 
 specMetaFilter *specMetaItem::takeFilter()
 {
+	qDebug() << "saving old filter" ;
 	specMetaFilter *oldFilter = filter ;
+	qDebug() << "setting filter to zero" << filter ; // TODO dubious crashes occur here...
 	filter = 0 ;
+	qDebug() << "invalidating" ;
 	invalidate() ;
+	qDebug() << "returning old filter" ;
 	return oldFilter ;
 }
 
@@ -84,6 +88,8 @@ void specMetaItem::attach(QwtPlot *plot)
 
 void specMetaItem::revalidate()
 {
+	qDebug() << "revalidating meta item" ;
+	refreshPlotData();
 }
 
 void specMetaItem::refreshPointers(const QHash<specModelItem *, specModelItem *> &mapping)
@@ -107,4 +113,41 @@ void specMetaItem::refreshPlotData()
 	foreach(specModelItem *item, items)
 		item->revalidate();
 	setData(filter->data(items)) ;
+	qDebug() << "Filter data size:" << dataSize() ;
+	for (int i = 0 ; i < dataSize() ; ++i)
+		qDebug() << "Filter data:" << sample(i).toPoint() ;
+}
+
+QStringList specMetaItem::internalDescriptors() const
+{
+	if (!filter) return QStringList() ;
+	return filter->variables() ;
+}
+
+int specMetaItem::descriptorIndex(const QString& Descriptor) const
+{
+	return internalDescriptors().indexOf(Descriptor) ;
+}
+
+QStringList specMetaItem::descriptorKeys() const
+{
+	QStringList keys = specModelItem::descriptorKeys() ;
+	keys << internalDescriptors() ;
+	return keys ;
+}
+
+QString specMetaItem::descriptor(const QString &key, bool full) const
+{
+	int pos = descriptorIndex(key) ;
+	if (pos < 0) return QString() ;
+	qDebug() << "descriptor sizes:" << descriptorKeys() << filter->variableValues() ;
+	return filter->variableValues().at(pos) ;
+}
+
+bool specMetaItem::changeDescriptor(QString key, QString value)
+{
+	int pos = descriptorIndex(key) ;
+	if (pos < 0) return false ;
+	filter->setVariableValue(value,pos) ;
+	return true ;
 }

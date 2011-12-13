@@ -13,6 +13,8 @@ private:
 	QList<specModelItem*> items ;
 	specMetaFilter *filter ;
 	specPlot *itemPlot() ;
+	QStringList internalDescriptors() const ;
+	int descriptorIndex(const QString&) const ;
 protected:
 	QDataStream& readFromStream(QDataStream&) ;
 	QDataStream& writeToStream(QDataStream &) const ;
@@ -27,6 +29,9 @@ public:
 	void attach(QwtPlot *plot) ;
 	void refreshPointers(const QHash<specModelItem*,specModelItem*>& mapping) ;
 	void refreshPlotData();
+	QStringList descriptorKeys() const ;
+	QString descriptor(const QString &key, bool full=false) const ;
+	bool changeDescriptor(QString key, QString value) ; // TODO add changeDescriptor(key,specDescriptor)
 };
 
 /* TODO in other classes
