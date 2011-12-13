@@ -9,6 +9,7 @@
 #include <textEditor/specsimpletextedit.h>
 #include <QVBoxLayout>
 #include <QDialogButtonBox>
+#include "specmetaitem.h"
 
 // TODO solve the myth of autoscaleaxis...
 
@@ -144,6 +145,7 @@ void specPlot::replot()
 		else if (dynamic_cast<specCanvasItem*>( item))
 			ordinary->append((specCanvasItem*) item) ;
 	}
+	qDebug() << "Checking if refresh necessary" << this ;
 	if (allItems.isEmpty())
 	{
 		QwtPlot::replot() ;
@@ -151,6 +153,12 @@ void specPlot::replot()
 	}
 	
 	highlightSelectable() ;
+
+	specModelItem *pointer = 0 ; // TODO find a more concise version.
+	foreach(QwtPlotItem *item, allItems)
+		if((pointer = dynamic_cast<specModelItem*>(item)) || (pointer = dynamic_cast<specMetaItem*>(item)))
+			pointer->revalidate();
+
 	
 	QRectF boundaries = allItems[0]->boundingRect() ; // DANGER: actually we must check, if the item plots on yLeft
 	foreach(QwtPlotItem *item, allItems) // TODO omit this if fixing of axis is enabled
@@ -198,11 +206,7 @@ void specPlot::replot()
 	
 	zoom->changeZoomBase(boundaries) ;
 
-	specModelItem *pointer = 0 ; // TODO find a more concise version.
-	foreach(QwtPlotItem *item, allItems)
-		if(pointer = dynamic_cast<specModelItem*>(item))
-			pointer->revalidate();
-
+	qDebug() << "----- replotting" << this ;
 	QwtPlot::replot() ;
 }
 

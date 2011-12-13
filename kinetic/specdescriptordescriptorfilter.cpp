@@ -24,6 +24,7 @@ void specDescriptorDescriptorFilter::setYDescriptor(const QString &desc)
 
 QStringList specDescriptorDescriptorFilter::variableValues()
 {
+	qDebug() << "called variable values" << xDescriptor << yDescriptor ;
 	return QStringList() << xDescriptor << yDescriptor ;
 }
 
@@ -51,5 +52,7 @@ QwtSeriesData<QPointF>* specDescriptorDescriptorFilter::data(QList<specModelItem
 	foreach(specModelItem* item, items)
 		series << QPointF(item->descriptor(xDescriptor).toDouble(),
 						  item->descriptor(yDescriptor).toDouble()) ; // TODO maybe check for numeric property
+	qDebug() << "Data in descriptor-filter:" << series ;
+	qSort(series.begin(),series.end(),specMetaFilter::lessThanXValue) ;
 	return new QwtPointSeriesData(series) ;
 }

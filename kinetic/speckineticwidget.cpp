@@ -1,5 +1,6 @@
 #include "speckineticwidget.h"
 #include <QTextStream>
+#include "speccanvasitem.h"
 
 specMetaView* specKineticWidget::view()
 { return items ; }
@@ -67,14 +68,15 @@ specKineticWidget::~specKineticWidget()
 
 void specKineticWidget::selectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
 {
-//	foreach(QModelIndex index, deselected.indexes())
-//		if (!index.column() && index.isValid() && !((specModelItem*) index.internalPointer())->isFolder())
-//			((specKinetic*) index.internalPointer())->hideRanges() ; // TODO create kinetic folder or extend specFolderItem
+	foreach(QModelIndex index, deselected.indexes())
+		if (!index.column() && index.isValid() && !((specModelItem*) index.internalPointer())->isFolder())
+			((specCanvasItem*) index.internalPointer())->detach() ; // TODO create kinetic folder or extend specFolderItem
 	
-//	foreach(QModelIndex index, selected.indexes())
-//		if (!index.column() && !((specModelItem*) index.internalPointer())->isFolder())
-//			((specKinetic*) index.internalPointer())->showRanges(plot) ;
+	foreach(QModelIndex index, selected.indexes())
+		if (!index.column() && !((specModelItem*) index.internalPointer())->isFolder())
+			((specCanvasItem*) index.internalPointer())->attach(plot) ;
 	
 	plot->replot() ;
 }
 
+// TODO crash when another meta item is added after the first has been assigned servers

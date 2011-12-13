@@ -141,6 +141,7 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 
 	actions->addPlot(plot) ;
 	actions->addPlot(kineticWidget->internalPlot()) ;
+	qDebug() << "connected plots:" << plot << kineticWidget->internalPlot() ;
 	kineticWidget->view()->assignDataView(items) ;
 // TODO reconnect setFont() slot
 }

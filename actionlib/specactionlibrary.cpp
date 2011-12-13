@@ -37,6 +37,7 @@ void specActionLibrary::push(specUndoCommand * cmd)
 	qDebug() << undoStack->index() ;
 	qDebug() << undoStack->canUndo() ;
 	qDebug() << undoStack->canRedo() ;
+	qDebug() << "*** pushing onto stack" ;
 	undoStack->push(cmd) ;
 	qDebug("*** pushed onto stack") ;
 }

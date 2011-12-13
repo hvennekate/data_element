@@ -9,6 +9,8 @@ class specMetaFilter
 {
 private:
 	specMetaItem *parent ;
+protected:
+	static bool lessThanXValue(const QPointF&, const QPointF&) ;
 public:
 	explicit specMetaFilter(specMetaItem* parent = 0) ;
 	specMetaItem *getParent() { return parent ; }
