@@ -32,7 +32,9 @@ void specNewMetaItemAction::execute()
 
 	}
 
+	qDebug() << "creating new meta item" ;
 	specMetaItem *pointer = new specMetaItem ;
+	qDebug() << "creating new filter" ;
 	specDescriptorDescriptorFilter *filter = new specDescriptorDescriptorFilter(pointer) ;
 	filter->setXDescriptor("Zeit") ;
 	filter->setYDescriptor("nu") ;
