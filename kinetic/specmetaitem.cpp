@@ -58,13 +58,9 @@ bool specMetaItem::connectServer(specModelItem *server)
 
 specMetaFilter *specMetaItem::takeFilter()
 {
-	qDebug() << "saving old filter" ;
 	specMetaFilter *oldFilter = filter ;
-	qDebug() << "setting filter to zero" << filter ; // TODO dubious crashes occur here...
 	filter = 0 ;
-	qDebug() << "invalidating" ;
 	invalidate() ;
-	qDebug() << "returning old filter" ;
 	return oldFilter ;
 }
 

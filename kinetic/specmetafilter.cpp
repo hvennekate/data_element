@@ -2,6 +2,7 @@
 
 
 specMetaFilter::specMetaFilter(specMetaItem *par)
+	: parent(0)
 {
 	setParent(par) ;
 }
