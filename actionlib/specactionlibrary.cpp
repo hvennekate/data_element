@@ -19,6 +19,8 @@
 #include "specnewmetaitemaction.h"
 #include "kinetic/specmetaview.h"
 #include "specaddconnectionsaction.h"
+#include "log/speclogview.h"
+#include "specimportspecaction.h"
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
@@ -134,6 +136,16 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		addConnectionsAction->setLibrary(this) ;
 		bar->addAction(addConnectionsAction) ;
 
+		return bar ;
+	}
+	else if (dynamic_cast<specLogView*>(target))
+	{
+		qDebug("0000000000 adding log view toolbar") ;
+		QToolBar *bar = new QToolBar(target) ;
+
+		specImportSpecAction *importAction = new specImportSpecAction(target) ;
+		importAction->setLibrary(this);
+		bar->addAction(importAction) ;
 		return bar ;
 	}
 
