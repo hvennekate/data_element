@@ -2,7 +2,7 @@
 #include <QFileDialog>
 #include "utility-functions.h"
 #include "specaddfoldercommand.h"
-#include "specdataview.h"
+#include "specview.h"
 
 specImportSpecAction::specImportSpecAction(QObject *parent) :
     specUndoAction(parent)
@@ -11,12 +11,12 @@ specImportSpecAction::specImportSpecAction(QObject *parent) :
 
 const std::type_info &specImportSpecAction::possibleParent()
 {
-	return typeid(specDataView) ;
+	return typeid(specView) ;
 }
 
 void specImportSpecAction::execute()
 {
-	specDataView *currentView = (specDataView*) parent() ; // TODO: outsource this code (shared with insert folder action)
+	specView *currentView = (specView*) parent() ; // TODO: outsource this code (shared with insert folder action)
 	specModel *model = currentView->model() ;
 	QModelIndex index = currentView->currentIndex() ;
 	specModelItem *item = model->itemPointer(index) ;
@@ -30,7 +30,7 @@ void specImportSpecAction::execute()
 
 	}
 
-	QStringList fileNames = QFileDialog::getOpenFileNames(currentView,tr("Files to import")) ;
+	QStringList fileNames = QFileDialog::getOpenFileNames(currentView,tr("Files to import")) ; // TODO get proper file type from model
 	QList<specModelItem*> importedItems ;
 	for(int i = 0 ; i < fileNames.size() ; ++i)
 	{
