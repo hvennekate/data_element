@@ -89,6 +89,7 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	logWidget->setFloating(true) ;
 	logs = new specLogView(logWidget) ;
 	logs->setModel(new specLogModel(items->model(),logs));
+	logs->model()->setMimeTypes(QStringList("application/spec.log.item"));
 	QToolBar *logToolbar = new QToolBar(logWidget) ;
 	foreach(QAction* pointer, logs->actions())
 		logToolbar->addAction(pointer) ;
@@ -118,7 +119,9 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	layout -> addWidget(actions->toolBar(items)) ;
 	layout -> addWidget(actions->toolBar(plot)) ;
 	layout -> addWidget(actions->toolBar(kineticWidget->view()));
+	layout -> addWidget(actions->toolBar(logs)) ;
 
+	items->model()->setMimeTypes(QStringList() << "application/spec.spectral.item" << "application/spec.log.item") ;
 	actions->addDragDropPartner(items->model()) ;
 	actions->addDragDropPartner(kineticWidget->view()->model()) ;
 	plot->setUndoPartner(actions) ;

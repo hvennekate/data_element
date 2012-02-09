@@ -20,6 +20,7 @@
 #include <QTime>
 #include <QDebug>
 #include "actionlib/specmovecommand.h"
+#include "actionlib/specaddfoldercommand.h"
 // TODO replace isFolder() by addChildren(empty list,0)
 
 bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria)
@@ -672,7 +673,7 @@ bool specModel::dropMimeData(const QMimeData *data,
 	if (action == Qt::IgnoreAction)
 		return true;
 
-	if (!data->hasFormat(mime.first()))
+	if (!data->hasFormat(mime.first())) // TODO:  What about the other types?
 		return false;
 
 	row = (row != -1 ? row : rowCount(parent) );
@@ -687,8 +688,19 @@ bool specModel::dropMimeData(const QMimeData *data,
 	QByteArray encodedData = data->data(mime.first()) ;
 	QDataStream stream(&encodedData, QIODevice::ReadOnly) ;
 	qDebug("dropping mime from stream...") ;
+	QModelIndexList newItems ;
 	while(!stream.atEnd())
-		insertFromStream(stream,parent,row++) ;
+	{
+		insertFromStream(stream,parent,row) ;
+		newItems << index(row++,0,parent) ;
+	}
+	if (dropBuddy)
+	{
+		specAddFolderCommand *command = new specAddFolderCommand ;
+		command->setParentWidget(internalDrop);
+		command->setItems(newItems) ;
+		dropBuddy->push(command);
+	}
 	return true ;
 }
 
@@ -708,7 +720,7 @@ void specModel::insertFromStream(QDataStream& stream, const QModelIndex& parent,
 
 specModel::specModel(QDataStream& in,QObject *par)
 	: QAbstractItemModel(par), mime("application/spec.model.item"), // TODO:  read mime type from stream
-	  internalDrop(false),
+	  internalDrop(0),
 	  dontDelete(false)
 {
 	root = new specFolderItem ;
