@@ -361,7 +361,8 @@ void specView::applySubMapToSelection()
 void specView::dropEvent(QDropEvent *event)
 {
 	qDebug("--- drop event received %d",this) ;
-	model()->setInternalDrop((event->source() == this && event->proposedAction() == Qt::MoveAction) ? this : 0) ;
+	model()->setInternalDrop((event->source() == this && event->proposedAction() == Qt::MoveAction)) ;
+	model()->setDropSource(this) ;
 
 	QTreeView::dropEvent(event) ;
 }
