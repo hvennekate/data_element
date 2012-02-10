@@ -41,7 +41,8 @@ private:
 	QModelIndexList allChildren(const QModelIndex&) const ;
 	QStringList mime ;
 	QMap<double,double> subMap ;
-	specView* internalDrop ;
+	bool internalDrop ;
+	specView* dropSource ;
 	specActionLibrary* dropBuddy ;
 	bool dontDelete ;
 public:
@@ -86,7 +87,8 @@ public:
 			    int role = Qt::DisplayRole) const;
 	
 // 	// Drag and drop:
-	void setInternalDrop(specView*) ;
+	void setInternalDrop(bool) ;
+	void setDropSource(specView*) ;
 	void setDropBuddy(specActionLibrary*) ;
 	Qt::DropActions supportedDropActions() const ;
 	QStringList mimeTypes() const ;

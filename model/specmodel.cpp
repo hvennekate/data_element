@@ -361,7 +361,8 @@ specModelItem* specModel::itemPointer(const QModelIndex& index) const
 
 specModel::specModel(QObject *par)
 	: QAbstractItemModel(par), mime("application/spec.model.item"),
-	  internalDrop(0),
+	  internalDrop(false),
+	  dropSource(0),
 	  dontDelete(false)
 {
 	qDebug("initializing model") ;
@@ -583,7 +584,7 @@ bool specModel::removeRows(int position, int rows, const QModelIndex &parent)
 	return true ;
 }
 
-void specModel::setInternalDrop(specView* val)
+void specModel::setInternalDrop(bool val)
 {
 	internalDrop = val ;
 }
@@ -677,11 +678,12 @@ bool specModel::dropMimeData(const QMimeData *data,
 		return false;
 
 	row = (row != -1 ? row : rowCount(parent) );
-	if (internalDrop && dropBuddy)
+	if (internalDrop && dropBuddy && dropSource)
 	{
-		dropBuddy->moveInternally(parent,row,internalDrop) ;
-		internalDrop = 0 ;
+		dropBuddy->moveInternally(parent,row,dropSource) ;
+		internalDrop = false ;
 		dontDelete = true ;
+		dropSource = 0 ;
 		return true ;
 	}
 	
@@ -697,10 +699,12 @@ bool specModel::dropMimeData(const QMimeData *data,
 	if (dropBuddy)
 	{
 		specAddFolderCommand *command = new specAddFolderCommand ;
-		command->setParentWidget(internalDrop);
+		command->setParentWidget(dropSource) ;  // MAJOR PROBLEM!!!
+		qDebug() << ")))) parent widget: " << dropSource << "Adding new undo command with these items:" << newItems ;
 		command->setItems(newItems) ;
 		dropBuddy->push(command);
 	}
+	dropSource = 0 ;
 	return true ;
 }
 
@@ -720,7 +724,8 @@ void specModel::insertFromStream(QDataStream& stream, const QModelIndex& parent,
 
 specModel::specModel(QDataStream& in,QObject *par)
 	: QAbstractItemModel(par), mime("application/spec.model.item"), // TODO:  read mime type from stream
-	  internalDrop(0),
+	  internalDrop(false),
+	  dropSource(0),
 	  dontDelete(false)
 {
 	root = new specFolderItem ;
@@ -829,4 +834,9 @@ QModelIndexList specModel::indexList(const QList<specModelItem *>& pointers) con
 	for (int i = 0 ; i < pointers.size() ; ++i)
 		returnList << index(pointers[i]) ;
 	return returnList ;
+}
+
+void specModel::setDropSource(specView *view)
+{
+	dropSource = view ;
 }

@@ -1,4 +1,4 @@
-#ifndef DESCRIPTORXRANGEFILTER_H
+/*#ifndef DESCRIPTORXRANGEFILTER_H
 #define DESCRIPTORXRANGEFILTER_H
 
 #include "specmetafilter.h"
@@ -20,3 +20,4 @@ public:
 };
 
 #endif // DESCRIPTORXRANGEFILTER_H
+*/
