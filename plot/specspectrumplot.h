@@ -17,12 +17,15 @@ private:
 	QAction *setReferenceAction, *alignWithReferenceAction, *addRangeAction, *removeRangeAction, *noSlopeAction ;
 	QAction *modifySVGs ;
 	QActionGroup *correctionActions, *alignmentActions ;
-	CanvasPicker *picker, *SVGpicker ;
+	CanvasPicker *correctionPicker, *alignmentPicker, *SVGpicker ;
 	specActionLibrary *undoPartner ;
 	QHash<specCanvasItem*, QList<int> > pointHash ;
 	QList<specRange*> zeroRanges ;
 	specView *view ;
 	specDataItem *reference ;
+	void toggleAligning(bool on=true) ;
+	void invalidateReference() ;
+
 
 	bool correctionChecked() ;
 

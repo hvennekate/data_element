@@ -306,9 +306,9 @@ bool specModel::isFolder(const QModelIndex& index) const
 
 void specModel::importFile(QModelIndex index)
 {
-	QTime timer ;
 	index = isFolder(index) ? index : parent(index) ;
 	QStringList fileNames = QFileDialog::getOpenFileNames();
+	QTime timer ;
 	timer.start() ;
 	if (fileNames.size())  //Haeh?
 	{
@@ -675,7 +675,28 @@ bool specModel::dropMimeData(const QMimeData *data,
 		return true;
 
 	if (!data->hasFormat(mime.first())) // TODO:  What about the other types?
+	{
+//		foreach(QString dataType, data->formats())
+//		{
+//			if (mimeConverters->contains(QPair<QString,QString>(dataType, mime.first())))
+//			{
+//				QList<specModelItem*> newItems = mimeConverters->value(QPair<QString,QString>(dataType, mime.first())) (data) ;
+//				insertItems(newItems,parent,row) ;
+//				if (dropBuddy)
+//				{
+//					QModelIndexList newIndexes ;
+//					for (int i = 0 ; i < newItems.size() ; ++i)
+//						newIndexes << index(row+i,0,parent) ;
+//					specAddFolderCommand * command = new specAddFolderCommand ;
+//					command->setParentWidget(dropSource) ;
+//					command->setItems(newIndexes) ;
+//					dropBuddy->push(command) ;
+//				}
+//				return true ;
+//			}
+//		}
 		return false;
+	}
 
 	row = (row != -1 ? row : rowCount(parent) );
 	if (internalDrop && dropBuddy && dropSource)
@@ -699,7 +720,7 @@ bool specModel::dropMimeData(const QMimeData *data,
 	if (dropBuddy)
 	{
 		specAddFolderCommand *command = new specAddFolderCommand ;
-		command->setParentWidget(dropSource) ;  // MAJOR PROBLEM!!!
+		command->setParentWidget(dropSource) ;
 		qDebug() << ")))) parent widget: " << dropSource << "Adding new undo command with these items:" << newItems ;
 		command->setItems(newItems) ;
 		dropBuddy->push(command);

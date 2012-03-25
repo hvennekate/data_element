@@ -46,6 +46,7 @@ private:
 	specActionLibrary* dropBuddy ;
 	bool dontDelete ;
 public:
+	static QHash<QPair<QString,QString>, QList<specModelItem*> (*)(const QMimeData*)> *mimeConverters ;
 	specModel(QObject *par = 0) ;
 	specModel(QDataStream&, QObject *par = 0) ;
 	~specModel() ;

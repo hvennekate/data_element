@@ -13,10 +13,32 @@
 #include "specsvgitem.h"
 #include "actionlib/specresizesvgcommand.h"
 
+void specSpectrumPlot::toggleAligning(bool on)
+{
+	foreach(QAction *action, alignmentActions->actions())
+		action->setEnabled(on) ;
+	alignWithReferenceAction->setEnabled(true) ;
+	if (on)
+	{
+		alignmentPicker= new CanvasPicker(this) ;
+		alignmentPicker->setOwning() ;
+		connect(alignmentPicker, SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SLOT(applyZeroRanges(specCanvasItem*,int,double,double))) ;
+	}
+	else
+		delete alignmentPicker ;
+}
+
+void specSpectrumPlot::invalidateReference()
+{
+	if (reference) delete reference ;
+	setReferenceAction->setToolTip(QString("Momentan keine Referenz."));
+}
+
 specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	specPlot(parent),
 	view(0),
-	picker(0),
+	correctionPicker(0),
+	alignmentPicker(0),
 	reference(0),
 	SVGpicker(0)
 {
@@ -50,6 +72,7 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	noSlopeAction = new QAction("no slope",alignmentActions) ;
 	noSlopeAction->setCheckable(true) ;
 	noSlopeAction->setChecked(false) ;
+	toggleAligning(false) ;
 
 
 	QImage image(":/add.png") ;
@@ -58,15 +81,15 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	buffer.open(QIODevice::WriteOnly) ;
 	image.save(&buffer,"PNG") ;
 
-	setReferenceAction->setToolTip(QString("test<b>fett</b> <img src=\"data:image/png;base64,%1\"></img>").arg(QString(buffer.data().toBase64())));
-
+	invalidateReference();
 	alignmentActions->addAction(setReferenceAction) ;
 	alignmentActions->addAction(alignWithReferenceAction) ;
 	alignmentActions->addAction(addRangeAction) ;
 	alignmentActions->addAction(removeRangeAction) ;
 	alignmentActions->addAction(noSlopeAction) ;
 
-
+	connect(alignWithReferenceAction,SIGNAL(toggled(bool)),correctionActions,SLOT(setDisabled(bool))) ;
+	connect(alignWithReferenceAction,SIGNAL(toggled(bool)),this,SLOT(correctionsChanged())) ;
 	connect(alignmentActions,SIGNAL(triggered(QAction*)),this,SLOT(alignmentChanged(QAction*))) ;
 	connect(modifySVGs,SIGNAL(triggered(bool)),this,SLOT(modifyingSVGs(bool))) ;
 }
@@ -89,6 +112,7 @@ QList<specDataItem*> specSpectrumPlot::folderContent(specModelItem *folder)
 
 void specSpectrumPlot::alignmentChanged(QAction *action)
 {
+	qDebug() << "VIEW:" << view ;
 	if (action == setReferenceAction) // turn this into an undo command.
 	{
 		if (reference) delete reference ;
@@ -100,14 +124,18 @@ void specSpectrumPlot::alignmentChanged(QAction *action)
 			referenceDataItems << folderContent(view->model()->itemPointer(referenceItems[i])) ;
 		if (referenceDataItems.isEmpty())
 		{
-			reference = 0 ;
+			invalidateReference();
 			return ;
 		}
 		reference = new specDataItem(QList<specDataPoint>(),QHash<QString,specDescriptor>()) ;
+		qDebug() << "new reference size:" << reference->dataSize() << referenceDataItems.size() << referenceItems.size() ;
 		for (int i = 0 ; i < referenceDataItems.size() ; ++i)
 			reference->operator +=(*(referenceDataItems[i])) ;
+		qDebug() << "new reference size (added):" << reference->dataSize() ;
 		reference->flatten();
+		reference->revalidate();
 		reference->setPen(QPen(Qt::red));
+		qDebug() << "new reference size (flattened):" << reference->dataSize() ;
 
 		// build tooltip
 		QwtPlot toolTipPlot ;
@@ -144,13 +172,6 @@ void specSpectrumPlot::alignmentChanged(QAction *action)
 		renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, false);
 		renderer.renderTo(&toolTipPlot,plotImage) ;
 
-		QDialog newDialog ;
-		newDialog.setLayout(new QVBoxLayout) ;
-		QLabel *newLabel =new QLabel(&newDialog) ;
-		newLabel->setPixmap(QPixmap::fromImage(plotImage)) ;
-		newDialog.layout()->addWidget(newLabel);
-		newDialog.exec() ;
-
 		QByteArray byteArray ;
 		QBuffer buffer(&byteArray) ;
 		buffer.open(QIODevice::WriteOnly) ;
@@ -161,35 +182,17 @@ void specSpectrumPlot::alignmentChanged(QAction *action)
 	}
 	else if (action == alignWithReferenceAction)
 	{
-		if (!alignWithReferenceAction->isChecked())
-		{
-			if (picker)
-			{
-				disconnect(picker, SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SLOT(applyZeroRanges(specCanvasItem*,int,double,double))) ;
-				delete picker ;
-				picker = 0 ;
-			}
-		}
-		correctionActions->setDisabled(alignWithReferenceAction->isChecked());
-		if (!picker && alignWithReferenceAction->isChecked())
-		{
-			picker = new CanvasPicker(this) ;
-			picker->setOwning() ;
-			connect(picker, SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SLOT(applyZeroRanges(specCanvasItem*,int,double,double))) ;
-		}
-		// TODO disable/enable highlighting of ranges or plots  ...
-		// !alignWithReferenceAction->isChecked() && correctionsChecked()
-		// or maybe simply call correctionsChanged()
+		toggleAligning(alignWithReferenceAction->isChecked());
 	}
 	else if (action == addRangeAction)
 	{
 		double min = axisScaleDiv(QwtPlot::xBottom)->lowerBound(), max = axisScaleDiv(QwtPlot::xBottom)->upperBound() ;
 		specRange *newRange = new specRange(min+.1*(max-min),max-.1*(max-min)) ;
 		newRange->attach(this) ;
-		picker->addSelectable(newRange) ;
+		alignmentPicker->addSelectable(newRange) ;
 	}
 	else if (action == removeRangeAction)
-		picker->removeSelected();
+		alignmentPicker->removeSelected();
 }
 
 bool specSpectrumPlot::correctionChecked()
@@ -202,35 +205,26 @@ bool specSpectrumPlot::correctionChecked()
 
 void specSpectrumPlot::correctionsChanged()
 {
-	if (!correctionChecked() || !correctionActions->isEnabled())
+	if (correctionChecked() && correctionActions->isEnabled())
 	{
-		// TODO unset highlighting -- should be done by picker...
-		qDebug("removing picker") ;
-		if (picker)
-		{
-			delete picker ;
-			picker = 0 ;
-		}
-		pointHash.clear();
-		// TODO merge undo stack actions -- dangerous:  consider other actions might have been performed meanwhile
-//		disconnect(undoPartner,SIGNAL(stackChanged()),this,SLOT(replot())) ;
-	}
-	else
-	{
-		if (!picker)
+		if (!correctionPicker)
 		{
 			qDebug("installing picker") ;
-			picker = new CanvasPicker(this) ;
-			connect(picker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this,SLOT(pointMoved(specCanvasItem*,int,double,double))) ;
+			correctionPicker = new CanvasPicker(this) ;
+			connect(correctionPicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this,SLOT(pointMoved(specCanvasItem*,int,double,double))) ;
 			QList<specCanvasItem*> items ;
 			QwtPlotItemList onPlot = itemList(spec::spectrum) ;
 			foreach(QwtPlotItem* item, onPlot)
 				items << dynamic_cast<specDataItem*>(item) ;
 			items.removeAll(0) ;
-			picker->addSelectable(items);
+			correctionPicker->addSelectable(items);
 		}
-//		connect(undoPartner,SIGNAL(stackChanged()),this,SLOT(replot())) ;
-		// TODO set highlighting
+	}
+	else
+	{
+		delete correctionPicker ;
+		correctionPicker = 0  ;
+		pointHash.clear();
 	}
 }
 
@@ -322,6 +316,47 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* item,int point, double ne
 				}
 			}
 		}
+		// apply reference
+		qDebug() << pointsInRange ;
+		if (reference && !pointsInRange.empty()) // TODO general return condition if pointsInRange is empty
+		{
+			// prepare map of x and y values
+			QMap<double,double> referenceMap ;
+			for (int i = 0 ; i < reference->dataSize() ; ++i)
+				referenceMap[reference->sample(i).x()] = reference->sample(i).y() ;
+			// try to find two bordering points for linear interpolation for each point in range.
+			for (QList<QPointF>::iterator i = pointsInRange.begin() ; i != pointsInRange.end() ; ++i)
+			{
+				double x = i->x() ;
+				// if exact same x value is contained in reference, just take it.
+				if (referenceMap.contains(x))
+				{
+					i->setY(i->y()-referenceMap[x]) ;
+					continue ;
+				}
+				QMap<double,double>::iterator pointAfter = referenceMap.upperBound(x);
+				// no points for lin interpol found -> take point from correction list
+				if (pointAfter == referenceMap.begin() || pointAfter == referenceMap.end())
+				{
+					pointsInRange.erase(i) ;
+					continue ;
+				}
+				QMap<double,double>::iterator pointBefore  = pointAfter - 1;
+				// subtract linear interpolation
+				double x1 = pointBefore.key(),
+						x2 = pointAfter.key(),
+						y1 = pointBefore.value(),
+						y2 = pointAfter.value(),
+						y = i->y() ;
+				i->setY(i->y()
+					- pointBefore.value()
+					- (pointAfter.value() - pointBefore.value()) /
+					  (pointAfter.key()   - pointBefore.key()  ) *
+					  (x - pointBefore.key())) ;
+			}
+			qDebug() << referenceMap << pointsInRange ;
+		}
+
 		// compute correction
 		double offset = 0, slope = 0 ;
 		if((noSlopeAction->isChecked() && !pointsInRange.isEmpty() )|| pointsInRange.size() == 1)
@@ -356,6 +391,7 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* item,int point, double ne
 				offset = correction[1];
 				slope = correction[0] ;
 			}
+			qDebug() << "Matrix: " << matrix << "Vektor: " << vector ;
 		}
 		specPlotMoveCommand *command = new specPlotMoveCommand(zeroCommand) ;
 		command->setItem(view->model()->index(spectrum));

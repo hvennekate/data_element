@@ -2,6 +2,8 @@
 #define SPECLOGMODEL_H
 #include "specmodel.h"
 
+QList<specModelItem*> specLogToData(const QMimeData*) ;
+
 class specLogModel : public specModel
 {
 private:
