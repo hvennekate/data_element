@@ -715,7 +715,7 @@ void specModel::insertFromStream(QDataStream& stream, const QModelIndex& parent,
 	while(!stream.atEnd())
 	{
 		qDebug("dropping an item") ;
-		specModelItem* pointer ;
+                specModelItem* pointer ;
 		stream >> pointer ;
 		list << pointer ;
 	}
