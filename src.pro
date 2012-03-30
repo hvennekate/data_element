@@ -79,7 +79,9 @@ SOURCES += main.cpp \
     actionlib/specaddconnectionscommand.cpp \
     actionlib/specdeleteconnectionscommand.cpp \
     actionlib/specaddconnectionsaction.cpp \
-    kinetic/descriptorxrangefilter.cpp
+    kinetic/descriptorxrangefilter.cpp \
+    model/specmimeconverter.cpp \
+    log/speclogtodataconverter.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -160,7 +162,9 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/specaddconnectionscommand.h \
     actionlib/specdeleteconnectionscommand.h \
     actionlib/specaddconnectionsaction.h \
-    kinetic/descriptorxrangefilter.h
+    kinetic/descriptorxrangefilter.h \
+    model/specmimeconverter.h \
+    log/speclogtodataconverter.h
 
 INCLUDEPATH += kinetic \
 	log \
