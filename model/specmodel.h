@@ -40,6 +40,7 @@ private:
 	QModelIndexList merge(QModelIndexList& list, const QList<QPair<QStringList::size_type, double> >& criteria) ;
 	QModelIndexList allChildren(const QModelIndex&) const ;
 	QStringList mime ;
+        QMap<QString,QPair<,> > mime ;
 	QMap<double,double> subMap ;
 	bool internalDrop ;
 	specView* dropSource ;
