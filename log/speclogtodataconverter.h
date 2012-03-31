@@ -7,11 +7,12 @@ class specLogToDataConverter : public specMimeConverter
 {
 private:
     specModelItem* getData(specModelItem*) ;
-    QFileDialog *path ;
+    QDir currentDirectory ;
 public:
     specLogToDataConverter();
     ~specLogToDataConverter() ;
-    QDataStream& convert(QDataStream &) ;
+    QDataStream& convert(QList<specModelItem *> &, QDataStream &) ;
+    QList<specModelItem*> convert(QDataStream&) ;
 };
 
 #endif // SPECLOGTODATACONVERTER_H
