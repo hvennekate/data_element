@@ -20,6 +20,6 @@ QList<specModelItem*> specMimeConverter::convert(QDataStream &stream)
 QDataStream& specMimeConverter::convert(QList<specModelItem *> &list, QDataStream &stream)
 {
     for (QList<specModelItem*>::iterator i = list.begin() ; i != list.end() ; ++i)
-        i->writeOut(stream) ;
+	(*i)->writeOut(stream) ;
     return stream ;
 }

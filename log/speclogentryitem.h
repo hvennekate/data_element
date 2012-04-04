@@ -5,7 +5,7 @@
 #include "specdescriptor.h"
 #include <QHash>
 
-class specLogEntryItem : public specFolderItem
+class specLogEntryItem : public specModelItem
 {
 private:
 	QHash<QString,specDescriptor> description ;

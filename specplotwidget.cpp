@@ -16,6 +16,7 @@
 #include <QMessageBox>
 #include <names.h>
 #include <QSettings>
+#include <speclogtodataconverter.h>
 
 void specPlotWidget::changeFileName(const QString& name)
 {
@@ -89,7 +90,8 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	logWidget->setFloating(true) ;
 	logs = new specLogView(logWidget) ;
 	logs->setModel(new specLogModel(items->model(),logs));
-	logs->model()->setMimeTypes(QStringList("application/spec.log.item"));
+//	logs->model()->setMimeTypes(QStringList("application/spec.log.item"));
+	logs->model()->mimeConverters[QString("application/spec.log.item")] = new specLogToDataConverter ;
 	QToolBar *logToolbar = new QToolBar(logWidget) ;
 	foreach(QAction* pointer, logs->actions())
 		logToolbar->addAction(pointer) ;
@@ -121,9 +123,12 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	layout -> addWidget(actions->toolBar(kineticWidget->view()));
 	layout -> addWidget(actions->toolBar(logs)) ;
 
-	items->model()->setMimeTypes(QStringList() << "application/spec.spectral.item" << "application/spec.log.item") ;
+//	items->model()->setMimeTypes(QStringList() << "application/spec.spectral.item" << "application/spec.log.item") ;
+	items->model()->mimeConverters[QString("application/spec.spectral.item")] = new specMimeConverter ;
+	items->model()->mimeConverters[QString("application/spec.log.item")] = new specLogToDataConverter ;
 	actions->addDragDropPartner(items->model()) ;
 	actions->addDragDropPartner(kineticWidget->view()->model()) ;
+	actions->addDragDropPartner(logs->model());
 	plot->setUndoPartner(actions) ;
 	qDebug("added undo toolbar") ;
 	layout -> addWidget(splitter)  ;

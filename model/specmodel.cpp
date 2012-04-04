@@ -310,7 +310,7 @@ void specModel::importFile(QModelIndex index)
 	QStringList fileNames = QFileDialog::getOpenFileNames();
 	QTime timer ;
 	timer.start() ;
-	if (fileNames.size())  //Haeh?
+	if (!fileNames.isEmpty())
 	{
 		foreach(QString fileName, fileNames)
 		{
@@ -363,7 +363,8 @@ specModel::specModel(QObject *par)
 	: QAbstractItemModel(par), mime("application/spec.model.item"),
 	  internalDrop(false),
 	  dropSource(0),
-	  dontDelete(false)
+	  dontDelete(false),
+	  dropBuddy(0)
 {
 	qDebug("initializing model") ;
 	root = new specFolderItem ;
@@ -595,7 +596,7 @@ Qt::DropActions specModel::supportedDropActions() const
 QStringList specModel::mimeTypes() const
 {
 	qDebug("### requested mime types %d",this) ;
-	return mime ;
+	return mimeConverters.keys() ;
 }
 
 void specModel::setMimeTypes(const QStringList& types)
@@ -626,43 +627,54 @@ QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 {
 	qDebug("### requested mime data %d",this) ;
 	QMimeData *mimeData = new QMimeData() ;
-	QByteArray encodedData, textData ;
-	QTextStream textStream(&textData, QIODevice::WriteOnly) ;
-	QDataStream stream(&encodedData,QIODevice::WriteOnly) ;
+//	QByteArray encodedData, textData ;
+//	QTextStream textStream(&textData, QIODevice::WriteOnly) ;
+//	QDataStream stream(&encodedData,QIODevice::WriteOnly) ;
 	QModelIndexList list = indices ;
 	qDebug("originally in list: %d",list.size()) ;
 	eliminateChildren(list) ;
 // 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
 // 	cout << "mimeData list size:  " << list.size() << endl ;
 	
-	qDebug("exporting %d items of mime",list.size()) ;
+	qDebug() << "exporting items of mime" << list ;
 	if (dropBuddy)
 		dropBuddy->setLastRequested(list) ;
-	// For text export
-	QList<QPair<bool,QString> > headerFormat ;
-	headerFormat << QPair<bool,QString>(false,"")
-			<< QPair<bool,QString>(true,"\n")
-			<< QPair<bool,QString>(true,"Time/ps\tWavenumbers/cm-1\tSignal/DmOD\tmax. Int.") ;
-	QList<QPair<spec::value,QString> > dataFormat ;
-	dataFormat << QPair<spec::value,QString>(spec::time,"\t")
-			<< QPair<spec::value,QString>(spec::wavenumber,"\t")
-			<< QPair<spec::value,QString>(spec::signal,"\t")
-			<< QPair<spec::value,QString>(spec::maxInt,"\n") ;
+//	// For text export
+//	QList<QPair<bool,QString> > headerFormat ;
+//	headerFormat << QPair<bool,QString>(false,"")
+//			<< QPair<bool,QString>(true,"\n")
+//			<< QPair<bool,QString>(true,"Time/ps\tWavenumbers/cm-1\tSignal/DmOD\tmax. Int.") ;
+//	QList<QPair<spec::value,QString> > dataFormat ;
+//	dataFormat << QPair<spec::value,QString>(spec::time,"\t")
+//			<< QPair<spec::value,QString>(spec::wavenumber,"\t")
+//			<< QPair<spec::value,QString>(spec::signal,"\t")
+//			<< QPair<spec::value,QString>(spec::maxInt,"\n") ;
 
-	foreach(QModelIndex index,list) // TODO eliminate children
-	{
-		qDebug("checking item") ;
-		if(index.isValid() && index.column() == 0)
-		{
-			qDebug("writing item") ;
-			itemPointer(index)->writeOut(stream) ;
-			itemPointer(index)->exportData(headerFormat, dataFormat, textStream);
-		}
-	}
+//	foreach(QModelIndex index,list) // TODO eliminate children
+//	{
+//		qDebug("checking item") ;
+//		if(index.isValid() && index.column() == 0)
+//		{
+//			qDebug("writing item") ;
+//			itemPointer(index)->writeOut(stream) ;
+//			itemPointer(index)->exportData(headerFormat, dataFormat, textStream);
+//		}
+//	}
 	
 // 	qDebug("setting mime data") ;
-	mimeData->setData(mime.first(),encodedData) ;
-	mimeData->setData("text/plain",textData) ;
+
+//	foreach(const QString& type, mimeConverters)
+	for (QHash<QString,specMimeConverter*>::const_iterator i = mimeConverters.begin() ; i != mimeConverters.end() ; ++i)
+	{
+		QByteArray encodedData ;
+		QDataStream stream(&encodedData,QIODevice::WriteOnly) ;
+		QList<specModelItem*> pointers = pointerList(list) ;
+		(*i)->convert(pointers,stream) ;
+		mimeData->setData(i.key(), encodedData) ;
+	}
+
+//	mimeData->setData(mime.first(),encodedData) ;
+//	mimeData->setData("text/plain",textData) ;
 // 	qDebug("returning mime data") ;
 	return mimeData ;
 }
@@ -671,32 +683,9 @@ bool specModel::dropMimeData(const QMimeData *data,
      Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
 	qDebug("### dropped mime data %d",this) ;
+	qDebug() << "Formats:" << data->formats() ;
 	if (action == Qt::IgnoreAction)
 		return true;
-
-	if (!data->hasFormat(mime.first())) // TODO:  What about the other types?
-	{
-//		foreach(QString dataType, data->formats())
-//		{
-//			if (mimeConverters->contains(QPair<QString,QString>(dataType, mime.first())))
-//			{
-//				QList<specModelItem*> newItems = mimeConverters->value(QPair<QString,QString>(dataType, mime.first())) (data) ;
-//				insertItems(newItems,parent,row) ;
-//				if (dropBuddy)
-//				{
-//					QModelIndexList newIndexes ;
-//					for (int i = 0 ; i < newItems.size() ; ++i)
-//						newIndexes << index(row+i,0,parent) ;
-//					specAddFolderCommand * command = new specAddFolderCommand ;
-//					command->setParentWidget(dropSource) ;
-//					command->setItems(newIndexes) ;
-//					dropBuddy->push(command) ;
-//				}
-//				return true ;
-//			}
-//		}
-		return false;
-	}
 
 	row = (row != -1 ? row : rowCount(parent) );
 	if (internalDrop && dropBuddy && dropSource)
@@ -707,22 +696,35 @@ bool specModel::dropMimeData(const QMimeData *data,
 		dropSource = 0 ;
 		return true ;
 	}
-	
-	QByteArray encodedData = data->data(mime.first()) ;
-	QDataStream stream(&encodedData, QIODevice::ReadOnly) ;
-	qDebug("dropping mime from stream...") ;
-	QModelIndexList newItems ;
-	while(!stream.atEnd())
+
+	specMimeConverter* converter ;
+	QString typeToUse ;
+//	for (QHash<QString,specMimeConverter*>::iterator i = mimeConverters->begin() ; i != mimeConverters->end() ;++i)
+	foreach(const QString& type, mimeConverters.keys())
 	{
-		insertFromStream(stream,parent,row) ;
-		newItems << index(row++,0,parent) ;
+//		QString type = i.key() ;
+		if (data->hasFormat(type))
+		{
+			converter = mimeConverters[type] ;
+			typeToUse = type ;
+			break ;
+		}
 	}
+
+	QByteArray encodedData = data->data(typeToUse) ;
+	QDataStream stream(&encodedData, QIODevice::ReadOnly) ;
+	qDebug() << "dropping mime from stream.  Type:" << typeToUse ;
+	QList<specModelItem*> newItems = converter->convert(stream) ;
+	qDebug() << "inserting" << newItems.size() << "items via mime" << newItems ;
+	insertItems(newItems,parent,row) ;
+	QModelIndexList newIndexes = indexList(newItems) ;
+
 	if (dropBuddy)
 	{
 		specAddFolderCommand *command = new specAddFolderCommand ;
 		command->setParentWidget(dropSource) ;
 		qDebug() << ")))) parent widget: " << dropSource << "Adding new undo command with these items:" << newItems ;
-		command->setItems(newItems) ;
+		command->setItems(newIndexes) ;
 		dropBuddy->push(command);
 	}
 	dropSource = 0 ;
@@ -747,7 +749,8 @@ specModel::specModel(QDataStream& in,QObject *par)
 	: QAbstractItemModel(par), mime("application/spec.model.item"), // TODO:  read mime type from stream
 	  internalDrop(false),
 	  dropSource(0),
-	  dontDelete(false)
+	  dontDelete(false),
+	  dropBuddy(0)
 {
 	root = new specFolderItem ;
 	Descriptors += "" ;

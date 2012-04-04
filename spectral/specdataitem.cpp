@@ -162,11 +162,8 @@ bool specDataItem::setActiveLine(const QString& key, int line)
 
 void specDataItem::refreshPlotData()
 {
-	qDebug() << "wnumsplot: " << wnums().size() << ints().size() ;
 	QVector<double> x=filter.wnums(data), y=filter.ints(data);
-	qDebug() << "collected data:" << x.size() ;
 	processData(x,y) ;
-	qDebug() << "processed:" << x.size() << "merge:" << mergePlotData ;
 	setSamples(x,y) ;
 }
 
