@@ -22,7 +22,7 @@ public:
 	/*! Add an item as child at index \a position.*/
 	bool addChild(specModelItem*, QList<specModelItem*>::size_type position) ;
 	/*! Add all elements of \a list as children at index \a position.*/
-	bool addChildren(QList<specModelItem*> list, QList<specModelItem*>::size_type position) ;
+	bool addChildren(QList<specModelItem*> list, QList<specModelItem*>::size_type position = 0) ;
 	/*! @todo remove children:  tell parent via destructor or let parent remove child? */
 	void removeChild(specModelItem*) ;
 	

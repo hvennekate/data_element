@@ -96,8 +96,5 @@ specDescriptor& specDescriptor::operator=(const QString& val)
 {
 	contentValue = val ;
 	currentLine = val.contains(QRegExp("\n")) ? val.section(QRegExp("\n"),0,0) : val ;
-	qDebug() << "----------Multiline:" << val.contains(QRegExp("\n")) << currentLine ;
-
-	qDebug() << "------------desc: " << val << currentLine ;
 	return *this ;
 }

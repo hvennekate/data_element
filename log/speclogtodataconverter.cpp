@@ -18,9 +18,10 @@ QDataStream &specLogToDataConverter::convert(QList<specModelItem *> &list, QData
 QList<specModelItem*> specLogToDataConverter::convert(QDataStream &stream)
 {
 	QList<specModelItem*> items = specMimeConverter::convert(stream) ;
+	qDebug() << "performing log to data conversion" <<  items ;
 	for (int i = 0 ; i < items.size() ; ++i)
 	{
-		specLogEntryItem *logItem = dynamic_cast<specLogEntryItem*>(items[i]) ;
+		specModelItem *logItem = dynamic_cast<specLogEntryItem*>(items[i]) ;
 		//item may be a folder
 		if (!logItem)
 			logItem = dynamic_cast<specFolderItem*>(items[i]) ;
@@ -32,7 +33,7 @@ QList<specModelItem*> specLogToDataConverter::convert(QDataStream &stream)
 			specModelItem *newItem = getData(items[i]) ;
 			if (newItem != items[i])
 			{
-				delete item[i] ;
+				delete items[i] ;
 				if (newItem)
 					items[i] = newItem ;
 				else
@@ -40,6 +41,7 @@ QList<specModelItem*> specLogToDataConverter::convert(QDataStream &stream)
 			}
 		}
 	}
+	qDebug() << "log to data conversion done" << items ;
 	return items ;
 }
 
@@ -52,8 +54,8 @@ specModelItem* specLogToDataConverter::getData(specModelItem *item)
 		QVector<specModelItem*> children ;
 		for (int i = 0 ; i < item->children() ; ++i)
 		{
-			specModelItem* child = folder->child(i)
-					specModelItem* newChild = getData(child) ;
+			specModelItem* child = folder->child(i) ;
+			specModelItem* newChild = getData(child) ;
 			if (newChild)
 			{
 				folder->addChild(newChild,folder->childNo(child)) ;
@@ -65,24 +67,36 @@ specModelItem* specLogToDataConverter::getData(specModelItem *item)
 
 
 	//if item is a log item, try to open corresponding file
-	QString fileName = item->descriptor("file",false) ;
+	QString fileName = item->descriptor("Datei",false) ;
+	qDebug() << "file name to import" << fileName ;
 	fileName = fileName.section("\\",-1,-1) ;
+	qDebug() << "file name to import" << fileName ;
 
-	QFileDialog path ;
-	path.setWindowTitle("Datei zum Importieren angeben") ;
-	path.setDirectory(currentDirectory) ;
-	path.setFileMode(QFileDialog::ExistingFile);
-	path.selectFile(fileName) ;
-	path.setNameFilters(QStringList(fileName)) ;
-	if (!path.exec())
-		return 0 ;
-	currentDirectory = path.directory() ;
+	QDir::setCurrent(currentDirectory.absolutePath()) ;
+	QFile file(fileName) ;
+	if (!file.exists())
+	{
+		QFileDialog path ;
+		path.setWindowTitle("Datei zum Importieren angeben") ;
+		path.setDirectory(currentDirectory) ;
+		path.setFileMode(QFileDialog::ExistingFile);
+		path.selectFile(fileName) ;
+		path.setNameFilters(QStringList(QString("%1 (%1)").arg(fileName))) ;
+		qDebug() << "name filters" << path.nameFilters() ;
+		if (!path.exec())
+			return 0 ;
+		currentDirectory = path.directory() ;
 
+		if (path.selectedFiles().isEmpty())
+			return 0 ;
+
+		file.setFileName(path.selectedFiles().first()) ;
+	}
+	file.open(QFile::ReadOnly | QFile::Text) ;
 	specFolderItem *newItem = new specFolderItem(0,fileName) ;
+	fileName = file.fileName() ;
+	newItem->addChildren(fileFilter(fileName)(file)) ; // TODO take care that there actually is a file filter...
 
-	if (path.selectedFiles().isEmpty())
-		return 0 ;
-
-	QFile file(path.selectedFiles().first()) ;
-	newItem->addChildren(fileFilter(file)(file)) ; // TODO take care that there actually is a file filter...
+	qDebug() << "number of children in new item:" << newItem->children() ;
+	return newItem ;
 }

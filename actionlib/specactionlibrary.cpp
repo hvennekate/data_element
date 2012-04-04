@@ -236,6 +236,7 @@ QDataStream& specActionLibrary::read(QDataStream &in)
 
 void specActionLibrary::setLastRequested(const QModelIndexList &list)
 {
+	qDebug() << "setting last req" << list ;
 	lastRequested = list ;
 }
 
