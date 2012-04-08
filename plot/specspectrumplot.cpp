@@ -291,13 +291,14 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 	undoPartner->push(command) ;
 }
 
-void specSpectrumPlot::applyZeroRanges(specCanvasItem* item,int point, double newX, double newY)
+specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
+	const QwtPlotItemList& zeroRanges,
+	const QwtPlotItemList& spectra,
+	const QMap<double, double>& referenceSpectrum,
+	const specView* view,
+	bool noSlope)
 {
-	((specRange*) item)->pointMoved(point,newX,newY) ;
-	QwtPlotItemList zeroRanges = itemList(spec::zeroRange) ;
-	QwtPlotItemList spectra = itemList(spec::spectrum) ; // TODO roll back previous undo command if it was of the same kind and merge with what is to come.
 	specMultiCommand *zeroCommand = new specMultiCommand ;
-	zeroCommand->setParentWidget(view) ;
 	for (int i = 0 ; i < spectra.size() ; ++i)
 	{
 		QList<QPointF> pointsInRange ;
@@ -318,30 +319,26 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* item,int point, double ne
 		}
 		// apply reference
 		qDebug() << pointsInRange ;
-		if (reference && !pointsInRange.empty()) // TODO general return condition if pointsInRange is empty
+		if (referenceSpectrum.size() > 1 && !pointsInRange.empty()) // TODO general return condition if pointsInRange is empty
 		{
-			// prepare map of x and y values
-			QMap<double,double> referenceMap ;
-			for (int i = 0 ; i < reference->dataSize() ; ++i)
-				referenceMap[reference->sample(i).x()] = reference->sample(i).y() ;
 			// try to find two bordering points for linear interpolation for each point in range.
 			for (QList<QPointF>::iterator i = pointsInRange.begin() ; i != pointsInRange.end() ; ++i)
 			{
 				double x = i->x() ;
 				// if exact same x value is contained in reference, just take it.
-				if (referenceMap.contains(x))
+				if (referenceSpectrum.contains(x))
 				{
-					i->setY(i->y()-referenceMap[x]) ;
+					i->setY(i->y()-referenceSpectrum[x]) ;
 					continue ;
 				}
-				QMap<double,double>::iterator pointAfter = referenceMap.upperBound(x);
+				QMap<double,double>::const_iterator pointAfter = referenceSpectrum.upperBound(x);
 				// no points for lin interpol found -> take point from correction list
-				if (pointAfter == referenceMap.begin() || pointAfter == referenceMap.end())
+				if (pointAfter == referenceSpectrum.begin() || pointAfter == referenceSpectrum.end())
 				{
 					pointsInRange.erase(i) ;
 					continue ;
 				}
-				QMap<double,double>::iterator pointBefore  = pointAfter - 1;
+				QMap<double,double>::const_iterator pointBefore  = pointAfter - 1;
 				// subtract linear interpolation
 				double x1 = pointBefore.key(),
 						x2 = pointAfter.key(),
@@ -354,12 +351,12 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* item,int point, double ne
 					  (pointAfter.key()   - pointBefore.key()  ) *
 					  (x - pointBefore.key())) ;
 			}
-			qDebug() << referenceMap << pointsInRange ;
+			qDebug() << referenceSpectrum << pointsInRange ;
 		}
 
 		// compute correction
 		double offset = 0, slope = 0 ;
-		if((noSlopeAction->isChecked() && !pointsInRange.isEmpty() )|| pointsInRange.size() == 1)
+		if((noSlope && !pointsInRange.isEmpty() )|| pointsInRange.size() == 1)
 		{
 			// offset only
 			qDebug("computing offset") ;
@@ -394,11 +391,26 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* item,int point, double ne
 			qDebug() << "Matrix: " << matrix << "Vektor: " << vector ;
 		}
 		specPlotMoveCommand *command = new specPlotMoveCommand(zeroCommand) ;
+		if (view && view->model())
 		command->setItem(view->model()->index(spectrum));
 		qDebug() << "setting slope and offset" << offset << slope ;
 		command->setCorrections(0,-offset,-slope,1.) ;
-		command->setParentWidget(view) ;
 	}
+	return zeroCommand ;
+}
+
+void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double newX, double newY)
+{
+	((specRange*) range)->pointMoved(point,newX,newY) ;
+	QwtPlotItemList zeroRanges = itemList(spec::zeroRange) ;
+	QwtPlotItemList spectra = itemList(spec::spectrum) ; // TODO roll back previous undo command if it was of the same kind and merge with what is to come.
+	// prepare map of x and y values
+	QMap<double,double> referenceSpectrum ;
+	for (int i = 0 ; i < reference->dataSize() ; ++i)
+		referenceSpectrum[reference->sample(i).x()] = reference->sample(i).y() ;
+
+	specMultiCommand *zeroCommand = generateCorrectionCommand(zeroRanges, spectra, referenceSpectrum, view, noSlopeAction->isChecked()) ;
+	zeroCommand->setParentWidget(view) ;
 	undoPartner->push(zeroCommand) ;
 	replot() ;
 }

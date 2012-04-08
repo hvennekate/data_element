@@ -9,6 +9,8 @@
 #include "specview.h"
 #include "actionlib/specundoaction.h"
 
+class specMultiCommand ;
+
 class specSpectrumPlot : public specPlot
 {
 	Q_OBJECT
@@ -36,13 +38,14 @@ public:
 	QList<QAction*> actions() { return QList<QAction*>() << correctionActions->actions() << alignmentActions->actions() << printAction << modifySVGs; }
 	void setView(specView* mod) { view = mod ; }
 	void setUndoPartner(specActionLibrary* lib) { qDebug("setting action lib") ; undoPartner = lib ; ((specUndoAction*) printAction)->setLibrary(lib);}
+	static specMultiCommand* generateCorrectionCommand(const QwtPlotItemList& zeroRanges, const QwtPlotItemList& spectra, const QMap<double, double>& referenceSpectrum, const specView*, bool noSlope = false) ;
 signals:
 
 private slots:
 	void correctionsChanged() ;
 	void alignmentChanged(QAction*) ;
 	void pointMoved(specCanvasItem*,int point, double x, double y) ;
-	void applyZeroRanges(specCanvasItem*,int point, double x, double y) ;
+	void applyZeroRanges(specCanvasItem* range,int point, double x, double y) ;
 	void resizeSVG(specCanvasItem*, int point, double x, double y) ;
 	void modifyingSVGs(const bool&) ;
 };

@@ -17,7 +17,7 @@ public:
 	QDataStream& write(QDataStream &out) const ;
 	QDataStream& read(QDataStream &in) ;
 	int id() const { return spec::multiCommandId ; }
-
+//	void setParentWidget(QWidget *) ; // TODO consider making virtual in undocommand
 	bool mergeWith(const QUndoCommand *other) ;
 };
 

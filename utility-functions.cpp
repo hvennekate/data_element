@@ -334,6 +334,7 @@ QVector<double> waveNumbers(QTextStream& in) {
 
 QList<specModelItem*> readHVFile(QFile& file)
 {
+	qDebug() << "reading file" << file.fileName() ;
 	QTextStream in(&file) ;
 	
 	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system
@@ -366,6 +367,7 @@ QList<specModelItem*> readHVFile(QFile& file)
 			specData.last()->invalidate(); ;
 		}
 	}
+	qDebug() << "returning read file content" << specData ;
 	return specData ;
 }
 
@@ -453,6 +455,7 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 
 QList<specModelItem*> (*fileFilter(QString& fileName)) (QFile&)
 {
+	qDebug() << "Getting filter for" << fileName ;
 	QFile file(fileName) ;
 	file.open(QFile::ReadOnly | QFile::Text) ;
 	QTextStream in(&file) ;
