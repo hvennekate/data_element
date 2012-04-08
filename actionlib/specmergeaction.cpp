@@ -2,6 +2,7 @@
 #include "specdeletecommand.h"
 #include "specaddfoldercommand.h"
 #include "specmulticommand.h"
+#include "specspectrumplot.h"
 
 #include <QDialog>
 #include <QDialogButtonBox>
@@ -25,7 +26,8 @@ void specMergeAction::execute()
 
 	// let user define similarities
 	QList<QPair<QStringList::size_type, double> > criteria ;
-	if (!getMergeCriteria(criteria, model->descriptors(), model->descriptorProperties())) return ;
+	bool spectralAdaptation ;
+	if (!getMergeCriteria(criteria, model->descriptors(), model->descriptorProperties(),spectralAdaptation)) return ;
 
 	QVector<specModelItem*> toBeDeleted ;
 	QVector<specModelItem*> newlyInserted ;
@@ -43,7 +45,8 @@ void specMergeAction::execute()
 		if (! item)
 			continue ;
 		specDataItem *newItem = new specDataItem(*item) ;
-		bool others ;
+		toBeDeleted << item ; // TODO check possibility of immediate deletion
+		QList<specModelItem*> toMergeWith ;
 		// look for items to merge with
 		for (int i = 0 ; i < items.size() ; ++i)
 		{
@@ -55,20 +58,52 @@ void specMergeAction::execute()
 					items.takeAt(i--) ;
 					continue ;
 				}
-				others = true ;
-				*newItem += *(other) ;
+				toMergeWith << other ;
+//				*newItem += *(other) ;
 				toBeDeleted << items.takeAt(i--) ;
 			}
 		}
-		if (others)
+		// if there are others, do the merge
+		if (!toMergeWith.isEmpty())
 		{
+			specMultiCommand *correctionCommand = 0 ;
+			if (spectralAdaptation)
+			{
+				// generate reference spectrum
+				QMap<double,double> reference ;
+				newItem->revalidate();
+				const QwtSeriesData<QPointF>* spectrum = newItem->data() ;
+				for (int i = 0 ; i < spectrum->size() ; ++i)
+				{
+					const QPointF point = spectrum->sample(i) ;
+					reference[point.x()] = point.y() ;
+				}
+
+				// define spectral ranges
+				QwtPlotItemList ranges ;
+				ranges << new specRange(reference.begin().key(), (reference.end() -1).key()) ; // DANGER
+				// TODO set up sensible ranges to account for "holes" in the spectrum
+
+				// generate list of spectra
+				// TODO generate this list directly above
+				QwtPlotItemList spectra ;
+				for (QList<specModelItem*>::iterator i = toMergeWith.begin() ; i != toMergeWith.end() ; ++i)
+					spectra << (QwtPlotItem*) *i ;
+
+				// perform spectral adaptation
+				correctionCommand= specSpectrumPlot::generateCorrectionCommand(ranges, spectra, reference, view) ;
+				correctionCommand->redo();
+			}
+			foreach(specModelItem* other, toMergeWith)
+				*newItem += *((specDataItem*) other) ; // TODO check this cast
+			if (spectralAdaptation)
+				correctionCommand-> undo() ;
 			newItem->flatten();
 			if (! model->insertItems(QList<specModelItem*>() << newItem, model->index(item).parent(), model->index(item).row()))
 			{
 				delete newItem ;
 				continue ;
 			}
-			toBeDeleted << item ; // TODO check possibility of immediate deletion
 			newlyInserted << newItem ;
 		}
 		else
@@ -86,7 +121,7 @@ void specMergeAction::execute()
 	insertionCommand->setItems(insertList) ;
 	insertionCommand->setParentWidget(view) ;
 
-	// prepare to delete the old item
+	// prepare to delete the old items
 	specDeleteCommand *deletionCommand = new specDeleteCommand(command) ;
 	QModelIndexList deleteList = model->indexList(toBeDeleted.toList()) ;
 	qDebug() << "******* delete" << deleteList ;
@@ -97,7 +132,7 @@ void specMergeAction::execute()
 }
 
 
-bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, double> >& toCompare, const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties)
+bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, double> >& toCompare, const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties, bool& doSpectralAdaptation)
 { // TODO separate class
 	QDialog *descriptorMatch = new QDialog() ;
 	QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel) ;
@@ -120,9 +155,11 @@ bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, doubl
 	}
 	QScrollArea *scrollArea = new QScrollArea ;
 	QWidget *areaWidget = new QWidget ;
+	QCheckBox *spectralAdaptation = new QCheckBox("Spektrale Angleichung",descriptorMatch) ;
 	areaWidget->setLayout(descriptorLayout) ;
 	scrollArea->setWidget(areaWidget) ;
 	dialogLayout->addWidget(scrollArea) ;
+	dialogLayout->addWidget(spectralAdaptation);
 	dialogLayout->addWidget(buttons) ;
 	descriptorMatch->setLayout(dialogLayout) ;
 	bool retval = descriptorMatch->exec() ;
@@ -138,6 +175,8 @@ bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, doubl
 						((QLineEdit*) descriptorLayout->itemAt(i+1)->widget())->text().toDouble() : 0.) ;
 	}
 
+	doSpectralAdaptation = spectralAdaptation->checkState() ;
+	delete descriptorMatch ;
 	return retval ;
 }
 

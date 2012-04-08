@@ -29,7 +29,7 @@ class specDataItem : public specModelItem
 {
 private:
 	QHash<QString,specDescriptor> description ;
-	QList<specDataPoint> data ;
+	QList<specDataPoint> spectralData ;
 	specDataFilter filter ;
 	QVector<double> wnums() const ;
 	QVector<double> ints() const ;
@@ -40,7 +40,7 @@ protected:
 	QDataStream& writeToStream(QDataStream&) const ;
 public:
 	/*! Standard constructor.*/
-	specDataItem(QList<specDataPoint> data, // TODO change to reference/pointer
+	specDataItem(QList<specDataPoint> spectralData, // TODO change to reference/pointer
 		     QHash<QString,specDescriptor> description, // TODO change to reference/pointer
 		     specFolderItem* par=0, QString tag="");
 	specDataItem(const specDataItem&) ;
@@ -49,7 +49,7 @@ public:
 
 	int removeData(QList<specRange*>*) ;
 	void removeData(const QVector<int>&) ;
-	QList<specDataPoint> getData(const QVector<int>&) ;
+	QList<specDataPoint> getData(const QVector<int>& indexes) ;
 	const QList<specDataPoint>& allData() ;
 	void insertData(const QList<specDataPoint>&) ;
 	void clearData() ;

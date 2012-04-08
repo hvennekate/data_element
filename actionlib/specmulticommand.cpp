@@ -66,3 +66,15 @@ bool specMultiCommand::mergeWith(const QUndoCommand *other)
 		((specUndoCommand*) child(i))->mergeWith((const specUndoCommand*) other->child(i)) ;
 	return true ;
 }
+
+/* Stupid idea
+void specMultiCommand::setParentWidget(QWidget *widget) // TODO change calling code to not explicitly set every child's parent widget!
+{
+	specUndoCommand::setParentWidget(widget) ;
+//	specUndoCommand *childPointer = 0 ;
+//	for (int i = 0 ; i < childCount() ; ++i)
+//		if (childPointer = dynamic_cast<specUndoCommand*>(child(i)))
+//			childPointer->setParentWidget(widget) ;
+}
+
+*/

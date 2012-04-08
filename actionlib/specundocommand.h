@@ -15,7 +15,7 @@ public:
 	virtual QDataStream& write(QDataStream& out) const = 0 ;
 	virtual QDataStream& read(QDataStream& in) = 0 ;
 	virtual bool mergeable(const specUndoCommand* other) { Q_UNUSED(other) ; return true ; }
-	void setParentWidget(QWidget*) ;
+	void setParentWidget(QWidget*) ; // consider making virtual
 	QWidget *parentWidget() const ;
 signals:
 
