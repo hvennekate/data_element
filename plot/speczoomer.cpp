@@ -17,18 +17,14 @@ specZoomer::specZoomer(QwtPlotCanvas *canvas)
 
 void specZoomer::changeZoomBase(const QRectF& rect)
 {
-// 	qDebug("changing zoom base") ;
-	if(zoomStack()[0] == rect) return ;
+	if(zoomBase() == rect) return ;
 	QStack<QRectF> stack = zoomStack() ; // TODO ueberarbeiten!
 	stack.remove(0) ;
 	for(QStack<QRectF>::size_type i = 0 ; i < stack.size() ; i++)
 		if (! rect.contains(stack[i]))
 			stack.remove(i--) ;
 	stack.prepend(rect) ;
-	uint saveIndex = zoomRectIndex() ;
-	setZoomStack(stack) ;
-// 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
-	if (saveIndex != zoomRectIndex()) zoom((int) saveIndex-zoomRectIndex()) ;
+	setZoomStack(stack, stack.indexOf(zoomRect())) ;
 }
 
 QwtText specZoomer::trackerText(const QPointF &pos) const
