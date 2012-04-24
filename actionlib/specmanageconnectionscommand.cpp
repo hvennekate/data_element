@@ -47,7 +47,7 @@ void specManageConnectionsCommand::restore()
 	specMetaItem* client = targetPointer() ;
 	qDebug() << "got target" << client ;
 	foreach(specModelItem *pointer, pointers)
-		client->connectServer(pointer) ; // TODO consider removal from list if false is returned.
+		pointer->connectClient(client) ; // TODO consider removal from list if false is returned.
 	qDebug() << "done." ;
 }
 
@@ -56,7 +56,7 @@ void specManageConnectionsCommand::take()
 	QVector<specModelItem*> pointers = itemPointers() ;
 	specMetaItem* client = targetPointer() ;
 	foreach(specModelItem *pointer, pointers)
-		client->disconnectServer(pointer) ;
+		pointer->disconnectClient(client) ;
 }
 
 QDataStream &specManageConnectionsCommand::write(QDataStream &out) const

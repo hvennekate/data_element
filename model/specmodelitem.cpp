@@ -191,24 +191,26 @@ QVector<double> specModelItem::intensityData()
 	return QVector<double>() ;
 }
 
-void specModelItem::connectClient(specMetaItem *clnt)
-{
-	if (!clients.contains(clnt))
-	{
-		qDebug() << "connecting client" << clnt << this ;
-		clients << clnt ;
-		clnt->connectServer(this) ;
-	}
-	qDebug() << "done connecting client" ;
-}
-
-void specModelItem::disconnectClient(specMetaItem *clnt)
+bool specModelItem::connectClient(specModelItem *clnt)
 {
 	if (clients.contains(clnt))
-	{
-		clnt->disconnectServer(this) ;
-		clients.removeOne(clnt) ;
-	}
+		return false ;
+	if (!clnt->connectServer(this))
+		return false ;
+	qDebug() << "connecting client" << clnt << this ;
+	clients << clnt ;
+	qDebug() << "done connecting client" ;
+	return true ;
+}
+
+bool specModelItem::disconnectClient(specModelItem *clnt) // TODO template
+{
+	if (!clients.contains(clnt))
+		return false ;
+	if (!clnt->disconnectServer(this))
+		return false ;
+	clients.removeOne(clnt) ;
+	return true ;
 }
 
 void specModelItem::invalidate()
@@ -224,3 +226,22 @@ void specModelItem::revalidate()
 	refreshPlotData();
 }
 
+bool specModelItem::shortCircuit(specMetaItem *server)
+{
+	if (clients.contains(server))
+		return true ;
+	bool sc = false ;
+	foreach(specMetaItem* client, clients)
+		sc = sc || client->shortCircuit(server) ;
+	return sc ;
+}
+
+bool specModelItem::connectServer(specModelItem *itm)
+{
+	return false ;
+}
+
+bool specModelItem::disconnectServer(specModelItem *itm)
+{
+	return false ;
+}
