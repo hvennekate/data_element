@@ -32,14 +32,16 @@ private:
 protected:
 	void processData(QVector<double>&, QVector<double>&) const ;
 	// selectedPoints (3 Punkte fuer Korrekturen)
-protected:
+	virtual bool shortCircuit(specMetaItem* server) ;
 	virtual QDataStream& readFromStream(QDataStream&) =0 ;
 	virtual QDataStream& writeToStream(QDataStream&) const =0 ;
 public:
 	void revalidate() ;
 	void invalidate() ;
-	void connectClient(specMetaItem* clnt) ;
-	void disconnectClient(specMetaItem* clnt) ;
+	virtual bool connectServer(specModelItem*) ;
+	virtual bool disconnectServer(specModelItem*) ;
+	bool connectClient(specMetaItem* clnt) ;
+	bool disconnectClient(specMetaItem* clnt) ;
 	/*! Merge/sort plot data when rebuilding it.  Mainly applies to both specFolderItem and specDataItem.  Both are enabled by default. */
 	bool mergePlotData, sortPlotData ;
 	

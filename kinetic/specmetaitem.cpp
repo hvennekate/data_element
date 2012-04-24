@@ -3,7 +3,8 @@
 
 specMetaItem::specMetaItem(specFolderItem *par, QString description)
 	: specModelItem(par,description),
-	  filter(0)
+	  filter(0),
+	  currentlyConnectingServer(0)
 {
 }
 
@@ -34,23 +35,41 @@ QList<specModelItem*> specMetaItem::purgeConnections()
 	return list ;
 }
 
-bool specMetaItem::disconnectServer(specModelItem *server)
+bool specMetaItem::disconnectServer(specModelItem *server) // TODO template ? -> short circ?
 {
+	if (server == currentlyConnectingServer)
+		return true ;
 	if (!items.contains(server))
 		return false ;
+	currentlyConnectingServer = server ;
+	if (!server->disconnectClient(this))
+	{
+		currentlyConnectingServer = 0 ;
+		return false ;
+	}
+	currentlyConnectingServer = 0 ;
 	items.removeOne(server) ;
-	server->disconnectClient(this) ;
 	invalidate() ;
 	return true ;
 }
 
 bool specMetaItem::connectServer(specModelItem *server)
 {
+	if (currentlyConnectingServer == server)
+		return true ;
 	if (items.contains(server))
 		return false ;
-	qDebug() << "connectiong server" << server << this;
+	if (shortCircuit(server))
+		return false ;
+	qDebug() << "connecting server" << server << this;
+	currentlyConnectingServer = server ;
+	if (!server->connectClient(this))
+	{
+		currentlyConnectingServer = 0 ;
+		return false ;
+	}
+	currentlyConnectingServer = 0 ;
 	items << server ;
-	server->connectClient(this) ;
 	invalidate() ;
 	qDebug() << "done connecting server" << this ;
 	return true ;

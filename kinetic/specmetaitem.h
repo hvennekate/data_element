@@ -15,15 +15,16 @@ private:
 	specPlot *itemPlot() ;
 	QStringList internalDescriptors() const ;
 	int descriptorIndex(const QString&) const ;
+	specModelItem *currentlyConnectingServer ;
 protected:
 	QDataStream& readFromStream(QDataStream&) ;
 	QDataStream& writeToStream(QDataStream &) const ;
 public:
+	bool disconnectServer(specModelItem*) ;
+	bool connectServer(specModelItem*) ;
 	void revalidate() ;
 	explicit specMetaItem(specFolderItem* par=0, QString description="");
 	QList<specModelItem*> purgeConnections() ;
-	bool disconnectServer(specModelItem*) ;
-	bool connectServer(specModelItem*) ;
 	specMetaFilter *takeFilter() ;
 	void setFilter(specMetaFilter*) ;
 	void attach(QwtPlot *plot) ;
