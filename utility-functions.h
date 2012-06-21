@@ -23,4 +23,6 @@ QHash<QString,specDescriptor> fileHeader(QTextStream&) ;
 QList<specModelItem*> (*fileFilter(QString& fileName)) (QFile&);
 QList<double> gaussjinv(QList<QList<double> >&,QList<double>&) ;
 
+bool comparePoints(const QPointF&, const QPointF&) ;
+
 #endif

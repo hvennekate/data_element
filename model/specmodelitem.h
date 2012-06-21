@@ -5,7 +5,7 @@
 
 #include <QString>
 #include <QMultiMap>
-#include "speccanvasitem.h"
+#include "plot/speccanvasitem.h"
 #include <QIcon>
 #include <QStringList>
 #include "names.h"
@@ -32,7 +32,7 @@ private:
 protected:
 	void processData(QVector<double>&, QVector<double>&) const ;
 	// selectedPoints (3 Punkte fuer Korrekturen)
-	virtual bool shortCircuit(specMetaItem* server) ;
+	virtual bool shortCircuit(specModelItem* server) ;
 	virtual QDataStream& readFromStream(QDataStream&) =0 ;
 	virtual QDataStream& writeToStream(QDataStream&) const =0 ;
 public:

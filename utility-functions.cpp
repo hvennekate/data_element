@@ -9,6 +9,7 @@
 #include "speclogmessage.h"
 #include <QQueue>
 #include <QtDebug>
+#include <QPointF>
 using std::max ;
 using std::min ;
 
@@ -24,6 +25,11 @@ using std::min ;
 // 		qDebug() << d++ << (int) (ma*pow(10.,d)) - ma*pow(10.,d) << (int) (mb*pow(10.,d)) - mb*pow(10.,d);
 // 	return (round(ma*pow(10.,d)) == round(mb*pow(10.,d))) ;
 // }
+
+bool comparePoints(const QPointF& a, const QPointF& b)
+{
+	return a.x() < b.x() ;
+}
 
 QList<specModelItem*> readJCAMPFile(QFile& file)
 {
