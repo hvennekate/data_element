@@ -12,17 +12,14 @@ QString specMetaVariable::extract(QString & source, const QRegExp& expression) c
 }
 
 specMetaVariable::specMetaVariable(QString init)
-	: begin(-1),
-	  end(-1),
-	  inc(-1),
-	  valid(false),
-	  all(true),
-	  single(false),
-	  array(false)
+	: begin(0),
+	  end(int(INFINITY)),
+	  inc(1),
+	  valid(false)
 {
 	const QRegExp rangeExp("(\\[[0-9]*(:[0-9]?(:[0-9]?)?)?\\])"),
 			descriptorExp("(\\\"[^\\\"]*\\\"|" "(x|y|i|u|l))"),
-			number("[+\\-]?([0-9]+|[0-9]*\\.[0-9]+)([eE][0-9]+)?");
+			number("[+\\-]?([0-9]+|[0-9]*\\.[0-9]+)([eE][+-]?[0-9]+)?");
 	QString range = extract(init, rangeExp) ;
 	qDebug() << "AFTER RANGE EXTR" << init ;
 	QString descString = extract(init, descriptorExp) ;
@@ -34,23 +31,17 @@ specMetaVariable::specMetaVariable(QString init)
 	qDebug() << "AFTER 2ND NUMBER EXTR" << init ;
 
 	qDebug() << "RANGESTRING" << range ;
-	if (range.isEmpty())
-		all = true ;
-	else
+	if (!range.isEmpty())
 	{
-		all = false ;
 		//interpret the range
 		QStringList indexes = range.remove("[").remove("]").split(':') ;
 		qDebug() << "RANGEPARTS" << indexes << int(INFINITY);
-		if (indexes.size() == 1)
-			single = true ;
-		else
-		{
-			begin = qMax(0, indexes[0] == "" ? 0 : indexes[0].toInt()) ;
-			end   = qMax(begin, indexes[1] == "" ? int(INFINITY) : indexes[1].toInt()) ;
-			inc   = qBound(1, indexes.size() > 2 && indexes[2] != "" ? indexes[2].toInt() : 1, end-begin) ;
-			qDebug() << "RANGE" << begin << end << inc ;
-		}
+		qDebug() << "RANGESTRINGS" << indexes ;
+		begin = qMax(0, indexes[0] == "" ? 0 : indexes[0].toInt()) ;
+		end   = qMax(begin, indexes.size()==1 ? begin + 1
+								:(indexes[1] == "" ? int(INFINITY) : indexes[1].toInt())) ;
+		inc   = qBound(1, indexes.size() > 2 && indexes[2] != "" ? indexes[2].toInt() : 1, end-begin) ;
+		qDebug() << "RANGE" << begin << end << inc ;
 	}
 
 	// setting the mode of operation (consider using virtual functions/subclassing)
@@ -63,7 +54,6 @@ specMetaVariable::specMetaVariable(QString init)
 	{
 		mode = descString[0] ;
 		qDebug() << "CHECKING mode" << mode << descString ;
-		array = (mode == 'x' || mode == 'y') ; // consider making a function inspecting mode
 	}
 
 	// setup the interval
@@ -74,21 +64,9 @@ specMetaVariable::specMetaVariable(QString init)
 	valid = true ; // ????
 }
 
-bool specMetaVariable::completeRange() const
-{
-	return all ;
-}
-
 bool specMetaVariable::setRange(int &start, int &finish, int &step, int max) const
 {
 	qDebug() << "RANGE: " << begin << end << inc ;
-	if (single)
-	{
-		start = qBound(0,begin,max) ;
-		finish= start+1 ;
-		step  = 1 ;
-		return true ;
-	}
 	start  = qBound(0,begin,max) ;
 	finish = qBound(start,end,max) ;
 	step   = qBound(1, inc, finish-start) ;
@@ -97,20 +75,21 @@ bool specMetaVariable::setRange(int &start, int &finish, int &step, int max) con
 
 bool specMetaVariable::xValues(specModelItem *item, QVector<double> & xvals) const // false if vector was empty
 {
-	qDebug() << "ARRAY" << array << xvals.isEmpty()  ;
-	if (!array)
+	if (mode != 'x' && mode != 'y') // TODO via interval.invalid()
 		return true ;
 	item->refreshPlotData();
 	qDebug() << "DATASIZE" << item->dataSize() << "RANGE" << interval.minValue() << interval.maxValue();
-	if (xvals.isEmpty())
+	if (xvals.size() == 1 && xvals[0] == NAN)
 	{
 		double value ;
+		xvals.clear();
 		for (int i = 0 ; i < item->dataSize() ; ++i)
 			if (interval.contains(value = item->data()->sample(i).x()))
 				xvals << value ;
 		return false ;
 	}
 
+	qDebug() << "xvals" << xvals ;
 	QVector<double> newXVals ;
 	foreach(double value, xvals) // TODO:  quick compare if same size
 	{

@@ -46,6 +46,8 @@ void tst_specMetaVariable::setRange_data()
 	QTest::addColumn<int>("inc");
 	QTest::newRow("every_other") << QString("[::2]i1600:1700") << 0 << 10 << 2;
 	QTest::newRow("odd_other") << QString("[1:5:2]i1600:1700") << 1 << 5 << 2;
+	QTest::newRow("all") << QString("i1600:1700") << 0 << 10 << 1;
+	QTest::newRow("single") << QString("[3]i1600:1700") << 3 << 4 << 1;
 }
 
 
@@ -70,9 +72,9 @@ void tst_specMetaVariable::xValues_data()
 	QTest::addColumn<bool>("returns") ;
 
 	QTest::newRow("initiate") << "[::2]x1600:1700"
-				  << QVector<double>()
+				  << QVector<double>(1,NAN)
 				  << (QVector<double>() << 1620 << 1650 << 1680)
-				  << false ;
+				  << true ;
 	QTest::newRow("single") << "[::2]x1600:1700"
 				<< (QVector<double>() << 1500 << 1650 << 1700)
 				<< (QVector<double>() << 1650)

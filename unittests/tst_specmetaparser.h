@@ -19,11 +19,11 @@ private Q_SLOTS:
 	void init() ;
 	void cleanup() ;
 
-	void warnings() ;
-	void warnings_data() ;
-
 	void ok() ;
 	void ok_data() ;
+
+	void warnings() ;
+	void warnings_data() ;
 
 	void evaluate() ;
 	void evaluate_data() ;
