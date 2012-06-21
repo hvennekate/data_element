@@ -7,7 +7,7 @@
 class specMetaVariable
 {
 	int begin, end, inc ;
-	bool valid, all, single, array ;
+	bool valid ;
 	QChar mode ;
 	QString descriptor ;
 	QwtInterval interval ;
@@ -17,7 +17,6 @@ public:
 	bool xValues(specModelItem*, QVector<double>&) const;
 	QVector<double> values(specModelItem*, const QVector<double>&) const ;
 	bool setRange(int& begin, int& end, int& increment, int max) const;
-	bool completeRange() const ;
 };
 
 #endif // SPECMETAVARIABLE_H

@@ -17,6 +17,7 @@ void specMetaParser::clear()
 
 void specMetaParser::setAssignments(const QString &expressionList, const QString& xExpression, const QString& yExpression)
 {
+	valid = true ;
 	const QRegExp name("[a-zA-Z][a-zA-Z0-9]*") ;
 	clear() ;
 	// Syntax:
@@ -34,11 +35,20 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 	//  x-Werte pruefen, matchen.
 	//
 	//  Dann x, y auswerten.
-	const QRegExp acceptable("(\\[[0-9]*(:[0-9]?(:[0-9]?)?)?\\])?"
-				 "(\\\"[^\\\"]*\\\"|"
+	qDebug() << "REGEXP" << "(\\[[0-9]*(:[0-9]*(:[0-9]*)?)?\\])?"
+				"(\"[^\"]*\"|"
+				"((x|y|i|u|l)"
+				"([+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][0-9]+)?)?:"
+				"([+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][0-9]+)?)?)" ;
+	const QRegExp acceptable(//"(\\[[0-9]*(:[0-9]*(:[0-9]*)?)?\\])?"
+				 "(\"[^\"]*\"|"
 				 "((x|y|i|u|l)"
-				 "([+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][0-9]+)?)?:"
-				 "([+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][0-9]+)?)?)") ;
+				 "("
+				 "(([+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?"
+				 "(:[+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?)|"
+				 "(([+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?:)?"
+				 "([+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?))"
+				 "))") ;
 	const QRegExp assignment(" *= *") ;
 	QStringList expressions = expressionList.split("\n") ;
 	errors.clear();
@@ -54,16 +64,18 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 		if (!name.exactMatch(symbol))
 		{
 			errors << QString("Not an acceptable variable name:  %1").arg(symbol) ;
+			valid = false ;
 			continue ;
 		}
 		if (!acceptable.exactMatch(value))
 		{
 			errors << QString("Not an acceptable value:  %1").arg(value) ;
+			valid = false ;
+			continue ;
 		}
 		symbols.append(GiNaC::symbol(symbol.toStdString())) ;
 		evaluators << new specMetaVariable(value) ;
 	}
-	valid = true ;
 	x = prepare(xExpression) ;
 	y = prepare(yExpression) ;
 }
@@ -74,18 +86,20 @@ QwtSeriesData<QPointF>* specMetaParser::evaluate(const QVector<specModelItem*>& 
 	QVector<QVector<int> > indexes(evaluators.size(),QVector<int>(3));
 	for (int i = 0 ; i < evaluators.size() ; ++i)
 		evaluators[i]->setRange(indexes[i][0], indexes[i][1], indexes[i][2], items.size()) ; // TODO do it over
+	qDebug() << "RANGES:"<< indexes ;
 	int j = 0 ;
 	while (true)
 	{
 		QVector<specModelItem*> currentItems ;
 		QVector<double> xValues(1,NAN) ; // start value in case no arrays are among our variables
+		qDebug() << "XVALUES parent" << xValues ;
 		bool filled = false;
 		for(int i = 0 ; i < indexes.size() ; ++i)
 		{
 			// check for exhaustion
 			int index = indexes[i][0]+indexes[i][2]*j ;
 			currentItems << (index > indexes[i][1] ? 0 : items[index]) ;
-			if (evaluators[i]->xValues(items[index],xValues))
+			if (!(evaluators[i]->xValues(items[index],xValues)))
 				if (filled) // Don't fill it twice! (conflicting selections)
 					break ;
 
