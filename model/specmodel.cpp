@@ -428,7 +428,6 @@ bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int 
 	// Check for possible new column headers
 	QTime timer ;
 	timer.start();
-	qDebug("checking new col headers") ;
 	for (QList<specModelItem*>::size_type i = 0 ; i < list.size() ; i++)
 	{
 		for (QStringList::size_type j = 0 ; j < list[i]->descriptorKeys().size() ; j++)
@@ -446,7 +445,7 @@ bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int 
 	qDebug("inserting %d",timer.restart()) ;
 	emit layoutAboutToBeChanged() ;
 	beginInsertRows(parent, row, row+list.size()-1);
-	qDebug("assigning to folder %d", timer.restart()) ;
+	qDebug("assigning to folder %d amount: %d", timer.restart(), list.size()) ;
 	if (itemPointer(parent)->isFolder())
 		((specFolderItem*) itemPointer(parent))->haltRefreshes(true) ;
 	bool retVal = itemPointer(parent)->addChildren(list,row) ;

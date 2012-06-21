@@ -191,7 +191,7 @@ QVector<double> specModelItem::intensityData()
 	return QVector<double>() ;
 }
 
-bool specModelItem::connectClient(specModelItem *clnt)
+bool specModelItem::connectClient(specMetaItem *clnt)
 {
 	if (clients.contains(clnt))
 		return false ;
@@ -203,7 +203,7 @@ bool specModelItem::connectClient(specModelItem *clnt)
 	return true ;
 }
 
-bool specModelItem::disconnectClient(specModelItem *clnt) // TODO template
+bool specModelItem::disconnectClient(specMetaItem *clnt) // TODO template
 {
 	if (!clients.contains(clnt))
 		return false ;
@@ -226,14 +226,12 @@ void specModelItem::revalidate()
 	refreshPlotData();
 }
 
-bool specModelItem::shortCircuit(specMetaItem *server)
+bool specModelItem::shortCircuit(specModelItem *server)
 {
-	if (clients.contains(server))
-		return true ;
-	bool sc = false ;
+	if (server == this) return true ;
 	foreach(specMetaItem* client, clients)
-		sc = sc || client->shortCircuit(server) ;
-	return sc ;
+		if (client->shortCircuit(server)) return true ;
+	return false;
 }
 
 bool specModelItem::connectServer(specModelItem *itm)
