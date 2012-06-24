@@ -28,9 +28,10 @@ private:
 	specFolderItem* iparent ;
 	void detachChild(specModelItem* child) ;
 	bool dataValid ;
-	QList<specMetaItem*> clients ;
+	QSet<specMetaItem*> clients ;
 protected:
 	void processData(QVector<double>&, QVector<double>&) const ;
+	QwtSeriesData<QPointF>* processData(QwtSeriesData<QPointF>* dat) const;
 	// selectedPoints (3 Punkte fuer Korrekturen)
 	virtual bool shortCircuit(specModelItem* server) ;
 	virtual QDataStream& readFromStream(QDataStream&) =0 ;

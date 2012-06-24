@@ -11,7 +11,7 @@ class specMetaFilter ;
 class specMetaItem : public specModelItem
 {
 private:
-	QList<specModelItem*> items ;
+	QSet<specModelItem*> items ;
 	specMetaParser filter ;
 	QHash<QString,specDescriptor> variables ;
 	specPlot *itemPlot() ;
@@ -24,7 +24,6 @@ protected:
 public:
 	bool disconnectServer(specModelItem*) ;
 	bool connectServer(specModelItem*) ;
-	void revalidate() ;
 	explicit specMetaItem(specFolderItem* par=0, QString description="");
 	QList<specModelItem*> purgeConnections() ;
 //	specMetaParser *takeFilter() ; // TODO obsolete

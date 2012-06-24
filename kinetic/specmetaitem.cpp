@@ -10,9 +10,9 @@ specMetaItem::specMetaItem(specFolderItem *par, QString description)
 
 specPlot *specMetaItem::itemPlot()
 {
-	for (int i = 0 ; i < items.size() ; ++i)
-		if (items[i]->plot())
-			return ((specPlot*) (items[i]->plot())) ;
+	foreach(specModelItem* item, items)
+		if (item->plot())
+			return ((specPlot*) item->plot()) ;
 	return 0 ;
 }
 
@@ -28,9 +28,10 @@ QDataStream &specMetaItem::readFromStream(QDataStream &in)
 
 QList<specModelItem*> specMetaItem::purgeConnections()
 {
-	QList<specModelItem*> list = items ;
-	while(!items.isEmpty())
-		items.takeLast()->disconnectClient(this) ;
+	QList<specModelItem*> list = items.toList() ;
+	foreach(specModelItem* item, items)
+		item->disconnectClient(this) ;
+	items.clear();
 	invalidate() ;
 	return list ;
 }
@@ -48,7 +49,7 @@ bool specMetaItem::disconnectServer(specModelItem *server) // TODO template ? ->
 		return false ;
 	}
 	currentlyConnectingServer = 0 ;
-	items.removeOne(server) ;
+	items.remove(server) ;
 	invalidate() ;
 	return true ;
 }
@@ -101,19 +102,13 @@ void specMetaItem::attach(QwtPlot *plot)
 	specModelItem::attach(plot) ;
 }
 
-void specMetaItem::revalidate()
-{
-	qDebug() << "revalidating meta item" ;
-	refreshPlotData();
-}
-
 void specMetaItem::refreshPointers(const QHash<specModelItem *, specModelItem *> &mapping)
 {// TODO this could be problematic with 32bit vs. 64bit systems...
 	invalidate() ;
-	QList<specModelItem*> newPointers ;
+	QSet<specModelItem*> newPointers ;
 	foreach(specModelItem* pointer, items)
 		newPointers << mapping[pointer] ;
-	newPointers.removeAll(0) ;
+	newPointers.remove(0) ;
 	items = newPointers ;
 }
 
@@ -128,11 +123,11 @@ void specMetaItem::refreshPlotData()
 	foreach(specModelItem *item, items)
 		item->revalidate();
 	filter.setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
-	setData(filter.evaluate(items.toVector())) ; // TODO use vector
+	setData(processData(filter.evaluate(items.toList().toVector()))) ; // TODO use vector
 	variables["errors"] = filter.warnings() ;
 	qDebug() << "Filter data size:" << dataSize() ;
 	for (int i = 0 ; i < dataSize() ; ++i)
-		qDebug() << "Filter data:" << sample(i).toPoint() ;
+		qDebug() << "Filter data:" << sample(i) ;
 }
 
 //QStringList specMetaItem::internalDescriptors() const

@@ -27,7 +27,7 @@ bool specFolderItem::addChildren(QList<specModelItem*> list, QList<specModelItem
 		list[i]->setParent(this) ;
 		childrenList.insert(position+i, list[i]) ;
 	}
-	invalidate(); ;
+	invalidate();
 	return true ;
 }
 	
@@ -81,15 +81,16 @@ void specFolderItem::refreshPlotData()
 	}
 	qDebug("got data %d", timer.restart()) ;
 	processData(x,y) ;
-	qDebug("processed data %d", timer.restart()) ;
+//	qDebug("processed data %d", timer.restart()) ;
 	setSamples(x,y) ;
-	qDebug("set samples %d",timer.restart()) ;
+//	qDebug("set samples %d",timer.restart()) ;
+//	processData() ;
 }
 
 void specFolderItem::removeChild(specModelItem* child)
 {
 	childrenList.removeAt(childrenList.indexOf(child)) ;
-	invalidate(); ; ///! @todo move this to view/plotwidget (suspend frequent refreshes) -- maybe removeChildren instead
+	invalidate();///! @todo move this to view/plotwidget (suspend frequent refreshes) -- maybe removeChildren instead
 }
 
 QDataStream& specFolderItem::readFromStream(QDataStream& stream)
@@ -175,7 +176,7 @@ void specFolderItem::buildTree(QStringList descriptors)
 	// Maybe the remaining criteria are usable for some tree-building...
 	buildTree(descriptors) ;
 	suspendRefresh = false ;
-	invalidate(); ;
+	invalidate();
 }
 
 specModelItem* specFolderItem::child(QList<specModelItem*>::size_type i) const

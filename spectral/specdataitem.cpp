@@ -165,6 +165,7 @@ void specDataItem::refreshPlotData()
 	QVector<double> x=filter.wnums(spectralData), y=filter.ints(spectralData);
 	processData(x,y) ;
 	setSamples(x,y) ;
+//	processData() ;
 }
 
 specDataItem::specDataItem(const specDataItem &other)
