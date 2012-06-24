@@ -14,7 +14,7 @@
 // TODO solve the myth of autoscaleaxis...
 
 specPlot::specPlot(QWidget *parent)
-	: canBeSelected(NULL), QwtPlot(parent), select(false)
+	: canBeSelected(NULL), QwtPlot(parent), select(false), replotting(false)
 {
 	setAutoReplot(false) ;
 	zoom  = new specZoomer(this->canvas()) ;
@@ -128,6 +128,8 @@ void specPlot::changeYLabel(QString newTitle)
 
 void specPlot::replot()
 {
+	if (replotting) return ;
+	replotting = true ;
 	QwtPlotItemList allItems = itemList();
 	ranges->clear() ;
 	ordinary->clear() ;
@@ -149,6 +151,7 @@ void specPlot::replot()
 	if (allItems.isEmpty())
 	{
 		QwtPlot::replot() ;
+		replotting = false ;
 		return ;
 	}
 	
@@ -208,6 +211,7 @@ void specPlot::replot()
 
 	qDebug() << "----- replotting" << this ;
 	QwtPlot::replot() ;
+	replotting = false ;
 }
 
 specPlot::~specPlot()

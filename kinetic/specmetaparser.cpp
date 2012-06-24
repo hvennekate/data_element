@@ -98,7 +98,6 @@ QwtSeriesData<QPointF>* specMetaParser::evaluate(const QVector<specModelItem*>& 
 		evaluators[i]->setRange(indexes[i][0], indexes[i][1], indexes[i][2], items.size()) ; // TODO do it over
 	qDebug() << "RANGES:"<< indexes ;
 	int j = 0 ;
-	bool rangeExhausted = false ;
 	while (true)
 	{
 		qDebug() << "starting loop" ;
@@ -113,39 +112,37 @@ QwtSeriesData<QPointF>* specMetaParser::evaluate(const QVector<specModelItem*>& 
 			// check for exhaustion
 			int index = indexes[i][0]+indexes[i][2]*j ;
 			qDebug() << "current index" << index << items.size() ;
-			if (!(index < indexes[i][1]))
-			{
-				rangeExhausted = true ;
-				break ;
-			}
+			if (!(index < indexes[i][1])) break ;
 			currentItems << items[index] ;
 			evaluators[i]->xValues(items[index],xValues) ;
 		}
-		if (rangeExhausted) break ; // termination for while loop
+		if (currentItems.size() != indexes.size()) break ; // termination for while loop
 
 		qDebug() << "filling substitution list" << evaluators.size() << xValues.size() ;
-		QVector<GiNaC::exmap> substitutions(xValues.size()) ;
-//		QVector<GiNaC::lst> substitutions(xValues.size()) ;
+		QVector<QVector<double> > substitutions(xValues.size(),QVector<double>(evaluators.size())) ;
 		for(int i = 0 ; i < evaluators.size() ; ++i)
 		{
 			QVector<double> values = evaluators[i]->values(currentItems[i],xValues) ;
 			qDebug() << "VALUES:" << values << i << evaluators.size() ;
 			for (int k = 0 ; k < values.size() ; ++k)
-				substitutions[k][symbols[i]] = values[k] ;
+				substitutions[k][i] = values[k] ; // Matrix kippen...
 		}
 
 		qDebug() << "evaluating" ;
 		for (int i = 0 ; i < substitutions.size() ; ++i)
 		{
-//			GiNaC::ex xEx = GiNaC::evalf(x.subs(symbols,substitutions[i], GiNaC::subs_options::no_pattern)),
-//					yEx = GiNaC::evalf(y.subs(symbols,substitutions[i], GiNaC::subs_options::no_pattern)) ;
-			GiNaC::ex xEx = GiNaC::evalf(x.subs(substitutions[i], GiNaC::subs_options::no_pattern)),
-					yEx = GiNaC::evalf(y.subs(substitutions[i], GiNaC::subs_options::no_pattern)) ;
-			qDebug() << "Evaluating GiNaC" <<GiNaC::is_a<GiNaC::symbol>(x) << GiNaC::is_a<GiNaC::numeric>(xEx) << xEx.return_type() ;
-			x.dbgprint();
-			xEx.dbgprint();
-			std::cerr << "substitutions:" << substitutions[i] <<"\n" ;
-			std::cerr << "x-Expression: " << xEx << "\ny-Expression: " << yEx << "\n" ;
+			if (containsNan(substitutions[i]))
+			{
+				data << QPointF(NAN, NAN) ;
+				continue ;
+			}
+			GiNaC::exmap substitution ;
+			qDebug() << "substitution:" << substitutions[i] ;
+			for (int k = 0 ; k < substitutions[i].size() ; ++k)
+				substitution[symbols[k]] = substitutions[i][k] ;
+
+			GiNaC::ex xEx = GiNaC::evalf(x.subs(substitution, GiNaC::subs_options::no_pattern)),
+					yEx = GiNaC::evalf(y.subs(substitution, GiNaC::subs_options::no_pattern)) ;
 			if (GiNaC::is_a<GiNaC::numeric>(xEx) && GiNaC::is_a<GiNaC::numeric>(yEx))
 			{
 				qDebug() << "Success" ;
@@ -153,9 +150,7 @@ QwtSeriesData<QPointF>* specMetaParser::evaluate(const QVector<specModelItem*>& 
 					GiNaC::ex_to<GiNaC::numeric>(yEx).to_double()) ;
 			}
 		}
-		qDebug() << "done";
 		++j ;
-		qDebug() << "incremented" << substitutions.size() << data.size() ;
 	}
 	qDebug() << "data size before returning:" << data.size() << data ;
 	return new QwtPointSeriesData(data) ;
@@ -193,4 +188,12 @@ GiNaC::ex specMetaParser::prepare(const QString &val)
 		valid = false ;
 	}
 	return  retVal ;
+}
+
+bool specMetaParser::containsNan(const QVector<double> &vector)
+{
+	foreach(double zahl, vector)
+		if (isnan(zahl))
+			return true ;
+	return false ;
 }

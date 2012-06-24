@@ -47,7 +47,7 @@ void specManageConnectionsCommand::restore()
 	specMetaItem* client = targetPointer() ;
 	qDebug() << "got target" << client ;
 	foreach(specModelItem *pointer, pointers)
-		pointer->connectClient(client) ; // TODO consider removal from list if false is returned.
+		client->connectServer(pointer); // TODO consider removal from list if false is returned.
 	qDebug() << "done." ;
 }
 

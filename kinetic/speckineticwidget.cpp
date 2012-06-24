@@ -75,7 +75,7 @@ void specKineticWidget::selectionChanged(const QItemSelection & selected, const 
 	foreach(QModelIndex index, selected.indexes())
 		if (!index.column() && !((specModelItem*) index.internalPointer())->isFolder())
 			((specCanvasItem*) index.internalPointer())->attach(plot) ;
-	
+	qDebug() << "Kinetic selection changed" ;
 	plot->replot() ;
 }
 

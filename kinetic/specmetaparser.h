@@ -19,6 +19,7 @@ private:
 	GiNaC::ex x, y ;
 	QString xExp, yExp ;
 	void clear() ;
+	bool containsNan(const QVector<double>&) ;
 public:
 	specMetaParser(const QString &expressionList, const QString& xExpression, const QString& yExpression);
 	QString warnings() const ;

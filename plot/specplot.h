@@ -14,6 +14,7 @@ class specPlot : public QwtPlot
 {
 	Q_OBJECT
 private:
+	bool replotting ;
 	QList<specCanvasItem*>* canBeSelected ;
 	QList<specCanvasItem*>* ranges ;
 	QList<specCanvasItem*>* ordinary ;

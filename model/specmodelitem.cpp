@@ -9,6 +9,7 @@
 #include <QTime>
 #include <QDebug>
 #include "kinetic/specmetaitem.h"
+#include "utility-functions.h"
 
 specModelItem::specModelItem(specFolderItem* par, QString description)
 	: specCanvasItem(description), iparent(0), mergePlotData(true), sortPlotData(true)
@@ -102,6 +103,37 @@ void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 		x = xt ;// TODO simply swap the vectors!!!
 		y = yt ;
 	}
+}
+
+QwtSeriesData<QPointF>* specModelItem::processData(QwtSeriesData<QPointF>* dat) const
+{
+	if (!sortPlotData && !mergePlotData)
+		return dat ;
+	QVector<QPointF> newData(dat->size()) ;
+	for(int i = 0 ; i < dat->size() ; ++i)
+		newData[i] = dat->sample(i) ; // TODO quicker!
+	if (sortPlotData)
+		qSort(newData.begin(), newData.end(), comparePoints) ;
+
+	QwtSeriesData<QPointF>* retVal = dat ;
+	typedef QVector<QPointF>::const_iterator vecit ;
+	if (mergePlotData)
+	{
+		QVector<QPointF> realData ;
+		for(vecit i = newData.begin() ; i != newData.end() ; ++i)
+		{
+			double x = i->x(), y = i->y() ;
+			vecit j ;
+			for (j = i+1 ; j != newData.end() && j->x() == x; ++j)
+				y += j->y() ;
+			realData << QPointF(x,y/(j-i)) ; // TODO: Unit test!
+		}
+		retVal = new QwtPointSeriesData(realData) ;
+	}
+	else
+		retVal = new QwtPointSeriesData(newData);
+	delete dat ;
+	return retVal ;
 }
 
 QString specModelItem::descriptor(const QString &key, bool full) const
@@ -209,8 +241,7 @@ bool specModelItem::disconnectClient(specMetaItem *clnt) // TODO template
 		return false ;
 	if (!clnt->disconnectServer(this))
 		return false ;
-	clients.removeOne(clnt) ;
-	return true ;
+	return clients.remove(clnt) ;
 }
 
 void specModelItem::invalidate()
@@ -224,6 +255,7 @@ void specModelItem::revalidate()
 {
 	if (dataValid) return ;
 	refreshPlotData();
+	dataValid = true ;
 }
 
 bool specModelItem::shortCircuit(specModelItem *server)
