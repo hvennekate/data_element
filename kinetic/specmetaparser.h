@@ -17,6 +17,7 @@ private:
 	QList<specMetaVariable*> evaluators ;
 	GiNaC::ex prepare(const QString&) ;
 	GiNaC::ex x, y ;
+	QString xExp, yExp ;
 	void clear() ;
 public:
 	specMetaParser(const QString &expressionList, const QString& xExpression, const QString& yExpression);

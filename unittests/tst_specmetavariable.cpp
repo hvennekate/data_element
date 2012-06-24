@@ -74,7 +74,7 @@ void tst_specMetaVariable::xValues_data()
 	QTest::newRow("initiate") << "[::2]x1600:1700"
 				  << QVector<double>(1,NAN)
 				  << (QVector<double>() << 1620 << 1650 << 1680)
-				  << true ;
+				  << false ;
 	QTest::newRow("single") << "[::2]x1600:1700"
 				<< (QVector<double>() << 1500 << 1650 << 1700)
 				<< (QVector<double>() << 1650)

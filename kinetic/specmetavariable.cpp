@@ -79,7 +79,7 @@ bool specMetaVariable::xValues(specModelItem *item, QVector<double> & xvals) con
 		return true ;
 	item->refreshPlotData();
 	qDebug() << "DATASIZE" << item->dataSize() << "RANGE" << interval.minValue() << interval.maxValue();
-	if (xvals.size() == 1 && xvals[0] == NAN)
+	if (xvals.size() == 1 && isnan(xvals[0]))
 	{
 		double value ;
 		xvals.clear();
@@ -89,7 +89,7 @@ bool specMetaVariable::xValues(specModelItem *item, QVector<double> & xvals) con
 		return false ;
 	}
 
-	qDebug() << "xvals" << xvals ;
+	qDebug() << "xvals" << xvals << xvals.size() << (isnan(xvals[0]));
 	QVector<double> newXVals ;
 	foreach(double value, xvals) // TODO:  quick compare if same size
 	{
@@ -113,12 +113,16 @@ QVector<double> specMetaVariable::values(specModelItem* item, const QVector<doub
 {
 	// No range checking!!
 	if (mode == 'd')
+	{
+		qDebug() << "Evaluating descriptor" << item->descriptor(descriptor) << item->descriptor(descriptor).toDouble() ;
 		return QVector<double>(xvals.size(), item->descriptor(descriptor).toDouble()) ;
+	}
 	if (mode == 'x') // assuming this has been checked...
 		return xvals ;
 
 	QVector<QPointF> points ;
 	QPointF point ;
+
 	for(int i = 0 ; i < item->dataSize() ; ++i)
 		if (xvals.contains((point = item->sample(i)).x()))
 			points << point ;
@@ -131,6 +135,10 @@ QVector<double> specMetaVariable::values(specModelItem* item, const QVector<doub
 			retVal << point.y() ;
 		return retVal ;
 	}
+	for (int i = 0 ; i < item->dataSize() ; ++i)
+		if (interval.contains((point = item->sample(i)).x()))
+			points << point ;
+
 	double r = 0 ;
 	if (mode == 'u')
 	{

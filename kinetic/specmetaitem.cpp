@@ -3,7 +3,7 @@
 
 specMetaItem::specMetaItem(specFolderItem *par, QString description)
 	: specModelItem(par,description),
-	  filter(0),
+	  filter("","",""),
 	  currentlyConnectingServer(0)
 {
 }
@@ -75,29 +75,29 @@ bool specMetaItem::connectServer(specModelItem *server)
 	return true ;
 }
 
-specMetaFilter *specMetaItem::takeFilter()
-{
-	specMetaFilter *oldFilter = filter ;
-	filter = 0 ;
-	invalidate() ;
-	return oldFilter ;
-}
+//specMetaParser *specMetaItem::takeFilter()
+//{
+//	specMetaParser *oldFilter = filter ;
+//	filter = 0 ;
+//	invalidate() ;
+//	return oldFilter ;
+//}
 
-void specMetaItem::setFilter(specMetaFilter *newFilter)
-{
-	filter = newFilter ;
-	invalidate() ;
-}
+//void specMetaItem::setFilter(specMetaFilter *newFilter)
+//{
+//	filter = newFilter ;
+//	invalidate() ;
+//}
 
 void specMetaItem::attach(QwtPlot *plot)
 {
 	specPlot *otherPlot = itemPlot() ;
-	if (otherPlot && filter)
-	{
-		QList<specCanvasItem*> otherItems = filter->plotIndicators() ;
-		foreach(specCanvasItem* item, otherItems)
-			item->attach(otherPlot) ;
-	}
+//	if (otherPlot && filter)
+//	{
+//		QList<specCanvasItem*> otherItems = filter->plotIndicators() ;
+//		foreach(specCanvasItem* item, otherItems)
+//			item->attach(otherPlot) ;
+//	}
 	specModelItem::attach(plot) ;
 }
 
@@ -119,50 +119,68 @@ void specMetaItem::refreshPointers(const QHash<specModelItem *, specModelItem *>
 
 void specMetaItem::refreshPlotData()
 {
-	if (!filter)
-	{
-		setData(0); // TODO is this allowed?
-		return ;
-	}
+//	if (!filter)
+//	{
+//		setData(0); // TODO is this allowed?
+//		return ;
+//	}
 	// TODO do some more checks on valid items etc.
 	foreach(specModelItem *item, items)
 		item->revalidate();
-	setData(filter->data(items)) ;
+	filter.setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
+	setData(filter.evaluate(items.toVector())) ; // TODO use vector
+	variables["errors"] = filter.warnings() ;
 	qDebug() << "Filter data size:" << dataSize() ;
 	for (int i = 0 ; i < dataSize() ; ++i)
 		qDebug() << "Filter data:" << sample(i).toPoint() ;
 }
 
-QStringList specMetaItem::internalDescriptors() const
-{
-	if (!filter) return QStringList() ;
-	return filter->variables() ;
-}
+//QStringList specMetaItem::internalDescriptors() const
+//{
+//	if (!filter) return QStringList() ;
+//	return filter->variables() ;
+//}
 
-int specMetaItem::descriptorIndex(const QString& Descriptor) const
-{
-	return internalDescriptors().indexOf(Descriptor) ;
-}
+//int specMetaItem::descriptorIndex(const QString& Descriptor) const
+//{
+//	return internalDescriptors().indexOf(Descriptor) ;
+//}
 
 QStringList specMetaItem::descriptorKeys() const
 {
 	QStringList keys = specModelItem::descriptorKeys() ;
-	keys << internalDescriptors() ;
+//	keys << internalDescriptors() ;
+	keys << "variables" << "x" << "y" << "errors" ;
 	return keys ;
 }
 
 QString specMetaItem::descriptor(const QString &key, bool full) const
 {
-	int pos = descriptorIndex(key) ;
-	if (pos < 0) return QString() ;
-	qDebug() << "descriptor sizes:" << descriptorKeys() << filter->variableValues() ;
-	return filter->variableValues().at(pos) ;
+	if (key == "") return specModelItem::descriptor(key,full) ;
+	return variables[key].content(full) ;
+//	if (key == "variables")
+//	int pos = descriptorIndex(key) ;
+//	if (pos < 0) return QString() ;
+//	qDebug() << "descriptor sizes:" << descriptorKeys() << filter->variableValues() ;
+//	return filter->variableValues().at(pos) ;
 }
 
 bool specMetaItem::changeDescriptor(QString key, QString value)
 {
-	int pos = descriptorIndex(key) ;
-	if (pos < 0) return false ;
-	filter->setVariableValue(value,pos) ;
+	if (key == "") return specModelItem::changeDescriptor(key,value) ;
+	if (!descriptorKeys().contains(key)) return false ;
+	variables[key] = value ;
+	refreshPlotData(); // TODO actually just invalidate
 	return true ;
+//	int pos = descriptorIndex(key) ;
+//	if (pos < 0) return false ;
+//	filter->setVariableValue(value,pos) ;
+//	return true ;
 }
+
+spec::descriptorFlags specMetaItem::descriptorProperties(const QString &key) const
+{
+	if (key == "") return specModelItem::descriptorProperties(key) ;
+	return (key == "errors" ? spec::def : spec::editable) ;
+}
+

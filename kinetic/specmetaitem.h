@@ -2,7 +2,8 @@
 #define SPECMETAITEM_H
 
 #include "specmodelitem.h"
-#include "specmetafilter.h"
+#include "specmetaparser.h"
+#include "model/specdescriptor.h"
 
 class specPlot ;
 class specMetaFilter ;
@@ -11,10 +12,11 @@ class specMetaItem : public specModelItem
 {
 private:
 	QList<specModelItem*> items ;
-	specMetaFilter *filter ;
+	specMetaParser filter ;
+	QHash<QString,specDescriptor> variables ;
 	specPlot *itemPlot() ;
-	QStringList internalDescriptors() const ;
-	int descriptorIndex(const QString&) const ;
+//	QStringList internalDescriptors() const ;
+//	int descriptorIndex(const QString&) const ;
 	specModelItem *currentlyConnectingServer ;
 protected:
 	QDataStream& readFromStream(QDataStream&) ;
@@ -25,14 +27,15 @@ public:
 	void revalidate() ;
 	explicit specMetaItem(specFolderItem* par=0, QString description="");
 	QList<specModelItem*> purgeConnections() ;
-	specMetaFilter *takeFilter() ;
-	void setFilter(specMetaFilter*) ;
+//	specMetaParser *takeFilter() ; // TODO obsolete
+//	void setFilter(specMetaParser*) ; // TODO obsolete
 	void attach(QwtPlot *plot) ;
 	void refreshPointers(const QHash<specModelItem*,specModelItem*>& mapping) ;
 	void refreshPlotData();
 	QStringList descriptorKeys() const ;
 	QString descriptor(const QString &key, bool full=false) const ;
 	bool changeDescriptor(QString key, QString value) ; // TODO add changeDescriptor(key,specDescriptor)
+	spec::descriptorFlags descriptorProperties(const QString& key) const ;
 };
 
 /* TODO in other classes
