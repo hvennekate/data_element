@@ -52,7 +52,7 @@ bool specModelItem::isEditable(QString key) const
 {
 	if (key == "")
 		return true ;
-	return false ;
+	return descriptorProperties(key) & spec::editable ;
 }
 
 bool specModelItem::changeDescriptor(QString key, QString value)

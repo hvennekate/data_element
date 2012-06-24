@@ -12,7 +12,7 @@ void tst_specMetaParser::init()
 
 	QList<specDataPoint> data ;
 	for (int i = 1500 ; i < 2000 ; i += 30)
-		data << specDataPoint(42, i, sqrt(i), 1000) ;
+		data << specDataPoint(42, i, i/10, 1000) ;
 
 	testItems << new specDataItem(data, description) << new specDataItem(data, description);
 
@@ -53,12 +53,14 @@ void tst_specMetaParser::evaluate_data()
 
 	double integral = 15.*(162+2.*165+168) ;
 	QTest::newRow("simple") << "x = x1600:1700\ny = i1600:1700" << "x" << "y" <<
-							(QVector<QPointF>() << QPointF(1620,integral)
-												<< QPointF(1650,integral)
-												<< QPointF(1680,integral)
-												<< QPointF(1620,integral)
-												<< QPointF(1650,integral)
-												<< QPointF(1680,integral));
+				   (QVector<QPointF>() << QPointF(1620,integral)
+				    << QPointF(1650,integral)
+				    << QPointF(1680,integral)
+				    << QPointF(1620,integral)
+				    << QPointF(1650,integral)
+				    << QPointF(1680,integral));
+	QTest::newRow("Descriptors") << "x = \"Zeit\"\ny = \"Zeit\"" << "x" << "y" <<
+				   QVector<QPointF>(2,QPointF(42,42));
 }
 
 void tst_specMetaParser::ok()
