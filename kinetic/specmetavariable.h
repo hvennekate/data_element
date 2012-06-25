@@ -4,10 +4,9 @@
 #include "model/specmodelitem.h"
 #include <qwt_interval.h>
 
-class specMetaVariable
+class specMetaVariable : QwtInterval
 {
 	int begin, end, inc ;
-	QwtInterval interval ;
 	QString extract(QString&, const QRegExp&) const ;
 protected:
 	virtual double processPoints(QVector<QPointF>& points) const { return 0 ;}

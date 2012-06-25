@@ -59,10 +59,10 @@ static specMetaVariable* specMetaVariable::factory(QString)
 }
 
 specMetaVariable::specMetaVariable(QString init)
-	: begin(0),
+	: QwtInterval(-INFINITY,INFINITY,QwtInterval::IncludeBorders),
+	  begin(0),
 	  end(int(INFINITY)),
 	  inc(1),
-	  interval(-INFINITY,INFINITY,QwtInterval::IncludeBorders),
 	  descriptor("")
 {}
 
