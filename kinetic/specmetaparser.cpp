@@ -95,7 +95,7 @@ QwtSeriesData<QPointF>* specMetaParser::evaluate(const QVector<specModelItem*>& 
 	QVector<QPointF> data ;
 	QVector<QVector<int> > indexes(evaluators.size(),QVector<int>(3));
 	for (int i = 0 ; i < evaluators.size() ; ++i)
-		evaluators[i]->setRange(indexes[i][0], indexes[i][1], indexes[i][2], items.size()) ; // TODO do it over
+		evaluators[i]->setIndexRange(indexes[i][0], indexes[i][1], indexes[i][2], items.size()) ; // TODO do it over
 	qDebug() << "RANGES:"<< indexes ;
 	int j = 0 ;
 	while (true)
