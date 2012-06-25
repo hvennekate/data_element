@@ -1,5 +1,11 @@
 #include "specmetavariable.h"
 #include "utility-functions.h"
+#include "specdescriptorvariable.h"
+#include "specminvariable.h"
+#include "specmaxvariable.h"
+#include "specxvariable.h"
+#include "specyvariable.h"
+#include "specintegralvariable.h"
 
 QString specMetaVariable::extract(QString & source, const QRegExp& expression) const
 {
@@ -11,60 +17,56 @@ QString specMetaVariable::extract(QString & source, const QRegExp& expression) c
 	return returnValue ;
 }
 
-specMetaVariable::specMetaVariable(QString init)
-	: begin(0),
-	  end(int(INFINITY)),
-	  inc(1),
-	  valid(false)
+static specMetaVariable* specMetaVariable::factory(QString)
 {
 	const QRegExp rangeExp("(\\[[0-9]*(:[0-9]?(:[0-9]?)?)?\\])"),
 			descriptorExp("(\\\"[^\\\"]*\\\"|" "(x|y|i|u|l))"),
 			number("[+\\-]?([0-9]+|[0-9]*\\.[0-9]+)([eE][+-]?[0-9]+)?");
 	QString range = extract(init, rangeExp) ;
-	qDebug() << "AFTER RANGE EXTR" << init ;
 	QString descString = extract(init, descriptorExp) ;
-	qDebug() << "AFTER DESCRIPTOR EXTR" << init ;
 	QString xlower = extract(init, number) ;
-	qDebug() << "AFTER 1ST NUMBER EXTR" << init << xlower;
 	extract(init, QRegExp(":")) ;
 	QString xupper = extract(init, number) ;
-	qDebug() << "AFTER 2ND NUMBER EXTR" << init ;
 
-	qDebug() << "RANGESTRING" << range ;
+	// setting the mode of operation (consider using virtual functions/subclassing)
+	specMetaVariable *product ;
+	if (descString[0] == '"')
+	{
+		product = new specDescriptorVariable ;
+		descriptor = descString.mid(1, descString.size()-2) ;
+	}
+	if (descString[0] == 'i') product = new specIntegralVariable ;
+	if (descString[0] == 'u') product = new specMaxVariable ;
+	if (descString[0] == 'l') product = new specMinVariable ;
+	if (descString[0] == 'x') product = new specXVariable ;
+	if (descString[0] == 'y') product = new specYVariable;
+
 	if (!range.isEmpty())
 	{
 		//interpret the range
 		QStringList indexes = range.remove("[").remove("]").split(':') ;
-		qDebug() << "RANGEPARTS" << indexes << int(INFINITY);
-		qDebug() << "RANGESTRINGS" << indexes ;
-		begin = qMax(0, indexes[0] == "" ? 0 : indexes[0].toInt()) ;
-		end   = qMax(begin, indexes.size()==1 ? begin + 1
+		product->begin = qMax(0, indexes[0] == "" ? 0 : indexes[0].toInt()) ;
+		product->end   = qMax(begin, indexes.size()==1 ? begin + 1
 								:(indexes[1] == "" ? int(INFINITY) : indexes[1].toInt())) ;
-		inc   = qBound(1, indexes.size() > 2 && indexes[2] != "" ? indexes[2].toInt() : 1, end-begin) ;
-		qDebug() << "RANGE" << begin << end << inc ;
-	}
-
-	// setting the mode of operation (consider using virtual functions/subclassing)
-	if (descString[0] == '"')
-	{
-		descriptor = descString.mid(1, descString.size()-2) ;
-		mode = 'd' ;
-	}
-	else
-	{
-		mode = descString[0] ;
-		qDebug() << "CHECKING mode" << mode << descString ;
+		product->inc   = qBound(1, indexes.size() > 2 && indexes[2] != "" ? indexes[2].toInt() : 1, end-begin) ;
 	}
 
 	// setup the interval
-	interval.setMinValue( xlower.isEmpty() ? -INFINITY : xlower.toDouble()) ;
-	interval.setMaxValue( xupper.isEmpty() ?  INFINITY : xupper.toDouble()) ;
-	interval.setBorderFlags(QwtInterval::IncludeBorders) ;
+	product->interval.setMinValue( xlower.isEmpty() ? -INFINITY : xlower.toDouble()) ;
+	product->interval.setMaxValue( xupper.isEmpty() ?  INFINITY : xupper.toDouble()) ;
 
-	valid = true ; // ????
+	return product ;
 }
 
-bool specMetaVariable::setRange(int &start, int &finish, int &step, int max) const
+specMetaVariable::specMetaVariable(QString init)
+	: begin(0),
+	  end(int(INFINITY)),
+	  inc(1),
+	  interval(-INFINITY,INFINITY,QwtInterval::IncludeBorders),
+	  descriptor("")
+{}
+
+bool specMetaVariable::setIndexRange(int &start, int &finish, int &step, int max) const
 {
 	qDebug() << "RANGE: " << begin << end << inc ;
 	start  = qBound(0,begin,max) ;
@@ -109,60 +111,13 @@ bool specMetaVariable::xValues(specModelItem *item, QVector<double> & xvals) con
 	return true ;
 }
 
-QVector<double> specMetaVariable::values(specModelItem* item, const QVector<double>& xvals) const
+QVector<double> specMetaVariable::values(specModelItem *item, const QVector<double> &xvals) const
 {
-	// No range checking!!
-	if (mode == 'd')
-	{
-		qDebug() << "Evaluating descriptor" << item->descriptor(descriptor) << item->descriptor(descriptor).toDouble() ;
-		return QVector<double>(xvals.size(), item->descriptor(descriptor).toDouble()) ;
-	}
-	if (mode == 'x') // assuming this has been checked...
-		return xvals ;
-
 	QVector<QPointF> points ;
 	QPointF point ;
-
-	if (mode == 'y')
-	{
-		for(int i = 0 ; i < item->dataSize() ; ++i)
-			if (xvals.contains((point = item->sample(i)).x()))
-				points << point ;
-		if (points.empty()) return QVector<double>(xvals.size(),NAN) ;
-		QVector<double> retVal ;
-		foreach(QPointF point, points)
-			retVal << point.y() ;
-		return retVal ;
-	}
 	for (int i = 0 ; i < item->dataSize() ; ++i)
 		if (interval.contains((point = item->sample(i)).x()))
 			points << point ;
 	if (points.empty()) return QVector<double>(xvals.size(),NAN) ;
-
-	double r = 0 ;
-	if (mode == 'u')
-	{
-		r = -INFINITY ;
-		foreach (const QPointF point, points)
-			r = qMax(r,point.y()) ;
-	}
-	else if (mode == 'l')
-	{
-		r = INFINITY ;
-		foreach (const QPointF point, points)
-			r = qMin(r,point.y()) ;
-	}
-	else if (mode == 'i')
-	{
-		qSort(points.begin(),points.end(),comparePoints) ;
-		QPointF previous = points.first() ; // (ought to contain at least one element at this point)
-		foreach (const QPointF point, points)
-		{
-			QPointF diff = point - previous ;
-			r += diff.x()*(diff.y()/2.+previous.y()) ;
-			previous = point ;
-		}
-	}
-
-	return QVector<double>(xvals.size(),r) ;
+	return QVector<double>(xvals.size(), processPoints(points)) ;
 }

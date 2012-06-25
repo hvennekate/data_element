@@ -32,7 +32,7 @@ void tst_specMetaVariable::setRange()
 	QFETCH(int, inc) ;
 	int a,b,c ;
 	specMetaVariable testVar(variableString) ;
-	testVar.setRange(a,b,c,10) ;
+	testVar.setIndexRange(a,b,c,10) ;
 	QCOMPARE(a,min) ;
 	QCOMPARE(b,max) ;
 	QCOMPARE(c,inc) ;
