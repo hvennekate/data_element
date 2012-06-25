@@ -78,7 +78,7 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 			continue ;
 		}
 		symbols.append(GiNaC::symbol(symbol.toStdString())) ;
-		evaluators << new specMetaVariable(value) ;
+		evaluators << specMetaVariable::factory(value) ;
 	}
 	qDebug() << "xExpression" << xExpression  << (xExpression == "x") << "yExpression" << yExpression ;
 	x = prepare(xExpression) ;
