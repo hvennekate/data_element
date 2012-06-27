@@ -179,3 +179,10 @@ spec::descriptorFlags specMetaItem::descriptorProperties(const QString &key) con
 	return (key == "errors" ? spec::def : spec::editable) ;
 }
 
+QIcon specMetaItem::decoration() const
+{
+	if (!descriptor("errors",true).isEmpty())
+		return QIcon::fromTheme("dialog-warning") ;
+
+	return QIcon(":/kinetic.png") ;
+}

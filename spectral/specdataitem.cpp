@@ -177,12 +177,10 @@ specDataItem::specDataItem(const specDataItem &other)
 
 QString specDataItem::descriptor(const QString &key, bool full) const
 {
-	if (key == "") return specModelItem::descriptor(key, full) ;
-	
 	if (description.contains(key))
 		return description[key].content(full) ;
 	
-	return "" ;
+	return specModelItem::descriptor(key, full) ;
 }
 
 QIcon specDataItem::decoration() const { return QIcon(":/data.png") ; }

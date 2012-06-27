@@ -127,3 +127,16 @@ void specKineticModel::conditionalUpdate(specCanvasItem* itemPointer)
 		}
 	}
 }
+
+QVariant specKineticModel::data(const QModelIndex &index, int role) const
+{
+	specModelItem* pointer = itemPointer(index) ;
+	qDebug() << "kinetic role" ;
+	if (role == Qt::DecorationRole && !pointer->descriptor("errors").isEmpty())
+	{
+		qDebug() << "warning" ;
+		return QIcon::fromTheme("dialog-warning") ;
+	}
+	else
+		return specModel::data(index, role) ;
+}

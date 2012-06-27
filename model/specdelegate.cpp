@@ -19,7 +19,15 @@ QWidget* specDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 {
 	QTextEdit *editor = new QTextEdit(parent) ;
 //	editor->setFrame(false) ;
+//	editor->setTextBackgroundColor(Qt::yellow);
+	QPalette palette = editor->palette() ;
+	palette.setColor(QPalette::Base,palette.toolTipBase().color());
+	palette.setColor(QPalette::Text,palette.toolTipText().color());
+	editor->setPalette(palette) ;
+	editor->setFrameShadow(QFrame::Plain);
+	editor->setFrameShape(QFrame::NoFrame) ;
 	editor->setAcceptRichText(false) ;
+	editor->setBackgroundRole(QPalette::Text);
 	editor->setLineWrapMode(QTextEdit::NoWrap) ;
 	editor->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 	editor->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

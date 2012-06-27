@@ -22,6 +22,7 @@ protected:
 	QDataStream& readFromStream(QDataStream&) ;
 	QDataStream& writeToStream(QDataStream &) const ;
 public:
+
 	bool disconnectServer(specModelItem*) ;
 	bool connectServer(specModelItem*) ;
 	explicit specMetaItem(specFolderItem* par=0, QString description="");
@@ -35,6 +36,7 @@ public:
 	QString descriptor(const QString &key, bool full=false) const ;
 	bool changeDescriptor(QString key, QString value) ; // TODO add changeDescriptor(key,specDescriptor)
 	spec::descriptorFlags descriptorProperties(const QString& key) const ;
+	QIcon decoration() const ;
 };
 
 /* TODO in other classes

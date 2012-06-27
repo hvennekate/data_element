@@ -37,11 +37,9 @@ void tst_specMetaParser::evaluate()
 	qDebug() << parser.warnings() ;
 	QwtSeriesData<QPointF> *data = parser.evaluate(testItems) ;
 	QwtPointSeriesData reference(result) ;
-
-	qDebug() << "DATA SIZE:" << data->size() << reference.size() << result.size() ;
 	QCOMPARE(data->size(),reference.size()) ;
 	for (int i = 0 ; i < data->size() && i < reference.size() ; ++i)
-		QCOMPARE(data->sample(i),reference.sample(i)) ;
+		QCOMPARE(data->sample(i),reference.sample(i)) ;	
 	delete data ;
 }
 void tst_specMetaParser::evaluate_data()

@@ -193,7 +193,9 @@ specView::specView(QWidget* parent)
 	setDragEnabled(true) ;
 	setAcceptDrops(true) ;
 	setDropIndicatorShown(true) ;
+	QAbstractItemDelegate *olddel = itemDelegate() ;
 	setItemDelegate(new specDelegate) ;
+	delete olddel ;
 	setAllColumnsShowFocus(true) ;
 	
 	connect(header(),SIGNAL(sectionMoved(int,int,int)),this,SLOT(columnMoved(int,int,int))) ;
