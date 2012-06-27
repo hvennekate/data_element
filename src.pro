@@ -83,7 +83,8 @@ SOURCES += main.cpp \
     model/specmimeconverter.cpp \
     log/speclogtodataconverter.cpp \
     kinetic/specmetaparser.cpp \
-    kinetic/specmetavariable.cpp
+    kinetic/specmetavariable.cpp \
+    kinetic/specmetadelegate.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -168,7 +169,8 @@ HEADERS += cutbyintensitydialog.h \
     model/specmimeconverter.h \
     log/speclogtodataconverter.h \
     kinetic/specmetaparser.h \
-    kinetic/specmetavariable.h
+    kinetic/specmetavariable.h \
+    kinetic/specmetadelegate.h
 
 INCLUDEPATH += kinetic \
 	log \

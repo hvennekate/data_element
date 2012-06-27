@@ -1,9 +1,13 @@
 #include "specmetaview.h"
+#include "specmetadelegate.h"
 
 specMetaView::specMetaView(QWidget *parent) :
 	specView(parent),
 	dataView(0)
 {
+	QAbstractItemDelegate *olddel = itemDelegate() ;
+	setItemDelegate(new specMetaDelegate) ;
+	delete olddel ;
 }
 
 specMetaView::~specMetaView()

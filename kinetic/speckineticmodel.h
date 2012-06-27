@@ -18,6 +18,7 @@ public:
 	bool insertItems ( QList< specModelItem * > list, QModelIndex parent, int row );
 	void connectToModel(specModel*) ;
 	void connectToPlot(specPlot*) ; // TODO maybe move to view/widget
+	QVariant data(const QModelIndex &index, int role) const ;
 public slots:
 	void conditionalUpdate(specCanvasItem*) ;
 
