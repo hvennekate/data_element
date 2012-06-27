@@ -10,9 +10,14 @@
 #include <QDebug>
 #include "kinetic/specmetaitem.h"
 #include "utility-functions.h"
+#include <QPainter>
 
 specModelItem::specModelItem(specFolderItem* par, QString description)
-	: specCanvasItem(description), iparent(0), mergePlotData(true), sortPlotData(true)
+	: specCanvasItem(description),
+	  iparent(0),
+	  mergePlotData(true),
+	  sortPlotData(true),
+	  description("",spec::editable)
 {
 	setParent(par) ;
 }
@@ -58,9 +63,9 @@ bool specModelItem::isEditable(QString key) const
 
 bool specModelItem::changeDescriptor(QString key, QString value)
 {
-	if (key == "")
+	if (key == "" && description.isEditable())
 	{
-		QwtPlotCurve::setTitle(value) ;
+		description.setContent(value) ;
 		return true ;
 	}
 	
@@ -138,7 +143,7 @@ QwtSeriesData<QPointF>* specModelItem::processData(QwtSeriesData<QPointF>* dat) 
 
 QString specModelItem::descriptor(const QString &key, bool full) const
 {
-	if (key == "") return QwtPlotCurve::title().text() ;
+	if (key == "") return description.content(full) ;
 	return QString() ;
 }
 
@@ -146,9 +151,15 @@ bool specModelItem::isFolder() const { return false ;}
 
 QIcon specModelItem::indicator(const QString& Descriptor) const
 {
-	if (Descriptor == "") return decoration() ;
+	QIcon def = decoration(), arrow = QIcon::fromTheme("go-down") ;
+	QSize size = def.availableSizes().first() ; // TODO unsafe!
+	QPixmap map(size.width()*2,size.height()) ;
+	QPainter painter(map) ;
+	painter.dr
 	if (descriptor(Descriptor,true).contains(QRegExp("\n")))
 		return QIcon::fromTheme("go-down") ;
+	if (Descriptor == "")
+		return decoration() ;
 	return QIcon() ;
 }
 
@@ -185,7 +196,7 @@ QDataStream& operator>>(QDataStream& stream, specModelItem*& pointer)
 	QPen pen ;
 	pointer->readFromStream(stream)
 			>> pointer->mergePlotData >> pointer->sortPlotData >> title >> pen ;
-	pointer->QwtPlotCurve::setTitle(title) ;
+	pointer->description.setContent(title) ;
 	pointer->setPen(pen) ;
 	qDebug()<< "merge from copy:" << pointer->mergePlotData ;
 	pointer->invalidate();
@@ -197,7 +208,7 @@ QDataStream& specModelItem::writeOut(QDataStream& stream) const
 // 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
 // 	cout << "called operator<<" << endl ;
 	return (writeToStream(stream)
-			<< mergePlotData << sortPlotData << QwtPlotCurve::title().text() << pen()) ;
+			<< mergePlotData << sortPlotData << description.content(true) << pen()) ;
 	qDebug()<< "merge from original:" << mergePlotData ;
 }
 
