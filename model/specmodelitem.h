@@ -12,6 +12,7 @@
 #include <QDataStream>
 #include <QTextStream>
 #include "specrange.h"
+#include "specdescriptor.h"
 
 class specModelItem ;
 class specFolderItem ;
@@ -29,6 +30,7 @@ private:
 	void detachChild(specModelItem* child) ;
 	bool dataValid ;
 	QSet<specMetaItem*> clients ;
+	specDescriptor description ;
 protected:
 	void processData(QVector<double>&, QVector<double>&) const ;
 	QwtSeriesData<QPointF>* processData(QwtSeriesData<QPointF>* dat) const;
