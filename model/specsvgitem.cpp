@@ -1,11 +1,17 @@
 #include "specsvgitem.h"
+#include <qwt/qwt_plot.h>
 
 specSVGItem::specSVGItem(specFolderItem *par, QString description)
 	: specModelItem(par,description),
 	  image(0),
 	  data(0),
-	  highlighting(0)
+	  highlighting(0),
+	  width(-1),
+	  height(-1),
+	  fix(center)
 {
+	width = 100 ;
+	height = 100 ;
 	setStyle(QwtPlotCurve::NoCurve);
 }
 
@@ -30,6 +36,7 @@ void specSVGItem::attach(QwtPlot *plot)
 
 void specSVGItem::setBoundingRect(const QRectF &rect)
 {
+	qDebug() << "Setting SVG bounding rect" << rect << rect.width() << rect.height();
 	if (!data || !image) return ;
 	image->loadData(rect,*data) ;
 	highlight(highlighting) ;
@@ -39,23 +46,72 @@ void specSVGItem::highlight(bool highlight)
 {
 	highlighting = highlight ;
 	if (!image) return ;
-	QRectF bounds = image->boundingRect() ;
-	QVector<QPointF> points ;
+	QVector<QPointF> points(specSVGItem::size) ;
 	for (int i = 0 ; i < specSVGItem::size ; ++i)
-		points << QPointF() ;
-	points[center] = bounds.center() ;
-	points[left]   = (bounds.topLeft()+bounds.bottomLeft())/2. ;
-	points[right]  = (bounds.topRight()+bounds.bottomRight())/2. ;
-	points[top]    = (bounds.topLeft()+bounds.topRight())/2. ;
-	points[bottom] = (bounds.bottomLeft()+bounds.bottomRight())/2. ;
-	points[topLeft]     = bounds.topLeft() ;
-	points[bottomLeft]  = bounds.bottomLeft() ;
-	points[topRight]    = bounds.topRight() ;
-	points[bottomRight] = bounds.bottomRight() ;
+		points[i] = anchorPoint((SVGCornerPoints) i) ;
 	qDebug() << "bounding points:" << points ;
 	setSamples(points) ;
 	if (!highlight)
 		setSymbol(0) ;
 	else
 		setSymbol(new QwtSymbol(QwtSymbol::Ellipse,QBrush(Qt::black),QPen(Qt::white),QSize(5,5))) ;
+}
+
+QPointF specSVGItem::anchorPoint(const SVGCornerPoints &point) const
+{
+//	if (point == undefined) return QPointF() ;
+	QRectF bounds = image->boundingRect() ;
+	switch(point)
+	{
+	case center: return bounds.center() ;
+	case left: return (bounds.topLeft()+bounds.bottomLeft())/2. ;
+	case right: return (bounds.topRight()+bounds.bottomRight())/2. ;
+	case top: return (bounds.topLeft()+bounds.topRight())/2. ;
+	case bottom: return (bounds.bottomLeft()+bounds.bottomRight())/2. ;
+	case topLeft: return bounds.topLeft() ;
+	case bottomLeft: return bounds.bottomLeft() ;
+	case topRight: return bounds.topRight() ;
+	case bottomRight: return bounds.bottomRight() ;
+	default: return QPointF() ;
+	}
+}
+
+void specSVGItem::setAnchor(QRectF& bounds, const QPointF & anchor, const SVGCornerPoints &point) const
+{
+	switch(point)
+	{
+	case center:
+	case right:
+	case left:
+	case bottom:
+	case top:
+		 bounds.moveCenter(anchor) ;
+	}
+
+	switch (point)
+	{
+	case center: bounds.moveCenter(anchor) ; break ;
+	case right: bounds.moveRight(anchor.x()) ; break ;
+	case left: bounds.moveLeft(anchor.x()) ; break ;
+	case bottom: bounds.moveBottom(anchor.y()) ; break ;
+	case top: bounds.moveTop(anchor.y()) ; break ;
+	case topLeft: bounds.moveTopLeft(anchor) ; break ;
+	case topRight: bounds.moveTopRight(anchor) ; break ;
+	case bottomLeft: bounds.moveBottomLeft(anchor) ; break ;
+	case bottomRight: bounds.moveBottomRight(anchor) ; break ;
+	}
+}
+
+void specSVGItem::refreshSVG(double xfactor, double yfactor)
+{
+	qDebug() << "Refreshing SVG plot data" ;
+	if (!plot()) return ;
+	if (!image) return ;
+	QPointF fixPoint = anchorPoint(fix) ;
+	QRectF bounds = image->boundingRect() ;
+	qDebug() << "bottom" << plot()->canvasMap(QwtPlot::xBottom).sDist() << plot()->canvasMap(QwtPlot::xBottom).pDist() ;
+	if (width  >= 0) bounds.setWidth(width * xfactor) ;
+	if (height >= 0) bounds.setHeight(height * yfactor) ;
+	if (fix >= 0)    setAnchor(bounds, fixPoint, fix) ;
+	setBoundingRect(bounds) ;
 }

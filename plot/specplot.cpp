@@ -10,6 +10,7 @@
 #include <QVBoxLayout>
 #include <QDialogButtonBox>
 #include "specmetaitem.h"
+#include "specsvgitem.h"
 
 // TODO solve the myth of autoscaleaxis...
 
@@ -135,6 +136,7 @@ void specPlot::replot()
 	ordinary->clear() ;
 	kineticRanges->clear() ;
 	selectRanges->clear();
+	QVector<specSVGItem*> svgitems ;
 	qDebug("rebuilding plot item pointer lists") ;
 	foreach(QwtPlotItem* item, allItems)
 	{
@@ -144,6 +146,8 @@ void specPlot::replot()
 			selectRanges->append((specCanvasItem*) item) ;
 		else if (dynamic_cast<specRange*>(item))
 			ranges->append((specCanvasItem*) item) ;
+		else if (dynamic_cast<specSVGItem*>(item))
+			svgitems << (specSVGItem*) item ;
 		else if (dynamic_cast<specCanvasItem*>( item))
 			ordinary->append((specCanvasItem*) item) ;
 	}
@@ -163,16 +167,23 @@ void specPlot::replot()
 			pointer->revalidate();
 
 	
-	QRectF boundaries = allItems[0]->boundingRect() ; // DANGER: actually we must check, if the item plots on yLeft
+	QRectF boundaries ; //= allItems[0]->boundingRect() ; // DANGER: actually we must check, if the item plots on yLeft
+	qDebug() << "adapting plot ranges" << allItems << "SVGs:" << svgitems ;
 	foreach(QwtPlotItem *item, allItems) // TODO omit this if fixing of axis is enabled
 	{
-		if(item->yAxis() == QwtPlot::yLeft)
+		if(item->yAxis() == QwtPlot::yLeft && !dynamic_cast<specSVGItem*>(item) && !dynamic_cast<QwtPlotSvgItem*>(item)) // TODO change
 		{
-			QRectF bnd = item->boundingRect() ;
-			boundaries.setLeft(qMin(bnd.left(),boundaries.left())) ;
-			boundaries.setRight(qMax(bnd.right(),boundaries.right())) ;
-			boundaries.setBottom(qMax(bnd.bottom(),boundaries.bottom())) ;
-			boundaries.setTop(qMin(bnd.top(),boundaries.top())) ;
+//			QRectF bnd = item->boundingRect() ;
+//			if (boundaries.isValid())
+//			{
+//				qDebug() << "adapting for item" << item ;
+//				boundaries.setLeft(qMin(bnd.left(),boundaries.left())) ;
+//				boundaries.setRight(qMax(bnd.right(),boundaries.right())) ;
+//				boundaries.setBottom(qMax(bnd.bottom(),boundaries.bottom())) ;
+//				boundaries.setTop(qMin(bnd.top(),boundaries.top())) ;
+//			}
+//			else boundaries = bnd ;
+			boundaries |= item->boundingRect() ;
 		}
 // 		boundaries |= item->boundingRect() ;
 	}
@@ -209,6 +220,11 @@ void specPlot::replot()
 	
 	zoom->changeZoomBase(boundaries) ;
 
+	QRectF zoomRect = zoom->zoomRect() ;
+	double xfactor = zoomRect.width()  / canvasMap(QwtPlot::xBottom).pDist(),
+	       yfactor = zoomRect.height() / canvasMap(QwtPlot::yLeft).pDist() ;
+	foreach(specSVGItem* svgitem, svgitems)
+		svgitem->refreshSVG(xfactor, yfactor) ;
 	qDebug() << "----- replotting" << this ;
 	QwtPlot::replot() ;
 	replotting = false ;
