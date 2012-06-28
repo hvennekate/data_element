@@ -1,6 +1,6 @@
 #include "specdescriptorvariable.h"
 
-QVector<double> specDescriptorVariable::values(specModelItem *, const QVector<double> &) const
+QVector<double> specDescriptorVariable::values(specModelItem *item, const QVector<double> &xvals) const
 {
 	return QVector<double>(xvals.size(), item->descriptor(descriptor).toDouble()) ;
 }

@@ -1,8 +1,5 @@
 #include "specintegralvariable.h"
-
-specIntegralVariable::specIntegralVariable()
-{
-}
+#include "utility-functions.h"
 
 double specIntegralVariable::processPoints(QVector<QPointF> &points) const
 {

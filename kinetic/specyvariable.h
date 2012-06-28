@@ -5,7 +5,8 @@
 class specYVariable : public specMetaVariable
 {
 public:
-    QVector<double> values(specModelItem *, const QVector<double> &) const ;
+	bool xValues(specModelItem *, QVector<double> &) const ;
+	QVector<double> values(specModelItem *, const QVector<double> &) const ;
 };
 
 #endif // SPECYVARIABLE_H

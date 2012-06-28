@@ -4,16 +4,16 @@
 #include "model/specmodelitem.h"
 #include <qwt_interval.h>
 
-class specMetaVariable : QwtInterval
+class specMetaVariable : public specRange // TODO change to specInterval
 {
 	int begin, end, inc ;
-	QString extract(QString&, const QRegExp&) const ;
+	static QString extract(QString&, const QRegExp&) ;
 protected:
 	virtual double processPoints(QVector<QPointF>& points) const { return 0 ;}
 	QString descriptor ;
 public:
 	specMetaVariable();
-	bool xValues(specModelItem*, QVector<double>&) const;
+	virtual bool xValues(specModelItem*, QVector<double>&) const;
 	virtual QVector<double> values(specModelItem*, const QVector<double>&) const ;
 	bool setIndexRange(int& begin, int& end, int& increment, int max) const;
 	static specMetaVariable* factory(QString) ;

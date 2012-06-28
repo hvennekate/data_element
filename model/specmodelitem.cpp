@@ -151,13 +151,20 @@ bool specModelItem::isFolder() const { return false ;}
 
 QIcon specModelItem::indicator(const QString& Descriptor) const
 {
-	QIcon def = decoration(), arrow = QIcon::fromTheme("go-down") ;
-	QSize size = def.availableSizes().first() ; // TODO unsafe!
-	QPixmap map(size.width()*2,size.height()) ;
-	QPainter painter(map) ;
-	painter.dr
 	if (descriptor(Descriptor,true).contains(QRegExp("\n")))
-		return QIcon::fromTheme("go-down") ;
+	{
+		if (Descriptor == "")
+		{
+			QIcon def = decoration(), arrow = QIcon::fromTheme("go-down") ;
+			const QSize size = def.availableSizes().first() ; // TODO unsafe!
+			const QSize small = size/2. ;
+			QPixmap map = def.pixmap(size) ;
+			QPainter painter(&map) ;
+			painter.drawPixmap(small.width(), small.height(), small.width(), small.height(), arrow.pixmap(small)) ;
+			return QIcon(map) ;
+		}
+		else return QIcon::fromTheme("go-down") ;
+	}
 	if (Descriptor == "")
 		return decoration() ;
 	return QIcon() ;

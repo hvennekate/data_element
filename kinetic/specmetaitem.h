@@ -14,9 +14,6 @@ private:
 	QSet<specModelItem*> items ;
 	specMetaParser filter ;
 	QHash<QString,specDescriptor> variables ;
-	specPlot *itemPlot() ;
-//	QStringList internalDescriptors() const ;
-//	int descriptorIndex(const QString&) const ;
 	specModelItem *currentlyConnectingServer ;
 protected:
 	QDataStream& readFromStream(QDataStream&) ;

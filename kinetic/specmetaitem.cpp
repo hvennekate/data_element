@@ -8,14 +8,6 @@ specMetaItem::specMetaItem(specFolderItem *par, QString description)
 {
 }
 
-specPlot *specMetaItem::itemPlot()
-{
-	foreach(specModelItem* item, items)
-		if (item->plot())
-			return ((specPlot*) item->plot()) ;
-	return 0 ;
-}
-
 QDataStream &specMetaItem::writeToStream(QDataStream &out) const
 {
 	return out ;
@@ -92,7 +84,10 @@ bool specMetaItem::connectServer(specModelItem *server)
 
 void specMetaItem::attach(QwtPlot *plot)
 {
-	specPlot *otherPlot = itemPlot() ;
+	QSet<specPlot *> otherPlots ;
+	foreach(specModelItem* item, items)
+		otherPlots << ((specPlot*) item->plot()) ;
+
 //	if (otherPlot && filter)
 //	{
 //		QList<specCanvasItem*> otherItems = filter->plotIndicators() ;
