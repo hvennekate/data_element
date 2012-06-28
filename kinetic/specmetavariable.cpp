@@ -7,7 +7,7 @@
 #include "specyvariable.h"
 #include "specintegralvariable.h"
 
-QString specMetaVariable::extract(QString & source, const QRegExp& expression) const
+QString specMetaVariable::extract(QString & source, const QRegExp& expression)
 {
 	int start = expression.indexIn(source) ;
 	if (start == -1) return QString() ;
@@ -17,7 +17,7 @@ QString specMetaVariable::extract(QString & source, const QRegExp& expression) c
 	return returnValue ;
 }
 
-static specMetaVariable* specMetaVariable::factory(QString)
+specMetaVariable* specMetaVariable::factory(QString init)
 {
 	const QRegExp rangeExp("(\\[[0-9]*(:[0-9]?(:[0-9]?)?)?\\])"),
 			descriptorExp("(\\\"[^\\\"]*\\\"|" "(x|y|i|u|l))"),
@@ -33,7 +33,7 @@ static specMetaVariable* specMetaVariable::factory(QString)
 	if (descString[0] == '"')
 	{
 		product = new specDescriptorVariable ;
-		descriptor = descString.mid(1, descString.size()-2) ;
+		product->descriptor = descString.mid(1, descString.size()-2) ;
 	}
 	if (descString[0] == 'i') product = new specIntegralVariable ;
 	if (descString[0] == 'u') product = new specMaxVariable ;
@@ -46,20 +46,20 @@ static specMetaVariable* specMetaVariable::factory(QString)
 		//interpret the range
 		QStringList indexes = range.remove("[").remove("]").split(':') ;
 		product->begin = qMax(0, indexes[0] == "" ? 0 : indexes[0].toInt()) ;
-		product->end   = qMax(begin, indexes.size()==1 ? begin + 1
+		product->end   = qMax(product->begin, indexes.size()==1 ? product->begin + 1
 								:(indexes[1] == "" ? int(INFINITY) : indexes[1].toInt())) ;
-		product->inc   = qBound(1, indexes.size() > 2 && indexes[2] != "" ? indexes[2].toInt() : 1, end-begin) ;
+		product->inc   = qBound(1, indexes.size() > 2 && indexes[2] != "" ? indexes[2].toInt() : 1, product->end - product->begin) ;
 	}
 
 	// setup the interval
-	product->interval.setMinValue( xlower.isEmpty() ? -INFINITY : xlower.toDouble()) ;
-	product->interval.setMaxValue( xupper.isEmpty() ?  INFINITY : xupper.toDouble()) ;
+	product->setMinValue( xlower.isEmpty() ? -INFINITY : xlower.toDouble()) ;
+	product->setMaxValue( xupper.isEmpty() ?  INFINITY : xupper.toDouble()) ;
 
 	return product ;
 }
 
-specMetaVariable::specMetaVariable(QString init)
-	: QwtInterval(-INFINITY,INFINITY,QwtInterval::IncludeBorders),
+specMetaVariable::specMetaVariable()
+	: specRange(-INFINITY,INFINITY),
 	  begin(0),
 	  end(int(INFINITY)),
 	  inc(1),
@@ -77,37 +77,6 @@ bool specMetaVariable::setIndexRange(int &start, int &finish, int &step, int max
 
 bool specMetaVariable::xValues(specModelItem *item, QVector<double> & xvals) const // false if vector was empty
 {
-	if (mode != 'x' && mode != 'y') // TODO via interval.invalid()
-		return true ;
-	item->refreshPlotData();
-	qDebug() << "DATASIZE" << item->dataSize() << "RANGE" << interval.minValue() << interval.maxValue();
-	if (xvals.size() == 1 && isnan(xvals[0]))
-	{
-		double value ;
-		xvals.clear();
-		for (int i = 0 ; i < item->dataSize() ; ++i)
-			if (interval.contains(value = item->data()->sample(i).x()))
-				xvals << value ;
-		return false ;
-	}
-
-	qDebug() << "xvals" << xvals << xvals.size() << (isnan(xvals[0]));
-	QVector<double> newXVals ;
-	foreach(double value, xvals) // TODO:  quick compare if same size
-	{
-		if (interval.contains(value))
-		{
-			for (int i = 0 ; i < item->dataSize() ; ++i)
-			{
-				if(item->data()->sample(i).x() == value)
-				{
-					newXVals << value ;
-					continue ;
-				}
-			}
-		}
-	}
-	xvals = newXVals ; // TODO: swap
 	return true ;
 }
 
@@ -116,7 +85,7 @@ QVector<double> specMetaVariable::values(specModelItem *item, const QVector<doub
 	QVector<QPointF> points ;
 	QPointF point ;
 	for (int i = 0 ; i < item->dataSize() ; ++i)
-		if (interval.contains((point = item->sample(i)).x()))
+		if (contains((point = item->sample(i)).x()))
 			points << point ;
 	if (points.empty()) return QVector<double>(xvals.size(),NAN) ;
 	return QVector<double>(xvals.size(), processPoints(points)) ;

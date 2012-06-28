@@ -4,7 +4,7 @@
 #include "specplot.h"
 
 specRange::specRange(double min, double max)
-	: QwtInterval(min,max)
+	: QwtInterval(min,max,QwtInterval::IncludeBorders) // TODO check if ok
 { // TODO set curve properties
 	QVector<double> x, y ;
 	x << min << max ;
