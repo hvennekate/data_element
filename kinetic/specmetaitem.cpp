@@ -3,7 +3,7 @@
 
 specMetaItem::specMetaItem(specFolderItem *par, QString description)
 	: specModelItem(par,description),
-	  filter("","",""),
+	  filter(new specMetaParser("","","",this)),
 	  currentlyConnectingServer(0)
 {
 }
@@ -82,19 +82,32 @@ bool specMetaItem::connectServer(specModelItem *server)
 //	invalidate() ;
 //}
 
-void specMetaItem::attach(QwtPlot *plot)
+void specMetaItem::refreshOtherPlots()
 {
 	QSet<specPlot *> otherPlots ;
 	foreach(specModelItem* item, items)
 		otherPlots << ((specPlot*) item->plot()) ;
+	otherPlots.remove(0) ;
+	filter->attachRanges(otherPlots)  ;
+	qDebug() << "Attaching meta item " << otherPlots ;
+	foreach(QwtPlot *otherPlot, otherPlots)
+		otherPlot->replot();
+}
 
-//	if (otherPlot && filter)
-//	{
-//		QList<specCanvasItem*> otherItems = filter->plotIndicators() ;
-//		foreach(specCanvasItem* item, otherItems)
-//			item->attach(otherPlot) ;
-//	}
+void specMetaItem::attach(QwtPlot *plot)
+{
+	if (!plot)
+	{
+		detach() ;
+		return ;
+	}
 	specModelItem::attach(plot) ;
+	refreshOtherPlots() ;
+}
+
+void specMetaItem::detach()
+{
+	filter->detachRanges();
 }
 
 void specMetaItem::refreshPointers(const QHash<specModelItem *, specModelItem *> &mapping)
@@ -117,12 +130,13 @@ void specMetaItem::refreshPlotData()
 	// TODO do some more checks on valid items etc.
 	foreach(specModelItem *item, items)
 		item->revalidate();
-	filter.setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
-	setData(processData(filter.evaluate(items.toList().toVector()))) ; // TODO use vector
-	variables["errors"] = filter.warnings() ;
+	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
+	setData(processData(filter->evaluate(items.toList().toVector()))) ; // TODO use vector
+	variables["errors"] = filter->warnings() ;
 	qDebug() << "Filter data size:" << dataSize() ;
 	for (int i = 0 ; i < dataSize() ; ++i)
 		qDebug() << "Filter data:" << sample(i) ;
+	refreshOtherPlots() ;
 }
 
 //QStringList specMetaItem::internalDescriptors() const

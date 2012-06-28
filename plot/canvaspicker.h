@@ -43,10 +43,11 @@ public:
 	virtual bool event(QEvent *);
 	specCanvasItem* current() ;
 	inline const QList<specCanvasItem*> getSelectable() { return selectable ;}
-	void addSelectable(QList<specCanvasItem*>&) ;
+	void addSelectable(const QList<specCanvasItem*>&) ;
 	void addSelectable(specCanvasItem*) ;
 	void removeSelectable(QList<specCanvasItem*>&) ;
 	void removeSelectable(specCanvasItem*) ;
+	void removeSelectable();
 	void removeSelected() ;
 	inline void setOwning(bool Owning =true) { owning = Owning ; } // TODO do this more skilfully.
 

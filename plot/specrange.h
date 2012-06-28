@@ -15,7 +15,6 @@ public:
 	virtual void refreshPlotData() ;
 	int rtti() const { return spec::zeroRange ; }
 	~specRange();
-
 };
 
 class specSelectRange : public specRange

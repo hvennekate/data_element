@@ -3,9 +3,13 @@
 #include <QRegExp>
 #include <qwt/qwt_series_data.h>
 #include <iostream>
+#include "specmetaitem.h"
 
-specMetaParser::specMetaParser(const QString &expressionList, const QString& xExpression, const QString& yExpression)
+specMetaParser::specMetaParser(const QString &expressionList, const QString& xExpression, const QString& yExpression, specMetaItem* par)
+	: parent(par),
+	  changingRange(false)
 {
+	qDebug() << "meta parser parent" << parent << this;
 	setAssignments(expressionList, xExpression, yExpression) ;
 }
 
@@ -21,6 +25,7 @@ void specMetaParser::clear()
 
 void specMetaParser::setAssignments(const QString &expressionList, const QString& xExpression, const QString& yExpression)
 {
+	if (changingRange) return ;
 	qDebug() << "SETTING PARSER VARIABLES" << expressionList.toAscii() << xExpression.toAscii() << yExpression.toAscii() << xExpression.size() ;
 	valid = true ;
 	const QRegExp name("[a-zA-Z][a-zA-Z0-9]*") ;
@@ -78,7 +83,7 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 			continue ;
 		}
 		symbols.append(GiNaC::symbol(symbol.toStdString())) ;
-		evaluators << specMetaVariable::factory(value) ;
+		evaluators << specMetaVariable::factory(value,this) ;
 	}
 	qDebug() << "xExpression" << xExpression  << (xExpression == "x") << "yExpression" << yExpression ;
 	x = prepare(xExpression) ;
@@ -196,4 +201,34 @@ bool specMetaParser::containsNan(const QVector<double> &vector)
 		if (isnan(zahl))
 			return true ;
 	return false ;
+}
+
+void specMetaParser::evaluatorIntervalChanged()
+{
+	qDebug() << "evaluatorIntervalChanged" << this ;
+	qDebug() << "parent is" << parent  ;
+	changingRange = true ;
+	if (parent)
+	{
+		qDebug() << "changing descriptor" ;
+		QStringList descriptor;
+		foreach(specMetaVariable* evaluator, evaluators)
+			descriptor += evaluator->codeValue() ;
+		qDebug() << "changing Descriptor" << descriptor ;
+		parent->changeDescriptor("variables", descriptor.join("\n")) ;
+	}
+	changingRange = false ;
+}
+
+void specMetaParser::attachRanges(QSet<specPlot *> plots)
+{
+	qDebug() << "attachRanges " << plots << evaluators ;
+	foreach(specMetaVariable* evaluator, evaluators)
+		evaluator->produceRanges(plots) ;
+}
+
+void specMetaParser::detachRanges()
+{
+	foreach(specMetaVariable* evaluator, evaluators)
+		evaluator->detachRanges();
 }
