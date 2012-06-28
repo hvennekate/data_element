@@ -10,6 +10,8 @@
 #include "names.h"
 #include "speccanvasitem.h"
 
+class specMetaRange ;
+
 class specPlot : public QwtPlot
 {
 	Q_OBJECT
@@ -20,6 +22,7 @@ private:
 	QList<specCanvasItem*>* ordinary ;
 	QList<specCanvasItem*>* kineticRanges ;
 	QList<specCanvasItem*>* selectRanges ;
+	QList<specCanvasItem*> metaRanges ;
 	specZoomer   *zoom ;
 	bool scaleX, scaleY ;
 	void contextMenuEvent ( QContextMenuEvent* ) ;
@@ -36,12 +39,14 @@ private:
 	*multipleCorrections ;
 	QActionGroup *zero, *modifications ;
 	spec::moveMode mm ;
+	CanvasPicker *metaPicker ;
 	void setupActions() ;
 	void highlightSelectable(bool highlight=true) ;
 private slots:
 	void changeTitle(QString) ;
 	void changeXLabel(QString) ;
 	void changeYLabel(QString) ;
+	void metaRangeMoved(specCanvasItem*, int, double, double) ;
 public:
 	bool select ;
 	QList<specCanvasItem*>* selectable() ;

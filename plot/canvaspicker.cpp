@@ -237,7 +237,7 @@ void CanvasPicker::select ( const QPoint &pos )
 
 	qDebug("showing cursor") ;
 	showCursor ( false );
-	qDebug("done showing cursor") ;
+	qDebug() << "done showing cursor; distance: " << dist ;
 
 	if ( curve && dist < 10 ) // 10 pixels tolerance
 	{
@@ -486,8 +486,9 @@ void CanvasPicker::removeSelectable(specCanvasItem *item)
 	removeSelectable(list) ;
 }
 
-void CanvasPicker::addSelectable(QList<specCanvasItem *> &list)
+void CanvasPicker::addSelectable(const QList<specCanvasItem *> &list)
 {
+	qDebug() << "adding selectables" << list ;
 	selectable << list ;
 //	foreach(specCanvasItem* item, list)  // TODO consider this version.
 //		if (!list.contains(item))
@@ -528,6 +529,11 @@ void CanvasPicker::removeSelected()
 		toRemove << d_selectedCurve ;
 		removeSelectable(toRemove) ;
 	}
+}
+
+void CanvasPicker::removeSelectable()
+{
+	removeSelectable(selectable) ;
 }
 
 CanvasPicker::~CanvasPicker()

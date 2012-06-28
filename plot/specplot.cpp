@@ -11,12 +11,15 @@
 #include <QDialogButtonBox>
 #include "specmetaitem.h"
 #include "specsvgitem.h"
+#include "specmetarange.h"
 
 // TODO solve the myth of autoscaleaxis...
 
 specPlot::specPlot(QWidget *parent)
-	: canBeSelected(NULL), QwtPlot(parent), select(false), replotting(false)
+	: canBeSelected(NULL), QwtPlot(parent), select(false), replotting(false),
+	  metaPicker(new CanvasPicker(this))
 {
+	connect(metaPicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SLOT(metaRangeMoved(specCanvasItem*,int,double,double))) ;
 	setAutoReplot(false) ;
 	zoom  = new specZoomer(this->canvas()) ;
 	ranges = new QList<specCanvasItem*> ;
@@ -136,11 +139,14 @@ void specPlot::replot()
 	ordinary->clear() ;
 	kineticRanges->clear() ;
 	selectRanges->clear();
+	QList<specCanvasItem*> newMetaRanges; // TODO local variable
 	QVector<specSVGItem*> svgitems ;
-	qDebug("rebuilding plot item pointer lists") ;
+	qDebug() << "rebuilding plot item pointer lists" << allItems << metaPicker ;
 	foreach(QwtPlotItem* item, allItems)
 	{
-		if (dynamic_cast<specKineticRange*>(item))
+		if (dynamic_cast<specMetaRange*>(item))
+			newMetaRanges << ((specCanvasItem*) item) ;
+		else if (dynamic_cast<specKineticRange*>(item))
 			kineticRanges->append((specCanvasItem*) item) ;
 		else if (dynamic_cast<specSelectRange*>(item))
 			selectRanges->append((specCanvasItem*) item) ;
@@ -150,6 +156,12 @@ void specPlot::replot()
 			svgitems << (specSVGItem*) item ;
 		else if (dynamic_cast<specCanvasItem*>( item))
 			ordinary->append((specCanvasItem*) item) ;
+	}
+	if (metaRanges != newMetaRanges)
+	{
+		metaRanges = newMetaRanges ;
+		metaPicker->removeSelectable();
+		metaPicker->addSelectable(metaRanges) ;
 	}
 	qDebug() << "Checking if refresh necessary" << this ;
 	if (allItems.isEmpty())
@@ -356,4 +368,10 @@ void specPlot::refreshRanges()
 		pointer->applyRanges(rangeArray) ;
 	deleteZeroRangeAction->setEnabled(ranges->size()) ;
 	replot() ;
+}
+
+void specPlot::metaRangeMoved(specCanvasItem *item, int point, double x, double y)
+{
+	if (metaRanges.contains((specCanvasItem*) item))
+		((specMetaRange*) item)->pointMoved(point,x,y) ;
 }

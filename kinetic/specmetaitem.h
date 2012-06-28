@@ -12,9 +12,10 @@ class specMetaItem : public specModelItem
 {
 private:
 	QSet<specModelItem*> items ;
-	specMetaParser filter ;
+	specMetaParser *filter ;
 	QHash<QString,specDescriptor> variables ;
 	specModelItem *currentlyConnectingServer ;
+	void refreshOtherPlots() ;
 protected:
 	QDataStream& readFromStream(QDataStream&) ;
 	QDataStream& writeToStream(QDataStream &) const ;
@@ -27,6 +28,7 @@ public:
 //	specMetaParser *takeFilter() ; // TODO obsolete
 //	void setFilter(specMetaParser*) ; // TODO obsolete
 	void attach(QwtPlot *plot) ;
+	void detach();
 	void refreshPointers(const QHash<specModelItem*,specModelItem*>& mapping) ;
 	void refreshPlotData();
 	QStringList descriptorKeys() const ;
