@@ -84,7 +84,12 @@ SOURCES += main.cpp \
     log/speclogtodataconverter.cpp \
     kinetic/specmetaparser.cpp \
     kinetic/specmetavariable.cpp \
-    kinetic/specmetadelegate.cpp
+    kinetic/specintegralvariable.cpp \
+    kinetic/specxvariable.cpp \
+    kinetic/specdescriptorvariable.cpp \
+    kinetic/specyvariable.cpp \
+    kinetic/specminvariable.cpp \
+    kinetic/specmaxvariable.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -170,7 +175,12 @@ HEADERS += cutbyintensitydialog.h \
     log/speclogtodataconverter.h \
     kinetic/specmetaparser.h \
     kinetic/specmetavariable.h \
-    kinetic/specmetadelegate.h
+    kinetic/specintegralvariable.h \
+    kinetic/specxvariable.h \
+    kinetic/specdescriptorvariable.h \
+    kinetic/specyvariable.h \
+    kinetic/specminvariable.h \
+    kinetic/specmaxvariable.h
 
 INCLUDEPATH += kinetic \
 	log \
