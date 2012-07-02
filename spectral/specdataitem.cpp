@@ -40,26 +40,6 @@ bool specDataFilter::addData(QList<specDataPoint>& toBeAppended, const QVector<d
 	return true ;
 }
 
-
-//TODO naechste drei Funktionen vereinheitlichen...
-QVariant specDataFilter::plotData(const QList<specDataPoint>& data) const
-{
-	QList<QVariant> xdata, ydata, alldata ;
-	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
-	{
-		double xVal = data[i][x], yVal = data[i][y], t = data[i][0] ;
-		applyCorrection(t,xVal,yVal) ;
-		if (xVal > xmin && xVal < xmax && yVal > ymin && yVal < ymax)
-		{
-			xdata += xVal ;
-			ydata += yVal ;
-		}
-	}
-	foreach (QVariant item, xdata) alldata << item ;
-	foreach (QVariant item, ydata) alldata << item ;
-	return alldata ;
-}
-
 QVector<double> specDataFilter::wnums(const QList<specDataPoint>& data) const
 {
 	QVector<double> retval ;

@@ -374,4 +374,5 @@ void specPlot::metaRangeMoved(specCanvasItem *item, int point, double x, double 
 {
 	if (metaRanges.contains((specCanvasItem*) item))
 		((specMetaRange*) item)->pointMoved(point,x,y) ;
+	// TODO emit signal for metaview update
 }

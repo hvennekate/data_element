@@ -199,11 +199,11 @@ QDataStream& operator>>(QDataStream& stream, specModelItem*& pointer)
 		case spec::kinetic :
 			pointer = new specKinetic ; break ;
 	}
-	QString title ;
+//	QString title ;
 	QPen pen ;
 	pointer->readFromStream(stream)
-			>> pointer->mergePlotData >> pointer->sortPlotData >> title >> pen ;
-	pointer->description.setContent(title) ;
+			>> pointer->mergePlotData >> pointer->sortPlotData >> description >> pen ;
+//	pointer->description.setContent(title) ;
 	pointer->setPen(pen) ;
 	qDebug()<< "merge from copy:" << pointer->mergePlotData ;
 	pointer->invalidate();
@@ -215,7 +215,7 @@ QDataStream& specModelItem::writeOut(QDataStream& stream) const
 // 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
 // 	cout << "called operator<<" << endl ;
 	return (writeToStream(stream)
-			<< mergePlotData << sortPlotData << description.content(true) << pen()) ;
+			<< mergePlotData << sortPlotData << description << pen()) ;
 	qDebug()<< "merge from original:" << mergePlotData ;
 }
 
