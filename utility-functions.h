@@ -25,4 +25,29 @@ QList<double> gaussjinv(QList<QList<double> >&,QList<double>&) ;
 
 bool comparePoints(const QPointF&, const QPointF&) ;
 
+/*! Accumulate items equal to begin and average them in return value.
+    begin will be changed to past the last accumulated item.*/
+template<class T, class forwardIterator> // TODO mehr benutzen!
+inline T average(forwardIterator& begin,const forwardIterator& end,
+		 bool (*equal)(const T&,const T&))
+{
+	const T first = *begin++ ;
+	T retVal = first ;
+	int count = 1 ;
+	while (begin != end && equal(*begin,first))
+	{
+		retVal += *begin++ ;
+		++ count ;
+	}
+	return retVal /= (double) count ;
+}
+
+template<class T, class forwardIterator, class outputIterator>
+inline void averageToNew(forwardIterator begin, forwardIterator end,
+		  bool (*equal)(const T&,const T&), outputIterator target)
+{
+	while (begin != end)
+		*target++ = average(begin, end, equal) ;
+} ;
+
 #endif

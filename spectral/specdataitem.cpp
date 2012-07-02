@@ -1,94 +1,73 @@
 #include "specdataitem.h"
+#include "specdatapoint.h"
+#include "specdescriptor.h"
 #include <QVariant>
-#include <QTextStream>
-#include "speckineticrange.h"
-#include <QDebug>
+#include <utility-functions.h>
 
 
-void specDataFilter::applyCorrection(double &t, double &wn, double &in) const
+void specDataItem::applyCorrection(specDataPoint& point) const
 {
-	in = in*factor+offset+slope*wn ;
+	point.nu += xshift ;
+	point.sig = point.sig*factor+offset+slope*point.nu ;
 }
 
-void specDataFilter::subMap(QList<specDataPoint> &data, const QMap<double, double> &toSub)
+void specDataItem::reverseCorrection(specDataPoint& point) const
+{
+	point.sig = (point.sig-offset-slope*point.nu)/factor ;
+	point.nu = point.nu - xshift ;
+}
+
+void specDataItem::subMap(const QMap<double, double> &toSub)
 {
 	for (int i = 0 ; i < data.size() ; i++)
 	{
-		double t= data[i][0], n = data[i][x], in = data[i][y] ;
-		applyCorrection(t,n,in) ;
-		if (toSub.contains(n))
-			in -= toSub[n] ;
-		reverseCorrection(t,n,in) ;
-		data[i].sig = in ;
+		specDataPoint point = data[i] ;
+		applyCorrection(point) ;
+		if (toSub.contains(point.nu))
+			point.sig -= toSub[point.nu] ;
+		reverseCorrection(point) ;
+		data[i] = point ;
 	}
+	invalidate() ;
 }
 
-void specDataFilter::reverseCorrection(double &t, double &wn, double &in) const
-{
-	in = (in-offset-slope*wn)/factor ;
-}
-
-bool specDataFilter::addData(QList<specDataPoint>& toBeAppended, const QVector<double>& times, const QVector<double>& wnums, const QVector<double>& ints, const QVector<double>& mints)
-{
-	QVector<double>::size_type size = qMax(times.size(),qMax(wnums.size(),qMax(ints.size(),mints.size()))) ;
-	for (QVector<double>::size_type i = 0 ; i < size ; i++)
-	{
-		double t = times[i], w = wnums[i], j = ints[i], m = mints[i] ;
-		reverseCorrection(t,w,j) ;
-		toBeAppended << specDataPoint(t,w,j,m) ;
-	}
-	return true ;
-}
-
-QVector<double> specDataFilter::wnums(const QList<specDataPoint>& data) const
+QVector<double> specDataItem::wnums() const
 {
 	QVector<double> retval ;
 	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
 	{
-		double xVal = data[i][x], yVal = data[i][y], t = data[i][0] ;
-		applyCorrection(t,xVal,yVal) ;
-		if (xVal > xmin && xVal < xmax && yVal > ymin && yVal < ymax)
-			retval += xVal ;
+		specDataPoint point = data[i] ;
+		applyCorrection(point) ;
+		retval << point.nu ;
 	}
 	return retval ;
 }
 
-QVector<double> specDataFilter::mints(const QList<specDataPoint>& data) const
+QVector<double> specDataItem::intensityData() const
+{
+	QVector<double> retval ;
+	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
+		retval << data[i].mint ;
+	return retval ;
+}
+
+QVector<double> specDataItem::ints() const
 {
 	QVector<double> retval ;
 	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
 	{
-		double xVal = data[i][x], yVal = data[i][y], t = data[i][0] ;
-		applyCorrection(t,xVal,yVal) ;
-		if (xVal > xmin && xVal < xmax && yVal > ymin && yVal < ymax)
-			retval += data[i].mint ;
+		specDataPoint point = data[i] ;
+		applyCorrection(point) ;
+		retval << point.nu ;
 	}
 	return retval ;
 }
 
-QVector<double> specDataFilter::ints(const QList<specDataPoint>& data) const
+QVector<double> specDataItem::times() const
 {
 	QVector<double> retval ;
 	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
-	{
-		double xVal = data[i][x], yVal = data[i][y], t = data[i][0] ;
-		applyCorrection(t,xVal,yVal) ;
-		if (xVal > xmin && xVal < xmax && yVal > ymin && yVal < ymax)
-			retval += yVal ;
-	}
-	return retval ;
-}
-
-QVector<double> specDataFilter::times(const QList<specDataPoint>& data) const
-{
-	QVector<double> retval ;
-	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
-	{
-		double xVal = data[i][x];
-		double yVal = data[i][y]*factor+offset+slope*xVal ;
-		if (xVal > xmin && xVal < xmax && yVal > ymin && yVal < ymax)
-			retval += data[i].t ;
-	}
+		retval << data[i].t ;
 	return retval ;
 }
 
@@ -96,15 +75,14 @@ QVector<double> specDataFilter::times(const QList<specDataPoint>& data) const
 
 specDataItem::specDataItem(QList<specDataPoint> dat, QHash<QString,specDescriptor> desc, specFolderItem* par, QString description)
 	: specModelItem(par,description),
-	  spectralData(dat),
-	  description(desc) // TODO copy QwtPlotCurve properties
+	  data(dat),
+	  description(desc),
+	  offset(0),
+	  slope(0),
+	  factor(1),
+	  xshift(0),
+	  zeroMultiplications(0)
 {
-}
-
-specDataItem::~specDataItem()
-{
-	spectralData.clear() ;
-	description.clear() ;
 }
 
 bool specDataItem::isEditable(QString key) const
@@ -132,26 +110,27 @@ bool specDataItem::changeDescriptor(QString key, QString value)
 
 bool specDataItem::setActiveLine(const QString& key, int line)
 {
-	if (key == "")
-		return specModelItem::setActiveLine(key,line) ;
 	if (description.contains(key))
 		return description[key].setActiveLine(line) ;
-
-	return false ;
+	return specModelItem::setActiveLine(key,line) ;
 }
 
 void specDataItem::refreshPlotData()
 {
-	QVector<double> x=filter.wnums(spectralData), y=filter.ints(spectralData);
+	QVector<double> x=wnums(data), y=ints(data);
 	processData(x,y) ;
-	setSamples(x,y) ;
-//	processData() ;
+	setSamples(x,y) ; // TODO QPointF
 }
 
 specDataItem::specDataItem(const specDataItem &other)
-	: description(other.description),
-	  spectralData(other.spectralData),
-	  filter(other.filter)
+	: specModelItem(other),
+	  description(other.description),
+	  data(other.data),
+	  offset(other.offset),
+	  slope(other.slope),
+	  factor(other.factor),
+	  xshift(other.xshift),
+	  zeroMultiplications(other.zeroMultiplications) ;
 {
 }
 
@@ -159,7 +138,6 @@ QString specDataItem::descriptor(const QString &key, bool full) const
 {
 	if (description.contains(key))
 		return description[key].content(full) ;
-	
 	return specModelItem::descriptor(key, full) ;
 }
 
@@ -170,66 +148,20 @@ QStringList specDataItem::descriptorKeys() const
 	return (specModelItem::descriptorKeys() << description.keys()) ;
 }
 
-QVector<double> specDataItem::wnums() const { return filter.wnums(spectralData) ; }
-QVector<double> specDataItem::ints() const { return filter.ints(spectralData) ; }
-QVector<double> specDataItem::mints() const { return filter.mints(spectralData) ; }
-QVector<double> specDataItem::times() const { return filter.times(spectralData) ; }
-
-QDataStream& specDataItem::readFromStream(QDataStream& stream)
+QDataStream& specDataItem::readFromStream(QDataStream &in)
 {
-// 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
-// 	cout << "Reading data item " << endl ;
-	QVector<specDataPoint>::size_type dataSize ;
-	QHash<QString,specDescriptor>::size_type descriptionSize ;
-	stream >> dataSize >> descriptionSize ;
-	// Lese Filterdaten
-	stream >> filter.x >> filter.y >> filter.xmin >> filter.xmax >> filter.ymin >> filter.ymax >> filter.offset >> filter.slope >> filter.factor ;
-	
-	for (QVector<specDataPoint>::size_type i = 0 ; i < dataSize ; i++)
-	{
-// 		cout << "reading data point " << i << " of " << dataSize << endl ;
-		spectralData += specDataPoint() ;
-		stream >> spectralData.last() ;
-	}
-	for (QHash<QString,specDescriptor>::size_type i=0 ; i < descriptionSize ; i++)
-	{
-// 		cout << "reading descriptor " << i << " of " << descriptionSize << endl ;
-		QString key;
-		stream >> key ;
-		qDebug("reading descriptor: \"%s\"",key.data()) ;
-		stream >> description[key] ;
-	}
-//	refreshPlotData() ;
-// 	cout << "done reading data item." << endl ;
-	qDebug("///////////// from stream is editable via this: %d", this->isEditable(""));
-	qDebug() << "////////// wnums: " << wnums() << ints() ;
-	return stream;
+	invalidate();
+	return in >> description >> data >> offset >> slope >> factor >> xshift >> zeroMultiplications ;
 }
 
-QDataStream& specDataItem::writeToStream(QDataStream& stream) const
+QDataStream& specDataItem::writeToStream(QDataStream& out) const
 {
-// 	qDebug("writing data item") ;
-// 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
-// 	cout << "ID export:  " << (quint8) spec::data << endl ;
-	stream << (quint8) spec::data << spectralData.size() << description.size() ; 
-	// Filterdaten ausgeben:
-	stream << filter.x << filter.y << filter.xmin << filter.xmax << filter.ymin << filter.ymax << filter.offset << filter.slope << filter.factor ;
-	
-	for (QVector<specDataPoint>::size_type i = 0 ; i < spectralData.size() ; i++)
-		stream << spectralData[i] ;
-	for (QHash<QString,specDescriptor>::size_type i = 0 ; i < description.size() ; i++)
-	{
-		qDebug("writing descriptor \"%s\"",description.keys()[i].data()) ;
-		stream << (description.keys()[i]) << (description[description.keys()[i]]) ;
-	}
-	return stream ;
+	return out << description << data << offset << slope << factor << xshift >> zeroMultiplications ;
 }
 
 specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
-{// TODO : merge descriptors
-	qDebug("Descriptor is editable before: %d",this->isEditable("")) ;
-	qDebug("Descriptor is editable other : %d",toAdd.isEditable("")) ;
-	qDebug("merging descriptors") ;
+{
+	// merging descriptors
 	for(QStringList::size_type i = 0 ; i < toAdd.description.keys().size() ; i++)
 	{
 		QString key = toAdd.description.keys()[i] ;
@@ -237,8 +169,8 @@ specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 		{
 			if (description[key].isNumeric())
 			{
-				double total = spectralData.size() + toAdd.spectralData.size() ;
-				description[key] = description[key].numericValue()*spectralData.size()/total + toAdd.description[key].numericValue()*toAdd.spectralData.size()/total ;
+				double total = data.size() + toAdd.data.size() ;
+				description[key] = description[key].numericValue()*data.size()/total + toAdd.description[key].numericValue()*toAdd.data.size()/total ;
 			}
 			else if (!descriptor(key).contains(toAdd.descriptor(key)))
 				description[key] = descriptor(key).append(", ").append(toAdd.descriptor(key)) ;
@@ -249,99 +181,69 @@ specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 	if (!descriptor("").contains(toAdd.descriptor("")) )
 		changeDescriptor("",toAdd.descriptor("").prepend(descriptor("").isEmpty() ?"" : descriptor("").append(", ")) ) ;
 	// merging actual data
-	qDebug() << "merging data. size before: " << spectralData.size() ;
-	filter.addData(spectralData, toAdd.times(),toAdd.wnums(),toAdd.ints(),toAdd.mints()) ;
-	qDebug() << "merging data. size after: " << spectralData.size() ;
+	for (QVector<double>::size_type i = 0 ; i < toAdd.data.size() ; i++)
+	{
+		specDataPoint point = toAdd.data[i] ;
+		toAdd.applyCorrection(point) ;
+		reverseCorrection(point) ;
+		data << point ;
+	}
 	return (*this) ;
 }
 
-void specDataItem::subMap(const QMap<double, double>& map)
-{
-	filter.subMap(spectralData, map) ;
-	invalidate() ;
-}
 
 void specDataItem::flatten(bool timeAverage, bool oneTime)
 {
-	qSort(spectralData) ;
-	for (QVector<specDataPoint>::size_type i = 0 ; i < spectralData.size() ; i++)
-	{
-		specDataPoint toCompare = spectralData[i] ;
-		QVector<specDataPoint>::size_type number = 1 ;
-		for (QVector<specDataPoint>::size_type j = i+1 ; j < spectralData.size() ; j++)
-		{
-			if((timeAverage && spectralData[j].nu == toCompare.nu) || spectralData[j] == toCompare)
-			{
-				spectralData[i] += spectralData.takeAt(j--) ;
-				number++ ;
-			}
-			else break ; // should be sorted here...
-		}
-		spectralData[i] /= number ;
-	}
+	qSort(data) ;
+	QVector<specDataPoint> newData ;
+	bool (*comparison)(const specDataPoint&, const specDataPoint&) =
+			[](const specDataPoint& a, const specDataPoint& b) { return a.nu == b.nu ;} ;
+	averageToNew(data.begin(), data.end(), comparison, std::back_inserter(newData)) ;
+
+	data = newData ; // TODO swap
+	// average Time
 	if(oneTime)
 	{
 		double time = 0 ;
-		for (QVector<specDataPoint>::size_type i = 0 ; i < spectralData.size() ; i++)
-			time += spectralData[i].t ;
-		time /= spectralData.size() ;
-		for (QVector<specDataPoint>::size_type i = 0 ; i < spectralData.size() ; i++)
-			spectralData[i].t = time ;
+		for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
+			time += data[i].t ;
+		time /= data.size() ;
+		for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
+			data[i].t = time ;
 	}
 	invalidate() ;
 }
 
 spec::descriptorFlags specDataItem::descriptorProperties(const QString& key) const
 {
-	if (key == "") return specModelItem::descriptorProperties(key) ;
-	if (!description.contains(key)) return spec::def ;
-	return description[key].flags() ;
+	if (description.contains(key)) return description[key].flags() ;
+	return specModelItem::descriptorProperties(key) ;
 }
 
-QMultiMap<double,QPair<double,double> >* specDataItem::kinetics(QList<specKineticRange*> ranges) const
-{
-// 	QTextStream cout(stdout,QIODevice::WriteOnly);
-	QMultiMap<double,QPair<double,double> > *kinetic = new QMultiMap<double,QPair<double,double> > ;
-	QVector<double> nu = wnums(), t = times(), sig = ints() ;
-	foreach (specKineticRange* range, ranges)
-	{
-		for (int i = 0 ; i < nu.size() ; i++)
-		{
-// 			cout << "nu:  " << nu[i] << "  interval:  " << range->minValue() << "  " << range->maxValue() << endl ;
-			if (range->contains(nu[i])) // TODO omit conversion
-			{
-				kinetic->insert(t[i],QPair<double,double>(nu[i],sig[i])) ;
-			}
-		}
-	}
-	
-// 	cout << "returning list with size:  " << kinetic->size() << endl ;
-	return  kinetic; // TODO implementieren
-}
 
 void specDataItem::scaleBy(const double& mul)
 {
-	filter.slope  *= mul ;
-	filter.factor *= mul ;
-	filter.offset *= mul ;
+	slope  *= mul ;
+	factor *= mul ;
+	offset *= mul ;
 	invalidate();
 }
 
 void specDataItem::addToSlope(const double& off)
 {
-	filter.slope += off ;
+	slope += off ;
 	invalidate();
 }
 
 void specDataItem::moveYBy(const double& off)
 {
-	filter.offset += off ;
+	offset += off ;
 	invalidate();
 }
 
 void specDataItem::moveXBy(const double & value)
 {
-	filter.addX(spectralData,value) ;
+	xshift += value ;
 	invalidate();
 }
 
@@ -354,7 +256,7 @@ void specDataFilter::addX(QList<specDataPoint> &data, const double &value)
 void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out)
 {
 	revalidate();
-	QVector<double> t = times(), w = wnums(), s = ints(), m = mints() ;
+	QVector<double> t = times(), w = wnums(), s = ints(), m = intensityData() ;
 	
 	for (int i = 0 ; i < headerFormat.size() ; i++)
 		out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
@@ -376,111 +278,68 @@ void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, c
 	out << endl ;
 }
 
-QVector<double> specDataItem::intensityData()
-{
-	return mints() ;
-}
-
 int specDataItem::removeData(QList<specRange *> *listpointer)
 {
 	QVector<double> wns = wnums() ;
 	int count = wns.size() ;
-	qDebug("data size before deletion: %d",spectralData.size()) ;
 	for (int j = 0 ; j < listpointer->size() ; j++)
 	{
 		specRange *range = listpointer->at(j) ;
-		for(int i = spectralData.size()-1 ; i >= 0 ; i--)
+		for(int i = data.size()-1 ; i >= 0 ; i--)
 		{
 			if(range->contains(wns[i]))
 			{
 				wns.remove(i) ;
-				spectralData.removeAt(i) ;
+				data.removeAt(i) ;
 			}
 		}
 	}
 	invalidate() ;
-	qDebug("data size after deletion: %d",spectralData.size()) ;
 	return count-wns.size() ;
 }
 
-void specDataItem::removeData(const QVector<int> &indexes)
+void specDataItem::removeData(QVector<int> indexes)
 {
-	QVector<int> sortedIndexes = indexes ;
-	qSort(sortedIndexes) ; // TODO do better, maybe no reference
-	for (int i = sortedIndexes.size()-1 ; i >= 0 ; --i)
-		spectralData.takeAt(sortedIndexes[i]) ;
-	invalidate();
+	QVector<specDataPoint> newData ;
+	int i = 0 ;
+	qSort(indexes) ;
+	QVector<int>::iterator it = indexes.begin() ;
+	for (i = 0 ; i < data.size() ; ++i)
+	{
+		if (it != indexes.end() && i == *it)
+			it++ ;
+		else
+			newData << data[i] ;
+	}
+
+	int count = data.size() - newData.size() ;
+	data = newData ; // TODO swap
+	return count ;
 }
 
-const QList<specDataPoint>& specDataItem::allData()
+const QVector<specDataPoint>& specDataItem::allData()
 {
-	return spectralData ;
+	return data ;
 }
 
-QList<specDataPoint> specDataItem::getData(const QVector<int> &indexes)
+QVector<specDataPoint> specDataItem::getData(const QVector<int> &indexes)
 {
-	QList<specDataPoint> desiredData ;
+	QVector<specDataPoint> desiredData(indexes) ;
 	for (int i = 0 ; i < indexes.size() ; ++i)
-		desiredData << spectralData[indexes[i]] ;
+		desiredData[i] = data[indexes[i]] ;
 	return desiredData ;
 }
 
 void specDataItem::clearData()
 {
-	spectralData.clear();
+	data.clear();
+	invalidate();
 }
 
 void specDataItem::insertData(const QList<specDataPoint> &newData)
 {
-	spectralData << newData ; // TODO performance, filter
-	qSort(spectralData) ;
+	data << newData ;
+	qSort(data) ;
 	invalidate();
 }
 
-void specDataItem::average(int num)
-{
-	QVector<double> times = filter.times(spectralData), nus = filter.wnums(spectralData), sigs = filter.ints(spectralData), mints = filter.mints(spectralData);
-	spectralData.clear();
-	for (int i = 0 ; i+num < times.size() ; i += num)
-	{
-		double time = 0, nu = 0, sig = 0, mint = 0 ;
-		for (int j = i  ; j < i+num ; j++)
-		{
-			time += times[j] ;
-			nu   += nus  [j] ;
-			sig  += sigs [j] ;
-			mint = qMax(mint,mints[j]) ;
-		}
-		spectralData << specDataPoint(time/(double) num, nu/(double) num, sig/(double) num, mint) ;
-	}
-	filter.offset = 0. ;
-	filter.slope  = 0. ;
-	filter.factor = 1.0;
-	invalidate() ;
-}
-
-void specDataItem::movingAverage(int num)
-{
-	QVector<double> times = filter.times(spectralData), nus = filter.wnums(spectralData), sigs = filter.ints(spectralData), mints = filter.mints(spectralData);
-	spectralData.clear();
-	qDebug() << times << nus << sigs << mints ;
-	for (int i = num ; i < times.size() - num ; i++)
-	{
-		double time = 0, nu = 0, sig = 0, mint = 0 ;
-		for (int j = i-num ; j < i+num+1 ; j++)
-		{
-			time += times[j] ;
-			nu   += nus  [j] ;
-			sig  += sigs [j] ;
-			mint = qMax(mint,mints[j]) ;
-			qDebug() << "Addiere Werte:" << j << times[j] << nus[j] << sigs[j] ;
-		}
-		double div = 2.*num+1 ;
-		qDebug() << "erste Werte:" << time << nu << sig << mint << num << div ;
-		spectralData << specDataPoint(time/div, nu/div, sig/div, mint) ;
-	}
-	filter.offset = 0. ;
-	filter.slope  = 0. ;
-	filter.factor = 1.0;
-	invalidate() ;
-}
