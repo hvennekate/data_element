@@ -72,8 +72,10 @@ bool specModelItem::changeDescriptor(QString key, QString value)
 	return false ;
 }
 
-bool specModelItem::setActiveLine(const QString&, int)
+bool specModelItem::setActiveLine(const QString& key, int line)
 {
+	if (key == "")
+		return description.setActiveLine(line) ;
 	return false ;
 }
 
@@ -236,7 +238,7 @@ void specModelItem::exportData(const QList<QPair<bool,QString> >& headerFormat, 
 	out << endl ;
 }
 
-QVector<double> specModelItem::intensityData()
+QVector<double> specModelItem::intensityData() const
 {
 	return QVector<double>() ;
 }
