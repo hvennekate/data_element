@@ -32,9 +32,9 @@ int main(int argc, char *argv[])
 {
 	Q_INIT_RESOURCE(application);
 	QCoreApplication::setOrganizationName("MPIbpC") ;
-	QCoreApplication::setOrganizationDomain("mpibpc.gwdg.de") ;
+	QCoreApplication::setOrganizationDomain("mpibpc.mpg.de") ;
 	QCoreApplication::setApplicationName("spec-PumpProbe") ;
-	QApplication app(argc, argv);
+	QApplication app(argc, argv) ;
 	specAppWindow* mainWindow = new specAppWindow();
 	mainWindow->show();
 	return app.exec();

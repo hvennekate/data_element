@@ -6,22 +6,31 @@
 #include "specdatapoint.h"
 #include "specdescriptor.h"
 
-struct specDataFilter{ // TODO Eventuell direkt in specDataItem integrieren oder als friend Klasse.
-	int x,y ;
-	double xmin, xmax, ymin, ymax, offset, slope, factor ;
-	specDataFilter() : x(1), y(2), xmin(-INFINITY), xmax(INFINITY), ymin(-INFINITY), ymax(INFINITY), offset(0), slope(0), factor(1) {}
-	QVariant plotData(const QList<specDataPoint>&) const;
-	QVector<double> wnums(const QList<specDataPoint>&) const ;
-	QVector<double> ints(const QList<specDataPoint>&) const ;
-	QVector<double> times(const QList<specDataPoint>&) const ;
-	QVector<double> mints(const QList<specDataPoint>&) const ;
+/*! \brief Filter-Klasse fuer Plotdaten
+
+  Filtert Daten nach
+	\f$ \tilde{y} = a\cdot y + b\cdot x + c \f$
+ */
+class specDataFilter
+{ // TODO Eventuell direkt in specDataItem integrieren oder als friend Klasse.
+private:
+	double offset, slope, factor ;
+	void applyCorrection(double &t, double &wn, double &in) const; /*!< Korrektur anwenden. */
+	void reverseCorrection(double &t, double &wn, double &in) const; /*!< Korrektur rueckhaengig machen. */
+public:
+	specDataFilter() : offset(0), slope(0), factor(1) {}
+	QVector<double> wnums(const QList<specDataPoint>&) const ; /*!< Wellenzahlen */
+	QVector<double> ints(const QList<specDataPoint>&) const ;  /*!< Intensitaeten */
+	QVector<double> times(const QList<specDataPoint>&) const ; /*!< Zeiten */
+	QVector<double> mints(const QList<specDataPoint>&) const ; /*!< Maximalintensitaeten */
 	
-	bool addData(QList<specDataPoint>&, const QVector<double>&, const QVector<double>&, const QVector<double>&, const QVector<double>&) ;
+	bool addData(QList<specDataPoint>& existingList,
+		     const QVector<double>& newTimes,
+		     const QVector<double>& newWnums,
+		     const QVector<double>& newInts,
+		     const QVector<double>& newMInts) const ;
 	void subMap(QList<specDataPoint>& data, const QMap<double,double>& toSub) ;
 	void addX(QList<specDataPoint>& data, const double& value) ;
-	private:
-		void applyCorrection(double &t, double &wn, double &in) const;
-		void reverseCorrection(double &t, double &wn, double &in) const;
 };
 
 /*! List item which holds data.*/
