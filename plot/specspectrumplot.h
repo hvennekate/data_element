@@ -15,9 +15,18 @@ class specSpectrumPlot : public specPlot
 {
 	Q_OBJECT
 private:
-	QAction *offsetAction, *offlineAction, *scaleAction, *shiftAction, *printAction ;
-	QAction *setReferenceAction, *alignWithReferenceAction, *addRangeAction, *removeRangeAction, *noSlopeAction ;
-	QAction *modifySVGs ;
+	QAction *offsetAction,
+		*offlineAction,
+		*scaleAction,
+		*shiftAction,
+		*printAction,
+		*setReferenceAction,
+		*alignWithReferenceAction,
+		*addRangeAction,
+		*removeRangeAction,
+		*noSlopeAction,
+		*modifySVGs,
+		*subInterpolatedAction ;
 	QActionGroup *correctionActions, *alignmentActions ;
 	CanvasPicker *correctionPicker, *alignmentPicker, *SVGpicker ;
 	specActionLibrary *undoPartner ;
@@ -35,7 +44,7 @@ private:
 
 public:
 	explicit specSpectrumPlot(QWidget *parent = 0);
-	QList<QAction*> actions() { return QList<QAction*>() << correctionActions->actions() << alignmentActions->actions() << printAction << modifySVGs; }
+	QList<QAction*> actions() { return QList<QAction*>() << correctionActions->actions() << setReferenceAction << alignmentActions->actions() << printAction << modifySVGs; }
 	void setView(specView* mod) { view = mod ; }
 	void setUndoPartner(specActionLibrary* lib) { qDebug("setting action lib") ; undoPartner = lib ; ((specUndoAction*) printAction)->setLibrary(lib);}
 	static specMultiCommand* generateCorrectionCommand(const QwtPlotItemList& zeroRanges, const QwtPlotItemList& spectra, const QMap<double, double>& referenceSpectrum, const specView*, bool noSlope = false) ;
@@ -48,6 +57,7 @@ private slots:
 	void applyZeroRanges(specCanvasItem* range,int point, double x, double y) ;
 	void resizeSVG(specCanvasItem*, int point, double x, double y) ;
 	void modifyingSVGs(const bool&) ;
+	void multipleSubtraction() ;
 };
 
 #endif // SPECSPECTRUMPLOT_H

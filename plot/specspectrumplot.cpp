@@ -12,6 +12,7 @@
 #include "actionlib/specprintplotaction.h"
 #include "specsvgitem.h"
 #include "actionlib/specresizesvgcommand.h"
+#include "actionlib/specexchangedatacommand.h"
 
 void specSpectrumPlot::toggleAligning(bool on)
 {
@@ -50,6 +51,7 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	shiftAction   = new QAction("shift x",correctionActions) ;
 	printAction   = new specPrintPlotAction(this) ;
 	modifySVGs    = new QAction("Modify SVGs",this) ;
+	subInterpolatedAction = new QAction(QIcon(":/multiminus.png"), "Subtraction",this) ;
 
 	correctionActions->addAction(offsetAction) ;
 	correctionActions->addAction(offlineAction) ;
@@ -82,7 +84,7 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	image.save(&buffer,"PNG") ;
 
 	invalidateReference();
-	alignmentActions->addAction(setReferenceAction) ;
+//	alignmentActions->addAction(setReferenceAction) ;
 	alignmentActions->addAction(alignWithReferenceAction) ;
 	alignmentActions->addAction(addRangeAction) ;
 	alignmentActions->addAction(removeRangeAction) ;
@@ -92,6 +94,7 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	connect(alignWithReferenceAction,SIGNAL(toggled(bool)),this,SLOT(correctionsChanged())) ;
 	connect(alignmentActions,SIGNAL(triggered(QAction*)),this,SLOT(alignmentChanged(QAction*))) ;
 	connect(modifySVGs,SIGNAL(triggered(bool)),this,SLOT(modifyingSVGs(bool))) ;
+	connect(subInterpolatedAction, SIGNAL(triggered()), this, SLOT(multipleSubtraction())) ;
 }
 
 QList<specDataItem*> specSpectrumPlot::folderContent(specModelItem *folder)
@@ -392,7 +395,7 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 		}
 		specPlotMoveCommand *command = new specPlotMoveCommand(zeroCommand) ;
 		if (view && view->model())
-		command->setItem(view->model()->index(spectrum));
+			command->setItem(view->model()->index(spectrum));
 		qDebug() << "setting slope and offset" << offset << slope ;
 		command->setCorrections(0,-offset,-slope,1.) ;
 	}
@@ -479,4 +482,48 @@ void specSpectrumPlot::resizeSVG(specCanvasItem *item, int point, double x, doub
 	command->setParentWidget(this) ;
 	command->setItem(view->model()->index(pointer),bounds) ;
 	undoPartner->push(command) ;
+}
+
+void specSpectrumPlot::multipleSubtraction()
+{
+	QwtPlotItemList spectra = itemList(spec::spectrum) ;
+	// prepare map of x and y values
+	QMap<double,double> referenceSpectrum ; // TODO convert reference spectrum to map!
+	for (int i = 0 ; i < reference->dataSize() ; ++i)
+		referenceSpectrum[reference->sample(i).x()] = reference->sample(i).y() ;
+	// TODO more efficient undo:  generate added/subtracted spectrum (interpolated points included)
+	specMultiCommand* subCommand = new specMultiCommand ;
+	for (int i = 0 ; i < spectra.size() ; ++i)
+	{
+		specDataItem* spectrum = dynamic_cast<specDataItem*>(spectra[i]) ;
+		if (!spectrum) continue ;
+		QVector<specDataPoint> data = spectrum->allData() ;
+		spectrum->applyCorrection(data) ;
+		QMap<double,double>::iterator lower, upper ;
+		for (int i = 0 ; i < data.size() ; ++i)
+		{
+			lower = referenceSpectrum.lowerBound(data[i].nu) ;
+			if (lower == referenceSpectrum.end()) continue ;
+			double toSub = 0 ;
+			if (lower.key() == data[i].nu)
+				toSub = lower.value() ;
+			else // start interpolating
+			{
+				if (lower == referenceSpectrum.begin()) continue ;
+				upper = lower-- ;
+				toSub = lower.value() + (upper.value()-lower.value())
+							 * (data[i].nu-lower.key())
+							 / (upper.key()-lower.key());
+			}
+			data[i].sig -= toSub ;
+		}
+		spectrum->reverseCorrection(data) ;
+		specExchangeDataCommand *command = new specExchangeDataCommand(subCommand) ;
+		if (view && view->model())
+			command->setItem(view->model()->index(spectrum),data);
+	}
+
+	subCommand->setParentWidget(view) ;
+	undoPartner->push(subCommand) ;
+	replot() ;
 }
