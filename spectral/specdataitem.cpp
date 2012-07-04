@@ -276,45 +276,36 @@ int specDataItem::removeData(QList<specRange *> *listpointer)
 	return diff ;
 }
 
-void specDataItem::removeData(QVector<int> indexes)
+QVector<specDataPoint> specDataItem::getDataExcept(const QList<specRange*>& ranges)
 {
 	QVector<specDataPoint> newData ;
-	int i = 0 ;
-	qSort(indexes) ;
-	QVector<int>::const_iterator it = indexes.begin() ;
-	for (i = 0 ; i < data.size() ; ++i)
+	for (int i = 0 ; i < data.size() ; ++i)
 	{
-		if (it != indexes.end() && i == *it)
-			it++ ;
-		else
-			newData << data[i] ;
+		specDataPoint point = data[i] ;
+		applyCorrection(point) ;
+		foreach(specRange* range, ranges)
+			if (range->contains(point.nu))
+				continue ;
+		newData << data[i] ;
 	}
-
-	data = newData ; // TODO swap
+	return newData ;
 }
 
-const QVector<specDataPoint>& specDataItem::allData() const
+void specDataItem::applyCorrection(QVector<specDataPoint> &newData) const
 {
-	return data ;
+	for (int i = 0 ; i < newData.size() ; ++i)
+		applyCorrection(newData[i]) ;
 }
 
-QVector<specDataPoint> specDataItem::getData(const QVector<int> &indexes)
+void specDataItem::reverseCorrection(QVector<specDataPoint> &newData) const
 {
-	QVector<specDataPoint> desiredData(indexes.size()) ;
-	for (int i = 0 ; i < indexes.size() ; ++i)
-		desiredData[i] = data[indexes[i]] ;
-	return desiredData ;
+	for (int i = 0 ; i < newData.size() ; ++i)
+		reverseCorrection(newData[i]) ;
 }
 
-void specDataItem::clearData()
+void specDataItem::setData(const QVector<specDataPoint> &newData)
 {
-	data.clear();
-	invalidate();
-}
-
-void specDataItem::insertData(const QVector<specDataPoint> &newData)
-{
-	data << newData ;
+	data = newData ;
 	qSort(data) ;
 	invalidate();
 }

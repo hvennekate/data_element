@@ -59,9 +59,6 @@ SOURCES += main.cpp \
     actionlib/spectreeaction.cpp \
     actionlib/specmulticommand.cpp \
     actionlib/specmergeaction.cpp \
-    actionlib/specremovedatacommand.cpp \
-    actionlib/specmanagedatacommand.cpp \
-    actionlib/specinsertdatacommand.cpp \
     actionlib/specremovedataaction.cpp \
     actionlib/specaveragedataaction.cpp \
     actionlib/specexchangedatacommand.cpp \
@@ -153,9 +150,6 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/spectreeaction.h \
     actionlib/specmulticommand.h \
     actionlib/specmergeaction.h \
-    actionlib/specremovedatacommand.h \
-    actionlib/specmanagedatacommand.h \
-    actionlib/specinsertdatacommand.h \
     actionlib/specremovedataaction.h \
     actionlib/specaveragedataaction.h \
     actionlib/specexchangedatacommand.h \

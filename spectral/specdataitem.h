@@ -32,11 +32,11 @@ public:
 //	specDataItem(const specDataItem&) ;
 
 	/* For undo commands managing raw data */
-	QVector<specDataPoint> getData(const QVector<int>& indexes) ;
-	const QVector<specDataPoint>& allData() const ;
-	void insertData(const QVector<specDataPoint>&) ;
-	void clearData() ;
-	void removeData(QVector<int>) ;
+	const QVector<specDataPoint>& allData() const { return data ; }
+	void setData(const QVector<specDataPoint>&) ;
+	QVector<specDataPoint> getDataExcept(const QList<specRange*>& ranges) ;
+	void applyCorrection(QVector<specDataPoint>&) const ;
+	void reverseCorrection(QVector<specDataPoint>&) const ;
 
 	/* Description related */
 	QString descriptor(const QString &key, bool full =true) const ;
