@@ -91,7 +91,8 @@ SOURCES += main.cpp \
     kinetic/specminvariable.cpp \
     kinetic/specmaxvariable.cpp \
     kinetic/specmetadelegate.cpp \
-    kinetic/specmetarange.cpp
+    kinetic/specmetarange.cpp \
+    log/speclogwidget.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -184,7 +185,8 @@ HEADERS += cutbyintensitydialog.h \
     kinetic/specminvariable.h \
     kinetic/specmaxvariable.h \
     kinetic/specmetadelegate.h \
-    kinetic/specmetarange.h
+    kinetic/specmetarange.h \
+    log/speclogwidget.h
 
 INCLUDEPATH += kinetic \
 	log \

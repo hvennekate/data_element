@@ -20,17 +20,16 @@ private:
 	QVBoxLayout *layout ;
 	specPlot *plot ;
 	QWidget *content ;
-	QWidget *directParent ;
 	QSplitter *splitter ;
 	specMetaView *items ;
 private slots:
 	void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) ;
-// 	void currentChanged(const QItemSelection & selected, const QItemSelection & deselected) ;
 protected:
 	void contextMenuEvent(QContextMenuEvent*) ;
 public:
 	specKineticWidget ( QString, QWidget *parent = 0 );
 	~specKineticWidget();
+	void addToolbar(specActionLibrary*) ;
 
 	specPlot *internalPlot() { return plot ; }
 	

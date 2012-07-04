@@ -23,6 +23,7 @@ void specPlotWidget::changeFileName(const QString& name)
 	onDisk->setFileName(name) ;
 	setWindowTitle(QFileInfo(name).fileName()) ;
 	kineticWidget->setWindowTitle(QString("Kinetics of ").append(QFileInfo(name).fileName())) ;
+	logWidget->setWindowTitle(QString("Logs of ").append(QFileInfo(name).fileName())) ;
 }
 
 void specPlotWidget::contextMenuEvent(QContextMenuEvent* event)
@@ -41,12 +42,12 @@ void specPlotWidget::contextMenuEvent(QContextMenuEvent* event)
 }
 
 specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
-: QDockWidget(QFileInfo(fileName).fileName(), parent)
+	: QDockWidget(QFileInfo(fileName).fileName(), parent),
+	  actions(new specActionLibrary(this))
 {
 	kineticWidget = new specKineticWidget(QString(),this) ;
 
 	onDisk  = new QFile() ;
-	changeFileName(fileName) ;
 	QDataStream in ;
 	if(onDisk->exists())
 	{
@@ -77,30 +78,10 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	
 	qDebug("read both data and kinetics models") ;
 	
-	qDebug() << "connecting to model" << kineticWidget->view()->model() << endl ;
-//	kineticWidget->view()->model()->connectToModel(items->model()) ; // TODO mysterious crashes here.
-	qDebug() << "connected data model" << endl ;
-//	kineticWidget->view()->model()->connectToPlot(plot) ;
-	qDebug() << "connected data plot" << endl ;
-// 	setTitleBarWidget(new specDockTitle) ;
+	logWidget = new specLogWidget(items->model(), parent) ;
+	changeFileName(fileName) ;
 
-	// TODO outsource... clean-up for log widget ... title for log dock window
-	logWidget = new QDockWidget("Logs",parent) ;
-	QWidget *logContent = new QWidget(logWidget) ;
-	logWidget->setFloating(true) ;
-	logs = new specLogView(logWidget) ;
-	logs->setModel(new specLogModel(items->model(),logs));
-//	logs->model()->setMimeTypes(QStringList("application/spec.log.item"));
-	logs->model()->mimeConverters[QString("application/spec.log.item")] = new specLogToDataConverter ;
 	QToolBar *logToolbar = new QToolBar(logWidget) ;
-	foreach(QAction* pointer, logs->actions())
-		logToolbar->addAction(pointer) ;
-
-	QVBoxLayout *logLayout = new QVBoxLayout ;
-	logLayout->addWidget(logToolbar) ;
-	logLayout->addWidget(logs) ;
-	logContent->setLayout(logLayout);
-	logWidget->setWidget(logContent);
 
 	qDebug("creating actions, toolbars, connections") ;
 
@@ -117,18 +98,14 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	
 	layout -> addWidget(toolbar) ;
 	qDebug("adding undo toolbar") ;
-	actions = new specActionLibrary(this) ;
 	layout -> addWidget(actions->toolBar(items)) ;
 	layout -> addWidget(actions->toolBar(plot)) ;
-	layout -> addWidget(actions->toolBar(kineticWidget->view()));
-	layout -> addWidget(actions->toolBar(logs)) ;
 
-//	items->model()->setMimeTypes(QStringList() << "application/spec.spectral.item" << "application/spec.log.item") ;
 	items->model()->mimeConverters[QString("application/spec.spectral.item")] = new specMimeConverter ;
 	items->model()->mimeConverters[QString("application/spec.log.item")] = new specLogToDataConverter ;
 	actions->addDragDropPartner(items->model()) ;
-	actions->addDragDropPartner(kineticWidget->view()->model()) ;
-	actions->addDragDropPartner(logs->model());
+	logWidget->addToolbar(actions) ;
+	kineticWidget->addToolbar(actions) ;
 	plot->setUndoPartner(actions) ;
 	qDebug("added undo toolbar") ;
 	layout -> addWidget(splitter)  ;
@@ -148,8 +125,6 @@ specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
 	onDisk->close() ;
 
 	actions->addPlot(plot) ;
-	actions->addPlot(kineticWidget->internalPlot()) ;
-	qDebug() << "connected plots:" << plot << kineticWidget->internalPlot() ;
 	kineticWidget->view()->assignDataView(items) ;
 // TODO reconnect setFont() slot
 }
@@ -161,28 +136,11 @@ void specPlotWidget::modified()
 		currentTitle.append(" *") ;
 	setWindowTitle(currentTitle) ;
 	kineticWidget->setWindowTitle(QString("Kinetics of ").append(currentTitle)) ;
+	logWidget->setWindowTitle(QString("Logs of ").append(currentTitle)) ;
 }
 
 void specPlotWidget::createActions()
 {
-/*	importAction = new QAction(QIcon(":/fileimport.png"), tr("&Import"), this);
-	importAction->setShortcut(tr("Ctrl+I"));
-	importAction->setStatusTip(tr("Import a file"));
-	connect(importAction, SIGNAL(triggered()), this, SLOT(modified())) ;
-	connect(importAction, SIGNAL(triggered()), items, SLOT(importFile()));
-	
-	newItemAction = new QAction(QIcon(":/folder_new.png"), tr("&Neuer Eintrag"), this);
-	importAction->setShortcut(tr("Ctrl+E"));
-	importAction->setStatusTip(tr("Neuen Eintrag anlegen"));
-	connect(newItemAction, SIGNAL(triggered()), this, SLOT(modified())) ;
-	connect(newItemAction, SIGNAL(triggered()), items, SLOT(newItem()));
-	
-	deleteAction = new QAction(QIcon(":/item_delete.png"), tr("&Löschen"), this);
-	deleteAction->setShortcut(tr("Entf"));
-	deleteAction->setStatusTip(tr("Markierte Einträge löschen"));
-	connect(deleteAction, SIGNAL(triggered()), this, SLOT(modified())) ;
-	connect(deleteAction, SIGNAL(triggered()), items, SLOT(deleteItems()));*/
-	
 	saveAction = new QAction(QIcon(":/filesave.png"), tr("&Save"), this);
 	saveAction->setShortcut(tr("Strg+S"));
 	saveAction->setStatusTip(tr("Save"));
@@ -192,12 +150,8 @@ void specPlotWidget::createActions()
 	saveAsAction->setShortcut(tr("Strg+Shift+S"));
 	saveAsAction->setStatusTip(tr("Save as..."));
 	connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveFile()));
-	
-/*	treeAction = new QAction(QIcon(":/tree.png"), tr("Baum aufbauen"), this) ;
-	treeAction->setShortcut(tr("Ctrl+T"));
-	treeAction->setStatusTip(tr("Elemente kategorisieren"));
-	connect(treeAction, SIGNAL(triggered()), this, SLOT(modified())) ;
-	connect(treeAction, SIGNAL(triggered()), items, SLOT(buildTree())) ;*/
+
+	printAction = new QAction(QIcon::fromTheme("document-print"), tr("Print..."), this) ;
 	
 	kineticsAction = kineticWidget->toggleViewAction() ;
 	kineticsAction->setIcon(QIcon(":/kineticwindow.png")) ;
@@ -207,107 +161,9 @@ void specPlotWidget::createActions()
 	kineticsAction->setStatusTip(tr("Kinetikfenster anzeigen")) ;
 
 	logAction = logWidget->toggleViewAction() ;
+	logAction->setIcon(QIcon(":/logs.png")) ;
 	logAction->setText(tr("Log-Fenster")) ;
 	logAction->setParent(this) ;
-	
-	toKineticAction = new QAction(QIcon(":/toKinetic.png"), tr("Add to current kinetic"), this) ;
-	toKineticAction ->setStatusTip(tr("To current kinetic")) ;
-	connect(toKineticAction, SIGNAL(triggered()), this, SLOT(toKinetic())) ;
-	
-	fromKineticAction = new QAction(QIcon(":/fromKinetic.png"), tr("Select from current kinetic"), this) ;
-	fromKineticAction ->setStatusTip(tr("Select items connected to current kinetic")) ;
-	connect(fromKineticAction, SIGNAL(triggered()), this, SLOT(fromKinetic())) ;
-}
-
-void specPlotWidget::toKinetic()
-{
-//	kineticWidget->view()->addToCurrent(items->getSelection()) ;
-}
-
-void specPlotWidget::fromKinetic()
-{
-//	specKinetic *pointer = dynamic_cast<specKinetic*>((specModelItem*) kineticWidget->view()->currentIndex().internalPointer()) ;
-//	if (pointer)
-//	{
-//		items->selectionModel()->select(QModelIndex(),QItemSelectionModel::Clear) ;
-//		QItemSelection newSelection ;
-//		QModelIndexList list = pointer->connectedData() ;
-//		foreach(QModelIndex index, list)
-//			newSelection.select(index,index.model()->index(index.row(),index.model()->columnCount(index.parent())-1,index.parent())) ;
-//		items->selectionModel()->select(newSelection,QItemSelectionModel::Select) ;
-//	}
-}
-
-void specPlotWidget::newKinetics()
-{
-	kineticWidget = new specKineticWidget(windowTitle(),this) ;
-// 	QList<specModelItem*> list = items->currentlySelected() ;
-// 	foreach(specModelItem* pointer, list)
-// 		kineticWidget->addItem(pointer) ;
-	kineticWidget->show() ;
-}
-
-// void specPlotWidget::zeroCorrection()
-// {
-// 	if (zeroCorrectionAction->isChecked())
-// 	{
-// ///		plot->picker()->setMoveMode(spec::newZero) ;
-// // 		addZeroRangeAction->setEnabled(true) ;
-// // 		individualZeroAction->setEnabled(true) ;
-// 		scaleAction->setEnabled(false) ;
-// 		offsetAction->setEnabled(false);
-// 		offlineAction->setEnabled(false);
-// 	}
-// 	else
-// 	{
-// ///		plot->picker()->setMoveMode(spec::none) ;
-// 		addZeroRangeAction->setEnabled(false) ;
-// 		deleteZeroRangeAction->setEnabled(false) ;
-// 		individualZeroAction->setEnabled(false) ;
-// 		scaleAction->setEnabled(true) ; // TODO put actions into array
-// 		offsetAction->setEnabled(true);
-// 		offlineAction->setEnabled(true);
-// 		scaleCurve() ;
-// 		offlineCurve() ;
-// 		offsetCurve() ;
-// 	}
-// 	plot->replot() ;
-// }
-
-void specPlotWidget::scaleCurve() // TODO set-up scale, offset, slope actions.
-{
-///	if (scaleAction->isChecked())
-///		plot->picker()->enableMoveMode(spec::scale) ;
-///	else
-///		plot->picker()->disableMoveMode(spec::scale) ;
-	plot->replot() ;
-}
-
-void specPlotWidget::offsetCurve()
-{
-// 	if (offsetAction->isChecked())
-// 	{
-///		plot->picker()->enableMoveMode(spec::shift) ;
-// 		offlineAction->setEnabled(true) ;
-///		if(offlineAction->isChecked())
-///			plot->picker()->enableMoveMode(spec::slope) ;
-// 	}
-// 	else
-// 	{
-// 		offlineAction->setDisabled(true) ;
-///		plot->picker()->disableMoveMode(spec::shift) ;
-///		plot->picker()->disableMoveMode(spec::slope) ;
-// 	}
-// 	plot->replot() ;
-}
-
-void specPlotWidget::offlineCurve()
-{
-///	if (offlineAction->isChecked())
-///		plot->picker()->enableMoveMode(spec::slope) ;
-///	else
-///		plot->picker()->disableMoveMode(spec::slope) ;
-// 	plot->replot() ;
 }
 
 void specPlotWidget::createToolbars()
@@ -315,31 +171,18 @@ void specPlotWidget::createToolbars()
 	toolbar = new QToolBar(tr("File"));
 	toolbar-> setContentsMargins(0,0,0,0) ;
 	toolbar-> setIconSize(QSize(20,20)) ;
-	
-	foreach(QAction* pointer, items->actions())
-		toolbar->addAction(pointer) ;
-	
+
 	toolbar-> addAction(saveAction) ;
 	toolbar-> addAction(saveAsAction) ;
-// 	toolbar-> addAction(exportAction) ;
-// 	toolbar-> addAction(scaleAction);
-// 	toolbar-> addAction(offsetAction);
-// 	toolbar-> addAction(offlineAction);
-// 	toolbar-> addAction(zeroCorrectionAction) ;
-// 	toolbar-> addAction(addZeroRangeAction);
-// 	toolbar-> addAction(deleteZeroRangeAction);
-// 	toolbar-> addAction(individualZeroAction);
-	toolbar->addAction(logAction) ;
+	toolbar-> addAction(printAction) ;
+	toolbar-> addSeparator() ;
+	toolbar-> addAction(logAction) ;
 	toolbar-> addAction(kineticsAction) ;
-	toolbar-> addAction(toKineticAction) ;
-	toolbar-> addAction(fromKineticAction) ;
+	toolbar-> addSeparator() ;
+	toolbar-> addAction(actions->undoAction(this)) ;
+	toolbar-> addAction(actions->redoAction(this)) ;
 	foreach(QAction* action, plot->actions())
 		toolbar->addAction(action) ;
-// 	QMenu *testmenu = new QMenu("test") ;
-// // 	testmenu->addAction(importAction) ;
-// 	testmenu->setIcon(QIcon(":/folder_new.png")) ;
-// // 	testmenu->addAction(scaleAction) ;
-// 	toolbar->addAction(testmenu->menuAction()) ;
 }
 
 void specPlotWidget::closeEvent(QCloseEvent* event)
@@ -379,7 +222,7 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 			qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(kineticWidget) ;
 			qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(this) ;
 			qobject_cast<QMainWindow*>(parentWidget())->repaint() ;
-			delete kineticWidget ;
+			delete kineticWidget ; // TODO destructor!?
 			destroy(true,true) ;
 			delete(this) ;
 			event->accept() ;

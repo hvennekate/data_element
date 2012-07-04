@@ -7,6 +7,7 @@
 specTreeAction::specTreeAction(QObject *parent) :
 	specUndoAction(parent)
 {
+	setIcon(QIcon(":/tree.png")) ;
 }
 
 void specTreeAction::execute()

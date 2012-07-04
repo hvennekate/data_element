@@ -18,6 +18,7 @@ class specActionLibrary ;
 
 class specView ;
 class specModel ;
+class specUndoAction ;
 
 class specActionLibrary : public QObject
 {
@@ -37,6 +38,9 @@ public:
 	void addPlot(specPlot*) ;
 
 	static specUndoCommand* commandById(int id, specUndoCommand* parent = 0) ;
+	QAction* undoAction(QObject*) ;
+	QAction* redoAction(QObject*) ;
+
 signals:
 	void stackChanged() ;
 private:
@@ -45,7 +49,7 @@ private:
 	QVector<specModel*> partners;
 	QModelIndexList lastRequested ;
 	void addParent(QWidget*) ;
-
+	void addNewAction(QToolBar*, specUndoAction*) ;
 };
 
 #endif // SPECACTIONLIBRARY_H

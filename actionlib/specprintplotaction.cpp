@@ -13,6 +13,7 @@ specPrintPlotAction::specPrintPlotAction(QObject *parent) :
 	QSize plotSize = plot->size() ;
 	double aspectRatio = (double) plotSize.width() / plotSize.height() ;
 	printer->setOrientation(aspectRatio > 1. ? QPrinter::Landscape : QPrinter::Portrait) ;
+	setIcon(QIcon::fromTheme("document-print"));
 }
 
 const std::type_info &specPrintPlotAction::possibleParent()

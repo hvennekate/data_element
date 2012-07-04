@@ -17,6 +17,7 @@
 specMergeAction::specMergeAction(QObject *parent)
 	: specUndoAction(parent)
 {
+	setIcon(QIcon(":/merge.png")) ;
 }
 
 void specMergeAction::execute()

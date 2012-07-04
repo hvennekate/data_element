@@ -43,5 +43,6 @@
         <file>mave.png</file>
         <file>multiminus.png</file>
         <file>newMinus.png</file>
+        <file>logs.png</file>
     </qresource>
 </RCC>
