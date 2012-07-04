@@ -30,8 +30,7 @@ void specExchangeDataCommand::redo()
 		return ;
 	specDataItem *pointer = (specDataItem*) (item->items().first()) ;
 	QVector<specDataPoint> currentData(pointer->allData()) ; // TODO introduce swap here via function of the data item
-	pointer->clearData();
-	pointer->insertData(data) ;
+	pointer->setData(data);
 	data = currentData ;
 	if (pointer->plot())
 		pointer->plot()->replot() ;

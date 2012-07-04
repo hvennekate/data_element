@@ -1,6 +1,6 @@
 #include "specremovedataaction.h"
 #include "specmulticommand.h"
-#include "specremovedatacommand.h"
+#include "specexchangedatacommand.h"
 #include "cutbyintensitydialog.h"
 
 specRemoveDataAction::specRemoveDataAction(QObject *parent)
@@ -30,21 +30,9 @@ void specRemoveDataAction::execute()
 	{
 		specDataItem *item = dynamic_cast<specDataItem*>(view->model()->itemPointer(index)) ;
 		if (!item) continue ;
-		QVector<int> dataPoints ;
-		for (int i = 0 ; i < item->dataSize() ; ++i)
-		{
-			for (int j = 0 ; j < ranges.size() ; ++j)
-			{
-				if (ranges[j]->contains(item->sample(i).x()))
-				{
-					dataPoints << i ;
-					break ;
-				}
-			}
-		}
-		specRemoveDataCommand *command = new specRemoveDataCommand(groupCommand) ;
+		specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
 		command->setParentWidget(view) ;
-		command->setItem(index,dataPoints) ;
+		command->setItem(index,item->getDataExcept(ranges)) ;
 	}
 
 	delete dialog ;

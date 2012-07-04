@@ -17,15 +17,12 @@ specAverageDataAction::specAverageDataAction(QObject *parent) :
 
 void specAverageDataAction::execute()
 {
+	// TODO subclass QDialog, make one instance persistent in memory
 	QDialog dialog(parentWidget()) ;
 	dialog.setWindowTitle("Mitteln") ;
 	dialog.setLayout(new QVBoxLayout(&dialog)) ;
 	QSpinBox *number = new QSpinBox(&dialog) ;
 	number->setMinimum(1) ;
-//	QHBoxLayout *numberLayout = new QHBoxLayout(dialog) ;
-//	numberLayout->addWidget(new QLabel("Anzahl Punkte")) ;
-//	numberLayout->addWidget(number) ;
-//	dialog.layout()->addChildLayout(numberLayout) ;
 	number->setSuffix(" Punkte") ;
 	number->setSpecialValueText("1 Punkt") ;
 	dialog.layout()->addWidget(number) ;
@@ -56,6 +53,7 @@ void specAverageDataAction::execute()
 		specDataItem *item = dynamic_cast<specDataItem*>(view->model()->itemPointer(index)) ;
 		if (!item) continue ;
 		QVector<specDataPoint> oldData(item->allData()), newData ;
+		item->applyCorrection(oldData);
 		if (running->isChecked())
 		{
 //			newData.resize(oldData.size());
@@ -82,6 +80,7 @@ void specAverageDataAction::execute()
 				newData << dataPoint ;
 			}
 		}
+		item->reverseCorrection(newData);
 		specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
 		command->setParentWidget(view) ;
 		command->setItem(index,newData);
