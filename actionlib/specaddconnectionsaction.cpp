@@ -6,7 +6,7 @@
 specAddConnectionsAction::specAddConnectionsAction(QObject *parent) :
     specUndoAction(parent)
 {
-	this->setIcon(QIcon::fromTheme("list-new")) ;
+	this->setIcon(QIcon::fromTheme("list-new",QIcon(":/toKinetic.png"))) ;
 }
 
 const std::type_info &specAddConnectionsAction::possibleParent()

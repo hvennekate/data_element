@@ -12,6 +12,7 @@
 specAverageDataAction::specAverageDataAction(QObject *parent) :
     specUndoAction(parent)
 {
+	setIcon(QIcon(":/ave.png")) ;
 }
 
 void specAverageDataAction::execute()

@@ -6,6 +6,7 @@
 specRemoveDataAction::specRemoveDataAction(QObject *parent)
 	: specUndoAction(parent)
 {
+	setIcon(QIcon(":/cbi.png")) ;
 }
 
 void specRemoveDataAction::execute()

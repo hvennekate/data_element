@@ -7,6 +7,7 @@
 specImportSpecAction::specImportSpecAction(QObject *parent) :
     specUndoAction(parent)
 {
+	setIcon(QIcon(":/fileimport.png"));
 }
 
 const std::type_info &specImportSpecAction::possibleParent()

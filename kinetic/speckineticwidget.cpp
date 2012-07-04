@@ -19,7 +19,7 @@ void specKineticWidget::contextMenuEvent(QContextMenuEvent* event)
 }
 
 specKineticWidget::specKineticWidget(QString title, QWidget *parent)
-	: QDockWidget(title, parent ? (QWidget*) parent->parent() : NULL), directParent(parent) // TODO looks fuzzy
+	: QDockWidget(title, parent ? (QWidget*) parent->parent() : NULL)
 {
 	setFloating(true) ;
 	content = new QWidget ;
@@ -47,7 +47,6 @@ specKineticWidget::specKineticWidget(QString title, QWidget *parent)
 	setWidget(content) ;
 
 	connect(items->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),this,SLOT(selectionChanged(const QItemSelection&, const QItemSelection&))) ;
-	connect(items->selectionModel(),SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(currentChanged(const QModelIndex&, const QModelIndex&))) ;
 }
 
 QDataStream& operator<<(QDataStream& stream, const specKineticWidget& widget)
@@ -80,3 +79,10 @@ void specKineticWidget::selectionChanged(const QItemSelection & selected, const 
 }
 
 // TODO crash when another meta item is added after the first has been assigned servers
+
+void specKineticWidget::addToolbar(specActionLibrary* actions)
+{
+	actions->addDragDropPartner(items->model());
+	actions->addPlot(plot) ;
+	layout->insertWidget(0,actions->toolBar(items)) ;
+}

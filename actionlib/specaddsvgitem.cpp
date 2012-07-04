@@ -11,6 +11,7 @@
 specAddSVGItemAction::specAddSVGItemAction(QObject *parent) :
     specUndoAction(parent)
 {
+	setIcon(QIcon::fromTheme("insert-image")) ;
 }
 
 const std::type_info &specAddSVGItemAction::possibleParent()

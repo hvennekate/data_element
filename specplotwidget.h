@@ -17,6 +17,10 @@
 #include "actionlib/specactionlibrary.h"
 #include "log/speclogview.h"
 #include "log/speclogmodel.h"
+#include "log/speclogwidget.h"
+
+
+
 
 class specPlotWidget : public QDockWidget
 {
@@ -28,18 +32,16 @@ private:
 	QVBoxLayout* layout ;
 	specSpectrumPlot* plot ;
 	specDataView* items ;
-	specLogView* logs ;
 	QToolBar* toolbar ;
 	QSplitter* splitter;
 	QFile* onDisk ;
 	QAction *saveAction,
 		*kineticsAction,
-		*toKineticAction,
-   		*fromKineticAction,
 		*saveAsAction,
-		*logAction ;
+		*logAction,
+		*printAction ;
 	specActionLibrary *actions ;
-	QDockWidget *logWidget ;
+	specLogWidget *logWidget ;
 		
 	specKineticWidget *kineticWidget ;
 	void createActions() ;
@@ -49,13 +51,7 @@ private:
 	void changeFileName(const QString&) ;
 private slots:
 	void modified() ;
-	void scaleCurve() ;
-	void offsetCurve() ;
-	void offlineCurve() ;
 	void currentChanged(const QModelIndex&, const QModelIndex&) ;
-	void newKinetics() ;
-	void toKinetic() ;
-	void fromKinetic() ;
 protected :
 	void contextMenuEvent(QContextMenuEvent*) ;
 	void closeEvent(QCloseEvent*) ;
