@@ -9,10 +9,10 @@ class specExchangeDataCommand : public specUndoCommand
 {
 private:
 	specGenealogy *item ;
-	QList<specDataPoint> data ;
+	QVector<specDataPoint> data ;
 public:
 	explicit specExchangeDataCommand(specUndoCommand *parent = 0) ;
-	void setItem(const QModelIndex&, const QList<specDataPoint>& newData) ;
+	void setItem(const QModelIndex&, const QVector<specDataPoint>& newData) ;
 	QDataStream& write(QDataStream &out) const ;
 	QDataStream& read(QDataStream &in) ;
 	void redo();

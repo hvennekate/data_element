@@ -60,7 +60,7 @@ void changePlotStyleAction::actionTriggered()
 	specView *view = (specView*) parent() ;
 	specStyleCommand *newCommand = 0 ;
 	QObject *source = sender() ;
-	specDataItem item(QList<specDataPoint>(),QHash<QString,specDescriptor>(),0,"") ;
+	specDataItem item(QVector<specDataPoint>(),QHash<QString,specDescriptor>(),0,"") ;
 	if (source == lineColorAction)
 	{
 		qDebug("new pen color command") ;

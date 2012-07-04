@@ -86,6 +86,7 @@ void specSVGItem::setAnchor(QRectF& bounds, const QPointF & anchor, const SVGCor
 	case bottom:
 	case top:
 		 bounds.moveCenter(anchor) ;
+	default: ;
 	}
 
 	switch (point)

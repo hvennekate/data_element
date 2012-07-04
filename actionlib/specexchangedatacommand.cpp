@@ -6,7 +6,7 @@ specExchangeDataCommand::specExchangeDataCommand(specUndoCommand *parent)
 {
 }
 
-void specExchangeDataCommand::setItem(const QModelIndex & index, const QList<specDataPoint> &newData)
+void specExchangeDataCommand::setItem(const QModelIndex & index, const QVector<specDataPoint> &newData)
 {
 	data = newData ;
 	if (!parentWidget()) return ; // TODO dynamic cast
@@ -29,7 +29,7 @@ void specExchangeDataCommand::redo()
 	if (!item)
 		return ;
 	specDataItem *pointer = (specDataItem*) (item->items().first()) ;
-	QList<specDataPoint> currentData(pointer->allData()) ; // TODO introduce swap here via function of the data item
+	QVector<specDataPoint> currentData(pointer->allData()) ; // TODO introduce swap here via function of the data item
 	pointer->clearData();
 	pointer->insertData(data) ;
 	data = currentData ;

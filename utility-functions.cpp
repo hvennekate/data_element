@@ -10,6 +10,7 @@
 #include <QQueue>
 #include <QtDebug>
 #include <QPointF>
+#include "specdatapoint.h"
 using std::max ;
 using std::min ;
 
@@ -103,7 +104,7 @@ specModelItem* readJCAMPBlock(QTextStream& in)
 	QList<specModelItem*> children ;
 	QPair<QString,specDescriptor> ldr = readJCAMPldr(first,in) ; // process title
 	descriptors[ldr.first] = ldr.second ;
-	QList<specDataPoint> data;
+	QVector<specDataPoint> data;
 	while (!in.atEnd())
 	{
 		QPair<QString,specDescriptor> ldr = readJCAMPldr(first,in) ;
@@ -157,7 +158,7 @@ specModelItem* readJCAMPBlock(QTextStream& in)
 	return item ;
 }
 
-void readJCAMPdata(QTextStream& in, QList<specDataPoint>& data, double step, double xfactor, double yfactor) // TODO verify final x-value
+void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, double xfactor, double yfactor) // TODO verify final x-value
 {
 	qDebug("---- Reading JCAMP data. ----") ;
 	QRegExp specialCharacters("[?@%A-DF-Za-df-s+\\-\\s]|[Ee](?![+\\-\\s])"),
@@ -357,7 +358,7 @@ QList<specModelItem*> readHVFile(QFile& file)
 		QVector<double> data ;
 		data << headerItems["Zeit"].numericValue() << 0. << 0. << 0. ;
 
-		QList<specDataPoint> dataPoints ;
+		QVector<specDataPoint> dataPoints ;
 		for(QStringList::size_type i = 0 ; 2*i+1 < templist.size() ; i++)
 		{
 			data[1] = wavenumbers[i] ;
@@ -484,7 +485,7 @@ QList<specModelItem*> readPEFile(QFile& file)
 	
 	QList<specModelItem*> specData ;
 	QStringList buffer ;
-	QList<specDataPoint> dataPoints ;
+	QVector<specDataPoint> dataPoints ;
 	while(!in.atEnd() && (buffer = in.readLine().split(QRegExp("\\s+"))).size() >1)
 		dataPoints += specDataPoint(0,buffer[0].toDouble(),buffer[1].toDouble(),0) ;
 	specData += new specDataItem(dataPoints,headerItems) ;

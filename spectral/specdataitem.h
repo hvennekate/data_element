@@ -4,9 +4,8 @@
 #include "specmodelitem.h"
 #include <QHash>
 #include <QVector>
-
-class specDataPoint ;
-class specDescriptor ;
+#include "specdatapoint.h"
+#include "specdescriptor.h"
 
 /*! List item which holds data.*/
 class specDataItem : public specModelItem
@@ -26,16 +25,18 @@ protected:
 	QDataStream& writeToStream(QDataStream&) const ;
 public:
 	/*! Standard constructor.*/
-	specDataItem(QList<specDataPoint> data, // TODO change to reference/pointer
-		     QHash<QString,specDescriptor> description, // TODO change to reference/pointer
+	specDataItem(const QVector<specDataPoint> &data, // TODO change to reference/pointer
+		     const QHash<QString,specDescriptor> &description, // TODO change to reference/pointer
 		     specFolderItem* par=0, QString tag="");
+	/*! Copy constructor necessary because it is disabled in QwtPlotItem */
+//	specDataItem(const specDataItem&) ;
 
 	/* For undo commands managing raw data */
 	QVector<specDataPoint> getData(const QVector<int>& indexes) ;
-	const QList<specDataPoint>& allData() ;
+	const QVector<specDataPoint>& allData() const ;
 	void insertData(const QVector<specDataPoint>&) ;
 	void clearData() ;
-	void removeData(const QVector<int>&) ;
+	void removeData(QVector<int>) ;
 
 	/* Description related */
 	QString descriptor(const QString &key, bool full =true) const ;
@@ -54,11 +55,11 @@ public:
 	void addToSlope(const double&) ;
 	void moveYBy(const double&) ;
 	void moveXBy(const double&) ;
-	QVector<double> intensityData() ;
+	QVector<double> intensityData() const ;
 	void refreshPlotData() ;
 
 	/* not reviewed */
-	void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
+	void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) const ;
 
 	/* Functions to be deleted soon: */
 	void subMap(const QMap<double, double>&) ;

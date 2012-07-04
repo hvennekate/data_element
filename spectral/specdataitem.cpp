@@ -1,8 +1,7 @@
 #include "specdataitem.h"
-#include "specdatapoint.h"
-#include "specdescriptor.h"
 #include <QVariant>
 #include <utility-functions.h>
+#include <algorithm>
 
 
 void specDataItem::applyCorrection(specDataPoint& point) const
@@ -73,7 +72,8 @@ QVector<double> specDataItem::times() const
 
 
 
-specDataItem::specDataItem(QList<specDataPoint> dat, QHash<QString,specDescriptor> desc, specFolderItem* par, QString description)
+specDataItem::specDataItem(const QVector<specDataPoint>& dat, const QHash<QString,specDescriptor>& desc,
+			   specFolderItem* par, QString description)
 	: specModelItem(par,description),
 	  data(dat),
 	  description(desc),
@@ -117,21 +117,9 @@ bool specDataItem::setActiveLine(const QString& key, int line)
 
 void specDataItem::refreshPlotData()
 {
-	QVector<double> x=wnums(data), y=ints(data);
+	QVector<double> x=wnums(), y=ints();
 	processData(x,y) ;
 	setSamples(x,y) ; // TODO QPointF
-}
-
-specDataItem::specDataItem(const specDataItem &other)
-	: specModelItem(other),
-	  description(other.description),
-	  data(other.data),
-	  offset(other.offset),
-	  slope(other.slope),
-	  factor(other.factor),
-	  xshift(other.xshift),
-	  zeroMultiplications(other.zeroMultiplications) ;
-{
 }
 
 QString specDataItem::descriptor(const QString &key, bool full) const
@@ -156,15 +144,14 @@ QDataStream& specDataItem::readFromStream(QDataStream &in)
 
 QDataStream& specDataItem::writeToStream(QDataStream& out) const
 {
-	return out << description << data << offset << slope << factor << xshift >> zeroMultiplications ;
+	return out << description << data << offset << slope << factor << xshift << zeroMultiplications ;
 }
 
 specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 {
 	// merging descriptors
-	for(QStringList::size_type i = 0 ; i < toAdd.description.keys().size() ; i++)
+	foreach(QString key, toAdd.description.keys())
 	{
-		QString key = toAdd.description.keys()[i] ;
 		if (description.keys().contains(key))
 		{
 			if (description[key].isNumeric())
@@ -247,15 +234,8 @@ void specDataItem::moveXBy(const double & value)
 	invalidate();
 }
 
-void specDataFilter::addX(QList<specDataPoint> &data, const double &value)
+void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out) const
 {
-	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
-		data[i].nu += value ;
-}
-
-void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out)
-{
-	revalidate();
 	QVector<double> t = times(), w = wnums(), s = ints(), m = intensityData() ;
 	
 	for (int i = 0 ; i < headerFormat.size() ; i++)
@@ -280,22 +260,20 @@ void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, c
 
 int specDataItem::removeData(QList<specRange *> *listpointer)
 {
-	QVector<double> wns = wnums() ;
-	int count = wns.size() ;
-	for (int j = 0 ; j < listpointer->size() ; j++)
+	QVector<specDataPoint> newData ;
+	for (int i = 0 ; i < data.size() ; ++i)
 	{
-		specRange *range = listpointer->at(j) ;
-		for(int i = data.size()-1 ; i >= 0 ; i--)
-		{
-			if(range->contains(wns[i]))
-			{
-				wns.remove(i) ;
-				data.removeAt(i) ;
-			}
-		}
+		specDataPoint point = data[i] ;
+		applyCorrection(point) ;
+		foreach(specRange* range, *listpointer)
+			if (range->contains(point.nu))
+				continue ;
+		newData << data[i] ;
 	}
+	int diff = data.size() - newData.size() ;
+	data = newData ; // TODO swap
 	invalidate() ;
-	return count-wns.size() ;
+	return diff ;
 }
 
 void specDataItem::removeData(QVector<int> indexes)
@@ -303,7 +281,7 @@ void specDataItem::removeData(QVector<int> indexes)
 	QVector<specDataPoint> newData ;
 	int i = 0 ;
 	qSort(indexes) ;
-	QVector<int>::iterator it = indexes.begin() ;
+	QVector<int>::const_iterator it = indexes.begin() ;
 	for (i = 0 ; i < data.size() ; ++i)
 	{
 		if (it != indexes.end() && i == *it)
@@ -312,19 +290,17 @@ void specDataItem::removeData(QVector<int> indexes)
 			newData << data[i] ;
 	}
 
-	int count = data.size() - newData.size() ;
 	data = newData ; // TODO swap
-	return count ;
 }
 
-const QVector<specDataPoint>& specDataItem::allData()
+const QVector<specDataPoint>& specDataItem::allData() const
 {
 	return data ;
 }
 
 QVector<specDataPoint> specDataItem::getData(const QVector<int> &indexes)
 {
-	QVector<specDataPoint> desiredData(indexes) ;
+	QVector<specDataPoint> desiredData(indexes.size()) ;
 	for (int i = 0 ; i < indexes.size() ; ++i)
 		desiredData[i] = data[indexes[i]] ;
 	return desiredData ;
@@ -336,10 +312,20 @@ void specDataItem::clearData()
 	invalidate();
 }
 
-void specDataItem::insertData(const QList<specDataPoint> &newData)
+void specDataItem::insertData(const QVector<specDataPoint> &newData)
 {
 	data << newData ;
 	qSort(data) ;
 	invalidate();
 }
 
+//specDataItem::specDataItem(const specDataItem & other)
+//	: specModelItem(other),
+//	  offset(other.offset),
+//	  slope(other.slope),
+//	  factor(other.factor),
+//	  xshift(other.xshift),
+//	  zeroMultiplications(other.zeroMultiplications),
+//	  description(other.description),
+//	  data(other.data)
+//{}

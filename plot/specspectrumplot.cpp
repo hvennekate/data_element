@@ -127,7 +127,7 @@ void specSpectrumPlot::alignmentChanged(QAction *action)
 			invalidateReference();
 			return ;
 		}
-		reference = new specDataItem(QList<specDataPoint>(),QHash<QString,specDescriptor>()) ;
+		reference = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
 		qDebug() << "new reference size:" << reference->dataSize() << referenceDataItems.size() << referenceItems.size() ;
 		for (int i = 0 ; i < referenceDataItems.size() ; ++i)
 			reference->operator +=(*(referenceDataItems[i])) ;

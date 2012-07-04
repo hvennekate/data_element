@@ -21,7 +21,8 @@ namespace spec{
 	Q_DECLARE_OPERATORS_FOR_FLAGS(descriptorFlags)
 	
 	/*! Enum for list item types.  Primarily for save/load purposes.*/
-	enum specItemType {data=0, folder=1, logEntry=2, sysEntry=3, kinetic=4};
+	enum specItemType {data=6, folder=1, logEntry=2, sysEntry=3, kinetic=4, svg=5};
+	// originial data: 0
 	
 	/*! Enums for export formats */
 	enum separator{ nosep=0, space=1, tab=2, newline=3 } ;
