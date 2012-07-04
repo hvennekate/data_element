@@ -137,4 +137,5 @@ specStyleCommand *generateStyleCommand(spec::undoActionIds id)
 	case spec::symbolPenColorId :
 		return new specStyleCommandImplementation<QColor, &specCanvasItem::symbolPenColor, &specCanvasItem::setSymbolPenColor, spec::symbolPenColorId > ;
 	}
+	return 0 ;
 }

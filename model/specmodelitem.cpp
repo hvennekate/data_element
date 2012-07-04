@@ -190,7 +190,7 @@ QDataStream& operator>>(QDataStream& stream, specModelItem*& pointer)
 	switch (id)
 	{
 		case spec::data :
-			pointer = new specDataItem(QList<specDataPoint>(),
+			pointer = new specDataItem(QVector<specDataPoint>(),
 					QHash<QString,specDescriptor>()) ; break ;
 		case spec::folder :
 			pointer = new specFolderItem ; break ;
@@ -204,7 +204,7 @@ QDataStream& operator>>(QDataStream& stream, specModelItem*& pointer)
 //	QString title ;
 	QPen pen ;
 	pointer->readFromStream(stream)
-			>> pointer->mergePlotData >> pointer->sortPlotData >> description >> pen ;
+			>> pointer->mergePlotData >> pointer->sortPlotData >> pointer->description >> pen ;
 //	pointer->description.setContent(title) ;
 	pointer->setPen(pen) ;
 	qDebug()<< "merge from copy:" << pointer->mergePlotData ;

@@ -1,7 +1,7 @@
 #include "speclogmessage.h"
 
 specLogMessage::specLogMessage( QHash<QString,specDescriptor> desc, specFolderItem* par, QString tag)
-	: specDataItem(QList<specDataPoint>(),desc,par, tag)
+	: specDataItem(QVector<specDataPoint>(),desc,par, tag)
 {
 }
 

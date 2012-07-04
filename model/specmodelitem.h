@@ -1,8 +1,6 @@
 #ifndef SPECMODELITEM_H
 #define SPECMODELITEM_H
 
-#include <QObject>
-
 #include <QString>
 #include <QMultiMap>
 #include "plot/speccanvasitem.h"

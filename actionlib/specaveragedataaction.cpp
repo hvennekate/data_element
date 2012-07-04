@@ -54,7 +54,7 @@ void specAverageDataAction::execute()
 	{
 		specDataItem *item = dynamic_cast<specDataItem*>(view->model()->itemPointer(index)) ;
 		if (!item) continue ;
-		QList<specDataPoint> oldData(item->allData()), newData ;
+		QVector<specDataPoint> oldData(item->allData()), newData ;
 		if (running->isChecked())
 		{
 //			newData.resize(oldData.size());
