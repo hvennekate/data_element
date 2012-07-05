@@ -68,12 +68,12 @@ void specTreeAction::execute()
 	}
 	if (! model->insertItems(QList<specModelItem*>() << moveTargets.first().first, index, row)) return ;
 	specMultiCommand *command = new specMultiCommand ;
-	command->setParentWidget(view) ;
+	command->setParentObject(view) ;
 	command->setMergeable(false) ;
 
 	specAddFolderCommand *insertion = new specAddFolderCommand(command) ;
 	insertion->setItems(QModelIndexList() << model->index(row,0,index)) ;
-	insertion->setParentWidget(view) ;
+	insertion->setParentObject(view) ;
 	qDebug() << moveTargets ;
 
 	library->push(command);
@@ -86,7 +86,7 @@ void specTreeAction::execute()
 		QModelIndex parent = model->index(moveTargets[i].first) ;
 		qDebug() << "parent: " << parent << "target list:" << targets ;
 		specMoveCommand *moveCommand = new specMoveCommand(targets,parent,0,command) ;
-		moveCommand->setParentWidget(view);
+		moveCommand->setParentObject(view);
 		moveCommand->redo();
 	}
 }

@@ -45,7 +45,7 @@ void specAverageDataAction::execute()
 	QModelIndexList indexes = view->getSelection() ;
 	int numAverages = number->value() ;
 	specMultiCommand *groupCommand = new specMultiCommand ;
-	groupCommand->setParentWidget(view) ;
+	groupCommand->setParentObject(view) ;
 	groupCommand->setMergeable(false) ; // TODO consider dataExchange command (also to avoid frequent replots)
 //	library->push(groupCommand);
 	foreach(QModelIndex index, indexes)
@@ -82,7 +82,7 @@ void specAverageDataAction::execute()
 		}
 		item->reverseCorrection(newData);
 		specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
-		command->setParentWidget(view) ;
+		command->setParentObject(view) ;
 		command->setItem(index,newData);
 //		QVector<int> take, leave ;
 //		for (int i = 0 ; i < oldData.size() ; ++i)

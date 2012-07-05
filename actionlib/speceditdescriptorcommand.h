@@ -14,12 +14,15 @@ private:
 	specGenealogy *item ;
 public:
 	explicit specEditDescriptorCommand(specUndoCommand* parent = 0) ;
-	void setItem(const QModelIndex&, QString newContent, int activeLine) ;
+	void setItem(const QModelIndex &index, QString descriptor,
+		     QString newContent, int activeLine) ;
 	QDataStream& write(QDataStream &out) const ;
 	QDataStream& read(QDataStream &in) ;
 	void redo() ;
 	void undo() ;
 	int id() const {return spec::editDescriptorId ;}
+	bool mergeWith(const QUndoCommand *other) ;
+	bool mergeable(const specUndoCommand *other) ;
 };
 
 #endif // SPECEDITDESCRIPTORCOMMAND_H

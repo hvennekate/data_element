@@ -115,6 +115,13 @@ bool specDataItem::setActiveLine(const QString& key, int line)
 	return specModelItem::setActiveLine(key,line) ;
 }
 
+int specDataItem::activeLine(const QString& key) const
+{
+	if (description.contains(key))
+		return description[key].activeLine() ;
+	return specModelItem::activeLine(key) ;
+}
+
 void specDataItem::refreshPlotData()
 {
 	QVector<double> x=wnums(), y=ints();

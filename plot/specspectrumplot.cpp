@@ -290,7 +290,7 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 	specPlotMoveCommand *command = new specPlotMoveCommand ;
 	command->setItem(view->model()->index( (specModelItem*) item)) ; // TODO do dynamic cast first!!
 	command->setCorrections(shift,offset,offline,scale) ;
-	command->setParentWidget(view) ;
+	command->setParentObject(view) ;
 	undoPartner->push(command) ;
 }
 
@@ -413,7 +413,7 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double n
 		referenceSpectrum[reference->sample(i).x()] = reference->sample(i).y() ;
 
 	specMultiCommand *zeroCommand = generateCorrectionCommand(zeroRanges, spectra, referenceSpectrum, view, noSlopeAction->isChecked()) ;
-	zeroCommand->setParentWidget(view) ;
+	zeroCommand->setParentObject(view) ;
 	undoPartner->push(zeroCommand) ;
 	replot() ;
 }
@@ -479,7 +479,7 @@ void specSpectrumPlot::resizeSVG(specCanvasItem *item, int point, double x, doub
 		bounds.setBottom(bounds.top()+bounds.width()/aspectRatio) ;
 
 	specResizeSVGcommand *command = new specResizeSVGcommand ;
-	command->setParentWidget(this) ;
+	command->setParentObject(this) ;
 	command->setItem(view->model()->index(pointer),bounds) ;
 	undoPartner->push(command) ;
 }
@@ -523,7 +523,7 @@ void specSpectrumPlot::multipleSubtraction()
 			command->setItem(view->model()->index(spectrum),data);
 	}
 
-	subCommand->setParentWidget(view) ;
+	subCommand->setParentObject(view) ;
 	undoPartner->push(subCommand) ;
 	replot() ;
 }

@@ -65,6 +65,10 @@ QAction* specActionLibrary::undoAction(QObject* target)
 QToolBar* specActionLibrary::toolBar(QWidget *target)
 {
 	addParent(target) ;
+	specView* view ;
+	if ((view = dynamic_cast<specView*>(target)) && view->model())
+		addParent(view->model()) ;
+
 	if (typeid(*target)== typeid(specDataView))
 	{
 		QToolBar *bar = new QToolBar(target) ;
@@ -129,13 +133,13 @@ void specActionLibrary::addDragDropPartner(specModel* model)
 	model->setDropBuddy(this) ;
 }
 
-void specActionLibrary::addParent(QWidget *pointer)
+void specActionLibrary::addParent(QObject *pointer)
 {
 	if (!parents.contains(pointer))
 		parents << pointer ;
 }
 
-QWidget* specActionLibrary::parentId(int num)
+QObject* specActionLibrary::parentId(int num)
 {
 	return parents[num] ;
 }
@@ -150,7 +154,7 @@ QDataStream& specActionLibrary::write(QDataStream &out)
 	for (int i = 0 ; i < undoStack->count() ; ++i)
 	{
 		specUndoCommand* command = (specUndoCommand*) undoStack->command(i) ;
-		out << qint32(command->id()) << quint32(parents.indexOf(command->parentWidget())) ;
+		out << qint32(command->id()) << quint32(parents.indexOf(command->parentObject())) ;
 	}
 	for (int i = 0 ; i < undoStack->count() ; ++i)
 		((specUndoCommand*) undoStack->command(i))->write(out) ;
@@ -188,7 +192,7 @@ QDataStream& specActionLibrary::read(QDataStream &in)
 		qDebug() << "Id: " << id << "Parent: " << parentId << parents[parentId] ;
 		specUndoCommand *command = commandById(id) ;
 		if (!command) continue ;
-		command->setParentWidget(parents[parentId]) ;
+		command->setParentObject(parents[parentId]) ;
 		qDebug() << "pushing read in command onto stack" << command ;
 		undoStack->push(command) ;
 		qDebug() << "pushed command.  Stack size: " << undoStack->count() ;
@@ -213,7 +217,7 @@ void specActionLibrary::setLastRequested(const QModelIndexList &list)
 void specActionLibrary::moveInternally(const QModelIndex &parent, int row, specView* target)
 {
 	specMoveCommand *command = new specMoveCommand(lastRequested,parent,row) ;
-	command->setParentWidget(target);
+	command->setParentObject(target);
 	push(command) ;
 }
 

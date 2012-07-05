@@ -36,7 +36,7 @@ void specManageConnectionsCommand::setItems(const QModelIndex &client, QModelInd
 
 bool specManageConnectionsCommand::ok() const
 {
-	return parentWidget() && !items.isEmpty() && target ;
+	return parentObject() && !items.isEmpty() && target ;
 }
 
 void specManageConnectionsCommand::restore()
@@ -77,11 +77,11 @@ QDataStream &specManageConnectionsCommand::read(QDataStream &in)
 	qint32 toRead ;
 	in >> isSameModel >> toRead ;
 	specModel *model = isSameModel ?
-				(specModel*) (((QAbstractItemView*) parentWidget())->model()) :
-				(specModel*) (((specPlotWidget*) parentWidget()->parent()->parent())->mainView()->model()) ; // TODO this is highly dangerous!
+				(specModel*) (((QAbstractItemView*) parentObject())->model()) :
+				(specModel*) (((specPlotWidget*) parentObject()->parent()->parent())->mainView()->model()) ; // TODO this is highly dangerous!
 	for (int i = 0 ; i < toRead ; ++i)
 		items << new specGenealogy(model,in) ;
-	target = new specGenealogy((specModel*) (((QAbstractItemView*) parentWidget())->model()),in) ;
+	target = new specGenealogy((specModel*) (((QAbstractItemView*) parentObject())->model()),in) ;
 	return in ;
 }
 

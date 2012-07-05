@@ -28,8 +28,8 @@ QDataStream& specResizeSVGcommand::write(QDataStream &out) const
 
 QDataStream& specResizeSVGcommand::read(QDataStream &in)
 {
-	if (!parentWidget()) return in ;
-	specModel *model = ((specView*) parentWidget())->model();
+	if (!parentObject()) return in ;
+	specModel *model = ((specView*) parentObject())->model();
 	if (!model) return in ; // TODO dynamic_cast
 	in >> other ;
 	if (item) delete item ;

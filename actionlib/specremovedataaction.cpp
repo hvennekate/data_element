@@ -22,7 +22,7 @@ void specRemoveDataAction::execute()
 	}
 
 	specMultiCommand *groupCommand = new specMultiCommand ;
-	groupCommand->setParentWidget(view) ;
+	groupCommand->setParentObject(view) ;
 	groupCommand->setMergeable(false) ;
 	QList<specRange*> ranges = dialog->ranges() ;
 
@@ -31,7 +31,7 @@ void specRemoveDataAction::execute()
 		specDataItem *item = dynamic_cast<specDataItem*>(view->model()->itemPointer(index)) ;
 		if (!item) continue ;
 		specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
-		command->setParentWidget(view) ;
+		command->setParentObject(view) ;
 		command->setItem(index,item->getDataExcept(ranges)) ;
 	}
 

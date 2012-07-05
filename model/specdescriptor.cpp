@@ -65,6 +65,11 @@ bool specDescriptor::setActiveLine(int line)
 	return true ;
 }
 
+int specDescriptor::activeLine() const
+{
+	return contentValue.left(contentValue.indexOf(currentLine)).count("\n") ;
+}
+
 bool specDescriptor::setContent(const double& number)
 {
 	if (isNumeric() && isEditable())

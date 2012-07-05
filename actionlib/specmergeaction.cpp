@@ -113,7 +113,7 @@ void specMergeAction::execute()
 	}
 
 	specMultiCommand *command = new specMultiCommand ;
-	command->setParentWidget(view) ;
+	command->setParentObject(view) ;
 	command->setMergeable(false) ;
 
 	// preparing insertion command
@@ -121,14 +121,14 @@ void specMergeAction::execute()
 	QModelIndexList insertList = model->indexList(newlyInserted.toList()) ;
 	qDebug() << "******* insert" << insertList ;
 	insertionCommand->setItems(insertList) ;
-	insertionCommand->setParentWidget(view) ;
+	insertionCommand->setParentObject(view) ;
 
 	// prepare to delete the old items
 	specDeleteCommand *deletionCommand = new specDeleteCommand(command) ;
 	QModelIndexList deleteList = model->indexList(toBeDeleted.toList()) ;
 	qDebug() << "******* delete" << deleteList ;
 	deletionCommand->setItems(deleteList) ;
-	deletionCommand->setParentWidget(view) ;
+	deletionCommand->setParentObject(view) ;
 
 	library->push(command) ;
 }

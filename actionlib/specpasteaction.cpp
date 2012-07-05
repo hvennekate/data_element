@@ -40,7 +40,7 @@ void specPasteAction::execute()
 		list << model->index(i+row,0,index) ;
 	command->setItems(list) ;
 
-	command->setParentWidget((QWidget*)parent()) ;
+	command->setParentObject((QWidget*)parent()) ;
 
 	if (command->ok())
 		library->push(command) ;

@@ -79,7 +79,7 @@ QDataStream& specPlotMoveCommand::read(QDataStream &in)
 	in >> slope >> offset >> scale >> shift ;
 	if (items)
 		delete items ;
-	items = new specGenealogy(((specView*) parentWidget())->model(),in) ;
+	items = new specGenealogy(((specView*) parentObject())->model(),in) ;
 	return in ;
 }
 

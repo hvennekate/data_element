@@ -21,6 +21,7 @@
 #include <QDebug>
 #include "actionlib/specmovecommand.h"
 #include "actionlib/specaddfoldercommand.h"
+#include "actionlib/speceditdescriptorcommand.h"
 // TODO replace isFolder() by addChildren(empty list,0)
 
 bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria)
@@ -524,18 +525,34 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 	bool changed = false ;
 	if(index.isValid())
 	{
-		switch(role)
+		QString desc = Descriptors[index.column()] ;
+		specModelItem *pointer = itemPointer(index) ;
+		if (role == Qt::EditRole || role == spec::activeLineRole)
 		{
-			case Qt::EditRole :
-				changed =  itemPointer(index)->changeDescriptor(Descriptors[index.column()], value.toString()) ; break ;
-			case Qt::ForegroundRole :
-				itemPointer(index)->setPen(value.value<QPen>()) ;
-				changed = true ;
-				break ;
-			case 33 :
-				changed = true ; itemPointer(index)->mergePlotData = value.toBool() ; break ;
-			case spec::activeLineRole :
-				changed = itemPointer(index)->setActiveLine(Descriptors[index.column()], value.toInt()) ; break ;
+			if (! (pointer->descriptorProperties(desc) & spec::editable) ) return false ;
+			changed = true ;
+			specEditDescriptorCommand *command = new specEditDescriptorCommand ;
+			command->setParentObject(this) ;
+			if (role == Qt::EditRole)
+				command->setItem(index, desc, pointer->descriptor(desc),value.toInt()) ;
+			else
+				command->setItem(index, desc, value.toString(), pointer->activeLine(desc)) ;
+			// TODO unite in value-variant
+			dropBuddy->push(command) ;
+		}
+		else if (role == Qt::ForegroundRole)
+		{
+			itemPointer(index)->setPen(value.value<QPen>()) ;
+			changed = true ;
+		}
+		else if (role == 33)
+		{
+			changed = true ;
+			itemPointer(index)->mergePlotData = value.toBool() ;
+		}
+		else if (role == spec::activeLineRole)
+		{
+			changed = itemPointer(index)->setActiveLine(Descriptors[index.column()], value.toInt()) ;
 		}
 	}
 	if (changed) emit dataChanged(index,index) ;
@@ -721,7 +738,7 @@ bool specModel::dropMimeData(const QMimeData *data,
 	if (dropBuddy)
 	{
 		specAddFolderCommand *command = new specAddFolderCommand ;
-		command->setParentWidget(dropSource) ;
+		command->setParentObject(dropSource) ;
 		qDebug() << ")))) parent widget: " << dropSource << "Adding new undo command with these items:" << newItems ;
 		command->setItems(newIndexes) ;
 		dropBuddy->push(command);

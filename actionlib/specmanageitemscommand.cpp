@@ -28,7 +28,7 @@ void specManageItemsCommand::setItems(QModelIndexList & indexes)
 
 bool specManageItemsCommand::ok()
 {
-	return parentWidget() && !items.isEmpty() ;
+	return parentObject() && !items.isEmpty() ;
 }
 
 void specManageItemsCommand::prepare() // TODO make this the model's task
@@ -73,7 +73,7 @@ void specManageItemsCommand::take()
 void specManageItemsCommand::restore()
 {
 	if (!ok()) return ;
-	if (!parentWidget() || items.isEmpty()) return ;
+	if (!parentObject() || items.isEmpty()) return ;
 	prepare() ;
 	for(int i = 0 ; i < items.size() ; i++)
 		items[i]->returnItems();
@@ -95,8 +95,8 @@ QDataStream& specManageItemsCommand::read(QDataStream &in)
 	qint32 toRead ;
 	in >> toRead ;
 	qDebug("reading manageItemsCommand.") ;
-	qDebug() << "parent widget:" << parentWidget() << "current size:" << items.size() ;
-	specModel* model = (specModel*) (((QAbstractItemView*) parentWidget())->model()) ;
+	qDebug() << "parent widget:" << parentObject() << "current size:" << items.size() ;
+	specModel* model = (specModel*) (((QAbstractItemView*) parentObject())->model()) ;
 	for (int i = 0 ; i < toRead ; ++i)
 	{
 		qDebug() << "###### reading genealogy" << i << "of" << toRead ;

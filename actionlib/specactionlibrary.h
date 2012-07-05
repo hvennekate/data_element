@@ -31,7 +31,7 @@ public:
 	QDataStream& write(QDataStream&) ;
 	QDataStream& read(QDataStream&) ;
 	void push(specUndoCommand*) ;
-	QWidget* parentId(int) ;
+	QObject* parentId(int) ;
 	void addDragDropPartner(specModel*) ;
 	void setLastRequested(const QModelIndexList&) ;
 	void moveInternally(const QModelIndex&, int row, specView*) ;
@@ -45,10 +45,10 @@ signals:
 	void stackChanged() ;
 private:
 	QUndoStack *undoStack ;
-	QVector<QWidget*> parents ;
+	QVector<QObject*> parents ;
 	QVector<specModel*> partners;
 	QModelIndexList lastRequested ;
-	void addParent(QWidget*) ;
+	void addParent(QObject*) ;
 	void addNewAction(QToolBar*, specUndoAction*) ;
 };
 
