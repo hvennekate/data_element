@@ -54,12 +54,14 @@ QAction* specActionLibrary::redoAction(QObject* target)
 {
 	QAction *redoAction = undoStack->createRedoAction(target) ;
 	redoAction->setIcon(QIcon::fromTheme("edit-redo")) ;
+	return redoAction ;
 }
 
 QAction* specActionLibrary::undoAction(QObject* target)
 {
 	QAction *undoAction = undoStack->createUndoAction(target) ;
 	undoAction->setIcon(QIcon::fromTheme("edit-undo"));
+	return undoAction ;
 }
 
 QToolBar* specActionLibrary::toolBar(QWidget *target)

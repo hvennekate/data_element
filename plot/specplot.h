@@ -56,6 +56,8 @@ public:
 	virtual QList<QAction*> actions() ;
 	spec::moveMode moveMode() ;
 	void refreshRanges() ;
+	virtual QDataStream& read(QDataStream& in) ;
+	virtual QDataStream& write(QDataStream& out) const ;
 signals:
 	void changed() ;
 public slots :

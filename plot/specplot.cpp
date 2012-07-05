@@ -376,3 +376,14 @@ void specPlot::metaRangeMoved(specCanvasItem *item, int point, double x, double 
 		((specMetaRange*) item)->pointMoved(point,x,y) ;
 	// TODO emit signal for metaview update
 }
+
+QDataStream& specPlot::write(QDataStream &out) const
+{
+	return out << (quint8) 0 ;
+}
+
+QDataStream& specPlot::read(QDataStream &in)
+{
+	quint8 num ;
+	return in >> num ;
+}

@@ -371,7 +371,7 @@ void specView::dropEvent(QDropEvent *event)
 
 QDataStream& specView::write(QDataStream &out)
 {
-	out << qint8(0) ;
+	out << qint8(1) ;
 	specViewState state(this) ;
 	state.getState();
 	return state.write(out) ;
@@ -381,9 +381,13 @@ QDataStream& specView::read(QDataStream &in)
 {
 	qint8 version ;
 	in >> version ;
-	specViewState state(this) ;
-	state.read(in) ;
-	state.restoreState();
+	if (version == 1)
+	{
+		specViewState state(this) ;
+		state.read(in) ;
+		state.restoreState();
+		model()->read(in) ;
+	}
 	return in ;
 }
 

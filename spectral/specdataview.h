@@ -8,7 +8,7 @@ class specDataView : public specView
 {
 	Q_OBJECT
 public:
-	specDataView ( QWidget* parent=0 );
+	specDataView (specModel*, QWidget* parent=0 );
 	~specDataView();
 
 };

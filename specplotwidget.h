@@ -24,29 +24,24 @@
 
 class specPlotWidget : public QDockWidget
 {
-Q_OBJECT
+	Q_OBJECT
 private:
-	// TODO write function for conversion of data for plot
-// public:
+	specDataView* items ;
+	specLogWidget *logWidget ;
+	specKineticWidget *kineticWidget ;
 	QWidget* content ;
 	QVBoxLayout* layout ;
 	specSpectrumPlot* plot ;
-	specDataView* items ;
 	QToolBar* toolbar ;
 	QSplitter* splitter;
-	QFile* onDisk ;
+	QFile* file ;
 	QAction *saveAction,
-		*kineticsAction,
-		*saveAsAction,
-		*logAction,
-		*printAction ;
+	*kineticsAction,
+	*saveAsAction,
+	*logAction,
+	*printAction ;
 	specActionLibrary *actions ;
-	specLogWidget *logWidget ;
-		
-	specKineticWidget *kineticWidget ;
-	void createActions() ;
 	void createToolbars();
-	
 	void setConnections() ;
 	void changeFileName(const QString&) ;
 private slots:
@@ -56,16 +51,14 @@ protected :
 	void contextMenuEvent(QContextMenuEvent*) ;
 	void closeEvent(QCloseEvent*) ;
 public:
-    specPlotWidget(const QString& fileName = "", QWidget *parent = 0);
+	specPlotWidget(QWidget *parent = 0);
+	~specPlotWidget();
 
-    ~specPlotWidget();
+	void read(QString fileName) ;
 	specView* mainView() { return items ; } // TODO dangerous
 public slots :
 	void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) ; // TODO consider making these private
-	void setFont() ;
 	bool saveFile() ;
-// 	void zeroCorrection() ;
-//	void addZeroRange() ;
 signals :
 	void addItem(int position, int rows, const QModelIndex &index) ;
 

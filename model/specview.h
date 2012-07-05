@@ -42,8 +42,8 @@ public:
 //	QList<specModelItem*> currentlySelected() ;
 	virtual QList<QAction*> actions() ;
 	QModelIndexList getSelection() ;
-	QDataStream &write(QDataStream&) ;
-	QDataStream &read(QDataStream&) ;
+	virtual QDataStream &write(QDataStream&) const;
+	virtual QDataStream &read(QDataStream&) ;
 
 	signals:
 		void changed() ;

@@ -57,7 +57,7 @@ QVector<double> specDataItem::ints() const
 	{
 		specDataPoint point = data[i] ;
 		applyCorrection(point) ;
-		retval << point.nu ;
+		retval << point.sig ;
 	}
 	return retval ;
 }
