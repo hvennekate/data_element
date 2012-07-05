@@ -40,6 +40,7 @@ namespace spec{
 				  resizeSVGId    = 23,
 				  newConnectionsId = 30,
 				  deleteConnectionsId = 31,
+			    editDescriptorId = 32,
 			  penColorId         = 5001,
 			  symbolStyleId      = 5002,
 			  symbolSizeId       = 5003,

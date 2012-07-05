@@ -9,8 +9,8 @@ specExchangeDataCommand::specExchangeDataCommand(specUndoCommand *parent)
 void specExchangeDataCommand::setItem(const QModelIndex & index, const QVector<specDataPoint> &newData)
 {
 	data = newData ;
-	if (!parentWidget()) return ; // TODO dynamic cast
-	specDataItem *pointer = dynamic_cast<specDataItem*>(((specView*) parentWidget())->model()->itemPointer(index)) ;
+	if (!parentObject()) return ; // TODO dynamic cast
+	specDataItem *pointer = dynamic_cast<specDataItem*>(((specView*) parentObject())->model()->itemPointer(index)) ;
 	if (item)
 		delete item ;
 	item = 0 ;
@@ -46,6 +46,6 @@ QDataStream& specExchangeDataCommand::read(QDataStream &in)
 	if (item)
 		delete item ;
 	in >> data ;
-	item = new specGenealogy(((specView*) parentWidget())->model(),in) ;
+	item = new specGenealogy(((specView*) parentObject())->model(),in) ;
 	return in ;
 }

@@ -79,6 +79,13 @@ bool specModelItem::setActiveLine(const QString& key, int line)
 	return false ;
 }
 
+int specModelItem::activeLine(const QString& key) const
+{
+	if (key == "")
+		return description.activeLine() ;
+	return -1 ;
+}
+
 void specModelItem::refreshPlotData()
 { }
 

@@ -17,7 +17,7 @@ void specStyleCommandImplFuncTemplate::setItems(QModelIndexList items)
 	//			items.takeAt(i--) ;
 	qDebug() << "list size: " << items ;
 
-	specView *view = (specView*) parentWidget() ;
+	specView *view = (specView*) parentObject() ;
 	specModel *model = view->model() ;
 
 	QMap<int, QModelIndexList > groups ;
@@ -84,7 +84,7 @@ specStyleCommandImplTemplate
 QDataStream& specStyleCommandImplFuncTemplate::read(QDataStream &in)
 {
 	quint32 size ;
-	specModel* model = ((specView*) parentWidget())->model() ;
+	specModel* model = ((specView*) parentObject())->model() ;
 	in >> size ;
 	for (int i = 0 ; i < size ; ++i)
 		Genealogies << specGenealogy(model,in) ;

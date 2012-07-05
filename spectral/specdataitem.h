@@ -43,6 +43,7 @@ public:
 	bool changeDescriptor(QString key, QString value) ;
 	bool isEditable(QString key) const ;
 	bool setActiveLine(const QString &, int) ;
+	int activeLine(const QString &key) const ;
 	QStringList descriptorKeys() const ;
 	spec::descriptorFlags descriptorProperties(const QString& key) const ;
 

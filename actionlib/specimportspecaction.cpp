@@ -48,7 +48,7 @@ void specImportSpecAction::execute()
 	for (int i = 0 ; i < importedItems.size() ; ++i)
 		newIndexes << model->index(row+i,0,index) ;
 	command->setItems(newIndexes) ;
-	command->setParentWidget(currentView) ;
+	command->setParentObject(currentView) ;
 
 	if (command->ok())
 		library->push(command) ;

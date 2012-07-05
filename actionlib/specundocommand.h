@@ -6,7 +6,7 @@
 class specUndoCommand : public QUndoCommand
 {
 protected:
-	QWidget *pW ;
+	QObject *pW ;
 public:
 	explicit specUndoCommand(specUndoCommand *parent = 0);
 //	virtual void redo() = 0;
@@ -15,8 +15,8 @@ public:
 	virtual QDataStream& write(QDataStream& out) const = 0 ;
 	virtual QDataStream& read(QDataStream& in) = 0 ;
 	virtual bool mergeable(const specUndoCommand* other) { Q_UNUSED(other) ; return true ; }
-	void setParentWidget(QWidget*) ; // consider making virtual
-	QWidget *parentWidget() const ;
+	void setParentObject(QObject*) ; // consider making virtual
+	QObject *parentObject() const ;
 signals:
 
 public slots:

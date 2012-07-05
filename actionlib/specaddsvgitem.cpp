@@ -53,7 +53,7 @@ void specAddSVGItemAction::execute()
 	command->setItems(QModelIndexList() << model->index(row,0,index)) ;
 	qDebug("set item to command") ;
 
-	command->setParentWidget((QWidget*)parent()) ;
+	command->setParentObject((QWidget*)parent()) ;
 
 	if (command->ok())
 		library->push(command) ;

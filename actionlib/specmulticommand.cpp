@@ -39,7 +39,7 @@ QDataStream& specMultiCommand::read(QDataStream &in)
 	{
 		in >> id ; // TODO throw if id does not match
 		specUndoCommand *command = specActionLibrary::commandById(id,this) ;
-		command->setParentWidget(parentWidget()) ;
+		command->setParentObject(parentObject()) ;
 		command->read(in) ;
 	}
 	return in ;

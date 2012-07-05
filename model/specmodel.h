@@ -108,6 +108,7 @@ public:
 
 	void signalBeginReset() { beginResetModel() ; } // TODO just emit from whereever this function is called
 	void signalEndReset() { endResetModel() ; } // TODO just emit from whereever this function is called
+	void signalChanged(const QModelIndex& index)  { emit dataChanged(index,index) ; }
 	
 	
 // //TODO	bool QAbstractItemModel::setHeaderData ( int section, Qt::Orientation orientation, const QVariant & value, int role = Qt::EditRole )

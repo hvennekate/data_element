@@ -68,6 +68,7 @@ public:
 	/*! Set descriptor \a key 's value to  \a value. */
 	virtual bool changeDescriptor(QString key, QString value) ; // TODO add changeDescriptor(key,specDescriptor)
 	virtual bool setActiveLine(const QString&, int) ;
+	virtual int activeLine(const QString& key) const ;
 	/*! Regenerate data used for plotting. */
 	virtual void refreshPlotData() ; // TODO make private/protected
 	/*! Try to set data whose \f$\nu\f$ value is in \a ranges to zero by applying some correction (preferrably by subtracting a linear function previously fit to the data concerned).*/

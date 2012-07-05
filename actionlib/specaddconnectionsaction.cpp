@@ -32,7 +32,7 @@ void specAddConnectionsAction::execute()
 	qDebug("prepared target list") ;
 
 	specAddConnectionsCommand *command = new specAddConnectionsCommand ;
-	command->setParentWidget((QWidget*) parent()) ;
+	command->setParentObject((QWidget*) parent()) ;
 	command->setItems(target,servers) ;
 	qDebug("prepared command") ;
 

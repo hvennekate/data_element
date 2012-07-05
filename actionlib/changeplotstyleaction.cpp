@@ -81,7 +81,7 @@ void changePlotStyleAction::actionTriggered()
 	qDebug() << "commiting style" << &item ;
 	newCommand->obtainStyle(&item) ;
 	qDebug("committing action") ;
-	newCommand->setParentWidget(view) ;
+	newCommand->setParentObject(view) ;
 	newCommand->setItems(view->getSelection()) ;
 	library->push(newCommand) ;
 }
