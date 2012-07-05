@@ -90,7 +90,8 @@ SOURCES += main.cpp \
     kinetic/specmetadelegate.cpp \
     kinetic/specmetarange.cpp \
     log/speclogwidget.cpp \
-    actionlib/speceditdescriptorcommand.cpp
+    actionlib/speceditdescriptorcommand.cpp \
+    plot/specplotstyle.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -182,7 +183,8 @@ HEADERS += cutbyintensitydialog.h \
     kinetic/specmetadelegate.h \
     kinetic/specmetarange.h \
     log/speclogwidget.h \
-    actionlib/speceditdescriptorcommand.h
+    actionlib/speceditdescriptorcommand.h \
+    plot/specplotstyle.h
 
 INCLUDEPATH += kinetic \
 	log \
