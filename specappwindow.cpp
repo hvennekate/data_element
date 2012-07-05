@@ -31,14 +31,18 @@ void specAppWindow::closeEvent(QCloseEvent* event)
 
 void specAppWindow::newFile()
 {
-	addDockWidget(Qt::LeftDockWidgetArea, new specPlotWidget("",this)) ;
+	addDockWidget(Qt::LeftDockWidgetArea, new specPlotWidget(this)) ;
 }
 
 void specAppWindow::openFile()
 {
 	QString fileName = QFileDialog::getOpenFileName(this,"Name?","","spec-Dateien (*.spec)");
-	if (fileName != "")
-		addDockWidget(Qt::LeftDockWidgetArea, new specPlotWidget(fileName,this)) ;
+	if (fileName != "" && QFile::exists(fileName))
+	{
+		specPlotWidget *newWidget = new specPlotWidget(this) ;
+		newWidget->read(fileName) ;
+		addDockWidget(Qt::LeftDockWidgetArea, newWidget) ;
+	}
 }
 
 void specAppWindow::createActions()

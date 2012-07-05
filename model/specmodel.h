@@ -50,7 +50,6 @@ private:
 public:
 	QHash<QString, specMimeConverter*> mimeConverters ;
 	specModel(QObject *par = 0) ;
-	specModel(QDataStream&, QObject *par = 0) ;
 	~specModel() ;
 	
 	// Own functions
@@ -117,6 +116,8 @@ public slots:
 	void importFile(QModelIndex) ;
 	bool exportData(QModelIndexList& list) ;
 // 	bool insertRows(int position, int rows, const QModelIndex &parent = QModelIndex());
+	virtual QDataStream& read(QDataStream&) ;
+	virtual QDataStream& write(QDataStream&) const ;
 };
 
 #endif

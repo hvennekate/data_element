@@ -192,7 +192,7 @@ bool specModelItem::addChildren(QList<specModelItem*> list, QList<specModelItem*
 QStringList specModelItem::descriptorKeys() const
 { return QStringList(QString("")) ;}
 
-QDataStream& operator>>(QDataStream& stream, specModelItem*& pointer)
+QDataStream& specModelItem::read(QDataStream& stream)
 {
 	quint8 id ;// TODO read/write plot properties etc.
 	stream >> id ;

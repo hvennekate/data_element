@@ -89,6 +89,8 @@ public:
 	
 	friend QDataStream& operator>>(QDataStream&, specModelItem*&) ;
 	QDataStream& writeOut(QDataStream&) const;
+	virtual QDataStream& read(QDataStream& in) ;
+	virtual QDataStream& write(QDataStream& out) const;
 };
 
 #endif

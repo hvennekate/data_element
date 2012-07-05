@@ -20,7 +20,7 @@
 
 void specPlotWidget::changeFileName(const QString& name)
 {
-	onDisk->setFileName(name) ;
+	file->setFileName(name) ;
 	setWindowTitle(QFileInfo(name).fileName()) ;
 	kineticWidget->setWindowTitle(QString("Kinetics of ").append(QFileInfo(name).fileName())) ;
 	logWidget->setWindowTitle(QString("Logs of ").append(QFileInfo(name).fileName())) ;
@@ -28,10 +28,6 @@ void specPlotWidget::changeFileName(const QString& name)
 
 void specPlotWidget::contextMenuEvent(QContextMenuEvent* event)
 {
-// 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
-	int a,b,c,d ;
-	splitter->geometry().getCoords(&a,&b,&c,&d) ;
-// 	cout << "Splitter:  x: " << a << " " << c << "  y: " << b << " " << d << endl ;
 	if(splitter->geometry().contains(event->x(),event->y()))
 	{
 		if (splitter->orientation() == Qt::Horizontal)
@@ -41,92 +37,77 @@ void specPlotWidget::contextMenuEvent(QContextMenuEvent* event)
 	}
 }
 
-specPlotWidget::specPlotWidget(const QString& fileName, QWidget *parent)
-	: QDockWidget(QFileInfo(fileName).fileName(), parent),
-	  actions(new specActionLibrary(this))
+specPlotWidget::specPlotWidget(QWidget *parent)
+	: QDockWidget(tr("untitled"),parent),
+	  items(new specDataView(new specModel(items), this)),
+	  logWidget(new specLogWidget(items->model(), parent)),
+	  kineticWidget(new specKineticWidget(QString(),this)),
+	  content(new QWidget),
+	  layout(new QVBoxLayout),
+	  plot(new specSpectrumPlot),
+	  toolbar(new QToolBar(tr("File"),this)),
+	  splitter(new QSplitter(Qt::Vertical,this)),
+	  file(new QFile(this)),
+	  saveAction(new QAction(QIcon::fromTheme("document-save"), tr("Save"), this)),
+	  kineticsAction(kineticWidget->toggleViewAction()),
+	  logAction(logWidget->toggleViewAction()),
+	  saveAsAction(new QAction(QIcon::fromTheme("document-save-as"), tr("Save as..."), this)),
+	  printAction(new QAction(QIcon::fromTheme("document-print"), tr("Print..."), this))
 {
-	kineticWidget = new specKineticWidget(QString(),this) ;
-
-	onDisk  = new QFile() ;
-	QDataStream in ;
-	if(onDisk->exists())
-	{
-		onDisk->open(QFile::ReadOnly) ;
-		in.setDevice(onDisk) ;
-	}
-	content = new QWidget ;
-	layout  = new QVBoxLayout ;
-	plot    = new specSpectrumPlot ;
-	plot->setMinimumHeight(100) ;
-	
-	items   = new specDataView(this) ;
-	
-	qDebug("starting to read file") ;
-	if (onDisk->exists())
-	{
-		qDebug() << "filepos:" << onDisk->pos() ;
-		in >> *kineticWidget ;
-		qDebug() << "filepos:" << onDisk->pos() ;
-	}
-	
-	qDebug("read kinetic model") ;
-	
-	items->setModel(onDisk->exists() ? new specModel(in,items) : new specModel(items) ) ; // TODO employ >> operator
+	plot->setMinimumSize(100,100) ;
 	plot->setView(items) ;
-	qDebug("model: %d",items->model()) ;
-	qDebug() << "filepos:" << onDisk->pos() ;
-	
-	qDebug("read both data and kinetics models") ;
-	
-	logWidget = new specLogWidget(items->model(), parent) ;
-	changeFileName(fileName) ;
-
-	QToolBar *logToolbar = new QToolBar(logWidget) ;
-
-	qDebug("creating actions, toolbars, connections") ;
-
-	
-	createActions() ;
-	createToolbars();
-	setConnections() ;
-	
-	splitter= new QSplitter ;
-	splitter->setOrientation(Qt::Vertical) ;
-	splitter->addWidget(plot) ;
-	splitter->addWidget(items) ;
-	splitter->setOpaqueResize(false) ;
-	
-	layout -> addWidget(toolbar) ;
-	qDebug("adding undo toolbar") ;
-	layout -> addWidget(actions->toolBar(items)) ;
-	layout -> addWidget(actions->toolBar(plot)) ;
+	plot->setUndoPartner(actions) ;
 
 	items->model()->mimeConverters[QString("application/spec.spectral.item")] = new specMimeConverter ;
 	items->model()->mimeConverters[QString("application/spec.log.item")] = new specLogToDataConverter ;
+
 	actions->addDragDropPartner(items->model()) ;
-	logWidget->addToolbar(actions) ;
+	actions->addPlot(plot) ;
+
+	kineticWidget->view()->assignDataView(items) ;
 	kineticWidget->addToolbar(actions) ;
-	plot->setUndoPartner(actions) ;
-	qDebug("added undo toolbar") ;
+
+	logWidget->addToolbar(actions) ;
+
+	createToolbars();
+	setConnections() ;
+
+	splitter->addWidget(plot) ;
+	splitter->addWidget(items) ;
+	splitter->setOpaqueResize(false) ;
+
+	layout -> addWidget(toolbar) ;
+	layout -> addWidget(actions->toolBar(items)) ;
+	layout -> addWidget(actions->toolBar(plot)) ;
 	layout -> addWidget(splitter)  ;
 	layout -> setContentsMargins(0,0,0,0) ;
+
 	content->setLayout(layout) ;
 	setWidget(content) ;
+}
 
-	if (onDisk->exists())
+void specPlotWidget::read(QString fileName)
+{
+	// Checking for existence ought to have been done at this point
+	file->close(); // necessary?
+	file->setFileName(fileName) ;
+	if (!file->open(QFile::ReadOnly)) return ; // TODO warning message
+	QDataStream in(file) ;
+	// Basic layout of the file:
+	quint64 check ;
+	in >> check ;
+	if (check != FILECHECKRANDOMNUMBER)
 	{
-		qDebug() << "filepos:" << onDisk->pos() ;
-		actions->read(in) ;
-		items->read(in) ;
+		file->close();
+		return ; // TODO warning
 	}
+	QByteArray fileContent = file->readAll() ;
 
-
-	in.unsetDevice() ;
-	onDisk->close() ;
-
-	actions->addPlot(plot) ;
-	kineticWidget->view()->assignDataView(items) ;
-// TODO reconnect setFont() slot
+	plot->read(in) ;
+	items->read(in) ;
+	logWidget->read(in) ;
+	kineticWidget->read(in) ;
+	actions->read(in) ;
 }
 
 void specPlotWidget::modified()
@@ -139,36 +120,8 @@ void specPlotWidget::modified()
 	logWidget->setWindowTitle(QString("Logs of ").append(currentTitle)) ;
 }
 
-void specPlotWidget::createActions()
-{
-	saveAction = new QAction(QIcon(":/filesave.png"), tr("&Save"), this);
-	saveAction->setShortcut(tr("Strg+S"));
-	saveAction->setStatusTip(tr("Save"));
-	connect(saveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
-	
-	saveAsAction = new QAction(QIcon(":/filesaveas.png"), tr("&Save as..."), this);
-	saveAsAction->setShortcut(tr("Strg+Shift+S"));
-	saveAsAction->setStatusTip(tr("Save as..."));
-	connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveFile()));
-
-	printAction = new QAction(QIcon::fromTheme("document-print"), tr("Print..."), this) ;
-	
-	kineticsAction = kineticWidget->toggleViewAction() ;
-	kineticsAction->setIcon(QIcon(":/kineticwindow.png")) ;
-	kineticsAction->setText(tr("Kinetikfenster")) ;
-	kineticsAction->setParent(this) ;
-	kineticsAction->setShortcut(tr("Ctrl+K")) ;
-	kineticsAction->setStatusTip(tr("Kinetikfenster anzeigen")) ;
-
-	logAction = logWidget->toggleViewAction() ;
-	logAction->setIcon(QIcon(":/logs.png")) ;
-	logAction->setText(tr("Log-Fenster")) ;
-	logAction->setParent(this) ;
-}
-
 void specPlotWidget::createToolbars()
 {
-	toolbar = new QToolBar(tr("File"));
 	toolbar-> setContentsMargins(0,0,0,0) ;
 	toolbar-> setIconSize(QSize(20,20)) ;
 
@@ -181,6 +134,7 @@ void specPlotWidget::createToolbars()
 	toolbar-> addSeparator() ;
 	toolbar-> addAction(actions->undoAction(this)) ;
 	toolbar-> addAction(actions->redoAction(this)) ;
+	toolbar-> addSeparator() ;
 	foreach(QAction* action, plot->actions())
 		toolbar->addAction(action) ;
 }
@@ -234,32 +188,21 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 	qDebug("done closing dock") ;
 }
 
-void specPlotWidget::setFont()
-{
-	bool ok ;
-	QFont newFont = QFontDialog::getFont(&ok,QFont("Times", 10),this) ;
-	if (plot->itemList().size() && ok)
-	{
-		plot->setAxisFont(plot->itemList()[0]->xAxis(),newFont) ;
-		plot->setAxisFont(plot->itemList()[0]->yAxis(),newFont) ;
-	}
-}
-
 bool specPlotWidget::saveFile()
 {
-	changeFileName(onDisk->fileName() == "" || sender() == saveAsAction ? 
+	changeFileName(file->fileName() == "" || sender() == saveAsAction ?
 			QFileDialog::getSaveFileName(this,"Name?","","spec-Dateien (*.spec)") :
-			onDisk->fileName()) ;
-	if (onDisk->fileName() == "") return false ;
-	onDisk->open(QFile::WriteOnly) ;
-	QDataStream out(onDisk) ;
+			file->fileName()) ;
+	if (file->fileName() == "") return false ;
+	file->open(QFile::WriteOnly) ;
+	QDataStream out(file) ;
 	out << *(kineticWidget) ;
 	out << *(items->model()) ;
-	qDebug() << "filepos:" << onDisk->pos() ;
+	qDebug() << "filepos:" << file->pos() ;
 	actions->write(out) ;
 	items->write(out) ;
 	out.unsetDevice() ;
-	onDisk->close() ;
+	file->close() ;
 	return true ;
 }
 
@@ -279,13 +222,14 @@ void specPlotWidget::currentChanged(const QModelIndex& current, const QModelInde
 
 void specPlotWidget::setConnections()
 {
+	connect(saveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
+	connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 	connect(items->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),this,SLOT(selectionChanged(const QItemSelection&, const QItemSelection&))) ;
 	connect(items->selectionModel(),SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(currentChanged(const QModelIndex&, const QModelIndex&))) ;
-//	connect(plot->picker(),SIGNAL(moved(specCanvasItem*)),kineticWidget->view()->model(),SLOT(conditionalUpdate(specCanvasItem*))) ;
-// 	connect(plot->picker(),SIGNAL(rangesModified(QList<specRange*>*)),items,SLOT(newZeroRanges(QList<specRange*>*))) ;
 
 	connect(items->model(),SIGNAL(modelAboutToBeReset()),items,SLOT(prepareReset())) ;
 	connect(items->model(),SIGNAL(modelReset()),items,SLOT(resetDone())) ;
+	connect(actions,SIGNAL(stackChanged()), this, SLOT(modified())) ; // TODO check
 }
 
 #include <QPainter>

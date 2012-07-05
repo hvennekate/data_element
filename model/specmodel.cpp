@@ -326,35 +326,23 @@ void specModel::importFile(QModelIndex index)
 	}
 }
 
-QDataStream& operator<<(QDataStream& out, specModel& model)
+QDataStream& specModel::write(QDataStream& out) const
 {
+	out << (quint8) 0 ;
 	qDebug("---writing model") ;
-	out << (qint32) model.Descriptors.size() ;
-	for( int i =0 ; i < model.Descriptors.size() ; i++)
-		out << model.Descriptors[i] << (quint8) model.DescriptorProperties[i] ;
-	return model.root->writeOut(out) ;
-} // TODO save column widths --> on plotwidget level!
+	return model.root->writeOut(out << Descriptors << DescriptorProperties) ;
+}
 
-QDataStream& operator>>(QDataStream& in, specModel& model)
+QDataStream& specModel::read(QDataStream& in)
 {
-	qDebug("Reading model") ;
+	quint version = 0 ;
+	in >> version ;
 	delete model.root ;
 	model.Descriptors.clear() ;
 	model.DescriptorProperties.clear() ;
-// 	cout << "---reading  model" << endl ;
-	quint32 descriptorsSize;
-	quint8  prop ;
-	in >> descriptorsSize ;
-// 	cout << "---descriptors: " << descriptorsSize << endl ;
-	for (int i = 0 ; i < descriptorsSize ; i++)
-	{
-		model.Descriptors.append(QString()) ;
-		in >> model.Descriptors.last() >> prop ;
-		model.DescriptorProperties.append((spec::descriptorFlags) prop) ;
-// 		cout << "---read descriptor " << i << ":  " << model.descriptors.last() << "  Properties: " << model.descriptorProperties.last() << endl ;
-	}
-	qDebug("reading root item") ;
-	return in >> model.root ;
+	in >> Descriptors >> DescriptorProperties ;
+	root = new specFolderItem ;
+	return root->read(in) ;
 }
 
 specModelItem* specModel::itemPointer(const QModelIndex& index) const
@@ -759,20 +747,6 @@ void specModel::insertFromStream(QDataStream& stream, const QModelIndex& parent,
 		list << pointer ;
 	}
 	insertItems(list,parent,row) ;
-}
-
-specModel::specModel(QDataStream& in,QObject *par)
-	: QAbstractItemModel(par), mime("application/spec.model.item"), // TODO:  read mime type from stream
-	  internalDrop(false),
-	  dropSource(0),
-	  dontDelete(false),
-	  dropBuddy(0)
-{
-	root = new specFolderItem ;
-	Descriptors += "" ;
-	DescriptorProperties += spec::editable ;
-	in >> *this ;
-	qDebug("done reading model") ;
 }
 
 void specModel::fillSubMap(const QModelIndexList & indexList)
