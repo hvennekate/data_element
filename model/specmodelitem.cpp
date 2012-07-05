@@ -11,6 +11,8 @@
 #include "kinetic/specmetaitem.h"
 #include "utility-functions.h"
 #include <QPainter>
+#include "plot/specplotstyle.h"
+
 
 specModelItem::specModelItem(specFolderItem* par, QString description)
 	: specCanvasItem(description),
@@ -209,11 +211,10 @@ QDataStream& operator>>(QDataStream& stream, specModelItem*& pointer)
 			pointer = new specKinetic ; break ;
 	}
 //	QString title ;
-	QPen pen ;
 	pointer->readFromStream(stream)
-			>> pointer->mergePlotData >> pointer->sortPlotData >> pointer->description >> pen ;
-//	pointer->description.setContent(title) ;
-	pointer->setPen(pen) ;
+			>> pointer->mergePlotData >> pointer->sortPlotData >> pointer->description ;
+	specPlotStyle style(stream) ;
+	style.apply(pointer) ;
 	qDebug()<< "merge from copy:" << pointer->mergePlotData ;
 	pointer->invalidate();
 	return stream ;
@@ -221,11 +222,8 @@ QDataStream& operator>>(QDataStream& stream, specModelItem*& pointer)
 
 QDataStream& specModelItem::writeOut(QDataStream& stream) const
 {
-// 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
-// 	cout << "called operator<<" << endl ;
 	return (writeToStream(stream)
-			<< mergePlotData << sortPlotData << description << pen()) ;
-	qDebug()<< "merge from original:" << mergePlotData ;
+			<< mergePlotData << sortPlotData << description << specPlotStyle(this)) ;
 }
 
 spec::descriptorFlags specModelItem::descriptorProperties(const QString& key) const
