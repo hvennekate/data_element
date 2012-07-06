@@ -107,7 +107,7 @@ void specPlotWidget::read(QString fileName)
 	file->close();
 
 	specInStream in(&fileContent) ;
-	if (in.next() && in.type() == spec::mainWidget)
+	if (in.toNext(spec::mainWidget))
 	{
 		plot->read(in) ;
 		items->read(in) ;
@@ -115,8 +115,6 @@ void specPlotWidget::read(QString fileName)
 		kineticWidget->read(in) ;
 		actions->read(in) ;
 	}
-	else
-		in.skip();
 }
 
 void specPlotWidget::modified()

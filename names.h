@@ -31,7 +31,13 @@ namespace spec{
 		data = 6,
 		mainWidget = 7,
 		mainPlot = 8,
-		mainView = 9
+		mainView = 9,
+		viewState = 10,
+		logWidget = 11,
+		kineticWidget = 12,
+		actionLibrary = 13,
+		undoCommand = 14,
+
 		};
 	// originial data: 0
 	
