@@ -49,16 +49,20 @@ specKineticWidget::specKineticWidget(QString title, QWidget *parent)
 	connect(items->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),this,SLOT(selectionChanged(const QItemSelection&, const QItemSelection&))) ;
 }
 
-QDataStream& operator<<(QDataStream& stream, const specKineticWidget& widget)
+void specKineticWidget::write(specOutStream &out)
 {
-//	stream << *(widget.items->model()) ;
-	return stream ; // TODO
+	out.startContainer(spec::kineticWidget) ;
+	plot->write(out) ;
+	items->write(out) ;
+	out.stopContainer();
 }
 
-QDataStream& operator>>(QDataStream& stream, specKineticWidget& widget)
+bool specKineticWidget::read(specInStream &in)
 {
-//	stream >> *(widget.items->model()) ;
-	return stream ; // TODO
+	if (in.expect(spec::kineticWidget)
+			&& plot->read(in)
+			&& items->read(in)) return !in.next() ;
+	return false ;
 }
 
 specKineticWidget::~specKineticWidget()

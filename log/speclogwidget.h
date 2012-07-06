@@ -15,6 +15,8 @@ private:
 public:
 	explicit specLogWidget(specModel*, QWidget *parent = 0);
 	void addToolbar(specActionLibrary*) ;
+	void write(specOutStream&) ;
+	bool read(specInStream&) ;
 };
 
 #endif // SPECLOGWIDGET_H

@@ -369,26 +369,24 @@ void specView::dropEvent(QDropEvent *event)
 	QTreeView::dropEvent(event) ;
 }
 
-QDataStream& specView::write(QDataStream &out)
+void specView::write(specOutStream& out)
 {
-	out << qint8(1) ;
+	out.startContainer(spec::mainView) ;
+	model()->write(out) ;
 	specViewState state(this) ;
 	state.getState();
-	return state.write(out) ;
+	state.write(out) ;
+	out.stopContainer();
 }
 
-QDataStream& specView::read(QDataStream &in)
+bool specView::read(specInStream &in)
 {
-	qint8 version ;
-	in >> version ;
-	if (version == 1)
-	{
-		specViewState state(this) ;
-		state.read(in) ;
-		state.restoreState();
-		model()->read(in) ;
-	}
-	return in ;
+	if (!in.expect(spec::mainView)) return false ;
+	if (!model || !model()->read(in)) return false ;
+	specViewState state(this) ;
+	if (!state.read(in)) return false ;
+	state.restoreState();
+	return !in.next();
 }
 
 void specView::prepareReset()

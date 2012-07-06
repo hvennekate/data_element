@@ -10,9 +10,6 @@
 #include "specmetaview.h"
 
 class specKineticWidget;
-QDataStream& operator<<(QDataStream&, const specKineticWidget&);
-QDataStream& operator>>(QDataStream&, specKineticWidget&);
-
 class specKineticWidget : public QDockWidget
 {
 	Q_OBJECT
@@ -35,8 +32,9 @@ public:
 	
 	specMetaView *view() ;
 	
-	friend QDataStream& operator<<(QDataStream&, const specKineticWidget&);
-	friend QDataStream& operator>>(QDataStream&, specKineticWidget&);
+	void write(specOutStream&) ;
+	bool read(specInStream&) ;
+
 };
 
 #endif

@@ -27,8 +27,8 @@ public:
 	void setParent(specView* Parent) ;
 	void getState() ;
 	void restoreState() ;
-	QDataStream& write(QDataStream&) ;
-	QDataStream& read(QDataStream&) ;
+	void write(specOutStream&) ;
+	bool read(specInStream&) ;
 };
 
 #endif // SPECVIEWSTATE_H

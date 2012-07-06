@@ -120,10 +120,10 @@ void specViewState::restoreState()
 		parent->scrollTo(model()->index(currentTopItem),QAbstractItemView::PositionAtTop) ;
 }
 
-QDataStream& specViewState::write(QDataStream &out)
+void specViewState::write(specOutStream &out)
 {
-	out << quint8(0)
-	    << quint32(openFolders.size())
+	out.next(spec::viewState)
+	out << quint32(openFolders.size())
 	    << quint32(selectedItems.size())
 	    << hierarchyOfTopItem
 	    << hierarchyOfCurrentItem
@@ -132,16 +132,14 @@ QDataStream& specViewState::write(QDataStream &out)
 		out << model()->hierarchy(openFolders[i]) ;
 	for (int i = 0 ; i < selectedItems.size() ; ++i)
 		out << model()->hierarchy(selectedItems[i]) ;
-	return out ;
 }
 
-QDataStream& specViewState::read(QDataStream &in)
+bool specViewState::read(specInStream &in)
 {
-	quint8 version ;
+	if (!in.next() || in.type() != spec::viewState) return false ;
 	quint32 openFoldersSize ;
 	quint32 selectedItemsSize ;
-	in >> version
-	   >> openFoldersSize
+	in >> openFoldersSize
 	   >> selectedItemsSize
 	   >> hierarchyOfTopItem
 	   >> hierarchyOfCurrentItem
@@ -152,7 +150,7 @@ QDataStream& specViewState::read(QDataStream &in)
 	if (!model())
 	{
 		purgeLists();
-		return in ; // TODO cause error here.
+		return false ; // TODO cause error here.
 	}
 
 	for (int i = 0 ; i < openFolders.size() ; ++i)
@@ -167,5 +165,5 @@ QDataStream& specViewState::read(QDataStream &in)
 	}
 
 	// TODO maybe implicit restore
-	return in ;
+	return true ;
 }
