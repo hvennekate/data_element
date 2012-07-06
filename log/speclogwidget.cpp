@@ -22,3 +22,17 @@ void specLogWidget::addToolbar(specActionLibrary *actions)
 		actions->addDragDropPartner(view->model()) ;
 	layout->insertWidget(0,actions->toolBar(this->view)) ;
 }
+
+void specLogWidget::write(specOutStream & out)
+{
+	out.startContainer(spec::logWidget) ;
+	view->write(out) ;
+	out.stopContainer();
+}
+
+bool specLogWidget::read(specInStream &in)
+{
+	if (!in.expect(spec::logWidget)) return false ;
+	view->read(in) ;
+	return !in.next() ;
+}

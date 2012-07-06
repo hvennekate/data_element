@@ -146,8 +146,9 @@ QObject* specActionLibrary::parentId(int num)
 	return parents[num] ;
 }
 
-QDataStream& specActionLibrary::write(QDataStream &out)
+void specActionLibrary::write(specOutStream &out)
 {
+	out.startContainer(spec::actionLibrary) ;
 	out << qint32(undoStack->count()) ;
 	out << qint32(undoStack->index()) ;
 
@@ -156,11 +157,12 @@ QDataStream& specActionLibrary::write(QDataStream &out)
 	for (int i = 0 ; i < undoStack->count() ; ++i)
 	{
 		specUndoCommand* command = (specUndoCommand*) undoStack->command(i) ;
+		out.next(spec::undoCommand) ;
 		out << qint32(command->id()) << quint32(parents.indexOf(command->parentObject())) ;
 	}
 	for (int i = 0 ; i < undoStack->count() ; ++i)
-		((specUndoCommand*) undoStack->command(i))->write(out) ;
-	return out ;
+		((specUndoCommand*) undoStack->command(i))->write(out) ; // TODO Baustelle
+	out.stopContainer();
 }
 
 specUndoCommand *specActionLibrary::commandById(int id, specUndoCommand* parent)

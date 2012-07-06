@@ -9,6 +9,8 @@
 #include <QActionGroup>
 #include "names.h"
 #include "speccanvasitem.h"
+#include "specinstream.h"
+#include "specoutstream.h"
 
 class specMetaRange ;
 
@@ -56,8 +58,8 @@ public:
 	virtual QList<QAction*> actions() ;
 	spec::moveMode moveMode() ;
 	void refreshRanges() ;
-	virtual QDataStream& read(QDataStream& in) ;
-	virtual QDataStream& write(QDataStream& out) const ;
+	virtual bool read(specInStream& in) ;
+	virtual void write(specOutStream& out) const ;
 signals:
 	void changed() ;
 public slots :

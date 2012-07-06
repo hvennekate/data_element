@@ -16,7 +16,9 @@
 #include <QMessageBox>
 #include <names.h>
 #include <QSettings>
-#include <speclogtodataconverter.h>
+#include "speclogtodataconverter.h"
+#include "specinstream.h"
+#include "specoutstream.h"
 
 void specPlotWidget::changeFileName(const QString& name)
 {
@@ -102,12 +104,19 @@ void specPlotWidget::read(QString fileName)
 		return ; // TODO warning
 	}
 	QByteArray fileContent = file->readAll() ;
+	file->close();
 
-	plot->read(in) ;
-	items->read(in) ;
-	logWidget->read(in) ;
-	kineticWidget->read(in) ;
-	actions->read(in) ;
+	specInStream in(&fileContent) ;
+	if (in.next() && in.type() == spec::mainWidget)
+	{
+		plot->read(in) ;
+		items->read(in) ;
+		logWidget->read(in) ;
+		kineticWidget->read(in) ;
+		actions->read(in) ;
+	}
+	else
+		in.skip();
 }
 
 void specPlotWidget::modified()
@@ -195,13 +204,16 @@ bool specPlotWidget::saveFile()
 			file->fileName()) ;
 	if (file->fileName() == "") return false ;
 	file->open(QFile::WriteOnly) ;
-	QDataStream out(file) ;
-	out << *(kineticWidget) ;
-	out << *(items->model()) ;
-	qDebug() << "filepos:" << file->pos() ;
-	actions->write(out) ;
+	QDataStream ostr(file) ;
+	specOutStream out(&ostr) ;
+	out.startContainer(spec::mainWidget) ;
+	plot->write(out) ;
 	items->write(out) ;
-	out.unsetDevice() ;
+	logWidget->write(out) ;
+	kineticWidget->write(out) ;
+	actions->write(out) ;
+	out.stopContainer();
+	ostr.unsetDevice() ;
 	file->close() ;
 	return true ;
 }
