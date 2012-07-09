@@ -11,14 +11,13 @@
 #include <QTextStream>
 #include "specrange.h"
 #include "specdescriptor.h"
+#include "specoutstream.h"
+#include "specinstream.h"
 
 class specModelItem ;
 class specFolderItem ;
 class specKineticRange ;
 class specMetaItem ;
-
-QDataStream& operator>>(QDataStream&, specModelItem*&) ;
-// QDataStream& operator<<(QDataStream&, specModelItem*&) ;
 
 /*! Base class of list items. */
 class specModelItem : public specCanvasItem
@@ -36,6 +35,8 @@ protected:
 	virtual bool shortCircuit(specModelItem* server) ;
 	virtual QDataStream& readFromStream(QDataStream&) =0 ;
 	virtual QDataStream& writeToStream(QDataStream&) const =0 ;
+	void writeInternals(specOutStream&) const ;
+	bool readInternals(specInStream&) ;
 public:
 	void revalidate() ;
 	void invalidate() ;
@@ -88,9 +89,8 @@ public:
 	int rtti() const { return spec::spectrum ; }
 	
 	friend QDataStream& operator>>(QDataStream&, specModelItem*&) ;
-	QDataStream& writeOut(QDataStream&) const;
-	virtual QDataStream& read(QDataStream& in) ;
-	virtual QDataStream& write(QDataStream& out) const;
+	virtual bool read(specInStream& in) ;
+	virtual void write(specOutStream& out) const;
 };
 
 #endif

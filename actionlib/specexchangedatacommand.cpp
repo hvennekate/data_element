@@ -36,16 +36,18 @@ void specExchangeDataCommand::redo()
 		pointer->plot()->replot() ;
 }
 
-QDataStream& specExchangeDataCommand::write(QDataStream &out) const
+void specExchangeDataCommand::write(specOutStream &out) const
 {
-	return item->write(out << data) ;
+	out.startContainer(spec::exchangeDataCommandId);
+	item->write(out << data) ;
+	out.stopContainer();
 }
 
-QDataStream& specExchangeDataCommand::read(QDataStream &in)
+bool specExchangeDataCommand::read(specInStream &in)
 {
-	if (item)
-		delete item ;
+	if (!in.expect(spec::exchangeDataCommandId)) return false ;
+	if (item) delete item ;
 	in >> data ;
 	item = new specGenealogy(((specView*) parentObject())->model(),in) ;
-	return in ;
+	return !in.next() ;
 }

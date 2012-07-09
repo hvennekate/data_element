@@ -68,19 +68,22 @@ void specPlotMoveCommand::setCorrections(double xShift, double yOffset, double y
 	scale = yScale ;
 }
 
-QDataStream& specPlotMoveCommand::write(QDataStream &out) const
+void specPlotMoveCommand::write(specOutStream &out) const
 {
+	out.startContainer(spec::plotMoveCommandId) ;
 	out << slope << offset << scale << shift ;
-	return items->write(out) ;
+	items->write(out) ;
+	out.stopContainer();
 }
 
-QDataStream& specPlotMoveCommand::read(QDataStream &in)
+bool specPlotMoveCommand::read(specInStream &in)
 {
+	if (!in.expect(spec::plotMoveCommandId)) return false ;
 	in >> slope >> offset >> scale >> shift ;
 	if (items)
 		delete items ;
 	items = new specGenealogy(((specView*) parentObject())->model(),in) ;
-	return in ;
+	return !in.next() ;
 }
 
 bool specPlotMoveCommand::mergeable(const specUndoCommand *other)

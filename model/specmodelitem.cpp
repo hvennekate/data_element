@@ -192,6 +192,22 @@ bool specModelItem::addChildren(QList<specModelItem*> list, QList<specModelItem*
 QStringList specModelItem::descriptorKeys() const
 { return QStringList(QString("")) ;}
 
+void specModelItem::writeInternals(specOutStream &out) const
+{
+	out << mergePlotData << sortPlotData << description ;
+	description.write(out) ;
+	specPlotStyle(this).write(out);
+}
+
+void specModelItem::readInternals(specInStream &in)
+{
+	in >> mergePlotData >> sortPlotData ;
+	description.read(in) ;
+	specPlotStyle style ;
+	style.read(in) ;
+	style.apply(this);
+}
+
 QDataStream& specModelItem::read(QDataStream& stream)
 {
 	quint8 id ;// TODO read/write plot properties etc.
@@ -220,9 +236,10 @@ QDataStream& specModelItem::read(QDataStream& stream)
 	return stream ;
 }
 
-QDataStream& specModelItem::writeOut(QDataStream& stream) const
+QDataStream& specModelItem::write(QDataStream& stream) const
 {
-	return (writeToStream(stream)
+
+	(writeToStream(stream)
 			<< mergePlotData << sortPlotData << description << specPlotStyle(this)) ;
 }
 

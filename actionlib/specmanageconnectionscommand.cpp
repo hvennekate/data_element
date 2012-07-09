@@ -59,30 +59,34 @@ void specManageConnectionsCommand::take()
 		pointer->disconnectClient(client) ;
 }
 
-QDataStream &specManageConnectionsCommand::write(QDataStream &out) const
+void specManageConnectionsCommand::write(specOutStream &out) const
 {
+	if (!ok) return ;
+	out.startContainer(spec::ManageConnectionsCommandId) ;
 	out << qint8(sameModel()) ;
 	out << qint32(items.size()) ;
+//	if (ok()) 	// TODO why check if ok?
+	target->write(out) ;
 	for (int i = 0 ; i < items.size() ; ++i)
 		items[i]->write(out) ;
-	if (ok())
-		target->write(out) ;
+	out.stopContainer();
 	return out ;
 }
 
-QDataStream &specManageConnectionsCommand::read(QDataStream &in)
+bool specManageConnectionsCommand::read(specInStream &in)
 {
 	clear() ;
+	if (!in.expect(spec::ManageConnectionsCommandId)) return false ;
 	qint8 isSameModel ;
 	qint32 toRead ;
 	in >> isSameModel >> toRead ;
 	specModel *model = isSameModel ?
 				(specModel*) (((QAbstractItemView*) parentObject())->model()) :
 				(specModel*) (((specPlotWidget*) parentObject()->parent()->parent())->mainView()->model()) ; // TODO this is highly dangerous!
+	target = new specGenealogy((specModel*) (((QAbstractItemView*) parentObject())->model()),in) ;
 	for (int i = 0 ; i < toRead ; ++i)
 		items << new specGenealogy(model,in) ;
-	target = new specGenealogy((specModel*) (((QAbstractItemView*) parentObject())->model()),in) ;
-	return in ;
+	return !in.next() ;
 }
 
 QVector<specModelItem*> specManageConnectionsCommand::itemPointers() const

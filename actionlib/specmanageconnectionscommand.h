@@ -21,8 +21,8 @@ public:
 	virtual ~specManageConnectionsCommand() ;
 	bool ok() const ;
 	void setItems(const QModelIndex& client, QModelIndexList& servers) ;
-	QDataStream& write(QDataStream &out) const ;
-	QDataStream& read(QDataStream &in) ;
+	void write(QDataStream &out) const ;
+	bool read(specInStream &in) ;
 };
 
 #endif // SPECMANAGECONNECTIONSCOMMAND_H

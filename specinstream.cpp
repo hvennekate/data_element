@@ -27,7 +27,10 @@ bool specInStream::next()
 	if (currentArray->isEmpty())
 		return false ;
 	currentStream = new QDataStream(currentArray,QIODevice::ReadOnly) ;
-	*currentStream >> currentType ;
+	if (currentArray->isEmpty())
+		currentType = 0 ;
+	else
+		*currentStream >> currentType ;
 	return true ;
 }
 

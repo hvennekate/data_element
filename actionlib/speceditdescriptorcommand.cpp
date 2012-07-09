@@ -45,17 +45,20 @@ void specEditDescriptorCommand::redo()
 	}
 }
 
-QDataStream& specEditDescriptorCommand::write(QDataStream &out) const
+void specEditDescriptorCommand::write(specOutStream &out) const
 {
-	return item->write(out << previousContent << descriptor << previousActiveLine) ;
+	out.startContainer(spec::editDescriptorCommandId) ; // check if needs to be a container
+	item->write(out << previousContent << descriptor << previousActiveLine) ;
+	out.stopContainer();
 }
 
-QDataStream& specEditDescriptorCommand::read(QDataStream &in)
+bool specEditDescriptorCommand::read(specInStream& in)
 {
+	if (!in.expect(spec::editDescriptorCommandId)) return false ;
 	if (item) delete item ;
 	item = new specGenealogy(((specModel*) parentObject()),
 				 in >> previousContent >> descriptor >> previousActiveLine) ;
-	return in ;
+	return !in.next() ;
 }
 
 bool specEditDescriptorCommand::mergeable(const specUndoCommand *other)

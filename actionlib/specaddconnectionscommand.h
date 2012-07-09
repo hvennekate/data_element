@@ -9,7 +9,7 @@ public:
 	specAddConnectionsCommand(specUndoCommand *parent = 0);
 	void redo() ;
 	void undo() ;
-	int id() const { return spec::newConnectionsId ; }
+	int id() const { return spec::newConnectionsCommandId ; }
 };
 
 #endif // SPECADDCONNECTIONSCOMMAND_H

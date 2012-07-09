@@ -20,21 +20,24 @@ bool specResizeSVGcommand::ok()
 	return item && other.isValid() ;
 }
 
-QDataStream& specResizeSVGcommand::write(QDataStream &out) const
+void specResizeSVGcommand::write(specOutStream &out) const
 {
+	out.startContainer(spec::resizeSVGCommandId) ;
 	out << other ;
 	item->write(out) ;
+	out.stopContainer();
 }
 
-QDataStream& specResizeSVGcommand::read(QDataStream &in)
+bool specResizeSVGcommand::read(specInStream &in)
 {
+	if (!in.expect(spec::resizeSVGCommandId)) ;
 	if (!parentObject()) return in ;
 	specModel *model = ((specView*) parentObject())->model();
 	if (!model) return in ; // TODO dynamic_cast
 	in >> other ;
 	if (item) delete item ;
 	item = new specGenealogy(model, in) ;
-	return in ;
+	return !in.next() ;
 }
 
 void specResizeSVGcommand::redo()

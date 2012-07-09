@@ -16,11 +16,11 @@ public:
 	bool mergeWith(const QUndoCommand* other) ;
 	void setItem(QModelIndex) ;
 	void setCorrections(double xShift, double yOffset, double ySlope, double yScale) ;
-	int id() const { return spec::movePlotId ;}
+	int id() const { return spec::movePlotCommandId ;}
 	bool mergeable(const specUndoCommand* other) ;
 
-	QDataStream& write(QDataStream &out) const ;
-	QDataStream& read(QDataStream &in) ;
+	void write(specOutStream &out) const ;
+	bool read(specInStream &in) ;
 };
 
 #endif // SPECPLOTMOVECOMMAND_H

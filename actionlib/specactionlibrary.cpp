@@ -21,6 +21,7 @@
 #include "specaddconnectionsaction.h"
 #include "log/speclogview.h"
 #include "specimportspecaction.h"
+#include "names.h"
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
@@ -157,11 +158,15 @@ void specActionLibrary::write(specOutStream &out)
 	for (int i = 0 ; i < undoStack->count() ; ++i)
 	{
 		specUndoCommand* command = (specUndoCommand*) undoStack->command(i) ;
-		out.next(spec::undoCommand) ;
-		out << qint32(command->id()) << quint32(parents.indexOf(command->parentObject())) ;
+		out.next(spec::specItemType(command->id())) ;
+		out << quint32(parents.indexOf(command->parentObject())) ;
+		QByteArray array = new QByteArray ;
+		specOutStream *tempStream = new specOutStream(&array) ;
+		command->write(tempStream) ;
+		delete tempStream ;
+		out << array ;
+		delete tempStream ;
 	}
-	for (int i = 0 ; i < undoStack->count() ; ++i)
-		((specUndoCommand*) undoStack->command(i))->write(out) ; // TODO Baustelle
 	out.stopContainer();
 }
 
@@ -184,32 +189,43 @@ specUndoCommand *specActionLibrary::commandById(int id, specUndoCommand* parent)
 	}
 }
 
-QDataStream& specActionLibrary::read(QDataStream &in)
+bool specActionLibrary::read(specInStream &in)
 {
+	if (!in.expect(spec::actionLibrary)) return false ;
 	qint32 num, position ;
-	in >> num >> position ;
+	in >> num >> position ; // TODO really rely on num?
 	qDebug() << "count: " << num << "index: " << position ;
+	typedef QPair<specUndoCommand*, QByteArray*> commandBAPair ;
+	QVector<commandBAPair> newCommands ;
 	for (int i = 0 ; i < num ; ++i)
 	{
-		qint32 id, parentId ;
-		in >> id >> parentId ;
-		qDebug() << "Id: " << id << "Parent: " << parentId << parents[parentId] ;
-		specUndoCommand *command = commandById(id) ;
-		if (!command) continue ;
+		in.next() ;
+		specUndoCommand *command = commandById(in.type()) ;
+		if (!command)
+		{
+			newCommands.clear();
+			continue ;
+		}
+		QByteArray *ba = new QByteArray ;
+		qint32 parentId ;
+		in >> parentId >> *ba ;
 		command->setParentObject(parents[parentId]) ;
+		newCommands << commandBAPair(command, ba) ;
 		qDebug() << "pushing read in command onto stack" << command ;
 		undoStack->push(command) ;
 		qDebug() << "pushed command.  Stack size: " << undoStack->count() ;
 	}
 	undoStack->setIndex(position) ;
 	qDebug() << "Set position.  Stack size: " << undoStack->count() << "  Pos: " << undoStack->index() ;
-	for (int i = 0 ; i < num ; ++i)
+	foreach (commandBAPair pair, newCommands)
 	{
-		qDebug() << "reading command"<<i ;
-		((specUndoCommand*) undoStack->command(i))->read(in) ;
+		specInStream *inStream = new specInStream(pair.second) ;
+		pair.first->read(inStream) ;
+		delete inStream ;
+		delete pair.second ;
 	}
 	qDebug() << "reading undo commands done." ;
-	return in ;
+	return !in.next() ;
 }
 
 void specActionLibrary::setLastRequested(const QModelIndexList &list)

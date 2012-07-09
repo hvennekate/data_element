@@ -10,14 +10,14 @@ private:
 	specModel* Model ;
 	QVector<int> indexes ;
 	specFolderItem* Parent ;
-	QList<specModelItem*> Items ;
+	QVector<specModelItem*> Items ;
 	bool owning ;
 	bool knowingParent ;
 	void getItemPointers() ;
 public:
 	explicit specGenealogy(QModelIndexList&);
 	virtual ~specGenealogy() ;
-	specGenealogy(specModel*, QDataStream&) ;
+	specGenealogy(specModel*, specInStream&) ;
 	void setModel(specModel* model) ;
 	void takeItems() ;
 	void returnItems() ;
@@ -26,8 +26,7 @@ public:
 	specModel* model() ;
 	specFolderItem* parent() ;
 	const QList<specModelItem*>& items() const ;
-	QDataStream& write(QDataStream&) const ;
-	QDataStream& read(specModel*, QDataStream&) ;
+	void write(specOutStream&) const ;
 
 	bool operator==(const specGenealogy& other) ;
 	bool operator!=(const specGenealogy& other) ;
