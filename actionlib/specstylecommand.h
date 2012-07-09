@@ -25,8 +25,8 @@ class specStyleCommandImplementation : public specStyleCommand
 {
 public:
 	explicit specStyleCommandImplementation(specUndoCommand *parent = 0);
-	QDataStream& write(QDataStream& out) const ;
-	QDataStream& read(QDataStream& in) ;
+	void write(specOutStream& out) const ;
+	bool read(specInStream& in) ;
 	int id() const { return ID ; }
 
 	void redo() ;

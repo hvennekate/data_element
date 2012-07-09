@@ -71,25 +71,27 @@ void specStyleCommandImplFuncTemplate::undo()
 }
 
 specStyleCommandImplTemplate
-QDataStream& specStyleCommandImplFuncTemplate::write(QDataStream &out) const
+void specStyleCommandImplFuncTemplate::write(specOutStream &out) const
 {
+	out.startContainer(id());
 	out << quint32(Genealogies.size()) ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
 		Genealogies[i].write(out) ;
 	out << newProperty << oldProperties ;
-	return out ;
+	out.stopContainer();
 }
 
 specStyleCommandImplTemplate
-QDataStream& specStyleCommandImplFuncTemplate::read(QDataStream &in)
+bool& specStyleCommandImplFuncTemplate::read(specInStream &in)
 {
+	if (!in.expect(id())) return false ;
 	quint32 size ;
 	specModel* model = ((specView*) parentObject())->model() ;
 	in >> size ;
 	for (int i = 0 ; i < size ; ++i)
 		Genealogies << specGenealogy(model,in) ;
 	in >> newProperty >> oldProperties ;
-	return in ;
+	return !in.next() ;
 }
 
 specStyleCommandImplTemplate

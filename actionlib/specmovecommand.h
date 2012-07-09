@@ -19,8 +19,8 @@ public:
 	void redo() ;
 	void undo() ;
 	int id() const { return spec::moveItemsId ; }
-	QDataStream& write(QDataStream &) const ;
-	QDataStream& read(QDataStream &) ;
+	void write(specOutStream &) const ;
+	bool read(specInStream&) ;
 };
 
 #endif // SPECMOVECOMMAND_H

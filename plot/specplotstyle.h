@@ -3,7 +3,8 @@
 #include <QPen>
 #include <qwt_symbol.h>
 #include <qwt_plot_curve.h>
-
+#include "specinstream.h"
+#include "specoutstream.h"
 
 class specPlotStyle
 {
@@ -13,14 +14,12 @@ class specPlotStyle
 	QSize symbolSize ;
 	void initialize(const QwtPlotCurve*) ;
 public:
-	explicit specPlotStyle(QDataStream&);
+	explicit specPlotStyle(specInStream&);
 	explicit specPlotStyle(const QwtPlotCurve*);
 	void apply(QwtPlotCurve*) const;
 	void retrieve(QwtPlotCurve*) ;
-	QDataStream& write(QDataStream& out) const ;
-	QDataStream& read(QDataStream& in) ;
+	void write(specOutStream&) const ;
+	bool read(specOutStream&) const ;
 };
 
-QDataStream& operator<<(QDataStream&, const specPlotStyle&) ;
-QDataStream& operator>>(QDataStream&, specPlotStyle&) ;
 #endif // SPECPLOTSTYLE_H

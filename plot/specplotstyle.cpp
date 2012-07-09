@@ -1,6 +1,7 @@
 #include "specplotstyle.h"
+#include "names.h"
 
-specPlotStyle::specPlotStyle(QDataStream& in)
+specPlotStyle::specPlotStyle(specInStream& in)
 	: symbolType(-1)
 {
 	read(in) ;
@@ -24,14 +25,17 @@ void specPlotStyle::initialize(const QwtPlotCurve *curve)
 	}
 }
 
-QDataStream& specPlotStyle::write(QDataStream &out) const
+void specPlotStyle::write(specOutStream &out) const
 {
+	out.next(spec::plotStyle) ;
 	return out << pen << symbolPen << symbolType << symbolBrush << symbolSize ;
 }
 
-QDataStream& specPlotStyle::read(QDataStream &in)
+bool specPlotStyle::read(specInStream &in)
 {
-	return in >> pen >> symbolPen >> symbolType >> symbolBrush >> symbolSize ;
+	if (!in.expect(spec::plotStyle)) return ;
+	in >> pen >> symbolPen >> symbolType >> symbolBrush >> symbolSize ;
+	return true ;
 }
 
 void specPlotStyle::apply(QwtPlotCurve *c) const
@@ -46,14 +50,4 @@ void specPlotStyle::apply(QwtPlotCurve *c) const
 void specPlotStyle::retrieve(QwtPlotCurve *c)
 {
 	initialize(c) ;
-}
-
-QDataStream& operator>>(QDataStream& in, specPlotStyle& style)
-{
-	return style.read(in) ;
-}
-
-QDataStream& operator<<(QDataStream& out, const specPlotStyle& style)
-{
-	return style.write(out) ;
 }

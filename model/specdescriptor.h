@@ -3,11 +3,8 @@
 #include <QDataStream>
 #include <QString>
 #include <names.h>
-
-struct specDescriptor;
-
-QDataStream& operator<<(QDataStream&, const specDescriptor&);
-QDataStream& operator>>(QDataStream&, specDescriptor&);
+#include "specinstream.h"
+#include "specoutstream.h"
 
 class specDescriptor{ //make inline
 private:
@@ -29,9 +26,12 @@ public:
 	
 	specDescriptor& operator=(const double&) ;
 	specDescriptor& operator=(const QString&) ;
+
+	void write(specOutStream&) const;
+	bool read(specInStream&) ;
 	
-	friend QDataStream& operator<<(QDataStream&, const specDescriptor&);
-	friend QDataStream& operator>>(QDataStream&, specDescriptor&);
+//	friend QDataStream& operator<<(QDataStream&, const specDescriptor&);
+//	friend QDataStream& operator>>(QDataStream&, specDescriptor&);
 };
 
 #endif

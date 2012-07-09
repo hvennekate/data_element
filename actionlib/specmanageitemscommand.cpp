@@ -80,18 +80,21 @@ void specManageItemsCommand::restore()
 	finish() ;
 }
 
-QDataStream& specManageItemsCommand::write(QDataStream & out) const
+void specManageItemsCommand::write(specOutStream& out) const
 {
+	out.startContainer(spec::manageItemsCommandId);
 	out << qint32(items.size()) ;
 	qDebug("###### written size of genealogy list: %d", items.size()) ;
 	for (int i = 0 ; i < items.size() ; ++i)
 		items[i]->write(out) ;
+	out.stopContainer();
 	return out ;
 }
 
-QDataStream& specManageItemsCommand::read(QDataStream &in)
+bool specManageItemsCommand::read(specInStream &in)
 {
 	clear() ;
+	if (!in.expect(spec::manageItemsCommandId))  return false ;
 	qint32 toRead ;
 	in >> toRead ;
 	qDebug("reading manageItemsCommand.") ;
@@ -103,7 +106,7 @@ QDataStream& specManageItemsCommand::read(QDataStream &in)
 		items << new specGenealogy(model,in) ;
 	}
 	qDebug() << "##### read a total of" << items.size() ;
-	return in ;
+	return !in.next() ;
 }
 
 specManageItemsCommand::~specManageItemsCommand()

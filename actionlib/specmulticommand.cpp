@@ -22,19 +22,21 @@ void specMultiCommand::undo()
 	QUndoCommand::undo() ;
 }
 
-QDataStream& specMultiCommand::write(QDataStream &out) const
+void specMultiCommand::write(specOutStream &out) const // TODO make read/write part of specUndoCommand
+						       // +protected virtual worker functions
 {
+	out.startContainer(spec::multiCommandId) ;
 	out << mayMerge << qint32(childCount()) ;
 	for (int i = 0 ; i < childCount() ; ++i)
 		((const specUndoCommand*) child(i))->write(out) ;
-	return out ;
+	out.stopContainer();
 }
 
-QDataStream& specMultiCommand::read(QDataStream &in)
+bool specMultiCommand::read(specInStream &in)
 {
+	if(!in.expect(spec::multiCommandId)) return false ;
 	qint32 children, id ;
 	in >> mayMerge >> children ;
-
 	for (int i = 0 ; i < children ; ++i)
 	{
 		in >> id ; // TODO throw if id does not match
@@ -42,7 +44,7 @@ QDataStream& specMultiCommand::read(QDataStream &in)
 		command->setParentObject(parentObject()) ;
 		command->read(in) ;
 	}
-	return in ;
+	return !in.next() ;
 }
 
 bool specMultiCommand::mergeWith(const QUndoCommand *other)

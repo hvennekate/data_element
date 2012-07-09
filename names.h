@@ -37,6 +37,34 @@ namespace spec{
 		kineticWidget = 12,
 		actionLibrary = 13,
 		undoCommand = 14,
+		deleteCommandId = 15,
+		newFolderCommandId = 16,
+		moveItemsCommandId = 17,
+		modifyDataCommandId = 18,
+		movePlotCommandId = 19,
+		multiMoveCommandId = 20,
+		removeDataCommandId   = 21,
+		insertDataCommandId   = 22,
+		exchangeDataCommandId = 23,
+		resizeSVGCommandId    = 24,
+		newConnectionsCommandId = 31,
+		deleteConnectionsCommandId = 32,
+		editDescriptorCommandId = 33,
+		penColorCommandId         = 34,
+		symbolStyleCommandId      = 35,
+		symbolSizeCommandId       = 36,
+		symbolPenColorCommandId   = 37,
+		symbolBrushColorCommandId = 38,
+		manageConnectionsCommandId = 39,
+		manageItemsCommandId = 40,
+		editDescriptorCommandId = 41,
+		multiCommandId = 42,
+		genealogyId = 43,
+		model = 44,
+		descriptor = 45,
+		plotStyle = 46
+
+//		multiCommandId        = 64 // TODO needed per special bit?
 
 		};
 	// originial data: 0
@@ -45,25 +73,7 @@ namespace spec{
 	enum separator{ nosep=0, space=1, tab=2, newline=3 } ;
 	enum value{ time=0, wavenumber=1, signal=2, maxInt=3 } ;
 
-	enum undoActionIds{ deleteId = 10,
-			    newFolderId = 11,
-			    moveItemsId = 12,
-			    modifyDataId = 13,
-			    movePlotId = 14,
-			    multiMoveId = 15,
-			    removeDataId   = 20,
-			    insertDataId   = 21,
-			    exchangeDataId = 22,
-			    resizeSVGId    = 23,
-			    newConnectionsId = 30,
-			    deleteConnectionsId = 31,
-			    editDescriptorId = 32,
-			    penColorId         = 5001,
-			    symbolStyleId      = 5002,
-			    symbolSizeId       = 5003,
-			    symbolPenColorId   = 5004,
-			    symbolBrushColorId = 5005,
-			    multiCommandId        =10000} ;
+	enum undoActionIds{ } ;
 	enum itemRoles { activeLineRole = 50, fullContentRole = 51 } ;
 
 	enum rtti {canvasItem = 1001, spectrum = 1010, zeroRange = 1020, kineticCurve = 1030, kineticRange = 1040, SVGItem = 1050, metaRange = 1060 } ;

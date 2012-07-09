@@ -14,8 +14,8 @@ public:
 	void setMergeable(bool mergeable = true) ;
 	void redo() ;
 	void undo() ;
-	QDataStream& write(QDataStream &out) const ;
-	QDataStream& read(QDataStream &in) ;
+	void write(specOutStream &out) const ;
+	bool read(specInStream &in) ;
 	int id() const { return spec::multiCommandId ; }
 //	void setParentWidget(QWidget *) ; // TODO consider making virtual in undocommand
 	bool mergeWith(const QUndoCommand *other) ;

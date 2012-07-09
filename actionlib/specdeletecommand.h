@@ -15,7 +15,7 @@ public:
 	explicit specDeleteCommand(specUndoCommand *parent = 0);
 	void redo() ;
 	void undo() ;
-	int id() const { return spec::deleteId; }
+	int id() const { return spec::deleteCommandId; }
 };
 
 #endif // SPECDELETECOMMAND_H

@@ -13,8 +13,8 @@ private:
 public:
 	explicit specExchangeDataCommand(specUndoCommand *parent = 0) ;
 	void setItem(const QModelIndex&, const QVector<specDataPoint>& newData) ;
-	QDataStream& write(QDataStream &out) const ;
-	QDataStream& read(QDataStream &in) ;
+	void write(specOutStream &out) const ;
+	bool read(specInStream &in) ;
 	void redo();
 	void undo() ;
 	int id() const { return spec::exchangeDataId  ; }

@@ -12,7 +12,7 @@ public:
 	specAddFolderCommand(specUndoCommand *parent = 0);
 	void redo() ;
 	void undo() ;
-	int id() const { return spec::newFolderId ;}
+	int id() const { return spec::newFolderCommandId ;}
 };
 
 #endif // SPECADDFOLDERCOMMAND_H

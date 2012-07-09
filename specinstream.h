@@ -9,12 +9,12 @@ private:
 	Type currentType ;
 	bool produceArray() ;
 	void close() {}
+	void skip() ;
 public:
 	explicit specInStream(QDataStream*) ;
 	explicit specInStream(QByteArray*) ;
 	bool next() ;
 	Type type() ;
-	void skip() ;
 	bool toNext(Type) ; // QVector<Type>
 	bool expect(Type) ;
 

@@ -9,6 +9,7 @@ public:
 	specDeleteConnectionsCommand(specUndoCommand *parent) ;
 	void redo() ;
 	void undo() ;
+	int id() const { return spec::deleteConnectionsCommandId ; }
 };
 
 #endif // SPECDELETECONNECTIONSCOMMAND_H

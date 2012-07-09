@@ -2,19 +2,19 @@
 #include <QRegExp>
 #include <QDebug>
 
-QDataStream& operator<<(QDataStream& out, const specDescriptor& desc)
+void specDescriptor::write(specOutStream& out) const
 {
+	out.next(spec::descriptor)
 	out << desc.contentValue << desc.currentLine << (int) desc.properties ;
-	qDebug("out desc props: %d %d",(int)desc.properties, desc.isEditable()) ;
-	return out ;
 }
 
-QDataStream& operator>>(QDataStream& in , specDescriptor& desc) 
+bool specDescriptor::read(specInStream& in)
 {
+	if (!in.expect(spec::descriptor)) return false ;
 	int prop ;
 	in  >> desc.contentValue >> desc.currentLine >> prop ;
 	desc.properties = (spec::descriptorFlags) prop ;
-	return in ;
+	return true ;
 }
 
 
