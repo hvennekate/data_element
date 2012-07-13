@@ -2,19 +2,16 @@
 #include <QRegExp>
 #include <QDebug>
 
-void specDescriptor::write(specOutStream& out) const
+void specDescriptor::writeToStream(QDataStream &out) const
 {
-	out.next(spec::descriptor)
-	out << desc.contentValue << desc.currentLine << (int) desc.properties ;
+	out << desc.contentValue << desc.currentLine << (qint8) desc.properties ;
 }
 
-bool specDescriptor::read(specInStream& in)
+void specDescriptor::readFromStream(QDataStream &in)
 {
-	if (!in.expect(spec::descriptor)) return false ;
-	int prop ;
+	qint8 prop ;
 	in  >> desc.contentValue >> desc.currentLine >> prop ;
 	desc.properties = (spec::descriptorFlags) prop ;
-	return true ;
 }
 
 

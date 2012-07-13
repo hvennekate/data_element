@@ -192,19 +192,25 @@ bool specModelItem::addChildren(QList<specModelItem*> list, QList<specModelItem*
 QStringList specModelItem::descriptorKeys() const
 { return QStringList(QString("")) ;}
 
-void specModelItem::writeInternals(specOutStream &out) const
+void specModelItem::writeToStream(QDataStream &out) const
 {
-	out << mergePlotData << sortPlotData << description ;
-	description.write(out) ;
-	specPlotStyle(this).write(out);
+	out << mergePlotData << sortPlotData ;
 }
 
-void specModelItem::readInternals(specInStream &in)
+void specModelItem::writeContents(QDataStream &out) const
+{
+	out << description << specPlotStyle(this) ;
+}
+
+void specModelItem::readFromStream(QDataStream & in)
 {
 	in >> mergePlotData >> sortPlotData ;
-	description.read(in) ;
+}
+
+void specModelItem::readContents(QDataStream &in)
+{
 	specPlotStyle style ;
-	style.read(in) ;
+	in >> description >> style ;
 	style.apply(this);
 }
 

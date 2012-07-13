@@ -377,21 +377,18 @@ void specPlot::metaRangeMoved(specCanvasItem *item, int point, double x, double 
 	// TODO emit signal for metaview update
 }
 
-void specPlot::write(specOutStream &out) const
+void specPlot::writeToStream(QDataStream &out) const
 {
-	out.next(spec::mainPlot) ;
 	out << title().text()
 	    << axisTitle(QwtPlot::xBottom).text()
 	    << axisTitle(QwtPlot::yLeft).text() ;
 }
 
-bool specPlot::read(specInStream &in)
+void specPlot::readFromStream(QDataStream &in)
 {
-	if (!in.expect(spec::mainPlot)) return false ;
-	QString title, xTitle, yTitle ;
-	in >> title >> xTitle >> yTitle ;
-	setTitle(title) ;
-	setAxisTitle(QwtPlot::xBottom, xTitle) ;
-	setAxisTitle(QwtPlot::yLeft, yTitle) ;
-	return true ;
+	QString Title, xlabel, ylabel ;
+	in >> Title >> xlabel >> ylabel ;
+	setTitle(Title) ;
+	setAxisTitle(QwtPlot::xBottom, xlabel) ;
+	setAxisTitle(QwtPlot::yLeft, ylabel) ;
 }

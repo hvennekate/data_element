@@ -3,14 +3,17 @@
 #include <QDataStream>
 #include <QString>
 #include <names.h>
-#include "specinstream.h"
-#include "specoutstream.h"
+#include "specstreamable.h"
 
-class specDescriptor{ //make inline
+class specDescriptor : public specStreamable
+{ //make inline
 private:
 	QString contentValue ;
 	QString currentLine ;
 	spec::descriptorFlags properties ;
+	void writeToStream(QDataStream &out) const ;
+	void readFromStream(QDataStream &in) ;
+	type id() const { return specStreamable::descriptor ; }
 public:
 	specDescriptor(QString cont="", spec::descriptorFlags prop = spec::def) ;
 	specDescriptor(double d) ;
@@ -27,11 +30,6 @@ public:
 	specDescriptor& operator=(const double&) ;
 	specDescriptor& operator=(const QString&) ;
 
-	void write(specOutStream&) const;
-	bool read(specInStream&) ;
-	
-//	friend QDataStream& operator<<(QDataStream&, const specDescriptor&);
-//	friend QDataStream& operator>>(QDataStream&, specDescriptor&);
 };
 
 #endif

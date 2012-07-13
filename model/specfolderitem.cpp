@@ -93,33 +93,33 @@ void specFolderItem::removeChild(specModelItem* child)
 	invalidate();///! @todo move this to view/plotwidget (suspend frequent refreshes) -- maybe removeChildren instead
 }
 
-QDataStream& specFolderItem::readFromStream(QDataStream& stream)
+void specFolderItem::readFromStream(QDataStream& in)
 {
-// 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
-	qint32 noOfChildrenList ;
-	stream >> noOfChildrenList ;
-// 	cout << "Folder with " << noOfChildrenList << " children." << endl ;
-	QList<specModelItem*> tempChildrenList ;
-	while(tempChildrenList.size() < noOfChildrenList)
-	{
-// 		cout << "Reading child no. " << tempChildrenList.size() << " of " << noOfChildrenList << endl ;
-		specModelItem* pointer = 0 ;
-		stream >> pointer ;
-		tempChildrenList << pointer ;
-	}
-	addChildren(tempChildrenList,0) ;
-// 	cout << "read all children, returning." << endl ;
-	return stream ;
+	quint64 numChildren ;
+	specModelItem::readFromStream(in) ;
+	in >> numChildren ;
+	childrenList.fill(0,numChildren) ;
 }
 
-QDataStream& specFolderItem::writeToStream(QDataStream& stream) const
+void specFolderItem::readContents(QDataStream &in)
 {
-// 	qDebug("writing folder") ;
-	stream << (quint8) spec::folder << (qint32) children() ;
+	for (int i = 0 ; i < childrenList.size() ; ++i)
+		childrenList[i] = produceItem(in) ;
+}
+
+void specFolderItem::writeToStream(QDataStream& out) const
+{
+	specModelItem::writeToStream(out) ;
+	out << (quint64) << children() ;
+}
+
+void specFolderItem::writeContents(QDataStream &out) const
+{
+	specModelItem::writeContents(out)
 	foreach(specModelItem* child, childrenList)
 		child->writeOut(stream) ;
-	return stream ;
 }
+
 
 QStringList specFolderItem::descriptorKeys() const
 {
