@@ -8,11 +8,13 @@
 class specFolderItem : public specModelItem
 {
 private:
-	QList<specModelItem*> childrenList ;
+	QVector<specModelItem*> childrenList ;
 	bool suspendRefresh ;
-protected:
-	QDataStream& readFromStream(QDataStream&) ;
-	QDataStream& writeToStream(QDataStream&) const ;
+	void readFromStream(QDataStream& in) ;
+	void writeToStream(QDataStream& out) const ;
+	void writeContents(QDataStream &out) const;
+	void readContents(QDataStream &in);
+	type id() const { return specStreamable::folder ; }
 public:
 	/*! Standard constructor (cf. specModelItem).*/
 	specFolderItem(specFolderItem* par=0, QString description="");

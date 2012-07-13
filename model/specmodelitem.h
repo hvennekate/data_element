@@ -11,8 +11,7 @@
 #include <QTextStream>
 #include "specrange.h"
 #include "specdescriptor.h"
-#include "specoutstream.h"
-#include "specinstream.h"
+#include "specstreamable.h"
 
 class specModelItem ;
 class specFolderItem ;
@@ -20,7 +19,7 @@ class specKineticRange ;
 class specMetaItem ;
 
 /*! Base class of list items. */
-class specModelItem : public specCanvasItem
+class specModelItem : public specCanvasItem, public specStreamContainer
 {
 private:
 	specFolderItem* iparent ;
@@ -33,10 +32,10 @@ protected:
 	QwtSeriesData<QPointF>* processData(QwtSeriesData<QPointF>* dat) const;
 	// selectedPoints (3 Punkte fuer Korrekturen)
 	virtual bool shortCircuit(specModelItem* server) ;
-	virtual QDataStream& readFromStream(QDataStream&) =0 ;
-	virtual QDataStream& writeToStream(QDataStream&) const =0 ;
-	void writeInternals(specOutStream&) const ;
-	bool readInternals(specInStream&) ;
+	void readFromStream(QDataStream&) ;
+	void writeToStream(QDataStream&) const ;
+	void writeContents(QDataStream &out) const;
+	void readContents(QDataStream &in) ;
 	virtual specStream::Type id() const = 0;
 public:
 	void revalidate() ;

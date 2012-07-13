@@ -9,12 +9,11 @@
 #include <QActionGroup>
 #include "names.h"
 #include "speccanvasitem.h"
-#include "specinstream.h"
-#include "specoutstream.h"
+#include "specstreamable.h"
 
 class specMetaRange ;
 
-class specPlot : public QwtPlot
+class specPlot : public QwtPlot, public specStreamable
 {
 	Q_OBJECT
 private:
@@ -44,6 +43,9 @@ private:
 	CanvasPicker *metaPicker ;
 	void setupActions() ;
 	void highlightSelectable(bool highlight=true) ;
+	void readFromStream(QDataStream &in);
+	void writeToStream(QDataStream &out) const ;
+	specStreamable::type id() const {return specStreamable::mainPlot ;}
 private slots:
 	void changeTitle(QString) ;
 	void changeXLabel(QString) ;
@@ -58,8 +60,6 @@ public:
 	virtual QList<QAction*> actions() ;
 	spec::moveMode moveMode() ;
 	void refreshRanges() ;
-	virtual bool read(specInStream& in) ;
-	virtual void write(specOutStream& out) const ;
 signals:
 	void changed() ;
 public slots :

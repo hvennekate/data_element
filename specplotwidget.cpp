@@ -17,8 +17,7 @@
 #include <names.h>
 #include <QSettings>
 #include "speclogtodataconverter.h"
-#include "specinstream.h"
-#include "specoutstream.h"
+
 
 void specPlotWidget::changeFileName(const QString& name)
 {
@@ -106,15 +105,13 @@ void specPlotWidget::read(QString fileName)
 	QByteArray fileContent = file->readAll() ;
 	file->close();
 
-	specInStream in(&fileContent) ;
+	QDataStream in(fileContent) ;
 	if (in.toNext(spec::mainWidget))
-	{
-		plot->read(in) ;
-		items->read(in) ;
-		logWidget->read(in) ;
-		kineticWidget->read(in) ;
-		actions->read(in) ;
-	}
+		in >> *plot
+		   >> *items
+		   >> *logWidget
+		   >> *kineticWidget
+		   >> *actions ;
 }
 
 void specPlotWidget::modified()
@@ -202,16 +199,13 @@ bool specPlotWidget::saveFile()
 			file->fileName()) ;
 	if (file->fileName() == "") return false ;
 	file->open(QFile::WriteOnly) ;
-	QDataStream ostr(file) ;
-	specOutStream out(&ostr) ;
-	out.startContainer(spec::mainWidget) ;
-	plot->write(out) ;
-	items->write(out) ;
-	logWidget->write(out) ;
-	kineticWidget->write(out) ;
-	actions->write(out) ;
-	out.stopContainer();
-	ostr.unsetDevice() ;
+	QDataStream out(file) ;
+	out << quint64(FILECHECKRANDOMNUMBER)
+	    << *plot
+	    << *items
+	    << *logWidget
+	    << *kineticWidget
+	    << *actions ;
 	file->close() ;
 	return true ;
 }

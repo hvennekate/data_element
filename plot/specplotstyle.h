@@ -3,23 +3,23 @@
 #include <QPen>
 #include <qwt_symbol.h>
 #include <qwt_plot_curve.h>
-#include "specinstream.h"
-#include "specoutstream.h"
+#include "specstreamable.h"
 
-class specPlotStyle
+class specPlotStyle : public specStreamable
 {
 	QPen pen, symbolPen ;
 	qint16 symbolType ;
 	QBrush symbolBrush ;
 	QSize symbolSize ;
 	void initialize(const QwtPlotCurve*) ;
+	void writeToStream(QDataStream& out) const ;
+	void readFromStream(QDataStream& in) ;
+	specStreamable::type id() const { return specStreamable::plotStyle ; }
 public:
-	explicit specPlotStyle(specInStream&);
+	explicit specPlotStyle(QDataStream&);
 	explicit specPlotStyle(const QwtPlotCurve*);
 	void apply(QwtPlotCurve*) const;
 	void retrieve(QwtPlotCurve*) ;
-	void write(specOutStream&) const ;
-	bool read(specOutStream&) const ;
 };
 
 #endif // SPECPLOTSTYLE_H
