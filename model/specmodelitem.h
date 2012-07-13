@@ -37,6 +37,7 @@ protected:
 	virtual QDataStream& writeToStream(QDataStream&) const =0 ;
 	void writeInternals(specOutStream&) const ;
 	bool readInternals(specInStream&) ;
+	virtual specStream::Type id() const = 0;
 public:
 	void revalidate() ;
 	void invalidate() ;
@@ -90,6 +91,7 @@ public:
 	
 	friend QDataStream& operator>>(QDataStream&, specModelItem*&) ;
 	virtual bool read(specInStream& in) ;
+	static specModelItem* produce(specInStream& in) ;
 	virtual void write(specOutStream& out) const;
 };
 

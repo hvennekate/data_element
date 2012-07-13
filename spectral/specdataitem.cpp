@@ -143,15 +143,20 @@ QStringList specDataItem::descriptorKeys() const
 	return (specModelItem::descriptorKeys() << description.keys()) ;
 }
 
-QDataStream& specDataItem::readFromStream(QDataStream &in)
+bool specDataItem::read(specInStream &in)
 {
+	if (in.type() != id()) return false ;
 	invalidate();
-	return in >> description >> data >> offset >> slope >> factor >> xshift >> zeroMultiplications ;
+	readInternals(in) ;
+	in >> description >> data >> offset >> slope >> factor >> xshift >> zeroMultiplications ;
+	return true ; // TODO check for error
 }
 
-QDataStream& specDataItem::writeToStream(QDataStream& out) const
+void specDataItem::write(specOutStream &out) const
 {
-	return out << description << data << offset << slope << factor << xshift << zeroMultiplications ;
+	out.next(id()) ;
+	writeInternals(out) ;
+	out << description << data << offset << slope << factor << xshift << zeroMultiplications ;
 }
 
 specDataItem& specDataItem::operator+=(const specDataItem& toAdd)

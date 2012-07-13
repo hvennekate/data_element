@@ -39,6 +39,11 @@ bool specInStream::expect(Type t)
 	return (next() && type() == t) ;
 }
 
+bool specInStream::expect(const QVector<Type> &types)
+{
+	return (next() && types.contains(type()) ) ;
+}
+
 specStream::Type specInStream::type()
 {
 	return currentType & ~(specStream::containerType)  ;

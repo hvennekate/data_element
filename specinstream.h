@@ -17,6 +17,7 @@ public:
 	Type type() ;
 	bool toNext(Type) ; // QVector<Type>
 	bool expect(Type) ;
+	bool expect(const QVector<Type>&) ;
 
 	template<class T> specInStream& operator>>(T& object)
 	{
