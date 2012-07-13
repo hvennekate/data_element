@@ -92,9 +92,7 @@ SOURCES += main.cpp \
     log/speclogwidget.cpp \
     actionlib/speceditdescriptorcommand.cpp \
     plot/specplotstyle.cpp \
-    specstream.cpp \
-    specoutstream.cpp \
-    specinstream.cpp
+    specstreamable.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -188,9 +186,7 @@ HEADERS += cutbyintensitydialog.h \
     log/speclogwidget.h \
     actionlib/speceditdescriptorcommand.h \
     plot/specplotstyle.h \
-    specstream.h \
-    specoutstream.h \
-    specinstream.h
+    specstreamable.h
 
 INCLUDEPATH += kinetic \
 	log \
