@@ -208,39 +208,32 @@ void specModelItem::readInternals(specInStream &in)
 	style.apply(this);
 }
 
-QDataStream& specModelItem::read(QDataStream& stream)
+specModelItem *specModelItem::produce(specInStream &in)
 {
-	quint8 id ;// TODO read/write plot properties etc.
-	stream >> id ;
-	switch (id)
+	QVector<specStream::Type> types ;
+	types << ;
+	if (!in.expect(types)) return  0 ;
+	specModelItem *item = 0 ;
+	if (in.type() == ...) item = new ... ;
+	if (!item->read(in))
 	{
-		case spec::data :
-			pointer = new specDataItem(QVector<specDataPoint>(),
-					QHash<QString,specDescriptor>()) ; break ;
-		case spec::folder :
-			pointer = new specFolderItem ; break ;
-		case spec::logEntry :
-			pointer = new specLogEntryItem(QHash<QString,specDescriptor>()) ; break ;
-		case spec::sysEntry :
-			pointer = new specLogMessage(QHash<QString,specDescriptor>()) ; break ;
-		case spec::kinetic :
-			pointer = new specKinetic ; break ;
+		delete item ;
+		return 0 ;
 	}
-//	QString title ;
-	pointer->readFromStream(stream)
-			>> pointer->mergePlotData >> pointer->sortPlotData >> pointer->description ;
-	specPlotStyle style(stream) ;
-	style.apply(pointer) ;
-	qDebug()<< "merge from copy:" << pointer->mergePlotData ;
-	pointer->invalidate();
-	return stream ;
+	return item ;
 }
 
-QDataStream& specModelItem::write(QDataStream& stream) const
+bool specModelItem::read(specInStream& in)
 {
+	if (in.type() != id()) return false ;
+	readInternals(in) ;
+	return true ; // TODO maybe consider error in readInternals...
+}
 
-	(writeToStream(stream)
-			<< mergePlotData << sortPlotData << description << specPlotStyle(this)) ;
+void specModelItem::write(specOutStream& out) const
+{
+	out.next(id()) ;
+	writeInternals(out) ;
 }
 
 spec::descriptorFlags specModelItem::descriptorProperties(const QString& key) const

@@ -20,10 +20,9 @@ private:
 	QVector<double> times() const ;
 	void applyCorrection(specDataPoint&) const ;  /*!< Korrektur anwenden. */
 	void reverseCorrection(specDataPoint&) const; /*!< Korrektur rueckhaengig machen. */
-protected:
-	QDataStream& readFromStream(QDataStream&) ;
-	QDataStream& writeToStream(QDataStream&) const ;
 public:
+	bool read(specInStream &in) ;
+	void write(specOutStream &out) const ;
 	/*! Standard constructor.*/
 	specDataItem(const QVector<specDataPoint> &data, // TODO change to reference/pointer
 		     const QHash<QString,specDescriptor> &description, // TODO change to reference/pointer
