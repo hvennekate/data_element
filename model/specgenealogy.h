@@ -4,7 +4,7 @@
 #include "specmodel.h"
 #include <QVector>
 
-class specGenealogy
+class specGenealogy : public specStreamable
 {
 private:
 	specModel* Model ;
@@ -14,10 +14,14 @@ private:
 	bool owning ;
 	bool knowingParent ;
 	void getItemPointers() ;
+	void writeToStream(QDataStream &out) const ;
+	void readFromStream(QDataStream &in) ;
+	type id() const { return specStreamable::genealogyId ; }
+	specStreamable* factory(const type &t) const ;
 public:
 	explicit specGenealogy(QModelIndexList&);
 	virtual ~specGenealogy() ;
-	specGenealogy(specModel*, specInStream&) ;
+	specGenealogy(specModel*, QDataStream&) ;
 	void setModel(specModel* model) ;
 	void takeItems() ;
 	void returnItems() ;
@@ -26,7 +30,6 @@ public:
 	specModel* model() ;
 	specFolderItem* parent() ;
 	const QList<specModelItem*>& items() const ;
-	void write(specOutStream&) const ;
 
 	bool operator==(const specGenealogy& other) ;
 	bool operator!=(const specGenealogy& other) ;

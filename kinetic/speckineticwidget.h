@@ -10,7 +10,7 @@
 #include "specmetaview.h"
 
 class specKineticWidget;
-class specKineticWidget : public QDockWidget
+class specKineticWidget : public QDockWidget, public specStreamable
 {
 	Q_OBJECT
 private:
@@ -19,6 +19,9 @@ private:
 	QWidget *content ;
 	QSplitter *splitter ;
 	specMetaView *items ;
+	void writeToStream(QDataStream &out) const ;
+	void readFromStream(QDataStream &in) ;
+	type id() const { return specStreamable::metaWidget ;}
 private slots:
 	void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) ;
 protected:
@@ -32,9 +35,6 @@ public:
 	
 	specMetaView *view() ;
 	
-	void write(specOutStream&) ;
-	bool read(specInStream&) ;
-
 };
 
 #endif

@@ -85,20 +85,31 @@ specFolderItem* specGenealogy::parent()
 	return Parent ;
 }
 
-void specGenealogy::write(specOutStream &out) const
+void specGenealogy::writeToStream(QDataStream &out) const
 {
-	if (owning) out.startContainer(spec::genealogyId);
-	else out.next(spec::genealogyId)
-	out << indexes ;
-	out << qint8(owning) ;
-	out << qint32(Items.size()) ;
+	out << indexes << qint8(owning) << qint32(Items.size()) ;
 	if (owning)
 	{
 		for(int i = 0 ; i < Items.size() ; ++i)
-			Items[i]->writeOut(out) ;
-		out.stopContainer();
+			out << *(Items[i]) ;
 	}
-	out.stopContainer();
+}
+
+void specGenealogy::readFromStream(QDataStream &in)
+{
+	qint8 own ;
+	qint32 itemCount ;
+	in >> indexes >> own >> itemCount ;
+	owning = own ;
+	Items.fill(0,itemCount);
+	if (owning)
+		for (int i = 0 ; i < itemCount ; ++i)
+			Items[i] = (specModelItem*) produceItem(in) ;
+}
+
+specStreamable* specGenealogy::factory(const type &t) const
+{
+	return specModelItem::itemFactory(t) ;
 }
 
 specGenealogy::specGenealogy(specModel* mod, specInStream &in)
@@ -107,29 +118,7 @@ specGenealogy::specGenealogy(specModel* mod, specInStream &in)
 	qDebug("reading genealogy...") ;
 	Parent = 0 ;
 	Model = mod ;
-	if (!in.expect(spec::genealogyId)) return ;
-	in >> indexes ;
-	qint8 tempOwning ;
-	in >> tempOwning ;
-	owning = tempOwning ;
-	qint32 toRead ;
-	in >> toRead ;
-	if (owning)
-	{
-		qDebug("owning Items") ;
-		specModelItem *pointer ;
-		for (int i = 0 ; i < toRead ; ++i)
-		{
-			in >> pointer ; // TODO change!!!
-			Items << pointer ;
-		}
-		in.next() ;
-	}
-	else
-	{
-		qDebug("not owning Items") ;
-		Items = QVector<specModelItem*>(toRead,0)
-	}
+	readFromStream(in);
 }
 
 bool specGenealogy::seekParent()

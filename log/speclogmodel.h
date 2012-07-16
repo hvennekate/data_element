@@ -9,6 +9,7 @@ class specLogModel : public specModel
 private:
     Q_OBJECT
 	specModel *partner ;
+	type id() const { return specStreamable::logModel ; }
 public:
 	specLogModel(specModel *dataModel, QObject *parent = 0);
 

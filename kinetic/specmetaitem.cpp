@@ -8,14 +8,17 @@ specMetaItem::specMetaItem(specFolderItem *par, QString description)
 {
 }
 
-QDataStream &specMetaItem::writeToStream(QDataStream &out) const
+void specMetaItem::writeToStream(QDataStream &out) const
 {
-	return out ;
+	specModelItem::writeToStream(out) ;
+	out << variables << items ;
 }
 
-QDataStream &specMetaItem::readFromStream(QDataStream &in)
+void specMetaItem::readFromStream(QDataStream &in)
 {
-	return in ;
+	specModelItem::readFromStream(in) ;
+	in >> variables >> items ;
+	invalidate() ; // TODO maybe insert in data item or just model item.
 }
 
 QList<specModelItem*> specMetaItem::purgeConnections()

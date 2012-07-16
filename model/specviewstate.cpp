@@ -120,9 +120,8 @@ void specViewState::restoreState()
 		parent->scrollTo(model()->index(currentTopItem),QAbstractItemView::PositionAtTop) ;
 }
 
-void specViewState::write(specOutStream &out)
+void specViewState::writeToStream(QDataStream &out) const
 {
-	out.next(spec::viewState)
 	out << quint32(openFolders.size())
 	    << quint32(selectedItems.size())
 	    << hierarchyOfTopItem
@@ -134,9 +133,8 @@ void specViewState::write(specOutStream &out)
 		out << model()->hierarchy(selectedItems[i]) ;
 }
 
-bool specViewState::read(specInStream &in)
+void specViewState::readFromStream(QDataStream &in)
 {
-	if (!in.next() || in.type() != spec::viewState) return false ;
 	quint32 openFoldersSize ;
 	quint32 selectedItemsSize ;
 	in >> openFoldersSize
@@ -150,7 +148,7 @@ bool specViewState::read(specInStream &in)
 	if (!model())
 	{
 		purgeLists();
-		return false ; // TODO cause error here.
+		return ; // TODO cause error here.
 	}
 
 	for (int i = 0 ; i < openFolders.size() ; ++i)

@@ -3,7 +3,6 @@
 #include "specdataitem.h"
 #include "speclogentryitem.h"
 #include "speclogmessage.h"
-#include "speckinetic.h"
 #include <QTextStream>
 #include "speckineticrange.h"
 #include <QTime>
@@ -28,10 +27,7 @@ specModelItem::~specModelItem()
 {
 	setParent(0) ;
 }
-	
-QMultiMap<double,QPair<double,double> >* specModelItem::kinetics(QList<specKineticRange*>) const
-{ return new QMultiMap<double,QPair<double,double> > ; }
-	
+		
 void specModelItem::setParent(specFolderItem* par)
 {
 	if (par == iparent)
@@ -194,23 +190,15 @@ QStringList specModelItem::descriptorKeys() const
 
 void specModelItem::writeToStream(QDataStream &out) const
 {
-	out << mergePlotData << sortPlotData ;
-}
-
-void specModelItem::writeContents(QDataStream &out) const
-{
-	out << description << specPlotStyle(this) ;
+	out << mergePlotData << sortPlotData
+	    << description << specPlotStyle(this) ;
 }
 
 void specModelItem::readFromStream(QDataStream & in)
 {
-	in >> mergePlotData >> sortPlotData ;
-}
-
-void specModelItem::readContents(QDataStream &in)
-{
 	specPlotStyle style ;
-	in >> description >> style ;
+	in >> mergePlotData >> sortPlotData
+	   >> description >> style ;
 	style.apply(this);
 }
 
@@ -315,4 +303,23 @@ bool specModelItem::connectServer(specModelItem *itm)
 bool specModelItem::disconnectServer(specModelItem *itm)
 {
 	return false ;
+}
+
+specModelItem* specModelItem::itemFactory(specStreamable::type t)
+{
+	switch(t)
+	{
+	case specStreamable::dataItem : return new specDataItem ;
+	case specStreamable::folder : return new specFolderItem ;
+	case specStreamable::logEntry : return new specLogEntryItem ;
+	case specStreamable::sysEntry : return new specLogMessage ;
+	case specStreamable::svgItem : return new specSVGItem ;
+	case specStreamable::metaItem : return new specMetaItem ;
+	default: specStreamable::factory(t) ;
+	}
+}
+
+specModelItem* specModelItem::factory(const type &t) const
+{
+	return itemFactory(t) ;
 }

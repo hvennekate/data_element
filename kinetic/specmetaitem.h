@@ -6,7 +6,6 @@
 #include "model/specdescriptor.h"
 
 class specPlot ;
-class specMetaFilter ;
 
 class specMetaItem : public specModelItem
 {
@@ -16,17 +15,15 @@ private:
 	QHash<QString,specDescriptor> variables ;
 	specModelItem *currentlyConnectingServer ;
 	void refreshOtherPlots() ;
-protected:
-	QDataStream& readFromStream(QDataStream&) ;
-	QDataStream& writeToStream(QDataStream &) const ;
+	type id() const { return specStreamable::metaItem ; }
+	void readFromStream(QDataStream & in) ;
+	void writeToStream(QDataStream & out) const ;
 public:
 
 	bool disconnectServer(specModelItem*) ;
 	bool connectServer(specModelItem*) ;
 	explicit specMetaItem(specFolderItem* par=0, QString description="");
 	QList<specModelItem*> purgeConnections() ;
-//	specMetaParser *takeFilter() ; // TODO obsolete
-//	void setFilter(specMetaParser*) ; // TODO obsolete
 	void attach(QwtPlot *plot) ;
 	void detach();
 	void refreshPointers(const QHash<specModelItem*,specModelItem*>& mapping) ;

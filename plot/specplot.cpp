@@ -14,6 +14,7 @@
 #include "specmetarange.h"
 
 // TODO solve the myth of autoscaleaxis...
+// TODO remove kineticRanges
 
 specPlot::specPlot(QWidget *parent)
 	: canBeSelected(NULL), QwtPlot(parent), select(false), replotting(false),
@@ -137,7 +138,6 @@ void specPlot::replot()
 	QwtPlotItemList allItems = itemList();
 	ranges->clear() ;
 	ordinary->clear() ;
-	kineticRanges->clear() ;
 	selectRanges->clear();
 	QList<specCanvasItem*> newMetaRanges; // TODO local variable
 	QVector<specSVGItem*> svgitems ;
@@ -146,8 +146,6 @@ void specPlot::replot()
 	{
 		if (dynamic_cast<specMetaRange*>(item))
 			newMetaRanges << ((specCanvasItem*) item) ;
-		else if (dynamic_cast<specKineticRange*>(item))
-			kineticRanges->append((specCanvasItem*) item) ;
 		else if (dynamic_cast<specSelectRange*>(item))
 			selectRanges->append((specCanvasItem*) item) ;
 		else if (dynamic_cast<specRange*>(item))

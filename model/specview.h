@@ -13,7 +13,7 @@ class specModel ;
 class specViewState ;
 
 
-class specView : public QTreeView
+class specView : public QTreeView, public specStreamable
 { // TODO turn into abstract class (add purely virtual function)
 Q_OBJECT
 private:
@@ -26,6 +26,9 @@ private:
 	void contextMenuEvent(QContextMenuEvent*) ;
 	void triggerReselect() ;
 	bool setAllSelected(const QVariant&, int role = Qt::EditRole) ;
+	void readFromStream(QDataStream &in) ;
+	void writeToStream(QDataStream &out) const ;
+	type id() const { return specStreamable::mainView ; }
 private slots:
 	void averageItems() ;
 protected:

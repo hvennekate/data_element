@@ -23,16 +23,12 @@ void specLogWidget::addToolbar(specActionLibrary *actions)
 	layout->insertWidget(0,actions->toolBar(this->view)) ;
 }
 
-void specLogWidget::write(specOutStream & out)
+void specLogWidget::writeToStream(QDataStream &out) const
 {
-	out.startContainer(spec::logWidget) ;
-	view->write(out) ;
-	out.stopContainer();
+	out << *view ;
 }
 
-bool specLogWidget::read(specInStream &in)
+void specLogWidget::readFromStream(QDataStream &in)
 {
-	if (!in.expect(spec::logWidget)) return false ;
-	view->read(in) ;
-	return !in.next() ;
+	in >> *view ;
 }

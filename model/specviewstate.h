@@ -8,7 +8,7 @@
 class specView ;
 class specModel ;
 
-class specViewState
+class specViewState : public specStreamable
 {
 private:
 	specView *parent ;
@@ -22,13 +22,13 @@ private:
 	void purgeLists() ;
 	inline specModel* model() { return parent ? parent->model() : 0 ; }
 	specModelItem* hierarchyPointer(const QVector<int>&) ;
+	void writeToStream(QDataStream &out) const ;
+	void readFromStream(QDataStream &in) ;
 public:
 	explicit specViewState(specView* Parent) ;
 	void setParent(specView* Parent) ;
 	void getState() ;
 	void restoreState() ;
-	void write(specOutStream&) ;
-	bool read(specInStream&) ;
 };
 
 #endif // SPECVIEWSTATE_H
