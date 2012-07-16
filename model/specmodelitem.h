@@ -15,11 +15,10 @@
 
 class specModelItem ;
 class specFolderItem ;
-class specKineticRange ;
 class specMetaItem ;
 
 /*! Base class of list items. */
-class specModelItem : public specCanvasItem, public specStreamContainer
+class specModelItem : public specCanvasItem, public specStreamable
 {
 private:
 	specFolderItem* iparent ;
@@ -34,9 +33,7 @@ protected:
 	virtual bool shortCircuit(specModelItem* server) ;
 	void readFromStream(QDataStream&) ;
 	void writeToStream(QDataStream&) const ;
-	void writeContents(QDataStream &out) const;
-	void readContents(QDataStream &in) ;
-	virtual specStream::Type id() const = 0;
+	specModelItem* factory(const type &) const ;
 public:
 	void revalidate() ;
 	void invalidate() ;
@@ -52,7 +49,6 @@ public:
 	/*! Standard destructor.*/
 	virtual ~specModelItem();
 	/*! Returns a collection of data points (normally empty, needs to be reimplemented in subclasses). The format is time, signal.*/
-	virtual QMultiMap<double,QPair<double,double> >* kinetics(QList<specKineticRange*>) const;
 	
 	/*! Assign parent. */
 	void setParent(specFolderItem*) ; // TODO make private and friend of folder class
@@ -88,10 +84,7 @@ public:
 
 	int rtti() const { return spec::spectrum ; }
 	
-	friend QDataStream& operator>>(QDataStream&, specModelItem*&) ;
-	virtual bool read(specInStream& in) ;
-	static specModelItem* produce(specInStream& in) ;
-	virtual void write(specOutStream& out) const;
+	static specModelItem* itemFactory(specStreamable::type) ;
 };
 
 #endif

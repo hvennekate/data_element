@@ -28,10 +28,9 @@ private:
 	SVGCornerPoints fix ;
 	QPointF anchorPoint(const SVGCornerPoints& point) const;
 	void setAnchor(QRectF &bounds, const QPointF&, const SVGCornerPoints& point) const ;
-protected:
-	QDataStream& readFromStream(QDataStream &in){ return in ; }
-	QDataStream& writeToStream(QDataStream &out) const { return out ; }
-
+	type id() const { return specStreamable::svgItem ; }
+	void readFromStream(QDataStream &in) ;
+	void writeToStream(QDataStream &out) const;
 public:
 	specSVGItem(specFolderItem* par=0, QString description="") ;
 	int rtti() const { return spec::SVGItem ; }

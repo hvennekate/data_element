@@ -116,3 +116,29 @@ void specSVGItem::refreshSVG(double xfactor, double yfactor)
 	if (fix >= 0)    setAnchor(bounds, fixPoint, fix) ;
 	setBoundingRect(bounds) ;
 }
+
+void specSVGItem::writeToStream(QDataStream &out) const
+{
+	specModelItem::writeToStream(out) ;
+	out << quint8(highlighting) << qint16(width) << qint16(height) << qint16(fix)
+	    << image->boundingRect() << *data ;
+}
+
+void specSVGItem::readFromStream(QDataStream &in) const
+{
+	specModelItem::readFromStream(in) ;
+	quint8 hl ;
+	qint16 w, h, f ;
+	delete data ;
+	delete image ;
+	in >> hl >> w >> h >> f ;
+	highlighting = hl ;
+	width = w ;
+	height = h ;
+	fix = f ;
+	QRectF rect ;
+	image = new QwtPlotSvgItem ;
+	data = new QByteArray ;
+	in >> rect >> *data ;
+	// TODO refresh
+}

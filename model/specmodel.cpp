@@ -326,24 +326,14 @@ void specModel::importFile(QModelIndex index)
 	}
 }
 
-void specModel::write(specOutStream& out) const
+void specModel::writeToStream(QDataStream &out) const
 {
-	out.startContainer(spec::model);
-	qDebug("---writing model") ;
-	model.root->writeOut(out << Descriptors << DescriptorProperties) ;
-	out.stopContainer();
+	out << Descriptors << DescriptorProperties << *root ;
 }
 
-bool specModel::read(specInStream& in)
+void specModel::readFromStream(QDataStream &in)
 {
-	if (!in.expect(spec::model)) return false ;
-	delete model.root ;
-	model.Descriptors.clear() ;
-	model.DescriptorProperties.clear() ;
-	in >> Descriptors >> DescriptorProperties ;
-	root = new specFolderItem ; // TODO use factory function
-	root->read(in) ;
-	return !in.next() ;
+	in >> Descriptors >> DescriptorProperties >> *root ;
 }
 
 specModelItem* specModel::itemPointer(const QModelIndex& index) const

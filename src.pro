@@ -9,11 +9,7 @@ SOURCES += main.cpp \
     specminmaxvalidator.cpp \
     specplotwidget.cpp \
     utility-functions.cpp \
-    kinetic/speckinetic.cpp \
     kinetic/speckineticwidget.cpp \
-    kinetic/speckineticview.cpp \
-    kinetic/speckineticmodel.cpp \
-    kinetic/speckineticrange.cpp \
     log/speclogentryitem.cpp \
     log/speclogmessage.cpp \
     model/exportdialog.cpp \
@@ -66,9 +62,7 @@ SOURCES += main.cpp \
     actionlib/specaddsvgitem.cpp \
     actionlib/specprintplotaction.cpp \
     actionlib/specresizesvgcommand.cpp \
-    kinetic/specmetafilter.cpp \
     kinetic/specmetaitem.cpp \
-    kinetic/specdescriptordescriptorfilter.cpp \
     kinetic/specmetamodel.cpp \
     kinetic/specmetaview.cpp \
     actionlib/specnewmetaitemaction.cpp \
@@ -76,7 +70,6 @@ SOURCES += main.cpp \
     actionlib/specaddconnectionscommand.cpp \
     actionlib/specdeleteconnectionscommand.cpp \
     actionlib/specaddconnectionsaction.cpp \
-    kinetic/descriptorxrangefilter.cpp \
     model/specmimeconverter.cpp \
     log/speclogtodataconverter.cpp \
     kinetic/specmetaparser.cpp \
@@ -103,11 +96,7 @@ HEADERS += cutbyintensitydialog.h \
     specplotwidget.h \
     names.h \
     utility-functions.h \
-    kinetic/speckinetic.h \
     kinetic/speckineticwidget.h \
-    kinetic/speckineticview.h \
-    kinetic/speckineticmodel.h \
-    kinetic/speckineticrange.h \
     log/speclogentryitem.h \
     log/speclogmessage.h \
     model/exportdialog.h \
@@ -160,9 +149,7 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/specaddsvgitem.h \
     actionlib/specprintplotaction.h \
     actionlib/specresizesvgcommand.h \
-    kinetic/specmetafilter.h \
     kinetic/specmetaitem.h \
-    kinetic/specdescriptordescriptorfilter.h \
     kinetic/specmetamodel.h \
     kinetic/specmetaview.h \
     actionlib/specnewmetaitemaction.h \
@@ -170,7 +157,6 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/specaddconnectionscommand.h \
     actionlib/specdeleteconnectionscommand.h \
     actionlib/specaddconnectionsaction.h \
-    kinetic/descriptorxrangefilter.h \
     model/specmimeconverter.h \
     log/speclogtodataconverter.h \
     kinetic/specmetaparser.h \

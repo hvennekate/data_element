@@ -29,7 +29,7 @@ int indexLevel(const QModelIndex& index) ;
 
 class specView ;
 
-class specModel : public QAbstractItemModel
+class specModel : public QAbstractItemModel, public specStreamable
 {
 	Q_OBJECT
 private:
@@ -47,6 +47,9 @@ private:
 	specView* dropSource ;
 	specActionLibrary* dropBuddy ;
 	bool dontDelete ;
+	void writeToStream(QDataStream &out) const ;
+	void readFromStream(QDataStream &in) ;
+	type id() const { return specStreamable::model ; }
 public:
 	QHash<QString, specMimeConverter*> mimeConverters ;
 	specModel(QObject *par = 0) ;
@@ -116,8 +119,6 @@ public slots:
 	void importFile(QModelIndex) ;
 	bool exportData(QModelIndexList& list) ;
 // 	bool insertRows(int position, int rows, const QModelIndex &parent = QModelIndex());
-	virtual bool read(specInStream&) ;
-	virtual void write(specOutStream&) const ;
 };
 
 #endif

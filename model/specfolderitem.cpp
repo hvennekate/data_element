@@ -95,29 +95,22 @@ void specFolderItem::removeChild(specModelItem* child)
 
 void specFolderItem::readFromStream(QDataStream& in)
 {
+	foreach(specModelItem* child, childrenList)
+		delete child ;
 	quint64 numChildren ;
 	specModelItem::readFromStream(in) ;
 	in >> numChildren ;
 	childrenList.fill(0,numChildren) ;
-}
-
-void specFolderItem::readContents(QDataStream &in)
-{
 	for (int i = 0 ; i < childrenList.size() ; ++i)
-		childrenList[i] = produceItem(in) ;
+		childrenList[i] = produceItem(in) ; // TODO remove all zeros
 }
 
 void specFolderItem::writeToStream(QDataStream& out) const
 {
 	specModelItem::writeToStream(out) ;
 	out << (quint64) << children() ;
-}
-
-void specFolderItem::writeContents(QDataStream &out) const
-{
-	specModelItem::writeContents(out)
 	foreach(specModelItem* child, childrenList)
-		child->writeOut(stream) ;
+		out << *child ;
 }
 
 

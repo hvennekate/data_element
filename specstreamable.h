@@ -54,11 +54,12 @@ protected:
 		genealogyId = 43,
 		model = 44,
 		descriptor = 45,
-		plotStyle = 46
+		plotStyle = 46,
+		metaItem = 47
 	};
 	virtual type id() const = 0;
 	virtual bool isContainer() const { return false ; }
-	virtual specStreamable* factory(const type&) const {return 0; } // to be implemented in parent!
+	virtual specStreamable* factory(const type& t) const {Q_UNUSED(t) ; return 0; } // to be implemented in parent!
 	specStreamable* produceItem(QDataStream& in) const;
 private:
 	type effectiveId() const ;

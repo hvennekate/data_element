@@ -1,6 +1,5 @@
 #include "specnewmetaitemaction.h"
 #include "kinetic/specmetaview.h"
-#include "kinetic/specdescriptordescriptorfilter.h"
 #include "specmetamodel.h"
 #include "specaddfoldercommand.h"
 
@@ -34,10 +33,6 @@ void specNewMetaItemAction::execute()
 
 	qDebug() << "creating new meta item" ;
 	specMetaItem *pointer = new specMetaItem ;
-	qDebug() << "creating new filter" ;
-	specDescriptorDescriptorFilter *filter = new specDescriptorDescriptorFilter(pointer) ;
-	filter->setXDescriptor("Zeit") ;
-	filter->setYDescriptor("nu") ;
 	if (! model->insertItems(QList<specModelItem*>() << pointer, index,row))
 	{
 		delete pointer ;

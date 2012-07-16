@@ -9,9 +9,9 @@ class specLogEntryItem : public specModelItem
 {
 private:
 	QHash<QString,specDescriptor> description ;
-protected:
-	QDataStream& readFromStream ( QDataStream& arg1 );
-	QDataStream& writeToStream ( QDataStream& arg1 ) const;
+	type id() const { return specStreamable::logEntry ; }
+	void writeToStream(QDataStream &out) const ;
+	void readFromStream(QDataStream &in) ;
 public:
 	specLogEntryItem ( QHash<QString,specDescriptor> description, specFolderItem* par=0, QString tag="" );
 	~specLogEntryItem();

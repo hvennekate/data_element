@@ -12,8 +12,6 @@ private:
 	bool suspendRefresh ;
 	void readFromStream(QDataStream& in) ;
 	void writeToStream(QDataStream& out) const ;
-	void writeContents(QDataStream &out) const;
-	void readContents(QDataStream &in);
 	type id() const { return specStreamable::folder ; }
 public:
 	/*! Standard constructor (cf. specModelItem).*/

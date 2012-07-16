@@ -9,6 +9,7 @@ class specMetaView : public specView
 {
 	Q_OBJECT
 	specView *dataView ;
+	type id() const { return specStreamable::metaView ; }
 public:
 	explicit specMetaView(QWidget *parent = 0);
 	~specMetaView() ;
