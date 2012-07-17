@@ -41,7 +41,7 @@ void specPlotWidget::contextMenuEvent(QContextMenuEvent* event)
 specPlotWidget::specPlotWidget(QWidget *parent)
 	: QDockWidget(tr("untitled"),parent),
 	  items(new specDataView(new specModel(items), this)),
-	  logWidget(new specLogWidget(items->model(), parent)),
+	  logWidget(new specLogWidget(parent)),
 	  kineticWidget(new specKineticWidget(QString(),this)),
 	  content(new QWidget),
 	  layout(new QVBoxLayout),
@@ -51,8 +51,8 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	  file(new QFile(this)),
 	  saveAction(new QAction(QIcon::fromTheme("document-save"), tr("Save"), this)),
 	  kineticsAction(kineticWidget->toggleViewAction()),
-	  logAction(logWidget->toggleViewAction()),
 	  saveAsAction(new QAction(QIcon::fromTheme("document-save-as"), tr("Save as..."), this)),
+	  logAction(logWidget->toggleViewAction()),
 	  printAction(new QAction(QIcon::fromTheme("document-print"), tr("Print..."), this))
 {
 	plot->setMinimumSize(100,100) ;
@@ -216,19 +216,11 @@ specPlotWidget::~specPlotWidget()
 	destroy(true,true) ;
 }
 
-void specPlotWidget::currentChanged(const QModelIndex& current, const QModelIndex& previous)
-{
-// 	if (previous.isValid())
-// 		plot->picker()->removeItem((specModelItem*)previous.internalPointer()) ;
-// 	plot->picker()->addItem((specModelItem*) current.internalPointer()) ;
-}
-
 void specPlotWidget::setConnections()
 {
 	connect(saveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 	connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 	connect(items->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),this,SLOT(selectionChanged(const QItemSelection&, const QItemSelection&))) ;
-	connect(items->selectionModel(),SIGNAL(currentChanged(const QModelIndex&, const QModelIndex&)), this, SLOT(currentChanged(const QModelIndex&, const QModelIndex&))) ;
 
 	connect(items->model(),SIGNAL(modelAboutToBeReset()),items,SLOT(prepareReset())) ;
 	connect(items->model(),SIGNAL(modelReset()),items,SLOT(resetDone())) ;

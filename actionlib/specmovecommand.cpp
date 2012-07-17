@@ -45,11 +45,7 @@ void specMoveCommand::doIt()
 	specModelItem* target = (specFolderItem*) model->itemPointer(targetIndex.mid(1)) ;
 	qDebug() << "verifying that target is a folder %d" << target << targetIndex ;
 	if (!target->isFolder())
-	{
-		qDebug("not a folder") ;
 		target = target->parent() ;
-		qDebug("parent: %d",target) ;
-	}
 	qDebug("got target") ;
 	QList<specModelItem*> items ;
 	for (int i = 0 ; i < sourceIndexes.size() ; ++i)
@@ -86,14 +82,12 @@ void specMoveCommand::undoIt()
 	model->signalBeginReset();
 	qDebug("## getting target") ;
 	specModelItem* target = (specFolderItem*)model->itemPointer(sourceIndex) ;
-	qDebug("got target %d",target) ;
 	if (!target->isFolder()) target = target->parent() ;
 	((specFolderItem*) target)->haltRefreshes(true) ;
 	qDebug("## getting parents and items") ;
 	QVector<specFolderItem*> parents ;
 	QList<specModelItem*> items ;
 	int row = targetIndex[0] ;
-	qDebug("## getting item pointers %d %d",target,row) ;
 	for (int i = 0 ; i < number ; ++i)
 		items << ((specFolderItem*) target)->child(i+row) ;
 	qDebug("## got items") ;
@@ -107,7 +101,6 @@ void specMoveCommand::undoIt()
 			parents << parent ;
 			parent->haltRefreshes(true) ;
 		}
-		qDebug("adding children count: %d row: %d from list pos: %d pointer: %d parent: %d",sourceIndexes[i].second,sourceIndexes[i].first[0],count,items[count],parent) ;
 		parent->addChildren(items.mid(count,sourceIndexes[i].second),
 				    sourceIndexes[i].first[0]) ;
 		count += sourceIndexes[i].second ;

@@ -75,13 +75,13 @@ QVector<double> specDataItem::times() const
 specDataItem::specDataItem(const QVector<specDataPoint>& dat, const QHash<QString,specDescriptor>& desc,
 			   specFolderItem* par, QString description)
 	: specModelItem(par,description),
-	  data(dat),
-	  description(desc),
 	  offset(0),
 	  slope(0),
 	  factor(1),
 	  xshift(0),
-	  zeroMultiplications(0)
+	  zeroMultiplications(0),
+	  description(desc),
+	  data(dat)
 {
 }
 
@@ -209,7 +209,7 @@ specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 }
 
 
-void specDataItem::flatten(bool timeAverage, bool oneTime)
+void specDataItem::flatten(bool oneTime)
 {
 	qSort(data) ;
 	QVector<specDataPoint> newData ;
@@ -271,7 +271,7 @@ void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, c
 	for (int i = 0 ; i < headerFormat.size() ; i++)
 		out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
 	out << endl ;
-	for (int j = 0 ; j < dataSize() ; j++)
+	for (size_t j = 0 ; j < dataSize() ; j++)
 	{
 		for (int i = 0 ; i < dataFormat.size() ; i++)
 		{

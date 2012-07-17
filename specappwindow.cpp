@@ -23,7 +23,7 @@ void specAppWindow::closeEvent(QCloseEvent* event)
 	bool allClosed = true ;
 	specPlotWidget* pointer ;
 	foreach(QObject* dock, children())
-		if(pointer = dynamic_cast<specPlotWidget*>(dock)) //
+		if((pointer = dynamic_cast<specPlotWidget*>(dock))) //
 			allClosed = allClosed && pointer->close() ;
 	event->setAccepted(allClosed) ;
 	settings.setValue("mainWindow/geometry",saveGeometry()) ;

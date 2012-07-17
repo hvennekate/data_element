@@ -22,7 +22,7 @@ class specMetaVariable : public QwtInterval // TODO change to specInterval
 	QString code ;
 	void clearRanges() ;
 protected:
-	virtual double processPoints(QVector<QPointF>& points) const { return 0 ;}
+	virtual double processPoints(QVector<QPointF>& points) const { Q_UNUSED(points) return 0 ;}
 	QString descriptor ;
 	bool extractXs(specModelItem *item, QVector<double> & xvals) const ;
 public:

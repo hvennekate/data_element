@@ -5,8 +5,8 @@
 
 specMetaRange::specMetaRange(double x1, double x2, specMetaVariable *par)
 	: specRange(x1,x2),
-	  parent(par),
-	  selected(-1)
+	  selected(-1),
+	  parent(par)
 {
 }
 

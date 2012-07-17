@@ -39,12 +39,10 @@ specGenealogy::specGenealogy(QModelIndexList &list)
 	qDebug("removing indexes from list") ;
 	// rid the list of those entries we took
 	list.erase(list.begin(),last) ;
-	qDebug("items list size: %d  Validity: %d %d %d %d",Items.size(), Model, Parent, !indexes.isEmpty(), !Items.isEmpty()) ;
 }
 
 bool specGenealogy::valid()
 {
-	qDebug("Validity: %d %d %d %d", Model, Parent, !indexes.isEmpty(), !Items.isEmpty()) ;
 	return Model && Parent && !indexes.isEmpty() && !Items.isEmpty() ;
 }
 
@@ -120,8 +118,8 @@ specGenealogy::specGenealogy(specModel* mod, QDataStream &in)
 }
 
 specGenealogy::specGenealogy()
-	: Parent(0),
-	  Model(0),
+	: Model(0),
+	  Parent(0),
 	  owning(false)
 {
 }

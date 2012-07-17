@@ -75,4 +75,5 @@ bool specEditDescriptorCommand::mergeWith(const QUndoCommand *other)
 	const specEditDescriptorCommand *p = dynamic_cast<const specEditDescriptorCommand*>(other) ;
 	if (!p || !mergeable(p)) return false ;
 	previousActiveLine = p->previousActiveLine ;
+	return true ;
 }

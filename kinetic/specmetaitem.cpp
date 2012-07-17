@@ -146,7 +146,7 @@ void specMetaItem::refreshPlotData()
 	setData(processData(filter->evaluate(items.toList().toVector()))) ; // TODO use vector
 	variables["errors"] = filter->warnings() ;
 	qDebug() << "Filter data size:" << dataSize() ;
-	for (int i = 0 ; i < dataSize() ; ++i)
+	for (size_t i = 0 ; i < dataSize() ; ++i)
 		qDebug() << "Filter data:" << sample(i) ;
 	refreshOtherPlots() ;
 }

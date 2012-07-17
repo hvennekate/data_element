@@ -23,11 +23,11 @@
 #include <qwt_plot_directpainter.h>
 #include <QDebug>
 
-CanvasPicker::CanvasPicker ( specPlot *plot ) :
-		QObject ( plot ),
-		d_selectedCurve ( NULL ),
-		d_selectedPoint ( -1 ),
-		owning(false)
+CanvasPicker::CanvasPicker ( specPlot *plot )
+	: QObject ( plot ),
+	  owning(false),
+	  d_selectedCurve ( NULL ),
+	  d_selectedPoint ( -1 )
 //     mode(spec::none)
 {
 	QwtPlotCanvas *canvas = plot->canvas();
@@ -66,7 +66,6 @@ CanvasPicker::CanvasPicker ( specPlot *plot ) :
 #endif
 
 //	shiftCurveCursor ( true );  // What is this good for?  Happy debugging?!
-	qDebug("CanvasPicker::CanvasPicker %d", d_selectedCurve) ;
 }
 
 specCanvasItem* CanvasPicker::current()
@@ -110,10 +109,8 @@ bool CanvasPicker::eventFilter ( QObject *object, QEvent *e )
 		case QEvent::MouseButtonPress:
 		{
 			select ( ( ( QMouseEvent * ) e )->pos() );
-			qDebug("selected item %d %d",d_selectedCurve, d_selectedPoint) ;
 			if(((QMouseEvent*)e)->button() == Qt::RightButton && d_selectedCurve)
 			{
-				qDebug("calling for contextMenu") ;
 				contextMenu = d_selectedCurve->contextMenu() ;
 				if (contextMenu)
 				{
@@ -124,7 +121,6 @@ bool CanvasPicker::eventFilter ( QObject *object, QEvent *e )
 				d_selectedCurve = NULL ;
 				d_selectedPoint = -1 ;
 			}
-			qDebug("Done with event filter") ;
 			return true;
 		}
 		case QEvent::MouseMove:
@@ -213,7 +209,6 @@ void CanvasPicker::select ( const QPoint &pos )
 	specCanvasItem *curve = NULL;
 	double dist = 10e10;
 	int index = -1;
-	const QwtPlotItemList& itmList = plot()->itemList();
 	d_selectedCurve = NULL;
 	d_selectedPoint = -1;
 //	if ( plot()->itemList().isEmpty() ) return ;
@@ -353,7 +348,7 @@ void CanvasPicker::move ( const QPoint &pos )
 // Hightlight the selected point
 void CanvasPicker::showCursor ( bool showIt )
 {
-
+Q_UNUSED(showIt)
 // TODO this seems to be buggy in Qwt 6.0.1 and 6.0.0:  Ther is always a trace behind the cursor.  Reimplement!
 
 //	QwtSymbol *symbol = new QwtSymbol(*(d_selectedCurve->symbol()));

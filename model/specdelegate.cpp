@@ -17,6 +17,8 @@ bool specDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const Q
 
 QWidget* specDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+	Q_UNUSED(option)
+	Q_UNUSED(index)
 	QTextEdit *editor = new QTextEdit(parent) ;
 //	editor->setFrame(false) ;
 //	editor->setTextBackgroundColor(Qt::yellow);

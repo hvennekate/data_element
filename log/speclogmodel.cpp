@@ -3,8 +3,8 @@
 #include <QFileDialog>
 #include "utility-functions.h"
 
-specLogModel::specLogModel(specModel* dataModel,QObject *parent) :
-    specModel(parent)
+specLogModel::specLogModel(QObject *parent)
+	: specModel(parent)
 {
 }
 

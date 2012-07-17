@@ -31,7 +31,6 @@ void specStyleCommandImplFuncTemplate::setItems(QModelIndexList items)
 	for (QMap<int, QModelIndexList>::iterator i = groups.begin() ; i != groups.end() ; ++i)
 	{
 		qSort(i.value()) ;
-		int oldSize = Genealogies.size() ;
 		while (!i.value().isEmpty())
 			Genealogies << specGenealogy(i.value()) ;
 	}
@@ -84,7 +83,7 @@ void specStyleCommandImplFuncTemplate::readFromStream(QDataStream &in)
 //	clear() ;  TODO: where is this function?
 	quint32 size ;
 	in >> size >> newProperty >> oldProperties ;
-	for (int i = 0 ; i < size ; ++i)
+	for (quint32 i = 0 ; i < size ; ++i)
 	{
 		Genealogies << specGenealogy() ;
 		in >> Genealogies.last() ;

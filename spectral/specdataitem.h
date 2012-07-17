@@ -53,7 +53,7 @@ public:
 
 	/* Data operations */
 	specDataItem& operator+=(const specDataItem& toAdd) ;
-	void flatten(bool timeAverage=true, bool oneTime=true) ;
+	void flatten(bool oneTime=true) ;
 	void scaleBy(const double&) ;
 	void addToSlope(const double&) ;
 	void moveYBy(const double&) ;

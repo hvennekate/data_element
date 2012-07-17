@@ -82,6 +82,8 @@ bool specMetaVariable::setIndexRange(int &start, int &finish, int &step, int max
 
 bool specMetaVariable::xValues(specModelItem *item, QVector<double> & xvals) const // false if vector was empty
 {
+	Q_UNUSED(item)
+	Q_UNUSED(xvals)
 	return true ;
 }
 
@@ -89,7 +91,7 @@ QVector<double> specMetaVariable::values(specModelItem *item, const QVector<doub
 {
 	QVector<QPointF> points ;
 	QPointF point ;
-	for (int i = 0 ; i < item->dataSize() ; ++i)
+	for (size_t i = 0 ; i < item->dataSize() ; ++i)
 		if (contains((point = item->sample(i)).x()))
 			points << point ;
 	if (points.empty()) return QVector<double>(xvals.size(),NAN) ;
@@ -104,7 +106,7 @@ bool specMetaVariable::extractXs(specModelItem *item, QVector<double> &xvals) co
 	{
 		double value ;
 		xvals.clear();
-		for (int i = 0 ; i < item->dataSize() ; ++i)
+		for (size_t i = 0 ; i < item->dataSize() ; ++i)
 			if (contains(value = item->data()->sample(i).x()))
 				xvals << value ;
 		return false ;
@@ -116,7 +118,7 @@ bool specMetaVariable::extractXs(specModelItem *item, QVector<double> &xvals) co
 	{
 		if (contains(value))
 		{
-			for (int i = 0 ; i < item->dataSize() ; ++i)
+			for (size_t i = 0 ; i < item->dataSize() ; ++i)
 			{
 				if(item->data()->sample(i).x() == value)
 				{

@@ -46,7 +46,6 @@ private:
 	void changeFileName(const QString&) ;
 private slots:
 	void modified() ;
-	void currentChanged(const QModelIndex&, const QModelIndex&) ;
 protected :
 	void contextMenuEvent(QContextMenuEvent*) ;
 	void closeEvent(QCloseEvent*) ;

@@ -11,7 +11,7 @@ public:
 	specLogMessage(specFolderItem* par=0, QString tag="");
 	~specLogMessage();
 
-	bool changeDescriptor ( QString key, QString value ) { return false ; }
+	bool changeDescriptor ( QString key, QString value ) { Q_UNUSED(key) Q_UNUSED(value) return false ; }
 	bool isEditable ( QString key ) const;
 	QIcon decoration() const;
 	spec::descriptorFlags descriptorProperties ( const QString& key ) const;
