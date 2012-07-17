@@ -6,7 +6,7 @@ specPlotMoveCommand::specPlotMoveCommand(specUndoCommand* parent)
 {
 }
 
-void specPlotMoveCommand::redo()
+void specPlotMoveCommand::doIt()
 {
 	qDebug("specPlotMoveCommand %d") ;
 	if (!items) return ;
@@ -23,7 +23,7 @@ void specPlotMoveCommand::redo()
 	}
 }
 
-void specPlotMoveCommand::undo()
+void specPlotMoveCommand::undoIt()
 {
 	qDebug("undoing plot move command") ;
 	if (!items) return ;
@@ -68,22 +68,15 @@ void specPlotMoveCommand::setCorrections(double xShift, double yOffset, double y
 	scale = yScale ;
 }
 
-void specPlotMoveCommand::write(specOutStream &out) const
+void specPlotMoveCommand::writeToStream(QDataStream &out) const
 {
-	out.startContainer(spec::plotMoveCommandId) ;
-	out << slope << offset << scale << shift ;
-	items->write(out) ;
-	out.stopContainer();
+	out << slope << offset << scale << shift << *items ;
 }
 
-bool specPlotMoveCommand::read(specInStream &in)
+void specPlotMoveCommand::readFromStream(QDataStream &in)
 {
-	if (!in.expect(spec::plotMoveCommandId)) return false ;
-	in >> slope >> offset >> scale >> shift ;
-	if (items)
-		delete items ;
-	items = new specGenealogy(((specView*) parentObject())->model(),in) ;
-	return !in.next() ;
+	if (!items) items = new specGenealogy ;
+	in >> slope >> offset >> scale >> shift >> *items ;
 }
 
 bool specPlotMoveCommand::mergeable(const specUndoCommand *other)

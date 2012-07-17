@@ -21,7 +21,7 @@ private:
 	specMetaView *items ;
 	void writeToStream(QDataStream &out) const ;
 	void readFromStream(QDataStream &in) ;
-	type id() const { return specStreamable::metaWidget ;}
+	type typeId() const { return specStreamable::metaWidget ;}
 private slots:
 	void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) ;
 protected:

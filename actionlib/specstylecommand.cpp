@@ -42,7 +42,7 @@ void specStyleCommandImplFuncTemplate::setItems(QModelIndexList items)
 }
 
 specStyleCommandImplTemplate
-void specStyleCommandImplFuncTemplate::redo()
+void specStyleCommandImplFuncTemplate::doIt()
 {
 	specPlot *plot = 0 ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
@@ -56,7 +56,7 @@ void specStyleCommandImplFuncTemplate::redo()
 }
 
 specStyleCommandImplTemplate
-void specStyleCommandImplFuncTemplate::undo()
+void specStyleCommandImplFuncTemplate::undoIt()
 {
 	specPlot *plot = 0 ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
@@ -71,27 +71,33 @@ void specStyleCommandImplFuncTemplate::undo()
 }
 
 specStyleCommandImplTemplate
-void specStyleCommandImplFuncTemplate::write(specOutStream &out) const
+void specStyleCommandImplFuncTemplate::writeToStream(QDataStream &out) const
 {
-	out.startContainer(id());
-	out << quint32(Genealogies.size()) ;
+	out << quint32(Genealogies.size()) << newProperty << oldProperties ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
-		Genealogies[i].write(out) ;
-	out << newProperty << oldProperties ;
-	out.stopContainer();
+		out << Genealogies[i] ;
 }
 
 specStyleCommandImplTemplate
-bool& specStyleCommandImplFuncTemplate::read(specInStream &in)
+void specStyleCommandImplFuncTemplate::readFromStream(QDataStream &in)
 {
-	if (!in.expect(id())) return false ;
+//	clear() ;  TODO: where is this function?
 	quint32 size ;
-	specModel* model = ((specView*) parentObject())->model() ;
-	in >> size ;
+	in >> size >> newProperty >> oldProperties ;
 	for (int i = 0 ; i < size ; ++i)
-		Genealogies << specGenealogy(model,in) ;
-	in >> newProperty >> oldProperties ;
-	return !in.next() ;
+	{
+		Genealogies << specGenealogy() ;
+		in >> Genealogies.last() ;
+	}
+}
+
+specStyleCommandImplTemplate
+void specStyleCommandImplFuncTemplate::parentAssigned()
+{
+	if (!parentObject()) return ;
+	specModel *model = (specModel*) (((QAbstractItemView*) parentObject())->model()) ;
+	foreach(specGenealogy genealogy, Genealogies)
+		genealogy.setModel(model) ;
 }
 
 specStyleCommandImplTemplate
@@ -128,16 +134,18 @@ void specStyleCommandImplFuncTemplate::obtainStyle(specCanvasItem *item)
 	qDebug() << "getting property from: " << item << newProperty << "original:" << (item->*getProperty)() ;
 }
 
-specStyleCommand *generateStyleCommand(spec::undoActionIds id)
+specStyleCommand *generateStyleCommand(specStreamable::streamableType id)
 {
 	switch (id)
 	{
-	case spec::penColorId :
-		return new specStyleCommandImplementation<QColor, &specCanvasItem::penColor, &specCanvasItem::setPenColor, spec::penColorId> ;
-	case spec::symbolStyleId :
-		return new specStyleCommandImplementation<int, &specCanvasItem::symbolStyle, &specCanvasItem::setSymbolStyle, spec::symbolStyleId > ;
-	case spec::symbolPenColorId :
-		return new specStyleCommandImplementation<QColor, &specCanvasItem::symbolPenColor, &specCanvasItem::setSymbolPenColor, spec::symbolPenColorId > ;
+	case specStreamable::penColorCommandId :
+		return new specStyleCommandImplementation<QColor, &specCanvasItem::penColor, &specCanvasItem::setPenColor, specStreamable::penColorCommandId> ;
+	case specStreamable::symbolStyleCommandId :
+		return new specStyleCommandImplementation<int, &specCanvasItem::symbolStyle, &specCanvasItem::setSymbolStyle, specStreamable::symbolStyleCommandId > ;
+	case specStreamable::symbolPenColorCommandId :
+		return new specStyleCommandImplementation<QColor, &specCanvasItem::symbolPenColor, &specCanvasItem::setSymbolPenColor, specStreamable::symbolPenColorCommandId > ;
+	default:
+		return 0 ;
 	}
 	return 0 ;
 }

@@ -1,10 +1,15 @@
 #include "specplotstyle.h"
 #include "names.h"
 
+specPlotStyle::specPlotStyle()
+	: symbolType(-1)
+{
+}
+
 specPlotStyle::specPlotStyle(QDataStream& in)
 	: symbolType(-1)
 {
-	read(in) ;
+	readFromStream(in) ;
 }
 
 specPlotStyle::specPlotStyle(const QwtPlotCurve *c)

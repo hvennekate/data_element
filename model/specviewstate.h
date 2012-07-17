@@ -20,13 +20,16 @@ private:
 	QVector<int> hierarchyOfCurrentItem ;
 	QVector<qint32> widths ;
 	void purgeLists() ;
-	inline specModel* model() { return parent ? parent->model() : 0 ; }
+	inline specModel* model() const { return parent ? parent->model() : 0 ; }
 	specModelItem* hierarchyPointer(const QVector<int>&) ;
 	void writeToStream(QDataStream &out) const ;
 	void readFromStream(QDataStream &in) ;
+	type typeId() const { return specStreamable::viewState ; }
 public:
 	explicit specViewState(specView* Parent) ;
+	explicit specViewState(const specView* Parent) ;
 	void setParent(specView* Parent) ;
+	void getState(const specView* view) ;
 	void getState() ;
 	void restoreState() ;
 };

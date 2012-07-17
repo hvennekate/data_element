@@ -5,12 +5,12 @@ specAddConnectionsCommand::specAddConnectionsCommand(specUndoCommand *parent)
 {
 }
 
-void specAddConnectionsCommand::redo()
+void specAddConnectionsCommand::doIt()
 {
 	restore();
 }
 
-void specAddConnectionsCommand::undo()
+void specAddConnectionsCommand::undoIt()
 {
 	take();
 }

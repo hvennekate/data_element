@@ -147,85 +147,56 @@ QObject* specActionLibrary::parentId(int num)
 	return parents[num] ;
 }
 
-void specActionLibrary::write(specOutStream &out)
+void specActionLibrary::writeToStream(QDataStream &out) const
 {
-	out.startContainer(spec::actionLibrary) ;
 	out << qint32(undoStack->count()) ;
 	out << qint32(undoStack->index()) ;
-
-	qDebug() << "count:" << qint32(undoStack->count()) << "index:" << qint32(undoStack->index()) ;
-
 	for (int i = 0 ; i < undoStack->count() ; ++i)
 	{
 		specUndoCommand* command = (specUndoCommand*) undoStack->command(i) ;
-		out.next(spec::specItemType(command->id())) ;
-		out << quint32(parents.indexOf(command->parentObject())) ;
-		QByteArray array = new QByteArray ;
-		specOutStream *tempStream = new specOutStream(&array) ;
-		command->write(tempStream) ;
-		delete tempStream ;
-		out << array ;
-		delete tempStream ;
+		out << type(command->id()) << qint32(parents.indexOf(command->parentObject()))
+		    << *command ;
 	}
-	out.stopContainer();
 }
 
 specUndoCommand *specActionLibrary::commandById(int id, specUndoCommand* parent)
 {
 	switch(id)
 	{
-	case spec::deleteId :
+	case specStreamable::deleteCommandId :
 		return new specDeleteCommand(parent) ;
-	case spec::newFolderId :
+	case specStreamable::newFolderCommandId :
 		return new specAddFolderCommand(parent) ;
-	case spec::moveItemsId :
+	case specStreamable::moveItemsCommandId :
 		return new specMoveCommand(parent) ;
-	case spec::movePlotId :
+	case specStreamable::movePlotCommandId :
 		return new specPlotMoveCommand(parent) ;
-	case spec::multiCommandId :
+	case specStreamable::multiCommandId :
 		return new specMultiCommand(parent) ;
 	default:
 		return 0 ;
 	}
 }
 
-bool specActionLibrary::read(specInStream &in)
+void specActionLibrary::readFromStream(QDataStream &in)
 {
-	if (!in.expect(spec::actionLibrary)) return false ;
 	qint32 num, position ;
 	in >> num >> position ; // TODO really rely on num?
-	qDebug() << "count: " << num << "index: " << position ;
-	typedef QPair<specUndoCommand*, QByteArray*> commandBAPair ;
-	QVector<commandBAPair> newCommands ;
+
+	type t ;
+	QVector<qint32> parentIndex(num,0) ;
+
 	for (int i = 0 ; i < num ; ++i)
 	{
-		in.next() ;
-		specUndoCommand *command = commandById(in.type()) ;
-		if (!command)
-		{
-			newCommands.clear();
-			continue ;
-		}
-		QByteArray *ba = new QByteArray ;
-		qint32 parentId ;
-		in >> parentId >> *ba ;
-		command->setParentObject(parents[parentId]) ;
-		newCommands << commandBAPair(command, ba) ;
-		qDebug() << "pushing read in command onto stack" << command ;
+		in >> t >> parentIndex[i] ;
+		specUndoCommand *command = commandById(t) ;
+		in >> *command ;
 		undoStack->push(command) ;
-		qDebug() << "pushed command.  Stack size: " << undoStack->count() ;
 	}
+
 	undoStack->setIndex(position) ;
-	qDebug() << "Set position.  Stack size: " << undoStack->count() << "  Pos: " << undoStack->index() ;
-	foreach (commandBAPair pair, newCommands)
-	{
-		specInStream *inStream = new specInStream(pair.second) ;
-		pair.first->read(inStream) ;
-		delete inStream ;
-		delete pair.second ;
-	}
-	qDebug() << "reading undo commands done." ;
-	return !in.next() ;
+	for (int i = 0 ; i < num ; ++i)
+		((specUndoCommand*) undoStack->command(i))->setParentObject(parents[parentIndex[i]]) ;
 }
 
 void specActionLibrary::setLastRequested(const QModelIndexList &list)

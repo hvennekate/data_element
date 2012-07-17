@@ -5,12 +5,10 @@
 
 class specStreamable
 {
-
-protected:
-	virtual void writeToStream(QDataStream& out) const = 0;
-	virtual void readFromStream(QDataStream& in) = 0;
-	virtual void writeContents(QDataStream& out) const {Q_UNUSED(out)} ; // write container contents
-	virtual void readContents(QDataStream& in) {Q_UNUSED(in)} ; // read container contents
+public:
+	friend QDataStream& operator<<(QDataStream& out, const specStreamable&) ;
+	friend QDataStream& operator>>(QDataStream& in, specStreamable&) ;
+	void readDirectly(QDataStream& in) { readFromStream(in) ; } // TODO improve; make factory available broadly
 	typedef quint16 type;
 	enum streamableType : type
 	{
@@ -49,15 +47,24 @@ protected:
 		symbolBrushColorCommandId = 38,
 		manageConnectionsCommandId = 39,
 		manageItemsCommandId = 40,
-		editDescriptorCommandId = 41,
 		multiCommandId = 42,
 		genealogyId = 43,
 		model = 44,
 		descriptor = 45,
 		plotStyle = 46,
-		metaItem = 47
+		metaItem = 47,
+		metaModel = 48,
+		metaView = 49,
+		metaWidget = 50,
+		logModel = 51,
+		logView = 52
 	};
-	virtual type id() const = 0;
+protected:
+	virtual void writeToStream(QDataStream& out) const = 0;
+	virtual void readFromStream(QDataStream& in) = 0;
+	virtual void writeContents(QDataStream& out) const {Q_UNUSED(out)} ; // write container contents
+	virtual void readContents(QDataStream& in) {Q_UNUSED(in)} ; // read container contents
+	virtual type typeId() const = 0;
 	virtual bool isContainer() const { return false ; }
 	virtual specStreamable* factory(const type& t) const {Q_UNUSED(t) ; return 0; } // to be implemented in parent!
 	specStreamable* produceItem(QDataStream& in) const;
@@ -65,9 +72,6 @@ private:
 	type effectiveId() const ;
 	static bool isContainer(const type& t) { return t & container ; }
 	static void skipContainer(QDataStream& in) ;
-public:
-	friend QDataStream& operator<<(QDataStream& out, const specStreamable&) ;
-	friend QDataStream& operator>>(QDataStream& in, specStreamable&) ;
 };
 
 class specStreamContainer : public specStreamable

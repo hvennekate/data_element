@@ -59,34 +59,41 @@ void specManageConnectionsCommand::take()
 		pointer->disconnectClient(client) ;
 }
 
-void specManageConnectionsCommand::write(specOutStream &out) const
+void specManageConnectionsCommand::writeToStream(QDataStream &out) const
 {
-	if (!ok) return ;
-	out.startContainer(spec::ManageConnectionsCommandId) ;
-	out << qint8(sameModel()) ;
-	out << qint32(items.size()) ;
-//	if (ok()) 	// TODO why check if ok?
-	target->write(out) ;
+	if (!ok()) return ; // TODO why check if ok?
+	out << qint8(sameModel())
+	    << qint32(items.size())
+	    << *target ;
 	for (int i = 0 ; i < items.size() ; ++i)
-		items[i]->write(out) ;
-	out.stopContainer();
-	return out ;
+		out << *(items[i]) ;
 }
 
-bool specManageConnectionsCommand::read(specInStream &in)
+void specManageConnectionsCommand::readFromStream(QDataStream &in)
 {
 	clear() ;
-	if (!in.expect(spec::ManageConnectionsCommandId)) return false ;
 	qint8 isSameModel ;
 	qint32 toRead ;
 	in >> isSameModel >> toRead ;
-	specModel *model = isSameModel ?
-				(specModel*) (((QAbstractItemView*) parentObject())->model()) :
-				(specModel*) (((specPlotWidget*) parentObject()->parent()->parent())->mainView()->model()) ; // TODO this is highly dangerous!
-	target = new specGenealogy((specModel*) (((QAbstractItemView*) parentObject())->model()),in) ;
+	target = new specGenealogy ;
+	in >> *target ;
 	for (int i = 0 ; i < toRead ; ++i)
-		items << new specGenealogy(model,in) ;
-	return !in.next() ;
+	{
+		specGenealogy* genealogy = new specGenealogy;
+		in >> *genealogy ;
+		items << genealogy ;
+	}
+}
+
+void specManageConnectionsCommand::parentAssigned()
+{
+	if (!parentObject()) return ;
+	specModel *model = sameModel() ?
+		(specModel*) (((QAbstractItemView*) parentObject())->model()) :
+		(specModel*) (((specPlotWidget*) parentObject()->parent()->parent())->mainView()->model()) ;
+	target->setModel((specModel*) (((QAbstractItemView*) parentObject())->model()));
+	foreach(specGenealogy* genealogy, items)
+		genealogy->setModel(model) ;
 }
 
 QVector<specModelItem*> specManageConnectionsCommand::itemPointers() const

@@ -2,16 +2,27 @@
 
 specUndoCommand::specUndoCommand(specUndoCommand *parent) :
     QUndoCommand(parent),
-	pW(0) //parent->parentWidget()) // TODO adapt calling code
+	pO(0) //parent->parentWidget()) // TODO adapt calling code
 {
 }
 
 void specUndoCommand::setParentObject(QObject * par)
 {
-	pW = par ;
+	pO = par ;
+	parentAssigned();
 }
 
 QObject* specUndoCommand::parentObject() const
 {
-	return pW ;
+	return pO ;
+}
+
+void specUndoCommand::redo()
+{
+	if (pO) doIt() ;
+}
+
+void specUndoCommand::undo()
+{
+	if (pO) undoIt();
 }

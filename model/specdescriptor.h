@@ -13,7 +13,7 @@ private:
 	spec::descriptorFlags properties ;
 	void writeToStream(QDataStream &out) const ;
 	void readFromStream(QDataStream &in) ;
-	type id() const { return specStreamable::descriptor ; }
+	type typeId() const { return specStreamable::descriptor ; }
 public:
 	specDescriptor(QString cont="", spec::descriptorFlags prop = spec::def) ;
 	specDescriptor(double d) ;

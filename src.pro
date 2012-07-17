@@ -206,3 +206,5 @@ TARGET = data_element
 RESOURCES += icons/application.qrc
 
 QT += svg
+
+QMAKE_CXXFLAGS += -std=c++0x

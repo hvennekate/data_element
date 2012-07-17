@@ -15,7 +15,7 @@ private:
 	QHash<QString,specDescriptor> variables ;
 	specModelItem *currentlyConnectingServer ;
 	void refreshOtherPlots() ;
-	type id() const { return specStreamable::metaItem ; }
+	type typeId() const { return specStreamable::metaItem ; }
 	void readFromStream(QDataStream & in) ;
 	void writeToStream(QDataStream & out) const ;
 public:

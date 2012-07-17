@@ -8,7 +8,7 @@ class specLogView : public specView
 {
 private:
 	Q_OBJECT
-	type id() const { return specStreamable::logView ; }
+	type typeId() const { return specStreamable::logView ; }
 public:
 	explicit specLogView(QWidget *parent =0);
 	void setModel(specLogModel*) ;

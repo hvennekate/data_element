@@ -7,8 +7,7 @@
 //}
 
 specGenealogy::specGenealogy(QModelIndexList &list)
-	: owning(false),
-	  knowingParent(false)
+	: owning(false)
 {
 	qDebug("initializing genealogy") ;
 	if (list.isEmpty()) return ;
@@ -56,7 +55,7 @@ void specGenealogy::takeItems()
 	if (owning) return ;
 	if (!valid()) return ;
 	qDebug() << "before parent search" << Parent ;
-	if (!Parent)
+	if (!Parent) // TODO: Haeh?  wird doch schon bei valid() geprueft?
 		seekParent() ;
 	qDebug() << "checks done" << Parent ;
 	foreach(specModelItem* item, Items)
@@ -71,7 +70,7 @@ void specGenealogy::returnItems()
 	if (!valid()) return ;
 	if (!Parent)
 		seekParent() ;
-	Parent->addChildren(Items,indexes.first()) ;
+	Parent->addChildren(Items.toList(),indexes.first()) ;
 	owning = false ;
 }
 
@@ -112,13 +111,19 @@ specStreamable* specGenealogy::factory(const type &t) const
 	return specModelItem::itemFactory(t) ;
 }
 
-specGenealogy::specGenealogy(specModel* mod, specInStream &in)
-	: knowingParent(false)
+specGenealogy::specGenealogy(specModel* mod, QDataStream &in)
 {
 	qDebug("reading genealogy...") ;
 	Parent = 0 ;
 	Model = mod ;
 	readFromStream(in);
+}
+
+specGenealogy::specGenealogy()
+	: Parent(0),
+	  Model(0),
+	  owning(false)
+{
 }
 
 bool specGenealogy::seekParent()
@@ -127,13 +132,13 @@ bool specGenealogy::seekParent()
 	Parent = (specFolderItem*) Model->itemPointer(indexes.mid(1)) ;
 	if (!owning)
 		getItemPointers();
-
 	return Parent ;
 }
 
 void specGenealogy::setModel(specModel *model)
 {
 	Model = model ;
+	seekParent() ;
 }
 
 void specGenealogy::getItemPointers()
@@ -153,7 +158,7 @@ specGenealogy::~specGenealogy()
 
 const QList<specModelItem*>& specGenealogy::items() const
 {
-	return Items ;
+	return Items.toList() ;
 }
 
 bool specGenealogy::operator ==(const specGenealogy& other)

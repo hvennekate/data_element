@@ -11,7 +11,7 @@ QList<specModelItem*> specMimeConverter::convert(QDataStream &stream)
     {
             qDebug("dropping an item") ;
             specModelItem* pointer ;
-            stream >> pointer ;
+	    stream >> *pointer ;
             list << pointer ;
     }
     return list ;
@@ -20,6 +20,6 @@ QList<specModelItem*> specMimeConverter::convert(QDataStream &stream)
 QDataStream& specMimeConverter::convert(QList<specModelItem *> &list, QDataStream &stream)
 {
     for (QList<specModelItem*>::iterator i = list.begin() ; i != list.end() ; ++i)
-	(*i)->writeOut(stream) ;
+	    stream << *i ;
     return stream ;
 }

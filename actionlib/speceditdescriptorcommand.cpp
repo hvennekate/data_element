@@ -19,12 +19,12 @@ void specEditDescriptorCommand::setItem(const QModelIndex &index, QString desc,
 	item = new specGenealogy(QModelIndexList() << index) ;
 }
 
-void specEditDescriptorCommand::undo()
+void specEditDescriptorCommand::undoIt()
 {
-	redo() ;
+	doIt() ;
 }
 
-void specEditDescriptorCommand::redo()
+void specEditDescriptorCommand::doIt()
 {
 	if (!item) return ;
 	specDataItem *pointer = (specDataItem*) (item->items().first()) ;
@@ -45,20 +45,21 @@ void specEditDescriptorCommand::redo()
 	}
 }
 
-void specEditDescriptorCommand::write(specOutStream &out) const
+void specEditDescriptorCommand::writeToStream(QDataStream &out) const
 {
-	out.startContainer(spec::editDescriptorCommandId) ; // check if needs to be a container
-	item->write(out << previousContent << descriptor << previousActiveLine) ;
-	out.stopContainer();
+	out << previousContent
+	    << descriptor
+	    << previousActiveLine
+	    << *item ;
 }
 
-bool specEditDescriptorCommand::read(specInStream& in)
+void specEditDescriptorCommand::readFromStream(QDataStream &in)
 {
-	if (!in.expect(spec::editDescriptorCommandId)) return false ;
-	if (item) delete item ;
-	item = new specGenealogy(((specModel*) parentObject()),
-				 in >> previousContent >> descriptor >> previousActiveLine) ;
-	return !in.next() ;
+	if (!item) item = new specGenealogy ;
+	in >> previousContent
+	   >> descriptor
+	   >> previousActiveLine
+	   >> *item ;
 }
 
 bool specEditDescriptorCommand::mergeable(const specUndoCommand *other)

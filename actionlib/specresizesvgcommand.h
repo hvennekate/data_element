@@ -10,19 +10,17 @@ private:
 	specGenealogy *item ;
 	QRectF other ;
 	void exchange() ;
+	void doIt() ;
+	void undoIt() ;
+	void writeToStream(QDataStream &out) const;
+	void readFromStream(QDataStream &in) ;
+	type typeId() const { return specStreamable::resizeSVGCommandId ; }
 public:
 	explicit specResizeSVGcommand(specUndoCommand *parent = 0) ;
 	void setItem(const QModelIndex&, const QRectF&) ;
 	bool ok() ;
-	void write(specOutStream &out) const ;
-	bool read(specInStream &in) ;
-
 	bool mergeable(const specUndoCommand *other) ;
 	bool mergeWith(const QUndoCommand *other) ;
-
-	void redo() ;
-	void undo() ;
-	int id() const { return spec::resizeSVGCommandId ; }
 };
 
 #endif // SPECRESIZESVGCOMMAND_H

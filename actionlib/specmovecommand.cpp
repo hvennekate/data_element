@@ -34,11 +34,11 @@ specMoveCommand::specMoveCommand(specUndoCommand *parent)
 {
 }
 
-void specMoveCommand::redo()
+void specMoveCommand::doIt()
 {
 	qDebug("doing move action") ;
-	if (!pW) return ;
-	specModel* model = ((specView*) pW)->model() ; // TODO put into function
+	if (!parentObject()) return ;
+	specModel* model = ((specView*) parentObject())->model() ; // TODO put into function
 	qDebug("got model") ;
 	model->signalBeginReset();
 	qDebug("getting target") ;
@@ -80,11 +80,9 @@ void specMoveCommand::redo()
 	qDebug("done with move action") ;
 }
 
-void specMoveCommand::undo()
+void specMoveCommand::undoIt()
 {
-	if (!pW) return ;
-	qDebug("## getting model") ;
-	specModel* model = ((specView*) pW)->model() ; // TODO put into function
+	specModel* model = ((specView*) parentObject())->model() ; // TODO put into function
 	model->signalBeginReset();
 	qDebug("## getting target") ;
 	specModelItem* target = (specFolderItem*)model->itemPointer(sourceIndex) ;
@@ -123,17 +121,12 @@ void specMoveCommand::undo()
 	model->signalEndReset();
 }
 
-void specMoveCommand::write(specOutStream &out) const
+void specMoveCommand::writeToStream(QDataStream &out) const
 {
-	out.next(spec::moveCommandId) ;
-	out << sourceIndexes << qint32(number) << targetIndex << sourceIndex ;
+	out << sourceIndexes << number << targetIndex << sourceIndex ;
 }
 
-bool specMoveCommand::read(specInStream &in)
+void specMoveCommand::readFromStream(QDataStream &in)
 {
-	if (!in.expect(spec::moveCommandId)) return false ;
-	qint32 dummy ;
-	in >> sourceIndexes >> dummy >> targetIndex >> sourceIndex ;
-	number = dummy ;
-	return true ;
+	in >> sourceIndexes >> number >> targetIndex >> sourceIndex ;
 }

@@ -12,7 +12,7 @@ private:
 	bool suspendRefresh ;
 	void readFromStream(QDataStream& in) ;
 	void writeToStream(QDataStream& out) const ;
-	type id() const { return specStreamable::folder ; }
+	type typeId() const { return specStreamable::folder ; }
 public:
 	/*! Standard constructor (cf. specModelItem).*/
 	specFolderItem(specFolderItem* par=0, QString description="");

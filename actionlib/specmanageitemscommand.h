@@ -15,17 +15,18 @@ public:
 	virtual ~specManageItemsCommand() ;
 	bool ok() ;
 	void setItems(QModelIndexList&) ;
-	void write(specOutStream&) const ;
-	bool read(specInStream&) ;
 protected:
 	void take() ;
 	void restore() ;
 private:
+	void writeToStream(QDataStream &out) const;
+	void readFromStream(QDataStream &in) ;
 	QVector<specGenealogy*> items ;
 	bool inverse() ;
 	void clear() ;
 	void prepare() ;
 	void finish() ;
+	void parentAssigned();
 };
 
 #endif // SPECDELETECOMMAND_H

@@ -4,14 +4,14 @@
 
 void specDescriptor::writeToStream(QDataStream &out) const
 {
-	out << desc.contentValue << desc.currentLine << (qint8) desc.properties ;
+	out << contentValue << currentLine << (qint8) properties ;
 }
 
 void specDescriptor::readFromStream(QDataStream &in)
 {
 	qint8 prop ;
-	in  >> desc.contentValue >> desc.currentLine >> prop ;
-	desc.properties = (spec::descriptorFlags) prop ;
+	in  >> contentValue >> currentLine >> prop ;
+	properties = (spec::descriptorFlags) prop ;
 }
 
 

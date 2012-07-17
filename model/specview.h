@@ -9,9 +9,8 @@
 #include <QMap>
 #include "actionlib/specactionlibrary.h"
 
-class specModel ;
 class specViewState ;
-
+class specModel ;
 
 class specView : public QTreeView, public specStreamable
 { // TODO turn into abstract class (add purely virtual function)
@@ -28,7 +27,7 @@ private:
 	bool setAllSelected(const QVariant&, int role = Qt::EditRole) ;
 	void readFromStream(QDataStream &in) ;
 	void writeToStream(QDataStream &out) const ;
-	type id() const { return specStreamable::mainView ; }
+	type typeId() const { return specStreamable::mainView ; }
 private slots:
 	void averageItems() ;
 protected:
@@ -45,8 +44,6 @@ public:
 //	QList<specModelItem*> currentlySelected() ;
 	virtual QList<QAction*> actions() ;
 	QModelIndexList getSelection() ;
-	virtual void &write(specOutStream&) const;
-	virtual bool &read(specInStream&) ;
 
 	signals:
 		void changed() ;

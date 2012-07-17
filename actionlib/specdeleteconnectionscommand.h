@@ -5,11 +5,12 @@
 
 class specDeleteConnectionsCommand : public specManageConnectionsCommand
 {
+private:
+	void doIt() ;
+	void undoIt() ;
+	type typeId() const { return specStreamable::deleteConnectionsCommandId ; }
 public:
 	specDeleteConnectionsCommand(specUndoCommand *parent) ;
-	void redo() ;
-	void undo() ;
-	int id() const { return spec::deleteConnectionsCommandId ; }
 };
 
 #endif // SPECDELETECONNECTIONSCOMMAND_H
