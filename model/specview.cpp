@@ -13,6 +13,7 @@
 #include <QDialogButtonBox>
 #include "specviewstate.h"
 #include <QClipboard>
+#include "specmodel.h"
 using std::min ;
 using std::max ;
 
@@ -374,15 +375,15 @@ void specView::writeToStream(QDataStream &out) const
 	specViewState state(this) ;
 	out << state ;
 	if (model())
-		out << *model() ;
+		out << *((specStreamable*) model()) ; // TODO why is this necessary?
 }
 
 void specView::readFromStream(QDataStream &in)
 {
 	specViewState state(this) ;
 	in >> state ;
-	if (model)
-		in >> model ;
+	if (model())
+		in >> *((specStreamable*) model()) ; // TODO why is this necessary?
 	state.restoreState();
 }
 

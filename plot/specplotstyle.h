@@ -14,10 +14,11 @@ class specPlotStyle : public specStreamable
 	void initialize(const QwtPlotCurve*) ;
 	void writeToStream(QDataStream& out) const ;
 	void readFromStream(QDataStream& in) ;
-	specStreamable::type id() const { return specStreamable::plotStyle ; }
+	type typeId() const { return specStreamable::plotStyle ; }
 public:
 	explicit specPlotStyle(QDataStream&);
 	explicit specPlotStyle(const QwtPlotCurve*);
+	specPlotStyle() ;
 	void apply(QwtPlotCurve*) const;
 	void retrieve(QwtPlotCurve*) ;
 };

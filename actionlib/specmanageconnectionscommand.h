@@ -13,6 +13,9 @@ private:
 	QVector<specModelItem*> itemPointers() const ;
 	specMetaItem* targetPointer() const ;
 	bool sameModel() const ;
+	void writeToStream(QDataStream &out) const;
+	void readFromStream(QDataStream &in) ;
+	void parentAssigned();
 protected:
 	void take() ;
 	void restore() ;
@@ -21,8 +24,6 @@ public:
 	virtual ~specManageConnectionsCommand() ;
 	bool ok() const ;
 	void setItems(const QModelIndex& client, QModelIndexList& servers) ;
-	void write(QDataStream &out) const ;
-	bool read(specInStream &in) ;
 };
 
 #endif // SPECMANAGECONNECTIONSCOMMAND_H

@@ -11,13 +11,22 @@ specMetaItem::specMetaItem(specFolderItem *par, QString description)
 void specMetaItem::writeToStream(QDataStream &out) const
 {
 	specModelItem::writeToStream(out) ;
-	out << variables << items ;
+	out << variables << quint16(items.size()) ;
+	foreach(specModelItem* item, items)
+		out << quint64(item) ;
 }
 
 void specMetaItem::readFromStream(QDataStream &in)
 {
 	specModelItem::readFromStream(in) ;
-	in >> variables >> items ;
+	quint16 toRead ;
+	in >> variables >> toRead ;
+	quint64 p ;
+	for (int i = 0 ; i < toRead ; ++i)
+	{
+		in >> p ;
+		items << (specModelItem*) p ;
+	}
 	invalidate() ; // TODO maybe insert in data item or just model item.
 }
 

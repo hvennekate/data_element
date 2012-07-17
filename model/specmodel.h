@@ -49,7 +49,7 @@ private:
 	bool dontDelete ;
 	void writeToStream(QDataStream &out) const ;
 	void readFromStream(QDataStream &in) ;
-	type id() const { return specStreamable::model ; }
+	type typeId() const { return specStreamable::model ; }
 public:
 	QHash<QString, specMimeConverter*> mimeConverters ;
 	specModel(QObject *par = 0) ;

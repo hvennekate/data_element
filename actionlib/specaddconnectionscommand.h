@@ -5,11 +5,12 @@
 
 class specAddConnectionsCommand : public specManageConnectionsCommand
 {
+private:
+	void doIt();
+	void undoIt();
+	type typeId() const { return specStreamable::newConnectionsCommandId ; }
 public:
 	specAddConnectionsCommand(specUndoCommand *parent = 0);
-	void redo() ;
-	void undo() ;
-	int id() const { return spec::newConnectionsCommandId ; }
 };
 
 #endif // SPECADDCONNECTIONSCOMMAND_H

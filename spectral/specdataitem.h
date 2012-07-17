@@ -23,12 +23,13 @@ private:
 	void reverseCorrection(specDataPoint&) const; /*!< Korrektur rueckhaengig machen. */
 	void readFromStream(QDataStream &) ;
 	void writeToStream(QDataStream &) const ;
-	type id() const { return specStreamable::dataItem ; }
+	type typeId() const { return specStreamable::dataItem ; }
 public:
 	/*! Standard constructor.*/
 	specDataItem(const QVector<specDataPoint> &data, // TODO change to reference/pointer
 		     const QHash<QString,specDescriptor> &description, // TODO change to reference/pointer
 		     specFolderItem* par=0, QString tag="");
+	specDataItem() ;
 	/*! Copy constructor necessary because it is disabled in QwtPlotItem */
 //	specDataItem(const specDataItem&) ;
 

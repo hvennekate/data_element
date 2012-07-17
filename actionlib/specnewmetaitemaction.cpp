@@ -2,6 +2,7 @@
 #include "kinetic/specmetaview.h"
 #include "specmetamodel.h"
 #include "specaddfoldercommand.h"
+#include "specmetaitem.h"
 
 specNewMetaItemAction::specNewMetaItemAction(QObject *parent) :
     specUndoAction(parent)

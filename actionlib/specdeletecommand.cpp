@@ -5,12 +5,12 @@ specDeleteCommand::specDeleteCommand(specUndoCommand *parent)
 {
 }
 
-void specDeleteCommand::redo()
+void specDeleteCommand::doIt()
 {
 	take();
 }
 
-void specDeleteCommand::undo()
+void specDeleteCommand::undoIt()
 {
 	restore() ;
 }

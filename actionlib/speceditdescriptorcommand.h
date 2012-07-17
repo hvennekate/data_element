@@ -12,15 +12,15 @@ private:
 	QString descriptor ;
 	int previousActiveLine ;
 	specGenealogy *item ;
+	void doIt() ;
+	void undoIt() ;
+	void writeToStream(QDataStream &out) const ;
+	void readFromStream(QDataStream &in) ;
+	type typeId() const {return specStreamable::editDescriptorCommandId ;}
 public:
 	explicit specEditDescriptorCommand(specUndoCommand* parent = 0) ;
 	void setItem(const QModelIndex &index, QString descriptor,
 		     QString newContent, int activeLine) ;
-	void write(specInStream &out) const ;
-	bool read(specOutStream &in) ;
-	void redo() ;
-	void undo() ;
-	int id() const {return spec::editDescriptorCommandId ;}
 	bool mergeWith(const QUndoCommand *other) ;
 	bool mergeable(const specUndoCommand *other) ;
 };

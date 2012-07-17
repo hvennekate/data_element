@@ -85,6 +85,16 @@ specDataItem::specDataItem(const QVector<specDataPoint>& dat, const QHash<QStrin
 {
 }
 
+specDataItem::specDataItem()
+	: specModelItem(0,""),
+	  offset(0),
+	  slope(0),
+	  factor(1),
+	  xshift(0),
+	  zeroMultiplications(0)
+{
+}
+
 bool specDataItem::isEditable(QString key) const
 {
 	if (key== QString(""))
@@ -143,7 +153,7 @@ QStringList specDataItem::descriptorKeys() const
 	return (specModelItem::descriptorKeys() << description.keys()) ;
 }
 
-bool specDataItem::readFromStream(QDataStream &in)
+void specDataItem::readFromStream(QDataStream &in)
 {
 	specModelItem::readFromStream(in) ;
 	in >> description

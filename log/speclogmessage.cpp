@@ -1,19 +1,13 @@
 #include "speclogmessage.h"
 
-specLogMessage::specLogMessage( QHash<QString,specDescriptor> desc, specFolderItem* par, QString tag)
-	: specDataItem(QVector<specDataPoint>(),desc,par, tag)
+specLogMessage::specLogMessage(specFolderItem* par, QString tag)
+	: specModelItem(par,tag)
 {
 }
 
 
 specLogMessage::~specLogMessage()
 {
-}
-
-
-bool specLogMessage::changeDescriptor ( QString key, QString value )
-{
-	return false ;
 }
 
 bool specLogMessage::isEditable ( QString key ) const

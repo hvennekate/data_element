@@ -189,10 +189,12 @@ QModelIndexList specModel::merge(QModelIndexList& list, const QList<QPair<QStrin
 		qDebug("initial descriptor is editable: %d",int(itemPointer(mergeList.first())->descriptorProperties("") & spec::editable)) ;
 		QByteArray *firstItemData = new QByteArray() ;
 		QDataStream outStream(firstItemData,QIODevice::WriteOnly) ;
-		itemPointer(mergeList.takeFirst())->writeOut(outStream) ;
+		outStream << *(itemPointer(mergeList.takeFirst())) ;
 		QDataStream inStream(firstItemData,QIODevice::ReadOnly) ;
-		specModelItem *newItem ;
-		inStream >> newItem ;
+		type t ;
+		inStream >> t ;
+		specModelItem *newItem = specModelItem::itemFactory(t) ;
+		inStream >> *newItem ;
 		newItems << newItem ;
 		qDebug("initial descriptor of copy is editable: %d",int(newItem->descriptorProperties("") & spec::editable)) ;
 //		newItems << new specDataItem(* (specDataItem*) itemPointer(mergeList.takeFirst())) ;
@@ -328,12 +330,26 @@ void specModel::importFile(QModelIndex index)
 
 void specModel::writeToStream(QDataStream &out) const
 {
-	out << Descriptors << DescriptorProperties << *root ;
+	out << Descriptors ;
+	foreach(spec::descriptorFlags flag, DescriptorProperties)
+		out << quint8(flag) ;
+	out << *root ;
 }
 
 void specModel::readFromStream(QDataStream &in)
 {
-	in >> Descriptors >> DescriptorProperties >> *root ;
+	Descriptors.clear();
+	DescriptorProperties.clear();
+	delete root ;
+	root = new specFolderItem ;
+	in >> Descriptors ;
+	quint8 flag ;
+	for (int i = 0 ; i < Descriptors.size() ; ++i)
+	{
+		in >> flag ;
+		DescriptorProperties << QFlag(flag) ;
+	}
+	in >> *root ;
 }
 
 specModelItem* specModel::itemPointer(const QModelIndex& index) const
@@ -733,8 +749,10 @@ void specModel::insertFromStream(QDataStream& stream, const QModelIndex& parent,
 	while(!stream.atEnd())
 	{
 		qDebug("dropping an item") ;
-                specModelItem* pointer ;
-		stream >> pointer ;
+		type t ;
+		stream >> t ;
+		specModelItem* pointer = specModelItem::itemFactory(t);
+		pointer->readDirectly(stream);
 		list << pointer ;
 	}
 	insertItems(list,parent,row) ;

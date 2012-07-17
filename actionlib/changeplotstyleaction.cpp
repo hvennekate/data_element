@@ -64,7 +64,7 @@ void changePlotStyleAction::actionTriggered()
 	if (source == lineColorAction)
 	{
 		qDebug("new pen color command") ;
-		newCommand = generateStyleCommand(spec::penColorId) ;
+		newCommand = generateStyleCommand(specStreamable::penColorCommandId) ;
 		QColor color = QColorDialog::getColor() ;
 		if (!color.isValid()) return ;
 		item.setPenColor(color) ;
@@ -72,7 +72,7 @@ void changePlotStyleAction::actionTriggered()
 	else if (symbolActions.contains((QAction*) source))
 	{
 		qDebug("new symbol id") ;
-		newCommand = generateStyleCommand(spec::symbolStyleId) ;
+		newCommand = generateStyleCommand(specStreamable::symbolStyleCommandId) ;
 		qDebug("setting style of item %d", symbolActions.indexOf((QAction*) source) ) ;
 		item.setSymbolStyle(QwtSymbol::Style(symbolActions.indexOf((QAction*) source))) ;
 	}

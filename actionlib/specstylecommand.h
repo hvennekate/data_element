@@ -12,7 +12,7 @@ public:
 	virtual void obtainStyle(specCanvasItem*) = 0 ;
 };
 
-specStyleCommand *generateStyleCommand(spec::undoActionIds id) ;
+specStyleCommand *generateStyleCommand(specStreamable::streamableType id) ;
 
 #define specStyleCommandImplTemplate template<class property, \
 					      property (specCanvasItem::*getProperty)(), \
@@ -25,12 +25,6 @@ class specStyleCommandImplementation : public specStyleCommand
 {
 public:
 	explicit specStyleCommandImplementation(specUndoCommand *parent = 0);
-	void write(specOutStream& out) const ;
-	bool read(specInStream& in) ;
-	int id() const { return ID ; }
-
-	void redo() ;
-	void undo() ;
 
 	void setItems(QModelIndexList) ;
 	void obtainStyle(specCanvasItem*) ;
@@ -38,7 +32,14 @@ private:
 	void applyStyle(const specGenealogy&, int) ; // if int == -1: revert to old style
 	int styleNo(specCanvasItem*) ;
 	void saveStyles(const QList<specGenealogy>&) ;
-private:
+	type typeId() const { return ID ; }
+
+	void parentAssigned();
+	void doIt() ;
+	void undoIt() ;
+	void writeToStream(QDataStream &out) const;
+	void readFromStream(QDataStream &in);
+
 	property newProperty ;
 	QVector<property> oldProperties ;
 	QList<specGenealogy> Genealogies ;

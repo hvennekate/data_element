@@ -436,8 +436,7 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 		if (firstLine == "")
 		{
 			QPair<QString,QString> newDescriptor = interpretString(secondLine) ;
-			descriptors["Systemmeldung"] = ((newDescriptor.first += ": ") += newDescriptor.second) ;
-			logData += new specLogMessage(descriptors) ;
+			logData += new specLogMessage(0, newDescriptor.first + ": " + newDescriptor.second) ;
 		}
 		else
 		{

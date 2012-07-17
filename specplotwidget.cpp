@@ -105,13 +105,12 @@ void specPlotWidget::read(QString fileName)
 	QByteArray fileContent = file->readAll() ;
 	file->close();
 
-	QDataStream in(fileContent) ;
-	if (in.toNext(spec::mainWidget))
-		in >> *plot
-		   >> *items
-		   >> *logWidget
-		   >> *kineticWidget
-		   >> *actions ;
+	QDataStream inStream(fileContent) ;
+	inStream >> *plot
+		 >> *items
+		 >> *logWidget
+		 >> *kineticWidget
+		 >> *actions ;
 }
 
 void specPlotWidget::modified()

@@ -4,7 +4,6 @@
 #include <QInputDialog>
 #include <qwt_text_label.h>
 #include <qwt_scale_div.h>
-#include "speckineticrange.h"
 #include <qwt_symbol.h>
 #include <textEditor/specsimpletextedit.h>
 #include <QVBoxLayout>

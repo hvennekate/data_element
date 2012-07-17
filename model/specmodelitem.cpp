@@ -4,13 +4,13 @@
 #include "speclogentryitem.h"
 #include "speclogmessage.h"
 #include <QTextStream>
-#include "speckineticrange.h"
 #include <QTime>
 #include <QDebug>
 #include "kinetic/specmetaitem.h"
 #include "utility-functions.h"
 #include <QPainter>
 #include "plot/specplotstyle.h"
+#include "specsvgitem.h"
 
 
 specModelItem::specModelItem(specFolderItem* par, QString description)
@@ -196,38 +196,10 @@ void specModelItem::writeToStream(QDataStream &out) const
 
 void specModelItem::readFromStream(QDataStream & in)
 {
-	specPlotStyle style ;
+	specPlotStyle style(this) ;
 	in >> mergePlotData >> sortPlotData
 	   >> description >> style ;
 	style.apply(this);
-}
-
-specModelItem *specModelItem::produce(specInStream &in)
-{
-	QVector<specStream::Type> types ;
-	types << ;
-	if (!in.expect(types)) return  0 ;
-	specModelItem *item = 0 ;
-	if (in.type() == ...) item = new ... ;
-	if (!item->read(in))
-	{
-		delete item ;
-		return 0 ;
-	}
-	return item ;
-}
-
-bool specModelItem::read(specInStream& in)
-{
-	if (in.type() != id()) return false ;
-	readInternals(in) ;
-	return true ; // TODO maybe consider error in readInternals...
-}
-
-void specModelItem::write(specOutStream& out) const
-{
-	out.next(id()) ;
-	writeInternals(out) ;
 }
 
 spec::descriptorFlags specModelItem::descriptorProperties(const QString& key) const
@@ -315,7 +287,7 @@ specModelItem* specModelItem::itemFactory(specStreamable::type t)
 	case specStreamable::sysEntry : return new specLogMessage ;
 	case specStreamable::svgItem : return new specSVGItem ;
 	case specStreamable::metaItem : return new specMetaItem ;
-	default: specStreamable::factory(t) ;
+	default: return 0 ;
 	}
 }
 

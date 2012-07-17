@@ -14,7 +14,7 @@ private:
 	QVBoxLayout* layout ;
 	void writeToStream(QDataStream &out) const ;
 	void readFromStream(QDataStream &in) ;
-	type id() const { return specStreamable::logWidget ; }
+	type typeId() const { return specStreamable::logWidget ; }
 public:
 	explicit specLogWidget(specModel*, QWidget *parent = 0);
 	void addToolbar(specActionLibrary*) ;

@@ -5,12 +5,12 @@ specDeleteConnectionsCommand::specDeleteConnectionsCommand(specUndoCommand *pare
 {
 }
 
-void specDeleteConnectionsCommand::redo()
+void specDeleteConnectionsCommand::doIt()
 {
 	take() ;
 }
 
-void specDeleteConnectionsCommand::undo()
+void specDeleteConnectionsCommand::undoIt()
 {
 	restore() ;
 }

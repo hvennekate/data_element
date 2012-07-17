@@ -9,7 +9,7 @@ class specSVGItem : public specModelItem
 {
 public:
 
-	enum SVGCornerPoints { undefined = -1,
+	enum SVGCornerPoints : qint8 { undefined = -1,
 		center      = 0,
 		left        = 1,
 		right       = 2,
@@ -28,7 +28,7 @@ private:
 	SVGCornerPoints fix ;
 	QPointF anchorPoint(const SVGCornerPoints& point) const;
 	void setAnchor(QRectF &bounds, const QPointF&, const SVGCornerPoints& point) const ;
-	type id() const { return specStreamable::svgItem ; }
+	type typeId() const { return specStreamable::svgItem ; }
 	void readFromStream(QDataStream &in) ;
 	void writeToStream(QDataStream &out) const;
 public:

@@ -7,7 +7,7 @@ class specMetaModel : public specModel
 {
 	Q_OBJECT
 private:
-	type id() const { return specStreamable::metaModel ; }
+	type typeId() const { return specStreamable::metaModel ; }
 //	QHash<specModelItem*,specModelItem*> generate // TODO
 public:
 	explicit specMetaModel(QObject *parent = 0);

@@ -10,14 +10,14 @@ class specExchangeDataCommand : public specUndoCommand
 private:
 	specGenealogy *item ;
 	QVector<specDataPoint> data ;
+	void writeToStream(QDataStream &out) const ;
+	void readFromStream(QDataStream &in);
+	void doIt();
+	void undoIt() ;
+	type typeId() const { return specStreamable::exchangeDataCommandId  ; }
 public:
 	explicit specExchangeDataCommand(specUndoCommand *parent = 0) ;
 	void setItem(const QModelIndex&, const QVector<specDataPoint>& newData) ;
-	void write(specOutStream &out) const ;
-	bool read(specInStream &in) ;
-	void redo();
-	void undo() ;
-	int id() const { return spec::exchangeDataId  ; }
 };
 
 #endif // SPECEXCHANGEDATACOMMAND_H

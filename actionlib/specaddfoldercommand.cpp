@@ -6,13 +6,13 @@ specAddFolderCommand::specAddFolderCommand(specUndoCommand* parent)
 {
 }
 
-void specAddFolderCommand::redo()
+void specAddFolderCommand::doIt()
 {
 	qDebug("restoring addFolderAction") ;
 	restore();
 }
 
-void specAddFolderCommand::undo()
+void specAddFolderCommand::undoIt()
 {
 	qDebug("undoing addFolderAction") ;
 	take() ;

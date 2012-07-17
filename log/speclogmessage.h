@@ -6,12 +6,12 @@
 class specLogMessage : public specModelItem
 {
 private:
-	type id() const { return specStreamable::sysEntry ; }
+	type typeId() const { return specStreamable::sysEntry ; }
 public:
-	specLogMessage(QHash<QString,specDescriptor> description, specFolderItem* par=0, QString tag="");
+	specLogMessage(specFolderItem* par=0, QString tag="");
 	~specLogMessage();
 
-	bool changeDescriptor ( QString key, QString value ) { return false }
+	bool changeDescriptor ( QString key, QString value ) { return false ; }
 	bool isEditable ( QString key ) const;
 	QIcon decoration() const;
 	spec::descriptorFlags descriptorProperties ( const QString& key ) const;

@@ -80,36 +80,34 @@ void specManageItemsCommand::restore()
 	finish() ;
 }
 
-void specManageItemsCommand::write(specOutStream& out) const
+void specManageItemsCommand::writeToStream(QDataStream &out) const
 {
-	out.startContainer(spec::manageItemsCommandId);
 	out << qint32(items.size()) ;
-	qDebug("###### written size of genealogy list: %d", items.size()) ;
-	for (int i = 0 ; i < items.size() ; ++i)
-		items[i]->write(out) ;
-	out.stopContainer();
-	return out ;
+	foreach(specGenealogy* genealogy, items)
+		out << *genealogy ;
 }
 
-bool specManageItemsCommand::read(specInStream &in)
+void specManageItemsCommand::readFromStream(QDataStream &in)
 {
-	clear() ;
-	if (!in.expect(spec::manageItemsCommandId))  return false ;
 	qint32 toRead ;
 	in >> toRead ;
-	qDebug("reading manageItemsCommand.") ;
-	qDebug() << "parent widget:" << parentObject() << "current size:" << items.size() ;
-	specModel* model = (specModel*) (((QAbstractItemView*) parentObject())->model()) ;
 	for (int i = 0 ; i < toRead ; ++i)
 	{
-		qDebug() << "###### reading genealogy" << i << "of" << toRead ;
-		items << new specGenealogy(model,in) ;
+		specGenealogy *genealogy = new specGenealogy ;
+		in >> *genealogy ;
+		items << genealogy ;
 	}
-	qDebug() << "##### read a total of" << items.size() ;
-	return !in.next() ;
 }
 
 specManageItemsCommand::~specManageItemsCommand()
 {
 	clear() ;
+}
+
+void specManageItemsCommand::parentAssigned()
+{
+	if (!parentObject()) return ;
+	specModel *model = (specModel*) (((QAbstractItemView*) parentObject())->model()) ;
+	foreach(specGenealogy* genealogy, items)
+		genealogy->setModel(model) ;
 }

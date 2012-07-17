@@ -8,11 +8,12 @@
 
 class specAddFolderCommand : public specManageItemsCommand
 {
+private:
+	void doIt() ;
+	void undoIt() ;
+	type typeId() const { return specStreamable::newFolderCommandId ;}
 public:
 	specAddFolderCommand(specUndoCommand *parent = 0);
-	void redo() ;
-	void undo() ;
-	int id() const { return spec::newFolderCommandId ;}
 };
 
 #endif // SPECADDFOLDERCOMMAND_H

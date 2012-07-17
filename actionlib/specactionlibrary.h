@@ -11,8 +11,8 @@ class specActionLibrary ;
 #include <QUndoStack>
 #include "specundocommand.h"
 #include "specundoaction.h"
-#include "specview.h"
 #include "specmodel.h"
+#include "specview.h"
 #include <typeinfo>
 #include "specplot.h"
 
@@ -20,7 +20,7 @@ class specView ;
 class specModel ;
 class specUndoAction ;
 
-class specActionLibrary : public QObject
+class specActionLibrary : public QObject, public specStreamable
 {
 	Q_OBJECT
 public:
@@ -28,8 +28,6 @@ public:
 //	QMenuBar *menuBar(QObject*) ;
 	QToolBar *toolBar(QWidget*) ;
 //	QMenu *contextMenu(const QItemSelection&, specModel*) ; // actionLibrary bekommt Clients in fester Reihenfolge; speichert diese mit den Commands und restauriert so deren Referenz.
-	void write(specOutStream&) ;
-	bool read(specInStream&) ;
 	void push(specUndoCommand*) ;
 	QObject* parentId(int) ;
 	void addDragDropPartner(specModel*) ;
@@ -44,6 +42,9 @@ public:
 signals:
 	void stackChanged() ;
 private:
+	void writeToStream(QDataStream &out) const;
+	void readFromStream(QDataStream &in) ;
+	type typeId() const { return specStreamable::actionLibrary ; }
 	QUndoStack *undoStack ;
 	QVector<QObject*> parents ;
 	QVector<specModel*> partners;

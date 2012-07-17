@@ -9,8 +9,8 @@ specFolderItem::specFolderItem(specFolderItem* par, QString description)
 
 specFolderItem::~specFolderItem()
 {
-	while (children())
-		delete childrenList.takeLast() ;
+	foreach(specModelItem* childPointer, childrenList)
+		delete childPointer ;
 	childrenList.clear() ;
 }
 
@@ -89,7 +89,11 @@ void specFolderItem::refreshPlotData()
 
 void specFolderItem::removeChild(specModelItem* child)
 {
-	childrenList.removeAt(childrenList.indexOf(child)) ;
+	QVector<specModelItem*> newChildren ;
+	foreach (specModelItem* childPointer, childrenList)
+		if (childPointer != child)
+			newChildren << childPointer ;
+	childrenList = newChildren ;
 	invalidate();///! @todo move this to view/plotwidget (suspend frequent refreshes) -- maybe removeChildren instead
 }
 
@@ -102,13 +106,13 @@ void specFolderItem::readFromStream(QDataStream& in)
 	in >> numChildren ;
 	childrenList.fill(0,numChildren) ;
 	for (int i = 0 ; i < childrenList.size() ; ++i)
-		childrenList[i] = produceItem(in) ; // TODO remove all zeros
+		childrenList[i] = (specModelItem*) produceItem(in) ; // TODO remove all zeros
 }
 
 void specFolderItem::writeToStream(QDataStream& out) const
 {
 	specModelItem::writeToStream(out) ;
-	out << (quint64) << children() ;
+	out << (quint64) children() ;
 	foreach(specModelItem* child, childrenList)
 		out << *child ;
 }

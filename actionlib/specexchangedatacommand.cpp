@@ -19,12 +19,12 @@ void specExchangeDataCommand::setItem(const QModelIndex & index, const QVector<s
 	item = new specGenealogy(QModelIndexList() << index) ;
 }
 
-void specExchangeDataCommand::undo()
+void specExchangeDataCommand::undoIt()
 {
-	redo() ;
+	doIt() ;
 }
 
-void specExchangeDataCommand::redo()
+void specExchangeDataCommand::doIt()
 {
 	if (!item)
 		return ;
@@ -36,18 +36,13 @@ void specExchangeDataCommand::redo()
 		pointer->plot()->replot() ;
 }
 
-void specExchangeDataCommand::write(specOutStream &out) const
+void specExchangeDataCommand::writeToStream(QDataStream &out) const
 {
-	out.startContainer(spec::exchangeDataCommandId);
-	item->write(out << data) ;
-	out.stopContainer();
+	out << data << *item ;
 }
 
-bool specExchangeDataCommand::read(specInStream &in)
+void specExchangeDataCommand::readFromStream(QDataStream &in)
 {
-	if (!in.expect(spec::exchangeDataCommandId)) return false ;
-	if (item) delete item ;
-	in >> data ;
-	item = new specGenealogy(((specView*) parentObject())->model(),in) ;
-	return !in.next() ;
+	if (!item) item = new specGenealogy ;
+	in >> data >> *item ;
 }

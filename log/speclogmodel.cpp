@@ -19,9 +19,11 @@ QList<specModelItem*> specLogToData(const QMimeData* data)
 	while(!stream.atEnd())
 	{
 		qDebug("dropping an item") ;
-		specModelItem* pointer ;
-		stream >> pointer ;
-		list << pointer ;
+		specStreamable::type t ;
+		stream >> t ;
+		specModelItem *newItem = specModelItem::itemFactory(t) ;
+		newItem->readDirectly(stream); ;
+		list << newItem ;
 	}
 
 	// transform log entries to data entries

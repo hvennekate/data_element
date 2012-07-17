@@ -5,6 +5,12 @@ specViewState::specViewState(specView *Parent)
 	setParent(Parent) ;
 }
 
+specViewState::specViewState(const specView *temp)
+	: parent(0)
+{
+	getState(temp) ;
+}
+
 void specViewState::setParent(specView *Parent)
 {
 	parent = Parent ;
@@ -23,10 +29,16 @@ void specViewState::purgeLists()
 
 void specViewState::getState()
 {
-	if (!parent) return ;
-	purgeLists();
+	getState(parent) ;
+}
 
-	int columnCount = model()->columnCount(QModelIndex()) ;
+void specViewState::getState(const specView* view)
+{
+	if (!view) return ;
+	purgeLists();
+	specModel* model = view->model() ;
+
+	int columnCount = model->columnCount(QModelIndex()) ;
 	qDebug("++++ getting column widths %d",columnCount) ;
 	for (int i = 0 ; i < columnCount ; ++i)
 		widths << parent->columnWidth(i) ;
@@ -34,23 +46,23 @@ void specViewState::getState()
 	qDebug("+++++ getting selection") ;
 	QModelIndexList selectionList = parent->selectionModel()->selectedRows() ;
 	for (int i = 0 ; i < selectionList.size() ; ++i)
-		selectedItems << model()->itemPointer(selectionList[i]) ;
+		selectedItems << model->itemPointer(selectionList[i]) ;
 
 	qDebug("+++++ getting expanded") ;
-	QModelIndex item = model()->index(0,0,QModelIndex()) ;
+	QModelIndex item = model->index(0,0,QModelIndex()) ;
 	while (item.isValid())
 	{
-		qDebug() << "+++++ Hierarchy: " << model()->hierarchy(item) << model()->rowCount(item.parent()) ;
+		qDebug() << "+++++ Hierarchy: " << model->hierarchy(item) << model->rowCount(item.parent()) ;
 		if (parent->isExpanded(item))
-			openFolders << (specFolderItem*) model()->itemPointer(item) ;
+			openFolders << (specFolderItem*) model->itemPointer(item) ;
 		// go into if directory
-		if (model()->rowCount(item))
-			item = model()->index(0,0,item) ;
+		if (model->rowCount(item))
+			item = model->index(0,0,item) ;
 		// go up if reached last item
-		else //if (model()->rowCount(item.parent()) == item.row()+1)
+		else //if (model->rowCount(item.parent()) == item.row()+1)
 		{
 			// if last item go up.
-			while (model()->rowCount(item.parent()) == item.row()+1 && item.isValid())
+			while (model->rowCount(item.parent()) == item.row()+1 && item.isValid())
 				item = item.parent() ;
 			// go to next
 			item = item.sibling(item.row()+1,0);
@@ -59,15 +71,13 @@ void specViewState::getState()
 
 	qDebug("+++++ getting current") ;
 	// get current index
-	currentItem = model()->itemPointer(parent->currentIndex()) ;
-	hierarchyOfCurrentItem = model()->hierarchy(currentItem) ;
+	currentItem = model->itemPointer(parent->currentIndex()) ;
+	hierarchyOfCurrentItem = model->hierarchy(currentItem) ;
 
 	qDebug("+++++ getting topmost item") ;
-	currentTopItem = model()->itemPointer(parent->indexAt(QPoint(0,0))) ;
+	currentTopItem = model->itemPointer(parent->indexAt(QPoint(0,0))) ;
 	qDebug() << "++++++ item description:" << currentTopItem->descriptor("") ;
-	hierarchyOfTopItem = model()->hierarchy(currentTopItem) ;
-
-
+	hierarchyOfTopItem = model->hierarchy(currentTopItem) ;
 }
 
 specModelItem* specViewState::hierarchyPointer(const QVector<int> &hierarchy)
@@ -163,5 +173,4 @@ void specViewState::readFromStream(QDataStream &in)
 	}
 
 	// TODO maybe implicit restore
-	return true ;
 }

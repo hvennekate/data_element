@@ -3,7 +3,7 @@
 
 specStreamable::type specStreamable::effectiveId() const
 {
-	return type(id() | type(isContainer() ? specStreamable::container : specStreamable::type(0))) ;
+	return type(typeId() | type(isContainer() ? specStreamable::container : specStreamable::type(0))) ;
 }
 
 QDataStream& operator<<(QDataStream& out, const specStreamable& item)

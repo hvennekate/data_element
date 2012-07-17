@@ -11,11 +11,12 @@
 
 class specDeleteCommand : public specManageItemsCommand
 {
+private:
+	void doIt() ;
+	void undoIt() ;
+	type typeId() const { return specStreamable::deleteCommandId; }
 public:
 	explicit specDeleteCommand(specUndoCommand *parent = 0);
-	void redo() ;
-	void undo() ;
-	int id() const { return spec::deleteCommandId; }
 };
 
 #endif // SPECDELETECOMMAND_H

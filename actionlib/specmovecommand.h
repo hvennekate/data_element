@@ -10,17 +10,17 @@ class specMoveCommand : public specUndoCommand
 {
 private:
 	QVector<QPair<QVector<int>, int > > sourceIndexes ;
-	int number ;
+	qint32 number ;
 	QVector<int> targetIndex ;
 	QVector<int> sourceIndex ;
+	void doIt() ;
+	void undoIt() ;
+	void writeToStream(QDataStream &out) const;
+	void readFromStream(QDataStream &in) ;
+	type typeId() const { return specStreamable::moveItemsCommandId ; }
 public:
 	specMoveCommand(QModelIndexList& sources, const QModelIndex& target, int row, specUndoCommand* parent=0) ;
 	specMoveCommand(specUndoCommand* parent = 0) ;
-	void redo() ;
-	void undo() ;
-	int id() const { return spec::moveItemsId ; }
-	void write(specOutStream &) const ;
-	bool read(specInStream&) ;
 };
 
 #endif // SPECMOVECOMMAND_H

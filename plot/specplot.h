@@ -45,7 +45,7 @@ private:
 	void highlightSelectable(bool highlight=true) ;
 	void readFromStream(QDataStream &in);
 	void writeToStream(QDataStream &out) const ;
-	specStreamable::type id() const {return specStreamable::mainPlot ;}
+	type typeId() const {return specStreamable::mainPlot ;}
 private slots:
 	void changeTitle(QString) ;
 	void changeXLabel(QString) ;

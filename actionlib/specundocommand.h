@@ -2,22 +2,24 @@
 #define SPECUNDOCOMMAND_H
 
 #include <QUndoCommand>
-#include "specoutstream.h"
-#include "specinstream.h"
+#include "specstreamable.h"
 
-class specUndoCommand : public QUndoCommand
+class specUndoCommand : public QUndoCommand, public specStreamable
 {
+private:
+	QObject *pO ;
 protected:
-	QObject *pW ;
+	virtual void doIt() = 0;
+	virtual void undoIt() = 0 ;
+	virtual void parentAssigned() {}
 public:
 	explicit specUndoCommand(specUndoCommand *parent = 0);
-//	virtual void redo() = 0;
-//	virtual void undo() = 0;
+	void redo() ;
+	void undo() ;
 
-	virtual void write(specOutStream& out) const = 0 ;
-	virtual bool read(specInStream& in) = 0 ;
 	virtual bool mergeable(const specUndoCommand* other) { Q_UNUSED(other) ; return true ; }
 	void setParentObject(QObject*) ; // consider making virtual
+	int id() const { return typeId() ; }
 	QObject *parentObject() const ;
 signals:
 

@@ -9,11 +9,11 @@ class specLogEntryItem : public specModelItem
 {
 private:
 	QHash<QString,specDescriptor> description ;
-	type id() const { return specStreamable::logEntry ; }
+	type typeId() const { return specStreamable::logEntry ; }
 	void writeToStream(QDataStream &out) const ;
 	void readFromStream(QDataStream &in) ;
 public:
-	specLogEntryItem ( QHash<QString,specDescriptor> description, specFolderItem* par=0, QString tag="" );
+	explicit specLogEntryItem ( QHash<QString,specDescriptor> description = QHash<QString,specDescriptor>(), specFolderItem* par=0, QString tag="" );
 	~specLogEntryItem();
 
 	bool isEditable ( QString key ) const;

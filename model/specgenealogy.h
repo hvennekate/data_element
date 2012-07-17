@@ -12,16 +12,16 @@ private:
 	specFolderItem* Parent ;
 	QVector<specModelItem*> Items ;
 	bool owning ;
-	bool knowingParent ;
 	void getItemPointers() ;
 	void writeToStream(QDataStream &out) const ;
 	void readFromStream(QDataStream &in) ;
-	type id() const { return specStreamable::genealogyId ; }
+	type typeId() const { return specStreamable::genealogyId ; }
 	specStreamable* factory(const type &t) const ;
 public:
 	explicit specGenealogy(QModelIndexList&);
 	virtual ~specGenealogy() ;
 	specGenealogy(specModel*, QDataStream&) ;
+	specGenealogy() ;
 	void setModel(specModel* model) ;
 	void takeItems() ;
 	void returnItems() ;
