@@ -16,8 +16,11 @@
 // TODO remove kineticRanges
 
 specPlot::specPlot(QWidget *parent)
-	: canBeSelected(NULL), QwtPlot(parent), select(false), replotting(false),
-	  metaPicker(new CanvasPicker(this))
+	: QwtPlot(parent),
+	  replotting(false),
+	  canBeSelected(NULL),
+	  metaPicker(new CanvasPicker(this)),
+	  select(false)
 {
 	connect(metaPicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SLOT(metaRangeMoved(specCanvasItem*,int,double,double))) ;
 	setAutoReplot(false) ;

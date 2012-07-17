@@ -8,7 +8,6 @@ specPlotMoveCommand::specPlotMoveCommand(specUndoCommand* parent)
 
 void specPlotMoveCommand::doIt()
 {
-	qDebug("specPlotMoveCommand %d") ;
 	if (!items) return ;
 	items->seekParent() ;
 	if (!items->valid()) return ;

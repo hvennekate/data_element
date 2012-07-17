@@ -19,12 +19,8 @@ void specAddConnectionsAction::execute()
 	qDebug("adding connections") ;
 	specMetaView *view = (specMetaView*) parent() ;
 	qDebug("got view") ;
-	specMetaModel *model = view->model() ;
-	qDebug("got model") ;
 	specView *serverView = view->getDataView() ;
 	qDebug("got server view") ;
-	specModel *servermodel = serverView->model() ;
-	qDebug("got server model") ;
 
 	QModelIndex target = view->currentIndex() ;
 	QModelIndexList servers = serverView->getSelection() ;

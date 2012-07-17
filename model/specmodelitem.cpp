@@ -16,9 +16,9 @@
 specModelItem::specModelItem(specFolderItem* par, QString description)
 	: specCanvasItem(description),
 	  iparent(0),
+	  description("",spec::editable),
 	  mergePlotData(true),
-	  sortPlotData(true),
-	  description("",spec::editable)
+	  sortPlotData(true)
 {
 	setParent(par) ;
 }
@@ -103,7 +103,8 @@ void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 
 	if (mergePlotData)
 	{
-		for (int i = 0 ; i < x.size() ; i)
+		int i = 0 ;
+		while(i < x.size())
 		{
 			int j = i ;
 			double ysum = 0, xtemplate = x[i] ;
@@ -122,7 +123,7 @@ QwtSeriesData<QPointF>* specModelItem::processData(QwtSeriesData<QPointF>* dat) 
 	if (!sortPlotData && !mergePlotData)
 		return dat ;
 	QVector<QPointF> newData(dat->size()) ;
-	for(int i = 0 ; i < dat->size() ; ++i)
+	for(size_t i = 0 ; i < dat->size() ; ++i)
 		newData[i] = dat->sample(i) ; // TODO quicker!
 	if (sortPlotData)
 		qSort(newData.begin(), newData.end(), comparePoints) ;
@@ -180,10 +181,18 @@ QIcon specModelItem::indicator(const QString& Descriptor) const
 QIcon specModelItem::decoration() const { return QIcon() ; }
 
 bool specModelItem::addChild(specModelItem *child, QList<specModelItem*>::size_type position)
-{ return false ; }
+{
+	Q_UNUSED(child) ;
+	Q_UNUSED(position) ;
+	return false ;
+}
 
 bool specModelItem::addChildren(QList<specModelItem*> list, QList<specModelItem*>::size_type position)
-{ return false ; }
+{
+	Q_UNUSED(list)
+	Q_UNUSED(position)
+	return false ;
+}
 
 QStringList specModelItem::descriptorKeys() const
 { return QStringList(QString("")) ;}
@@ -213,7 +222,7 @@ void specModelItem::exportData(const QList<QPair<bool,QString> >& headerFormat, 
 	for (int i = 0 ; i < headerFormat.size() ; i++)
 		out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
 	out << endl ;
-	for (int j = 0 ; j < dataSize() ; j++)
+	for (size_t j = 0 ; j < dataSize() ; j++)
 		for (int i = 0 ; i < dataFormat.size() ; i++)
 			out << dataFormat[i].first << dataFormat[i].second ;
 	out << endl ;
@@ -269,11 +278,13 @@ bool specModelItem::shortCircuit(specModelItem *server)
 
 bool specModelItem::connectServer(specModelItem *itm)
 {
+	Q_UNUSED(itm)
 	return false ;
 }
 
 bool specModelItem::disconnectServer(specModelItem *itm)
 {
+	Q_UNUSED(itm)
 	return false ;
 }
 

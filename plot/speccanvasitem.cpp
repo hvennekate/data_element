@@ -77,7 +77,7 @@ void specCanvasItem::applyRanges(QList<QwtInterval*>& ranges)
 	matrix << QList<double>(vector) << QList<double>(vector) ;
 	for(int i = 0 ; i < ranges.size() ; i++)
 	{
-		for (int j = 0 ; j < dataSize() ; j++)
+		for (size_t j = 0 ; j < dataSize() ; j++)
 		{
 			if (ranges[i]->contains(sample(j).x()))
 			{

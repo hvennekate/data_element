@@ -73,7 +73,7 @@ void specFolderItem::refreshPlotData()
 	QVector<double> x, y ;
 	foreach(specModelItem* item, childrenList)
 	{
-		for (int i = 0 ; i < item->dataSize() ; i++)
+		for (size_t i = 0 ; i < item->dataSize() ; i++)
 		{
 			x << item->sample(i).x() ;
 			y << item->sample(i).y() ;

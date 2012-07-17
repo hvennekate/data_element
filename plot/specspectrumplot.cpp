@@ -37,11 +37,11 @@ void specSpectrumPlot::invalidateReference()
 
 specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	specPlot(parent),
-	view(0),
 	correctionPicker(0),
 	alignmentPicker(0),
-	reference(0),
-	SVGpicker(0)
+	SVGpicker(0),
+	view(0),
+	reference(0)
 {
 	correctionActions = new QActionGroup(this) ;
 	correctionActions->setExclusive(false);
@@ -307,7 +307,7 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 		QList<QPointF> pointsInRange ;
 		specModelItem* spectrum = (specModelItem*) spectra[i] ;
 		// extract points that lie in any of the ranges
-		for (int j = 0 ; j < spectrum->dataSize() ; ++j)
+		for (size_t j = 0 ; j < spectrum->dataSize() ; ++j)
 		{
 			QPointF point = spectrum->sample(j) ;
 			for (int k = 0 ; k < zeroRanges.size() ; ++k)
@@ -343,11 +343,6 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 				}
 				QMap<double,double>::const_iterator pointBefore  = pointAfter - 1;
 				// subtract linear interpolation
-				double x1 = pointBefore.key(),
-						x2 = pointAfter.key(),
-						y1 = pointBefore.value(),
-						y2 = pointAfter.value(),
-						y = i->y() ;
 				i->setY(i->y()
 					- pointBefore.value()
 					- (pointAfter.value() - pointBefore.value()) /
@@ -409,7 +404,7 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double n
 	QwtPlotItemList spectra = itemList(spec::spectrum) ; // TODO roll back previous undo command if it was of the same kind and merge with what is to come.
 	// prepare map of x and y values
 	QMap<double,double> referenceSpectrum ;
-	for (int i = 0 ; i < reference->dataSize() ; ++i)
+	for (size_t i = 0 ; i < reference->dataSize() ; ++i)
 		referenceSpectrum[reference->sample(i).x()] = reference->sample(i).y() ;
 
 	specMultiCommand *zeroCommand = generateCorrectionCommand(zeroRanges, spectra, referenceSpectrum, view, noSlopeAction->isChecked()) ;
@@ -489,7 +484,7 @@ void specSpectrumPlot::multipleSubtraction()
 	QwtPlotItemList spectra = itemList(spec::spectrum) ;
 	// prepare map of x and y values
 	QMap<double,double> referenceSpectrum ; // TODO convert reference spectrum to map!
-	for (int i = 0 ; i < reference->dataSize() ; ++i)
+	for (size_t i = 0 ; i < reference->dataSize() ; ++i)
 		referenceSpectrum[reference->sample(i).x()] = reference->sample(i).y() ;
 	// TODO more efficient undo:  generate added/subtracted spectrum (interpolated points included)
 	specMultiCommand* subCommand = new specMultiCommand ;

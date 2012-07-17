@@ -133,10 +133,6 @@ specModelItem* readJCAMPBlock(QTextStream& in)
 	}
 	specModelItem *item = 0 ;
 	
-	for(QHash<QString,specDescriptor>::iterator i = descriptors.begin() ; i != descriptors.end() ; i++)
-		foreach (specModelItem *child, children)
-			qDebug() << "Description key: " << i.key() << " Description content: " << i.value().content() ;
-			
 	if(descriptors["DATA TYPE"].content() == "LINK")
 	{
 		qDebug("Link item") ;
@@ -167,7 +163,6 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 		posDIFdigits("[J-R%]"),
 		negDIFdigits("[j-r]"),
 		posDUPdigits("[S-Zs]") ;
-	int yRead = 0 ;
 	bool wasDiff = false ;
 	QVector<double> yvals, xvals ;
 	while(!in.atEnd())
@@ -467,7 +462,11 @@ QList<specModelItem*> (*fileFilter(QString& fileName)) (QFile&)
 	QTextStream in(&file) ;
 	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ;
 	QString sample = in.readLine(5) ;
-	QList<specModelItem*> (*pointer)(QFile&) = (sample == "PE IR") ? pointer = readPEFile : (sample == "Solve" ? pointer = readHVFile : ( sample.left(2) == "##" ? pointer = readJCAMPFile : pointer = readLogFile )) ;
+	QList<specModelItem*> (*pointer)(QFile&) = 0 ;
+	if (sample == "PE IR") pointer = readPEFile ;
+	else if (sample == "Solve") pointer = readHVFile ;
+	else if (sample == "##") pointer = readJCAMPFile ;
+	else pointer = readLogFile ;
 	file.close() ;
 	return pointer ;
 }

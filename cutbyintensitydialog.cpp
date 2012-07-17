@@ -42,7 +42,7 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 			QwtPlotCurve *intensity = new QwtPlotCurve ;
 			QwtPlotCurve *dataCurve = new QwtPlotCurve ;
 			QVector<double> xdat, ydat ;
-			for (int i = 0 ; i < item->dataSize() ; i++)
+			for (size_t i = 0 ; i < item->dataSize() ; i++)
 			{
 				xdat << item->sample(i).x() ;
 				ydat << item->sample(i).y() ;

@@ -6,7 +6,7 @@ QVector<double> specYVariable::values(specModelItem *item, const QVector<double>
 	QVector<QPointF> points ;
 	QPointF point ;
 
-	for(int i = 0 ; i < item->dataSize() ; ++i)
+	for(size_t i = 0 ; i < item->dataSize() ; ++i)
 		if (xvals.contains((point = item->sample(i)).x()))
 			points << point ;
 	if (points.empty()) return QVector<double>(xvals.size(),NAN) ;

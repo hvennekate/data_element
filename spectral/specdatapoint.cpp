@@ -54,7 +54,6 @@ specDataPoint& specDataPoint::operator/=(const double& toDiv)
 
 specDataPoint& specDataPoint::operator/(const double& toDiv)
 {
-	specDataPoint toReturn = *this ;
-	toReturn /= toDiv ;
-	return toReturn ;
+	*this /= toDiv ;
+	return *this ;
 }

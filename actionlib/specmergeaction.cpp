@@ -75,7 +75,7 @@ void specMergeAction::execute()
 				QMap<double,double> reference ;
 				newItem->revalidate();
 				const QwtSeriesData<QPointF>* spectrum = newItem->QwtPlotCurve::data() ;
-				for (int i = 0 ; i < spectrum->size() ; ++i)
+				for (size_t i = 0 ; i < spectrum->size() ; ++i)
 				{
 					const QPointF point = spectrum->sample(i) ;
 					reference[point.x()] = point.y() ;

@@ -8,10 +8,9 @@ class specLogModel : public specModel
 {
 private:
     Q_OBJECT
-	specModel *partner ;
 	type typeId() const { return specStreamable::logModel ; }
 public:
-	specLogModel(specModel *dataModel, QObject *parent = 0);
+	explicit specLogModel(QObject *parent = 0);
 
 signals:
 

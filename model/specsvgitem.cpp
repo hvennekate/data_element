@@ -100,6 +100,7 @@ void specSVGItem::setAnchor(QRectF& bounds, const QPointF & anchor, const SVGCor
 	case topRight: bounds.moveTopRight(anchor) ; break ;
 	case bottomLeft: bounds.moveBottomLeft(anchor) ; break ;
 	case bottomRight: bounds.moveBottomRight(anchor) ; break ;
+	default: ;
 	}
 }
 

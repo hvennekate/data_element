@@ -159,8 +159,6 @@ const QList<spec::descriptorFlags>& specModel::descriptorProperties() const
 
 QModelIndexList specModel::merge(QModelIndexList& list, const QList<QPair<QStringList::size_type, double> >& criteria)
 {
-	bool fitInterpolated = true ; // TODO: Get from criteria
-// resolve folders and sort  TODO exclude system messages etc.
 	for (QModelIndexList::size_type i = 0 ; i < list.size() ; i++)
 		if (isFolder(list[i]))
 			list << allChildren(list.takeAt(i--)) ;
@@ -359,8 +357,8 @@ specModel::specModel(QObject *par)
 	: QAbstractItemModel(par), mime("application/spec.model.item"),
 	  internalDrop(false),
 	  dropSource(0),
-	  dontDelete(false),
-	  dropBuddy(0)
+	  dropBuddy(0),
+	  dontDelete(false)
 {
 	qDebug("initializing model") ;
 	root = new specFolderItem ;
@@ -380,6 +378,7 @@ specModel::~specModel()
 
 bool specModel::setHeaderData (int section,Qt::Orientation orientation,const QVariant & value,int role)
 {
+	Q_UNUSED(orientation)
 	if (role == Qt::EditRole)
 	{
 		Descriptors.replace(section,value.toString()) ;
@@ -454,7 +453,12 @@ bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int 
 	return retVal ;
 }
 
-int specModel::columnCount(const QModelIndex &parent) const {return Descriptors.size() ;}
+int specModel::columnCount(const QModelIndex &parent) const
+{
+	Q_UNUSED(parent)
+	return Descriptors.size() ;
+}
+
 int specModel::rowCount(const QModelIndex& parent) const
 { return itemPointer(parent)->children() ; }
 
@@ -557,6 +561,7 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 QVariant specModel::headerData(int section, Qt::Orientation orientation,
 		    int role) const
 {
+	Q_UNUSED(orientation)
 	if (role != Qt::DisplayRole)
 		return QVariant();
 	return Descriptors[section] ;
@@ -606,7 +611,6 @@ Qt::DropActions specModel::supportedDropActions() const
 
 QStringList specModel::mimeTypes() const
 {
-	qDebug("### requested mime types %d",this) ;
 	return mimeConverters.keys() ;
 }
 
@@ -636,7 +640,6 @@ void specModel::eliminateChildren(QModelIndexList& list) const
 
 QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 {
-	qDebug("### requested mime data %d",this) ;
 	QMimeData *mimeData = new QMimeData() ;
 //	QByteArray encodedData, textData ;
 //	QTextStream textStream(&textData, QIODevice::WriteOnly) ;
@@ -693,8 +696,7 @@ QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 bool specModel::dropMimeData(const QMimeData *data,
      Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
-	qDebug("### dropped mime data %d",this) ;
-	qDebug() << "Formats:" << data->formats() ;
+	Q_UNUSED(column)
 	if (action == Qt::IgnoreAction)
 		return true;
 
@@ -765,7 +767,7 @@ void specModel::fillSubMap(const QModelIndexList & indexList)
 	foreach(QModelIndex index, indexList)
 	{
 		specModelItem *pointer = itemPointer(index) ;
-		for (int i = 0 ; i < pointer->dataSize() ; i++)
+		for (size_t i = 0 ; i < pointer->dataSize() ; i++)
 		{
 			double xval = pointer->sample(i).x() ;
 			subMap[xval] += pointer->sample(i).y() ; // Qt promises "default-construction" of double as zero.

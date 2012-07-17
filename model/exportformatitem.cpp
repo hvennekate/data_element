@@ -48,12 +48,13 @@ QString exportFormatItem::separator()
 	QString retString ;
 	switch((spec::separator) Separator->currentIndex())
 	{
-		case spec::space:
-			retString = " " ; break ;
-		case spec::tab:
-			retString = '\t' ; break ;
-		case spec::newline:
-			retString = '\n'; break ;
+	case spec::space:
+		retString = " " ; break ;
+	case spec::tab:
+		retString = '\t' ; break ;
+	case spec::newline:
+		retString = '\n'; break ;
+	default: ;
 	}
 	return retString ;
 }

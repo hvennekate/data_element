@@ -16,7 +16,7 @@ private:
 	void readFromStream(QDataStream &in) ;
 	type typeId() const { return specStreamable::logWidget ; }
 public:
-	explicit specLogWidget(specModel*, QWidget *parent = 0);
+	explicit specLogWidget(QWidget *parent = 0);
 	void addToolbar(specActionLibrary*) ;
 };
 
