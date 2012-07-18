@@ -720,7 +720,7 @@ bool specModel::dropMimeData(const QMimeData *data,
 		return true ;
 	}
 
-	specMimeConverter* converter ;
+	specMimeConverter* converter = 0;
 	QString typeToUse ;
 //	for (QHash<QString,specMimeConverter*>::iterator i = mimeConverters->begin() ; i != mimeConverters->end() ;++i)
 	foreach(const QString& type, mimeConverters.keys())

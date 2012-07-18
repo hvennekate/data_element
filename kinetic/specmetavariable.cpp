@@ -32,7 +32,7 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 	QString xupper = extract(init, number) ;
 
 	// setting the mode of operation (consider using virtual functions/subclassing)
-	specMetaVariable *product ;
+	specMetaVariable *product = 0;
 	if (descString[0] == '"')
 	{
 		product = new specDescriptorVariable ;
