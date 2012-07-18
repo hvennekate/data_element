@@ -28,7 +28,7 @@ void specExchangeDataCommand::doIt()
 {
 	if (!item)
 		return ;
-	specDataItem *pointer = (specDataItem*) (item->items().first()) ;
+	specDataItem *pointer = (specDataItem*) (item->firstItem()) ;
 	QVector<specDataPoint> currentData(pointer->allData()) ; // TODO introduce swap here via function of the data item
 	pointer->setData(data);
 	data = currentData ;

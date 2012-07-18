@@ -9,7 +9,7 @@
 specGenealogy::specGenealogy(QModelIndexList &list)
 	: owning(false)
 {
-	qDebug("initializing genealogy") ;
+	qDebug()<< "###### initializing genealogy" << list.size();
 	if (list.isEmpty()) return ;
 	QModelIndexList::iterator last = list.begin() ;
 	Model = (specModel*) last->model() ;
@@ -27,7 +27,7 @@ specGenealogy::specGenealogy(QModelIndexList &list)
 	}
 
 	// getting pointers to Items to put into our list
-	qDebug("adding Items to own list") ;
+	qDebug() << "adding Items to own list" ;
 	for (QModelIndexList::iterator i = list.begin() ; i != last ; ++i)
 		Items << Model->itemPointer(*i) ;
 
@@ -39,6 +39,7 @@ specGenealogy::specGenealogy(QModelIndexList &list)
 	qDebug("removing indexes from list") ;
 	// rid the list of those entries we took
 	list.erase(list.begin(),last) ;
+	qDebug() << "######" << "items removed" << Items.size() << list.size() ;
 }
 
 bool specGenealogy::valid()
@@ -154,9 +155,15 @@ specGenealogy::~specGenealogy()
 			delete item ;
 }
 
-const QList<specModelItem*>& specGenealogy::items() const
+const QVector<specModelItem*>& specGenealogy::items() const
 {
-	return Items.toList() ;
+	return Items ;
+}
+
+specModelItem* specGenealogy::firstItem() const
+{
+	if (Items.isEmpty()) return 0 ;
+	return Items.first() ;
 }
 
 bool specGenealogy::operator ==(const specGenealogy& other)

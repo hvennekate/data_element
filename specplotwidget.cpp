@@ -40,7 +40,7 @@ void specPlotWidget::contextMenuEvent(QContextMenuEvent* event)
 
 specPlotWidget::specPlotWidget(QWidget *parent)
 	: QDockWidget(tr("untitled"),parent),
-	  items(new specDataView(new specModel(items), this)),
+	  items(new specDataView(this)),
 	  logWidget(new specLogWidget(parent)),
 	  kineticWidget(new specKineticWidget(QString(),this)),
 	  content(new QWidget),
@@ -53,8 +53,11 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	  kineticsAction(kineticWidget->toggleViewAction()),
 	  saveAsAction(new QAction(QIcon::fromTheme("document-save-as"), tr("Save as..."), this)),
 	  logAction(logWidget->toggleViewAction()),
-	  printAction(new QAction(QIcon::fromTheme("document-print"), tr("Print..."), this))
+	  printAction(new QAction(QIcon::fromTheme("document-print"), tr("Print..."), this)),
+	  actions(new specActionLibrary(this))
 {
+	items->setModel(new specModel(items));
+
 	plot->setMinimumSize(100,100) ;
 	plot->setView(items) ;
 	plot->setUndoPartner(actions) ;
@@ -67,8 +70,10 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 
 	kineticWidget->view()->assignDataView(items) ;
 	kineticWidget->addToolbar(actions) ;
+	kineticsAction->setIcon(QIcon(":/kineticwindow.png"));
 
 	logWidget->addToolbar(actions) ;
+	logAction->setIcon(QIcon(":/logs.png"));
 
 	createToolbars();
 	setConnections() ;
@@ -211,7 +216,6 @@ bool specPlotWidget::saveFile()
 
 specPlotWidget::~specPlotWidget()
 {
-	kineticWidget->deleteLater();
 	emit destroyed(this) ;
 	destroy(true,true) ;
 }

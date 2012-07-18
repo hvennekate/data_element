@@ -2,7 +2,6 @@
 #define SPECEDITDESCRIPTORCOMMAND_H
 
 #include "specundocommand.h"
-#include "specdataitem.h"
 #include "specgenealogy.h"
 
 class specEditDescriptorCommand : public specUndoCommand
@@ -20,9 +19,9 @@ private:
 public:
 	explicit specEditDescriptorCommand(specUndoCommand* parent = 0) ;
 	void setItem(const QModelIndex &index, QString descriptor,
-		     QString newContent, int activeLine) ;
-	bool mergeWith(const QUndoCommand *other) ;
-	bool mergeable(const specUndoCommand *other) ;
+		     QString newContent, int activeLine= 0) ;
+//	bool mergeWith(const QUndoCommand *other) ;
+//	bool mergeable(const specUndoCommand *other) ;
 };
 
 #endif // SPECEDITDESCRIPTORCOMMAND_H
