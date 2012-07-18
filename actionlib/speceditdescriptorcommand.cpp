@@ -1,4 +1,5 @@
 #include "speceditdescriptorcommand.h"
+#include "specmodelitem.h"
 
 specEditDescriptorCommand::specEditDescriptorCommand(specUndoCommand *parent)
 	: specUndoCommand(parent),
@@ -11,12 +12,13 @@ void specEditDescriptorCommand::setItem(const QModelIndex &index, QString desc,
 {
 	previousContent= newContent ;
 	previousActiveLine = activeLine ;
-	specDataItem *pointer = dynamic_cast<specDataItem*>(((specModel*) parentObject())->itemPointer(index)) ;
+	specModelItem *pointer = ((specModel*) (index.model()))->itemPointer(index) ;
 	if (item) delete item ;
 	item = 0 ;
 	if (!pointer) return ;
 	descriptor = desc ;
 	item = new specGenealogy(QModelIndexList() << index) ;
+	qDebug() << "!!!!!! item assigned" << item ;
 }
 
 void specEditDescriptorCommand::undoIt()
@@ -26,13 +28,16 @@ void specEditDescriptorCommand::undoIt()
 
 void specEditDescriptorCommand::doIt()
 {
+	qDebug() << "!!!!!!! starting doIt()" << item << item->items().size() ;
 	if (!item) return ;
-	specDataItem *pointer = (specDataItem*) (item->items().first()) ;
+	specModelItem *pointer = item->firstItem() ;
+	if (!pointer) return ;
 	QString currentContent = pointer->descriptor(descriptor,true) ;
 	int currentLine = pointer->activeLine(descriptor) ;
 
 	pointer->changeDescriptor(descriptor,previousContent) ;
 	pointer->setActiveLine(descriptor,previousActiveLine) ;
+	qDebug() << "!!!!! Descriptor edited: " << pointer->descriptor(descriptor,true) ;
 
 	previousContent = currentContent ;
 	previousActiveLine = currentLine ;
@@ -62,18 +67,18 @@ void specEditDescriptorCommand::readFromStream(QDataStream &in)
 	   >> *item ;
 }
 
-bool specEditDescriptorCommand::mergeable(const specUndoCommand *other)
-{
-	return id() == other->id()
-			&& ((specEditDescriptorCommand*) other)->previousContent == previousContent
-			&& *(((specEditDescriptorCommand*) other)->item) == *item
-			&& ((specEditDescriptorCommand*) other)->descriptor == descriptor ;
-}
+//bool specEditDescriptorCommand::mergeable(const specUndoCommand *other)
+//{
+//	return id() == other->id()
+//			&& ((specEditDescriptorCommand*) other)->previousContent == previousContent
+//			&& *(((specEditDescriptorCommand*) other)->item) == *item
+//			&& ((specEditDescriptorCommand*) other)->descriptor == descriptor ;
+//}
 
-bool specEditDescriptorCommand::mergeWith(const QUndoCommand *other)
-{
-	const specEditDescriptorCommand *p = dynamic_cast<const specEditDescriptorCommand*>(other) ;
-	if (!p || !mergeable(p)) return false ;
-	previousActiveLine = p->previousActiveLine ;
-	return true ;
-}
+//bool specEditDescriptorCommand::mergeWith(const QUndoCommand *other)
+//{
+//	const specEditDescriptorCommand *p = dynamic_cast<const specEditDescriptorCommand*>(other) ;
+//	if (!p || !mergeable(p)) return false ;
+//	previousActiveLine = p->previousActiveLine ;
+//	return true ;
+//}

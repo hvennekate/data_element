@@ -43,7 +43,7 @@ void specResizeSVGcommand::undoIt()
 
 void specResizeSVGcommand::exchange()
 {
-	specSVGItem *pointer = ((specSVGItem*) item->items().first()) ;
+	specSVGItem *pointer = ((specSVGItem*) item->firstItem()) ;
 	QRectF old = pointer->boundingRect() ;
 	pointer->setBoundingRect(other) ;
 	other = old ;

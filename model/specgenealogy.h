@@ -29,7 +29,8 @@ public:
 	bool seekParent() ;
 	specModel* model() ;
 	specFolderItem* parent() ;
-	const QList<specModelItem*>& items() const ;
+	const QVector<specModelItem*>& items() const ;
+	specModelItem* firstItem() const ;
 
 	bool operator==(const specGenealogy& other) ;
 	bool operator!=(const specGenealogy& other) ;
