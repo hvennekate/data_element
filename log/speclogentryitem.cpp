@@ -2,7 +2,8 @@
 
 
 specLogEntryItem::specLogEntryItem ( QHash<QString,specDescriptor> desc, specFolderItem* par, QString tag)
- : specModelItem(par, tag), description(desc)
+	: specModelItem(par, tag),
+	  description(desc)
 {
 }
 

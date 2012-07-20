@@ -1,8 +1,9 @@
 #include "speclogmessage.h"
 
-specLogMessage::specLogMessage(specFolderItem* par, QString tag)
-	: specModelItem(par,tag)
+specLogMessage::specLogMessage(QHash<QString,specDescriptor> description, specFolderItem* par, QString tag)
+	: specLogEntryItem(description, par, tag)
 {
+	qDebug() << "Log string:" << tag ;
 }
 
 
@@ -24,3 +25,9 @@ spec::descriptorFlags specLogMessage::descriptorProperties ( const QString& key 
 	return spec::def ;
 }
 
+bool specLogMessage::changeDescriptor( QString key, QString value )
+{
+	Q_UNUSED(key)
+	Q_UNUSED(value)
+	return false ;
+}

@@ -354,7 +354,8 @@ specModelItem* specModel::itemPointer(const QModelIndex& index) const
 { return (index.isValid() && index.internalPointer() != 0 ? (specModelItem*) index.internalPointer() : root) ; } // TODO evtl. als operator= definieren.
 
 specModel::specModel(QObject *par)
-	: QAbstractItemModel(par), mime("application/spec.model.item"),
+	: QAbstractItemModel(par),
+	  mime("application/spec.model.item"),
 	  internalDrop(false),
 	  dropSource(0),
 	  dropBuddy(0),
@@ -526,16 +527,25 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 	{
 		QString desc = Descriptors[index.column()] ;
 		specModelItem *pointer = itemPointer(index) ;
-		if (role == Qt::EditRole || role == spec::activeLineRole)
+		if (role == Qt::EditRole)
 		{
 			if (! (pointer->descriptorProperties(desc) & spec::editable) ) return false ;
 			changed = true ;
 			specEditDescriptorCommand *command = new specEditDescriptorCommand ;
 			command->setParentObject(this) ;
-			if (role == Qt::EditRole)
-				command->setItem(index, desc, pointer->descriptor(desc),value.toInt()) ;
+			qDebug() << "!!!!!! assigning item" << pointer ;
+			if (value.canConvert(QVariant::List))
+			{
+				QList<QVariant> list = value.toList() ;
+				if (list.isEmpty())
+				{
+					delete command ;
+					return false ;
+				}
+				command->setItem(index, desc, list[0].toString(), list[1].toInt()) ;
+			}
 			else
-				command->setItem(index, desc, value.toString(), pointer->activeLine(desc)) ;
+				command->setItem(index, desc, value.toString()) ;
 			// TODO unite in value-variant
 			dropBuddy->push(command) ;
 		}
@@ -710,7 +720,7 @@ bool specModel::dropMimeData(const QMimeData *data,
 		return true ;
 	}
 
-	specMimeConverter* converter ;
+	specMimeConverter* converter = 0;
 	QString typeToUse ;
 //	for (QHash<QString,specMimeConverter*>::iterator i = mimeConverters->begin() ; i != mimeConverters->end() ;++i)
 	foreach(const QString& type, mimeConverters.keys())

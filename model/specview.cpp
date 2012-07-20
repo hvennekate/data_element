@@ -400,3 +400,8 @@ void specView::resetDone()
 	state->restoreState();
 	delete state ;
 }
+
+void specView::dragEnterEvent(QDragEnterEvent *event)
+{
+	qDebug() << "Proposed action:" << event->proposedAction() ;
+}

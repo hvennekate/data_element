@@ -14,6 +14,7 @@ private:
 	void writeToStream(QDataStream &out) const;
 	void readFromStream(QDataStream &in) ;
 	type typeId() const { return specStreamable::multiCommandId ; }
+//	void parentAssigned();
 public:
 	explicit specMultiCommand(specUndoCommand* parent = 0);
 	void setMergeable(bool mergeable = true) ;

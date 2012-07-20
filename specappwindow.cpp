@@ -21,17 +21,28 @@ void specAppWindow::closeEvent(QCloseEvent* event)
 {
 	event->ignore() ;
 	bool allClosed = true ;
-	specPlotWidget* pointer ;
-	foreach(QObject* dock, children())
-		if((pointer = dynamic_cast<specPlotWidget*>(dock))) //
-			allClosed = allClosed && pointer->close() ;
+	while(!docks.isEmpty())
+		if (!docks.first()->close())
+			return ;
 	event->setAccepted(allClosed) ;
 	settings.setValue("mainWindow/geometry",saveGeometry()) ;
 }
 
 void specAppWindow::newFile()
 {
-	addDockWidget(Qt::LeftDockWidgetArea, new specPlotWidget(this)) ;
+	addDock(new specPlotWidget(this)) ;
+}
+
+void specAppWindow::removeDock()
+{
+	docks.removeAll((specPlotWidget*) sender()) ;
+}
+
+void specAppWindow::addDock(specPlotWidget *newDock)
+{
+	docks << newDock ;
+	connect(newDock,SIGNAL(destroyed()),this,SLOT(removeDock())) ;
+	addDockWidget(Qt::LeftDockWidgetArea, newDock) ;
 }
 
 void specAppWindow::openFile()
@@ -41,7 +52,7 @@ void specAppWindow::openFile()
 	{
 		specPlotWidget *newWidget = new specPlotWidget(this) ;
 		newWidget->read(fileName) ;
-		addDockWidget(Qt::LeftDockWidgetArea, newWidget) ;
+		addDock(newWidget) ;
 	}
 }
 

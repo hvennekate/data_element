@@ -100,13 +100,13 @@ QVector<specModelItem*> specManageConnectionsCommand::itemPointers() const
 {
 	QVector<specModelItem*> pointers ;
 	foreach(specGenealogy *genealogy,items)
-		pointers << genealogy->items().toVector() ; // TODO think over
+		pointers << genealogy->items() ; // TODO think over
 	return pointers ;
 }
 
 specMetaItem *specManageConnectionsCommand::targetPointer() const
 {
-	return (specMetaItem*) (target->items().first()) ;
+	return (specMetaItem*) (target->firstItem()) ;
 }
 
 bool specManageConnectionsCommand::sameModel() const

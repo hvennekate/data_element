@@ -72,21 +72,18 @@ specPlot::specPlot(QWidget *parent)
 	refreshMoveMode() ;
 }
 
-specZoomer   *specPlot::zoomer() { return zoom ;}
+specZoomer *specPlot::zoomer()
+{
+	return zoom ;
+}
 
 void specPlot::changeTitle(QString newTitle)
 {
-//	bool ok = false ; // TODO: QTextEdit
-//	QString newTitle = QInputDialog::getText((QWidget*) this,tr("New plot title"),tr("New plot title:"), QLineEdit::Normal,title().text(),&ok) ;
-//	if (ok)
 		setTitle(newTitle) ;
 }
 
 void specPlot::changeXLabel(QString newTitle)
 {
-//	bool ok = false ; // TODO: QTextEdit
-//	QString newTitle = QInputDialog::getText((QWidget*) this,tr("New x-axis label"),tr("New x-axis label:"), QLineEdit::Normal,title().text(),&ok) ;
-//	if (ok)
 		setAxisTitle(QwtPlot::xBottom,newTitle) ;
 }
 

@@ -34,15 +34,8 @@ specActionLibrary::specActionLibrary(QObject *parent) :
 
 void specActionLibrary::push(specUndoCommand * cmd)
 {
-	qDebug("*** pushing onto stack") ;
-	qDebug() << "undostack responses:  " ;
-	qDebug() << undoStack ;
-	qDebug() << undoStack->index() ;
-	qDebug() << undoStack->canUndo() ;
-	qDebug() << undoStack->canRedo() ;
-	qDebug() << "*** pushing onto stack" ;
+	qDebug() << "!!!!!!!!! Pushing command onto undo stack" ;
 	undoStack->push(cmd) ;
-	qDebug("*** pushed onto stack") ;
 }
 
 void specActionLibrary::addNewAction(QToolBar *bar, specUndoAction *action)
