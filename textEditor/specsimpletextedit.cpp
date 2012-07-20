@@ -83,6 +83,7 @@ QString specSimpleTextEdit::getText() const
 
 void specSimpleTextEdit::setText(const QString &text)
 {
+	content->clear() ;
 	content->setHtml(text) ;
 }
 

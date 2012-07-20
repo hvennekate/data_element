@@ -20,7 +20,8 @@ specPlot::specPlot(QWidget *parent)
 	  replotting(false),
 	  canBeSelected(NULL),
 	  metaPicker(new CanvasPicker(this)),
-	  select(false)
+	  select(false),
+	  textEdit(new specSimpleTextEdit(this))
 {
 	connect(metaPicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SLOT(metaRangeMoved(specCanvasItem*,int,double,double))) ;
 	setAutoReplot(false) ;
@@ -98,7 +99,6 @@ void specPlot::changeTextLabel()
 	qDebug() << "old text:" << oldText ;
 	///// First Try  TODO change into in-place editor
 	QDialog textDialog ; // TODO subclass this
-	specSimpleTextEdit *textEdit = new specSimpleTextEdit(this) ;
 	textDialog.setLayout(new QVBoxLayout(&textDialog)) ;
 	textEdit->setText(oldText) ;
 	textDialog.layout()->addWidget(textEdit) ;

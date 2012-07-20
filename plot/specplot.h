@@ -12,6 +12,7 @@
 #include "specstreamable.h"
 
 class specMetaRange ;
+class specSimpleTextEdit ;
 
 class specPlot : public QwtPlot, public specStreamable
 {
@@ -41,6 +42,7 @@ private:
 	QActionGroup *zero, *modifications ;
 	spec::moveMode mm ;
 	CanvasPicker *metaPicker ;
+	specSimpleTextEdit *textEdit ;
 	void setupActions() ;
 	void highlightSelectable(bool highlight=true) ;
 	void readFromStream(QDataStream &in);
