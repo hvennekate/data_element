@@ -18,7 +18,7 @@ public:
 private slots:
 	void newFile();
 	void openFile();
-	void createToolBars() ;
+	void removeDock() ;
 	
 protected:
 	void closeEvent(QCloseEvent*) ;
@@ -27,16 +27,15 @@ private:
 	QSettings settings ;
 	void createActions();
 	void createMenus();
-//	void createToolBars();
-// 	void createStatusBar();
-// 	void readSettings();
-// 	void writeSettings();
+	void createToolBars() ;
+	void addDock(specPlotWidget*) ;
 	
 	QMenu *fileMenu;
 	QMenu *helpMenu;
 	QToolBar *fileToolBar;
 	QAction *newAction;
 	QAction *openAction;
+	QList<specPlotWidget*> docks ;
 };
 
 #endif

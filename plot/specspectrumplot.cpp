@@ -298,7 +298,7 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 	const QwtPlotItemList& zeroRanges,
 	const QwtPlotItemList& spectra,
 	const QMap<double, double>& referenceSpectrum,
-	const specView* view,
+	specView* view,
 	bool noSlope)
 {
 	specMultiCommand *zeroCommand = new specMultiCommand ;
@@ -393,19 +393,22 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 			command->setItem(view->model()->index(spectrum));
 		qDebug() << "setting slope and offset" << offset << slope ;
 		command->setCorrections(0,-offset,-slope,1.) ;
+		command->setParentObject(view);
 	}
 	return zeroCommand ;
 }
 
 void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double newX, double newY)
 {
+	qDebug() << "Applying zero ranges" ;
 	((specRange*) range)->pointMoved(point,newX,newY) ;
 	QwtPlotItemList zeroRanges = itemList(spec::zeroRange) ;
 	QwtPlotItemList spectra = itemList(spec::spectrum) ; // TODO roll back previous undo command if it was of the same kind and merge with what is to come.
 	// prepare map of x and y values
 	QMap<double,double> referenceSpectrum ;
-	for (size_t i = 0 ; i < reference->dataSize() ; ++i)
-		referenceSpectrum[reference->sample(i).x()] = reference->sample(i).y() ;
+	if (reference)
+		for (size_t i = 0 ; i < reference->dataSize() ; ++i)
+			referenceSpectrum[reference->sample(i).x()] = reference->sample(i).y() ;
 
 	specMultiCommand *zeroCommand = generateCorrectionCommand(zeroRanges, spectra, referenceSpectrum, view, noSlopeAction->isChecked()) ;
 	zeroCommand->setParentObject(view) ;

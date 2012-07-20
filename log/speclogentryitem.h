@@ -13,7 +13,7 @@ private:
 	void writeToStream(QDataStream &out) const ;
 	void readFromStream(QDataStream &in) ;
 public:
-	explicit specLogEntryItem ( QHash<QString,specDescriptor> description = QHash<QString,specDescriptor>(), specFolderItem* par=0, QString tag="" );
+	explicit specLogEntryItem ( QHash<QString,specDescriptor> description = QHash<QString,specDescriptor>(), specFolderItem* par=0, QString tag="");
 	~specLogEntryItem();
 
 	bool isEditable ( QString key ) const;

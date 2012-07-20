@@ -13,10 +13,10 @@
 #include "specsvgitem.h"
 
 
-specModelItem::specModelItem(specFolderItem* par, QString description)
-	: specCanvasItem(description),
+specModelItem::specModelItem(specFolderItem* par, QString desc)
+	: specCanvasItem(),
 	  iparent(0),
-	  description("",spec::editable),
+	  description(desc, spec::editable),
 	  mergePlotData(true),
 	  sortPlotData(true)
 {
