@@ -208,3 +208,6 @@ RESOURCES += icons/application.qrc
 QT += svg
 
 QMAKE_CXXFLAGS += -std=c++0x
+
+FORMS += \
+    kinetic/connectionsManager.ui

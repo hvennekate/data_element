@@ -20,8 +20,8 @@ specPlot::specPlot(QWidget *parent)
 	  replotting(false),
 	  canBeSelected(NULL),
 	  metaPicker(new CanvasPicker(this)),
-	  select(false),
-	  textEdit(new specSimpleTextEdit(this))
+	  textEdit(new specSimpleTextEdit(this)),
+	  select(false)
 {
 	connect(metaPicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SLOT(metaRangeMoved(specCanvasItem*,int,double,double))) ;
 	setAutoReplot(false) ;
@@ -30,6 +30,7 @@ specPlot::specPlot(QWidget *parent)
 	ordinary = new QList<specCanvasItem*> ;
 	kineticRanges = new QList<specCanvasItem*> ;
 	selectRanges = new QList<specCanvasItem*> ;
+	textEdit->hide();
 
 	titleAction = new QAction(QIcon(":/changetitle.png"), tr("&Titel ändern..."), this);
 	titleAction->setShortcut(tr("Ctrl+T"));
@@ -179,23 +180,11 @@ void specPlot::replot()
 	QRectF boundaries ; //= allItems[0]->boundingRect() ; // DANGER: actually we must check, if the item plots on yLeft
 	qDebug() << "adapting plot ranges" << allItems << "SVGs:" << svgitems ;
 	foreach(QwtPlotItem *item, allItems) // TODO omit this if fixing of axis is enabled
-	{
-		if(item->yAxis() == QwtPlot::yLeft && !dynamic_cast<specSVGItem*>(item) && !dynamic_cast<QwtPlotSvgItem*>(item)) // TODO change
-		{
-//			QRectF bnd = item->boundingRect() ;
-//			if (boundaries.isValid())
-//			{
-//				qDebug() << "adapting for item" << item ;
-//				boundaries.setLeft(qMin(bnd.left(),boundaries.left())) ;
-//				boundaries.setRight(qMax(bnd.right(),boundaries.right())) ;
-//				boundaries.setBottom(qMax(bnd.bottom(),boundaries.bottom())) ;
-//				boundaries.setTop(qMin(bnd.top(),boundaries.top())) ;
-//			}
-//			else boundaries = bnd ;
+		if(item->yAxis() == QwtPlot::yLeft
+				&& !dynamic_cast<specSVGItem*>(item)
+				&& !dynamic_cast<QwtPlotSvgItem*>(item)
+				&& !dynamic_cast<specRange*>(item)) // TODO change
 			boundaries |= item->boundingRect() ;
-		}
-// 		boundaries |= item->boundingRect() ;
-	}
 	
 	double xOffset = boundaries.width()*.05, yOffset = boundaries.height()*.05, left, right, top, bottom ;
 	if (fixXAxisAction->isChecked())
@@ -227,6 +216,7 @@ void specPlot::replot()
 	boundaries.setTop(top);
 	boundaries.setBottom(bottom);//*/
 	
+	qDebug() << "new boundaries" << boundaries ;
 	zoom->changeZoomBase(boundaries) ;
 
 	QRectF zoomRect = zoom->zoomRect() ;

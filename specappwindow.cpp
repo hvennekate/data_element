@@ -22,8 +22,13 @@ void specAppWindow::closeEvent(QCloseEvent* event)
 	event->ignore() ;
 	bool allClosed = true ;
 	while(!docks.isEmpty())
+	{
+		qDebug() << "cycling closing" ;
 		if (!docks.first()->close())
+		{
 			return ;
+		}
+	}
 	event->setAccepted(allClosed) ;
 	settings.setValue("mainWindow/geometry",saveGeometry()) ;
 }

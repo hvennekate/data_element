@@ -85,7 +85,10 @@ specFolderItem* specGenealogy::parent()
 
 void specGenealogy::writeToStream(QDataStream &out) const
 {
-	out << indexes << qint8(owning) << qint32(Items.size()) ;
+	out << indexes
+		<< qint8(owning)
+		<< qint32(Items.size())
+		<< quint64(Model) ;
 	if (owning)
 	{
 		for(int i = 0 ; i < Items.size() ; ++i)
@@ -97,8 +100,10 @@ void specGenealogy::readFromStream(QDataStream &in)
 {
 	qint8 own ;
 	qint32 itemCount ;
-	in >> indexes >> own >> itemCount ;
+	quint64 m ;
+	in >> indexes >> own >> itemCount >> m;
 	owning = own ;
+	Model = (specModel*) m ; // TODO invalidate?
 	Items.fill(0,itemCount);
 	if (owning)
 		for (int i = 0 ; i < itemCount ; ++i)

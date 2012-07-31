@@ -28,7 +28,7 @@ void specAddConnectionsAction::execute()
 	qDebug("prepared target list") ;
 
 	specAddConnectionsCommand *command = new specAddConnectionsCommand ;
-	command->setParentObject((QWidget*) parent()) ;
+	command->setParentObject((QObject*) parent()) ;
 	command->setItems(target,servers) ;
 	qDebug("prepared command") ;
 

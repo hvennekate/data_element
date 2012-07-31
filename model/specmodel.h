@@ -58,8 +58,8 @@ public:
 	// Own functions
 	specModelItem* itemPointer(const QModelIndex&) const;
 	specModelItem* itemPointer(const QVector<int>&) const;
-	QModelIndex index(const QVector<int>&) const ;
-	QModelIndex index(specModelItem*) const ;
+	QModelIndex index(const QVector<int>&, int column = 0) const ;
+	QModelIndex index(specModelItem*, int column = 0) const ;
 	static QVector<int> hierarchy(specModelItem*) ;
 	static QVector<int> hierarchy(const QModelIndex&) ;
 	QList<specModelItem*> pointerList(const QModelIndexList&) const ;

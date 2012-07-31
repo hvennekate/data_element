@@ -12,7 +12,7 @@ private:
 	void clear() ;
 	QVector<specModelItem*> itemPointers() const ;
 	specMetaItem* targetPointer() const ;
-	bool sameModel() const ;
+	bool sameModel(specGenealogy*) const ;
 	void writeToStream(QDataStream &out) const;
 	void readFromStream(QDataStream &in) ;
 	void parentAssigned();

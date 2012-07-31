@@ -108,6 +108,7 @@ void specMetaItem::refreshOtherPlots()
 
 void specMetaItem::attach(QwtPlot *plot)
 {
+	qDebug() << "attaching meta item to plot" << plot ;
 	if (!plot)
 	{
 		detach() ;
@@ -119,6 +120,8 @@ void specMetaItem::attach(QwtPlot *plot)
 
 void specMetaItem::detach()
 {
+	qDebug() << "detaching meta item" ;
+//	specModelItem::detach() ;
 	filter->detachRanges();
 }
 

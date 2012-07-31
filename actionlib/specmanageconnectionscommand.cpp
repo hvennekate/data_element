@@ -62,8 +62,7 @@ void specManageConnectionsCommand::take()
 void specManageConnectionsCommand::writeToStream(QDataStream &out) const
 {
 	if (!ok()) return ; // TODO why check if ok?
-	out << qint8(sameModel())
-	    << qint32(items.size())
+	out << qint32(items.size())
 	    << *target ;
 	for (int i = 0 ; i < items.size() ; ++i)
 		out << *(items[i]) ;
@@ -72,9 +71,8 @@ void specManageConnectionsCommand::writeToStream(QDataStream &out) const
 void specManageConnectionsCommand::readFromStream(QDataStream &in)
 {
 	clear() ;
-	qint8 isSameModel ;
 	qint32 toRead ;
-	in >> isSameModel >> toRead ;
+	in >> toRead ;
 	target = new specGenealogy ;
 	in >> *target ;
 	for (int i = 0 ; i < toRead ; ++i)
@@ -88,12 +86,13 @@ void specManageConnectionsCommand::readFromStream(QDataStream &in)
 void specManageConnectionsCommand::parentAssigned()
 {
 	if (!parentObject()) return ;
-	specModel *model = sameModel() ?
-		(specModel*) (((QAbstractItemView*) parentObject())->model()) :
-		(specModel*) (((specPlotWidget*) parentObject()->parent()->parent())->mainView()->model()) ;
-	target->setModel((specModel*) (((QAbstractItemView*) parentObject())->model()));
+	if (!target) return ;
+
+	specModel *thisModel = (specModel*) (((QAbstractItemView*) parentObject())->model()) ,
+			  *otherModel= (specModel*) (((specPlotWidget*) (parentObject()->parent()->parent()))->mainView()->model()) ;
 	foreach(specGenealogy* genealogy, items)
-		genealogy->setModel(model) ;
+		genealogy->setModel(sameModel(genealogy) ? thisModel : otherModel) ;
+	target->setModel(thisModel) ;
 }
 
 QVector<specModelItem*> specManageConnectionsCommand::itemPointers() const
@@ -109,9 +108,9 @@ specMetaItem *specManageConnectionsCommand::targetPointer() const
 	return (specMetaItem*) (target->firstItem()) ;
 }
 
-bool specManageConnectionsCommand::sameModel() const
+bool specManageConnectionsCommand::sameModel(specGenealogy* item) const
 {
-	specModel *targetModel = target->model() ;
-	specModel *serverModel = items.first()->model() ; // TODO precautions
-	return targetModel == serverModel ;
+	if (!target || !item) return false ;
+	// TODO check
+	return target->model() == item->model() ;
 }

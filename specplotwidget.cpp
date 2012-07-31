@@ -42,10 +42,10 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	: QDockWidget(tr("untitled"),parent),
 	  items(new specDataView(this)),
 	  logWidget(new specLogWidget(parent)),
-	  kineticWidget(new specKineticWidget(QString(),this)),
-	  content(new QWidget),
-	  layout(new QVBoxLayout),
-	  plot(new specSpectrumPlot),
+	  kineticWidget(new specKineticWidget(QString(),parent)),
+	  content(new QWidget(this)),
+	  layout(new QVBoxLayout(content)),
+	  plot(new specSpectrumPlot(this)),
 	  toolbar(new QToolBar(tr("File"),this)),
 	  splitter(new QSplitter(Qt::Vertical,this)),
 	  file(new QFile(this)),
@@ -88,7 +88,6 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	layout -> addWidget(splitter)  ;
 	layout -> setContentsMargins(0,0,0,0) ;
 
-	content->setLayout(layout) ;
 	setWidget(content) ;
 }
 
@@ -166,7 +165,13 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 	}
 	else
 	{
+		qDebug() << "accepting close event" << event ;
 		event->accept() ;
+//		qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(kineticWidget) ;
+//		qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(this) ;
+//		qobject_cast<QMainWindow*>(parentWidget())->repaint() ;
+//		destroy(true,true) ;
+		delete this ;
 		return ;
 	}
 
@@ -180,12 +185,6 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 				break ;
 			}
 		case QMessageBox::No :
-			kineticWidget->close() ;
-			qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(kineticWidget) ;
-			qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(this) ;
-			qobject_cast<QMainWindow*>(parentWidget())->repaint() ;
-			delete kineticWidget ; // TODO destructor!?
-			destroy(true,true) ;
 			delete(this) ;
 			event->accept() ;
 			break ;
@@ -216,8 +215,11 @@ bool specPlotWidget::saveFile()
 
 specPlotWidget::~specPlotWidget()
 {
-	emit destroyed(this) ;
-	destroy(true,true) ;
+	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(kineticWidget) ;
+	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(logWidget) ;
+	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(this) ;
+	logWidget->deleteLater();
+	kineticWidget->deleteLater();
 }
 
 void specPlotWidget::setConnections()

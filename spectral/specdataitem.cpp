@@ -314,10 +314,17 @@ QVector<specDataPoint> specDataItem::getDataExcept(const QList<specRange*>& rang
 	{
 		specDataPoint point = data[i] ;
 		applyCorrection(point) ;
+		bool include = true ;
 		foreach(specRange* range, ranges)
+		{
 			if (range->contains(point.nu))
-				continue ;
-		newData << data[i] ;
+			{
+				include = false ;
+				break ;
+			}
+		}
+		if (include)
+			newData << data[i] ;
 	}
 	return newData ;
 }

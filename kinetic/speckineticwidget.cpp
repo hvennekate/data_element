@@ -19,7 +19,7 @@ void specKineticWidget::contextMenuEvent(QContextMenuEvent* event)
 }
 
 specKineticWidget::specKineticWidget(QString title, QWidget *parent)
-	: QDockWidget(title, parent ? (QWidget*) parent->parent() : NULL)
+	: QDockWidget(title, parent)
 {
 	setFloating(true) ;
 	content = new QWidget ;
@@ -61,6 +61,7 @@ void specKineticWidget::readFromStream(QDataStream &in)
 
 specKineticWidget::~specKineticWidget()
 {
+	qDebug() << "kinetic widget deleted" ;
 }
 
 void specKineticWidget::selectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
@@ -72,7 +73,7 @@ void specKineticWidget::selectionChanged(const QItemSelection & selected, const 
 	foreach(QModelIndex index, selected.indexes())
 		if (!index.column() && !((specModelItem*) index.internalPointer())->isFolder())
 			((specCanvasItem*) index.internalPointer())->attach(plot) ;
-	qDebug() << "Kinetic selection changed" ;
+	qDebug() << "Kinetic selection changed" << selected << deselected ;
 	plot->replot() ;
 }
 

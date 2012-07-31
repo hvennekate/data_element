@@ -836,15 +836,15 @@ void specModel::setDropBuddy(specActionLibrary *buddy)
 	dropBuddy = buddy ;
 }
 
-QModelIndex specModel::index(const QVector<int> &ancestry) const
+QModelIndex specModel::index(const QVector<int> &ancestry,int column) const
 {
 	QModelIndex returnIndex = QModelIndex() ;
 	for (int i = ancestry.size()-1 ; i >= 0 ; --i) // TODO consider precaution if invalid at any stage
-		returnIndex = index(ancestry[i],0,returnIndex) ;
+		returnIndex = index(ancestry[i],column,returnIndex) ;
 	return returnIndex ;
 }
 
-QModelIndex specModel::index(specModelItem *pointer) const
+QModelIndex specModel::index(specModelItem *pointer, int column) const
 {
 	specModelItem* parent = pointer ;
 	// Test if item is indeed part of THIS model
@@ -852,7 +852,7 @@ QModelIndex specModel::index(specModelItem *pointer) const
 	if (parent != root) return QModelIndex() ;
 
 	// Generate genealogy to find parent
-	return index(hierarchy(pointer)) ;
+	return index(hierarchy(pointer), column) ;
 }
 
 QList<specModelItem*> specModel::pointerList(const QModelIndexList &indexes) const

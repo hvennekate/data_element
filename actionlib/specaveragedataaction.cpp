@@ -18,6 +18,7 @@ specAverageDataAction::specAverageDataAction(QObject *parent) :
 void specAverageDataAction::execute()
 {
 	// TODO subclass QDialog, make one instance persistent in memory
+	// also:  minimale Anzahl Punkte, wenn nicht laufend: 2, sonst 1
 	QDialog dialog(parentWidget()) ;
 	dialog.setWindowTitle("Mitteln") ;
 	dialog.setLayout(new QVBoxLayout(&dialog)) ;

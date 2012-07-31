@@ -44,8 +44,8 @@ void specEditDescriptorCommand::doIt()
 
 	specModel *model = item->model() ;
 	if (model)
-	{
-		QModelIndex index = model->index(pointer) ;
+	{ // TODO: maybe implement specModel::index(specModelItem*, QString descriptor)
+		QModelIndex index = model->index(pointer, model->descriptors().indexOf(descriptor)) ;
 		model->signalChanged(index) ;
 	}
 }
