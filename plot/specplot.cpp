@@ -134,6 +134,7 @@ void specPlot::changeYLabel(QString newTitle)
 void specPlot::replot()
 {
 	if (replotting) return ;
+	emit startingReplot();
 	replotting = true ;
 	QwtPlotItemList allItems = itemList();
 	ranges->clear() ;
@@ -226,6 +227,7 @@ void specPlot::replot()
 		svgitem->refreshSVG(xfactor, yfactor) ;
 	qDebug() << "----- replotting" << this ;
 	QwtPlot::replot() ;
+	emit replotted();
 	replotting = false ;
 }
 

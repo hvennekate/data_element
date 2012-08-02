@@ -1,4 +1,5 @@
 #include "specviewstate.h"
+#include <QHeaderView>
 
 specViewState::specViewState(specView *Parent)
 {
@@ -38,13 +39,13 @@ void specViewState::getState(const specView* view)
 	purgeLists();
 	specModel* model = view->model() ;
 
-	int columnCount = model->columnCount(QModelIndex()) ;
+	int columnCount = view->header()->count() ;  //model->columnCount(QModelIndex()) ;
 	qDebug("++++ getting column widths %d",columnCount) ;
 	for (int i = 0 ; i < columnCount ; ++i)
-		widths << parent->columnWidth(i) ;
+		widths << view->columnWidth(i) ;
 
 	qDebug("+++++ getting selection") ;
-	QModelIndexList selectionList = parent->selectionModel()->selectedRows() ;
+	QModelIndexList selectionList = view->selectionModel()->selectedRows() ;
 	for (int i = 0 ; i < selectionList.size() ; ++i)
 		selectedItems << model->itemPointer(selectionList[i]) ;
 
@@ -53,7 +54,7 @@ void specViewState::getState(const specView* view)
 	while (item.isValid())
 	{
 		qDebug() << "+++++ Hierarchy: " << model->hierarchy(item) << model->rowCount(item.parent()) ;
-		if (parent->isExpanded(item))
+		if (view->isExpanded(item))
 			openFolders << (specFolderItem*) model->itemPointer(item) ;
 		// go into if directory
 		if (model->rowCount(item))
@@ -71,11 +72,11 @@ void specViewState::getState(const specView* view)
 
 	qDebug("+++++ getting current") ;
 	// get current index
-	currentItem = model->itemPointer(parent->currentIndex()) ;
+	currentItem = model->itemPointer(view->currentIndex()) ;
 	hierarchyOfCurrentItem = model->hierarchy(currentItem) ;
 
 	qDebug("+++++ getting topmost item") ;
-	currentTopItem = model->itemPointer(parent->indexAt(QPoint(0,0))) ;
+	currentTopItem = model->itemPointer(view->indexAt(QPoint(0,0))) ;
 	qDebug() << "++++++ item description:" << currentTopItem->descriptor("") ;
 	hierarchyOfTopItem = model->hierarchy(currentTopItem) ;
 }
@@ -109,13 +110,11 @@ void specViewState::restoreState()
 		parent->expand(model()->index(openFolders[i])) ;
 
 	// restore selection
-	qDebug("+++++ restoring selection %d",selectedItems.size()) ;
+	qDebug() << "+++++ restoring selection" << selectedItems ;
 	QItemSelection selectedIndexes ;
 	for (int i = 0 ; i < selectedItems.size() ; ++i)
-	{
-		QModelIndex index = model()->index(selectedItems[i]) ;
-		selectedIndexes.select(index,index) ;
-	}
+		selectedIndexes << QItemSelectionRange(model()->index(selectedItems[i])) ;
+
 	qDebug("passing selection to model") ;
 	parent->selectionModel()->select(selectedIndexes,QItemSelectionModel::Select) ;
 
@@ -154,6 +153,7 @@ void specViewState::readFromStream(QDataStream &in)
 	   >> widths ;
 	openFolders.resize(openFoldersSize) ;
 	selectedItems.resize(selectedItemsSize);
+	qDebug() << "++++ read selected size" << selectedItemsSize << selectedItems.size() ;
 	QVector<int> hierarchy ;
 	if (!model())
 	{

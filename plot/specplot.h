@@ -63,7 +63,8 @@ public:
 	spec::moveMode moveMode() ;
 	void refreshRanges() ;
 signals:
-	void changed() ;
+	void startingReplot() ;
+	void replotted() ;
 public slots :
 	void replot() ;
 	void changeTextLabel() ;

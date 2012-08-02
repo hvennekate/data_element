@@ -115,6 +115,7 @@ void specPlotWidget::read(QString fileName)
 		 >> *logWidget
 		 >> *kineticWidget
 		 >> *actions ;
+	changeFileName(fileName);
 }
 
 void specPlotWidget::modified()
@@ -231,6 +232,8 @@ void specPlotWidget::setConnections()
 	connect(items->model(),SIGNAL(modelAboutToBeReset()),items,SLOT(prepareReset())) ;
 	connect(items->model(),SIGNAL(modelReset()),items,SLOT(resetDone())) ;
 	connect(actions,SIGNAL(stackChanged()), this, SLOT(modified())) ; // TODO check
+
+	connect(kineticWidget->internalPlot(),SIGNAL(replotted()),plot,SLOT(replot())) ;
 }
 
 #include <QPainter>

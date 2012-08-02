@@ -371,18 +371,18 @@ void specView::dropEvent(QDropEvent *event)
 
 void specView::writeToStream(QDataStream &out) const
 {
+	if (model())
+		out << *((specStreamable*) model()) ; // TODO why is this cast necessary?
 	specViewState state(this) ;
 	out << state ;
-	if (model())
-		out << *((specStreamable*) model()) ; // TODO why is this necessary?
 }
 
 void specView::readFromStream(QDataStream &in)
 {
+	if (model())
+		in >> *((specStreamable*) model()) ; // TODO why is this cast necessary?
 	specViewState state(this) ;
 	in >> state ;
-	if (model())
-		in >> *((specStreamable*) model()) ; // TODO why is this necessary?
 	state.restoreState();
 }
 
