@@ -66,7 +66,6 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 		y1min = qMin(y1min,boundaries.top()) ;
 		y1max = qMax(y1max,boundaries.bottom()) ;
 	}
-	qDebug("ymin: %f, ymax: %f",y1min,y1max) ;
 	plot->setAxisScale(QwtPlot::yLeft,y1min,10.) ;
 //	plot->updateAxes();
 	plot->replot() ;
@@ -74,7 +73,6 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 
 void cutByIntensityDialog::performDeletion()
 {
-	qDebug("performing deletion") ;
 	QList<specCanvasItem*>* selectable = plot->selectable() ;
 	QList<specRange*>* ranges = new QList<specRange*> ;
 	for (int i = 0 ; i < selectable->size() ; i++)

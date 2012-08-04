@@ -18,7 +18,6 @@ QDataStream &specLogToDataConverter::convert(QList<specModelItem *> &list, QData
 QList<specModelItem*> specLogToDataConverter::convert(QDataStream &stream)
 {
 	QList<specModelItem*> items = specMimeConverter::convert(stream) ;
-	qDebug() << "performing log to data conversion" <<  items ;
 	for (int i = 0 ; i < items.size() ; ++i)
 	{
 		specModelItem *logItem = dynamic_cast<specLogEntryItem*>(items[i]) ;
@@ -41,7 +40,6 @@ QList<specModelItem*> specLogToDataConverter::convert(QDataStream &stream)
 			}
 		}
 	}
-	qDebug() << "log to data conversion done" << items ;
 	return items ;
 }
 
@@ -68,9 +66,7 @@ specModelItem* specLogToDataConverter::getData(specModelItem *item)
 
 	//if item is a log item, try to open corresponding file
 	QString fileName = item->descriptor("Datei",false) ;
-	qDebug() << "file name to import" << fileName ;
 	fileName = fileName.section("\\",-1,-1) ;
-	qDebug() << "file name to import" << fileName ;
 
 	QDir::setCurrent(currentDirectory.absolutePath()) ;
 	QFile file(fileName) ;
@@ -82,7 +78,6 @@ specModelItem* specLogToDataConverter::getData(specModelItem *item)
 		path.setFileMode(QFileDialog::ExistingFile);
 		path.selectFile(fileName) ;
 		path.setNameFilters(QStringList(QString("%1 (%1)").arg(fileName))) ;
-		qDebug() << "name filters" << path.nameFilters() ;
 		if (!path.exec())
 			return 0 ;
 		currentDirectory = path.directory() ;
@@ -97,6 +92,5 @@ specModelItem* specLogToDataConverter::getData(specModelItem *item)
 	fileName = file.fileName() ;
 	newItem->addChildren(fileFilter(fileName)(file)) ; // TODO take care that there actually is a file filter...
 
-	qDebug() << "number of children in new item:" << newItem->children() ;
 	return newItem ;
 }

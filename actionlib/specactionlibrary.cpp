@@ -1,7 +1,6 @@
 #include "specactionlibrary.h"
 #include "specdeleteaction.h"
 #include "specaddfolderaction.h"
-#include <QDebug>
 #include "specaddfoldercommand.h"
 #include "specdeletecommand.h"
 #include "specmovecommand.h"
@@ -28,13 +27,10 @@ specActionLibrary::specActionLibrary(QObject *parent) :
 {
 	undoStack = new QUndoStack ;
 	connect(undoStack,SIGNAL(indexChanged(int)),this,SIGNAL(stackChanged())) ;
-	qDebug("***** action library initialized") ;
-	qDebug() << undoStack ;
 }
 
 void specActionLibrary::push(specUndoCommand * cmd)
 {
-	qDebug() << "!!!!!!!!! Pushing command onto undo stack" ;
 	undoStack->push(cmd) ;
 }
 
@@ -194,7 +190,6 @@ void specActionLibrary::readFromStream(QDataStream &in)
 
 void specActionLibrary::setLastRequested(const QModelIndexList &list)
 {
-	qDebug() << "setting last req" << list ;
 	lastRequested = list ;
 }
 

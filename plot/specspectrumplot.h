@@ -46,7 +46,7 @@ public:
 	explicit specSpectrumPlot(QWidget *parent = 0);
 	QList<QAction*> actions() { return QList<QAction*>() << correctionActions->actions() << setReferenceAction << alignmentActions->actions() << printAction << modifySVGs; }
 	void setView(specView* mod) { view = mod ; }
-	void setUndoPartner(specActionLibrary* lib) { qDebug("setting action lib") ; undoPartner = lib ; ((specUndoAction*) printAction)->setLibrary(lib);}
+	void setUndoPartner(specActionLibrary* lib) { undoPartner = lib ; ((specUndoAction*) printAction)->setLibrary(lib);}
 	static specMultiCommand* generateCorrectionCommand(const QwtPlotItemList& zeroRanges, const QwtPlotItemList& spectra, const QMap<double, double>& referenceSpectrum, specView*, bool noSlope = false) ;
 signals:
 

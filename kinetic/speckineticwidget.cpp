@@ -34,7 +34,6 @@ specKineticWidget::specKineticWidget(QString title, QWidget *parent)
 	
 	items->setModel(new specMetaModel(items)) ;
 	items->model()->setMimeTypes(QStringList("application/spec.kinetic.item")) ;
-	qDebug() << "Kinetic model" << items->model() ;
 	
 	splitter->setOrientation(Qt::Vertical) ;
 	splitter->addWidget(plot) ;
@@ -61,7 +60,6 @@ void specKineticWidget::readFromStream(QDataStream &in)
 
 specKineticWidget::~specKineticWidget()
 {
-	qDebug() << "kinetic widget deleted" ;
 }
 
 void specKineticWidget::selectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
@@ -73,7 +71,6 @@ void specKineticWidget::selectionChanged(const QItemSelection & selected, const 
 	foreach(QModelIndex index, selected.indexes())
 		if (!index.column() && !((specModelItem*) index.internalPointer())->isFolder())
 			((specCanvasItem*) index.internalPointer())->attach(plot) ;
-	qDebug() << "Kinetic selection changed" << selected << deselected ;
 	plot->replot() ;
 }
 

@@ -18,7 +18,6 @@ void specEditDescriptorCommand::setItem(const QModelIndex &index, QString desc,
 	if (!pointer) return ;
 	descriptor = desc ;
 	item = new specGenealogy(QModelIndexList() << index) ;
-	qDebug() << "!!!!!! item assigned" << item ;
 }
 
 void specEditDescriptorCommand::undoIt()
@@ -28,7 +27,6 @@ void specEditDescriptorCommand::undoIt()
 
 void specEditDescriptorCommand::doIt()
 {
-	qDebug() << "!!!!!!! starting doIt()" << item << item->items().size() ;
 	if (!item) return ;
 	specModelItem *pointer = item->firstItem() ;
 	if (!pointer) return ;
@@ -37,7 +35,6 @@ void specEditDescriptorCommand::doIt()
 
 	pointer->changeDescriptor(descriptor,previousContent) ;
 	pointer->setActiveLine(descriptor,previousActiveLine) ;
-	qDebug() << "!!!!! Descriptor edited: " << pointer->descriptor(descriptor,true) ;
 
 	previousContent = currentContent ;
 	previousActiveLine = currentLine ;

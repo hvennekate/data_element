@@ -9,7 +9,6 @@
 specGenealogy::specGenealogy(QModelIndexList &list)
 	: owning(false)
 {
-	qDebug()<< "###### initializing genealogy" << list.size();
 	if (list.isEmpty()) return ;
 	QModelIndexList::iterator last = list.begin() ;
 	Model = (specModel*) last->model() ;
@@ -17,7 +16,6 @@ specGenealogy::specGenealogy(QModelIndexList &list)
 	int next = last->row() ;
 
 	// find iterator of end item
-	qDebug("finding end item") ;
 	while (	last != list.end() &&
 			last->parent() == parentIndex &&
 			last->row() == next)
@@ -27,19 +25,15 @@ specGenealogy::specGenealogy(QModelIndexList &list)
 	}
 
 	// getting pointers to Items to put into our list
-	qDebug() << "adding Items to own list" ;
 	for (QModelIndexList::iterator i = list.begin() ; i != last ; ++i)
 		Items << Model->itemPointer(*i) ;
 
-	qDebug("retrieving indexes") ;
 	// getting index cascade and parent
 	indexes = Model->hierarchy(list.first()) ;
 	Parent = Items.first()->parent() ;
 
-	qDebug("removing indexes from list") ;
 	// rid the list of those entries we took
 	list.erase(list.begin(),last) ;
-	qDebug() << "######" << "items removed" << Items.size() << list.size() ;
 }
 
 bool specGenealogy::valid()
@@ -50,17 +44,13 @@ bool specGenealogy::valid()
 
 void specGenealogy::takeItems()
 {
-	qDebug("starting to remove Items") ;
 	if (owning) return ;
 	if (!valid()) return ;
-	qDebug() << "before parent search" << Parent ;
 	if (!Parent) // TODO: Haeh?  wird doch schon bei valid() geprueft?
 		seekParent() ;
-	qDebug() << "checks done" << Parent ;
 	foreach(specModelItem* item, Items)
 		item->setParent(0) ;
 	owning = true ;
-	qDebug("done removing") ;
 }
 
 void specGenealogy::returnItems()
@@ -117,7 +107,6 @@ specStreamable* specGenealogy::factory(const type &t) const
 
 specGenealogy::specGenealogy(specModel* mod, QDataStream &in)
 {
-	qDebug("reading genealogy...") ;
 	Parent = 0 ;
 	Model = mod ;
 	readFromStream(in);

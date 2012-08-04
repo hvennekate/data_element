@@ -33,25 +33,20 @@ void specAddSVGItemAction::execute()
 	QModelIndex index = currentView->currentIndex() ;
 	specModelItem *item = model->itemPointer(index) ;
 	int row = 0 ;
-	qDebug("checking if item is folder") ;
 	if (!item->isFolder())
 	{
-		qDebug("item is not a folder") ;
 		row = index.row()+1 ;
 		index = index.parent() ;
 
 	}
-	qDebug("inserting item") ;
 	if (! model->insertItems(QList<specModelItem*>() << newItem, index, row))
 	{
 		delete newItem ;
 		return ;
 	}
 
-	qDebug("done inserting") ;
 	specAddFolderCommand *command = new specAddFolderCommand ;
 	command->setItems(QModelIndexList() << model->index(row,0,index)) ;
-	qDebug("set item to command") ;
 
 	command->setParentObject((QWidget*)parent()) ;
 

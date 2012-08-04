@@ -1,5 +1,4 @@
 #include "specundocommand.h"
-#include <QDebug>
 
 specUndoCommand::specUndoCommand(specUndoCommand *parent) :
     QUndoCommand(parent),
@@ -20,7 +19,6 @@ QObject* specUndoCommand::parentObject() const
 
 void specUndoCommand::redo()
 {
-	qDebug() << "!!!!!!! redoing command" << pO ;
 	if (pO) doIt() ;
 }
 

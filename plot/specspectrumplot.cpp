@@ -115,7 +115,6 @@ QList<specDataItem*> specSpectrumPlot::folderContent(specModelItem *folder)
 
 void specSpectrumPlot::alignmentChanged(QAction *action)
 {
-	qDebug() << "VIEW:" << view ;
 	if (action == setReferenceAction) // turn this into an undo command.
 	{
 		if (reference) delete reference ;
@@ -131,14 +130,11 @@ void specSpectrumPlot::alignmentChanged(QAction *action)
 			return ;
 		}
 		reference = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
-		qDebug() << "new reference size:" << reference->dataSize() << referenceDataItems.size() << referenceItems.size() ;
 		for (int i = 0 ; i < referenceDataItems.size() ; ++i)
 			reference->operator +=(*(referenceDataItems[i])) ;
-		qDebug() << "new reference size (added):" << reference->dataSize() ;
 		reference->flatten();
 		reference->revalidate();
 		reference->setPen(QPen(Qt::red));
-		qDebug() << "new reference size (flattened):" << reference->dataSize() ;
 
 		// build tooltip
 		QwtPlot toolTipPlot ;
@@ -155,9 +151,7 @@ void specSpectrumPlot::alignmentChanged(QAction *action)
 		toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick,2) ;
 
 		font = axisFont(QwtPlot::yLeft) ;
-		qDebug() << "old size:" << font.pixelSize() ;
 		font.setPixelSize(8) ;
-		qDebug() << "new size:" << font.pixelSize() ;
 		toolTipPlot.setAxisFont(QwtPlot::yLeft,font) ;
 		toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setSpacing(2) ;
 		toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MajorTick,4) ;
@@ -212,7 +206,6 @@ void specSpectrumPlot::correctionsChanged()
 	{
 		if (!correctionPicker)
 		{
-			qDebug("installing picker") ;
 			correctionPicker = new CanvasPicker(this) ;
 			connect(correctionPicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this,SLOT(pointMoved(specCanvasItem*,int,double,double))) ;
 			QList<specCanvasItem*> items ;
@@ -235,7 +228,6 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 {
 	if (!view) return ;
 	// get reference to point list from point hash (in order to re-use old code below)
-	qDebug("processing moved point") ;
 	QList<int>& selectedPoints = pointHash[item] ;
 	// Add new Point to list.
 	selectedPoints.prepend(selectedPoints.contains(no) ? selectedPoints.takeAt(selectedPoints.indexOf(no)) : no) ;
@@ -252,10 +244,8 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 
 
 	double scale = 1, offset = 0, offline = 0 ;
-	qDebug("computing coeffs") ;
 	if (scaleAction->isChecked() || offsetAction->isChecked() || offlineAction->isChecked())
 	{
-		qDebug("creating matrix") ;
 		QList<QList<double> > matrix ;
 		for (int i = 0 ; i < selectedPoints.size() ; i++) matrix << QList<double>() ;
 		if (scaleAction->isChecked())
@@ -286,7 +276,6 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 		offset= offsetAction->isChecked()&& !coeffs.isEmpty() ? coeffs.takeFirst() : 0. ,
 		offline=offlineAction->isChecked()&&!coeffs.isEmpty() ?coeffs.takeFirst() : 0. ;
 	}
-	qDebug("pushing new move command %f %f %f %f",shift,offset,offline,scale) ;
 	specPlotMoveCommand *command = new specPlotMoveCommand ;
 	command->setItem(view->model()->index( (specModelItem*) item)) ; // TODO do dynamic cast first!!
 	command->setCorrections(shift,offset,offline,scale) ;
@@ -321,7 +310,6 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 			}
 		}
 		// apply reference
-		qDebug() << pointsInRange ;
 		if (referenceSpectrum.size() > 1 && !pointsInRange.empty()) // TODO general return condition if pointsInRange is empty
 		{
 			// try to find two bordering points for linear interpolation for each point in range.
@@ -349,7 +337,6 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 					  (pointAfter.key()   - pointBefore.key()  ) *
 					  (x - pointBefore.key())) ;
 			}
-			qDebug() << referenceSpectrum << pointsInRange ;
 		}
 
 		// compute correction
@@ -357,11 +344,9 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 		if((noSlope && !pointsInRange.isEmpty() )|| pointsInRange.size() == 1)
 		{
 			// offset only
-			qDebug("computing offset") ;
 			for (int j = 0 ; j < pointsInRange.size() ; ++j)
 				offset += pointsInRange[j].y() ;
 			offset /= pointsInRange.size() ;
-			qDebug("done computing offset") ;
 		}
 		else if (pointsInRange.size() > 1)
 		{
@@ -386,12 +371,10 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 				offset = correction[1];
 				slope = correction[0] ;
 			}
-			qDebug() << "Matrix: " << matrix << "Vektor: " << vector ;
 		}
 		specPlotMoveCommand *command = new specPlotMoveCommand(zeroCommand) ;
 		if (view && view->model())
 			command->setItem(view->model()->index(spectrum));
-		qDebug() << "setting slope and offset" << offset << slope ;
 		command->setCorrections(0,-offset,-slope,1.) ;
 		command->setParentObject(view);
 	}
@@ -400,7 +383,6 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 
 void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double newX, double newY)
 {
-	qDebug() << "Applying zero ranges" ;
 	((specRange*) range)->pointMoved(point,newX,newY) ;
 	QwtPlotItemList zeroRanges = itemList(spec::zeroRange) ;
 	QwtPlotItemList spectra = itemList(spec::spectrum) ; // TODO roll back previous undo command if it was of the same kind and merge with what is to come.

@@ -20,10 +20,7 @@ using std::min ;
 // 	double ma = a /pow(10.,e) ;
 // 	double mb = b /pow(10.,e) ;
 // 	int d = 0 ;
-// 	qDebug() << "ma: " << ma << " mb: " << mb << " e: " << e ;
-// 	qDebug("%d %d",(int) (ma*1e10),(int) (mb*1e10)) ;
 // 	while ( (int) (ma*pow(10.,d)) != ma*pow(10.,d) && (int) (mb*pow(10.,d)) != mb*pow(10.,d) )
-// 		qDebug() << d++ << (int) (ma*pow(10.,d)) - ma*pow(10.,d) << (int) (mb*pow(10.,d)) - mb*pow(10.,d);
 // 	return (round(ma*pow(10.,d)) == round(mb*pow(10.,d))) ;
 // }
 
@@ -34,7 +31,6 @@ bool comparePoints(const QPointF& a, const QPointF& b)
 
 QList<specModelItem*> readJCAMPFile(QFile& file)
 {
-	qDebug("---- Reading JCAMP-DX file... ----") ;
 	// Preparing stream
 	QTextStream in(&file) ;
 	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ;
@@ -42,18 +38,15 @@ QList<specModelItem*> readJCAMPFile(QFile& file)
 	QString title = in.readLine() ;
 	QPair<QString,specDescriptor> titleLine = readJCAMPldr(title,in) ;
 	if (titleLine.first != "TITLE") return QList<specModelItem*>() ;
-	qDebug() << "First line ok.  Title:" << titleLine.second.content() ;
 	specModelItem *item = readJCAMPBlock(in) ;
 	// setting previously read title to item
 	item->changeDescriptor("",titleLine.second.content()) ;
 	// TODO make description writable --> add setDescriptorFlags(...) function
-	qDebug("Done reading JCAMP-DX file.  Returning result") ;
 	return (QList<specModelItem*>() << item) ;
 }
 
 QPair<QString,specDescriptor> readJCAMPldr(QString &first,QTextStream &in)
 {
-	qDebug() << "++ Interpreting ++" << first ;
 	QQueue<QString> toInterpret ;
 	// get all lines neccessary
 	do
@@ -62,17 +55,10 @@ QPair<QString,specDescriptor> readJCAMPldr(QString &first,QTextStream &in)
 		first = in.readLine() ;
 	} while (first.left(2) != "##" && !in.atEnd()) ;
 	
-	for (int i = 0 ; i < toInterpret.size() ; i++)
-		qDebug() << "Complete input to interpret: " <<  toInterpret[i] ;
-	
 	// extract label
 	int pos = toInterpret[0].indexOf("=") ;
 	QString label = toInterpret[0].mid(2,pos-2) ;
 	toInterpret[0].remove(0,pos+1) ;
-	
-	qDebug() << "Label: " << label ;
-	for (int i = 0 ; i < toInterpret.size() ; i++)
-		qDebug() << "Content: " <<  toInterpret[i] ;
 	
 	// process lines
 	QString data, nl ;
@@ -91,14 +77,12 @@ QPair<QString,specDescriptor> readJCAMPldr(QString &first,QTextStream &in)
 		
 	} while (!toInterpret.isEmpty()) ;
 	
-	qDebug() << "data: " << data ;
 	
 	return QPair<QString,specDescriptor>(label,specDescriptor(data)) ;
 }
 
 specModelItem* readJCAMPBlock(QTextStream& in)
 {
-	qDebug("---- Reading JCAMP block ----") ;
 	QString first = in.readLine() ;
 	QHash<QString,specDescriptor> descriptors ;
 	QList<specModelItem*> children ;
@@ -126,7 +110,6 @@ specModelItem* readJCAMPBlock(QTextStream& in)
 					       descriptors["XFACTOR"].content().toDouble(),
 					       descriptors["YFACTOR"].content().toDouble()
 					     ) ;
-			qDebug() << "Size of data" << data.size() ;
 		}
 		else
 			descriptors[ldr.first] = ldr.second ;
@@ -135,7 +118,6 @@ specModelItem* readJCAMPBlock(QTextStream& in)
 	
 	if(descriptors["DATA TYPE"].content() == "LINK")
 	{
-		qDebug("Link item") ;
 		item = new specFolderItem() ;
 		// pass description down to children
 		for(QHash<QString,specDescriptor>::iterator i = descriptors.begin() ; i != descriptors.end() ; i++)
@@ -145,7 +127,6 @@ specModelItem* readJCAMPBlock(QTextStream& in)
 	}
 	else
 	{
-		qDebug("regular data item") ;
 		item = new specDataItem(data,descriptors) ;
 		foreach(specModelItem *child, children)
 			delete child ;
@@ -156,7 +137,6 @@ specModelItem* readJCAMPBlock(QTextStream& in)
 
 void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, double xfactor, double yfactor) // TODO verify final x-value
 {
-	qDebug("---- Reading JCAMP data. ----") ;
 	QRegExp specialCharacters("[?@%A-DF-Za-df-s+\\-\\s]|[Ee](?![+\\-\\s])"),
 		posSQZdigits("[A-DF-I@]|E(?![+\\-\\s])"),
 		negSQZdigits("[a-df-i]|e(?![+\\-\\s])"),
@@ -168,20 +148,15 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 	while(!in.atEnd())
 	{
 		QString line = in.readLine() ;
-		qDebug() << "Getting data from line: " << line ;
 		QString x = line.left(line.indexOf(specialCharacters)) ;
 		line.remove(0,line.indexOf(specialCharacters)) ;
-		qDebug() << "x value: " << x ;
-		qDebug() << "last x: " << xvals.last() << step << xfactor ;
 		if (!xvals.isEmpty() && fabs((x.toDouble()-((xvals.last()+step)/xfactor))/ x.toDouble()) > 1e-5 ) // TODO arbitrary limit!!
-			qDebug() << "X Vals do not match..." << x << (xvals.first()+(xvals.size())*step)/xfactor ; // TODO do error treatment
 			// TODO check first and last X and Y val.
 		xvals << (xvals.isEmpty() ? x.toDouble()*xfactor : xvals.last()+step) ;
 		// yvalue check -> (5.8.2) in paper Appl. Spec. 42(1), 151
 		if(wasDiff)
 		{
 			xvals.remove(xvals.size()-1) ;
-			qDebug("y check") ;
 			// identify, retrieve and remove item from head of string.
 			int itemLength = line.indexOf(specialCharacters,1) ;
 			if (itemLength == -1) itemLength = line.size() ;
@@ -209,7 +184,6 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 				break ; // TODO error handling
 		}
 		// Interpret y values
-		qDebug("interpreting y values") ;
 		while(!line.isEmpty())
 		{
 			// identify, retrieve and remove item from head of string.
@@ -220,14 +194,12 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 			yInput.remove(QRegExp("[\\s]")) ;
 			if (yInput.isEmpty()) break ;
 			
-			qDebug() << "yInput: " << yInput << "rest of line: " << line ;
 			
 			// identify first character and treat according to JCAMP rules
 			QString firstChar = yInput.left(1) ;
 			yInput.remove(0,1) ;
 			if (firstChar == "?")
 			{
-				qDebug("Got a NaN value") ;
 				xvals << NAN ;
 				line.prepend(yInput) ;
 				wasDiff = false ;
@@ -237,7 +209,6 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 			// there might really be something to interpret:
 			if (posSQZdigits.exactMatch(firstChar))
 			{
-				qDebug() << "posSQZ" ;
 				yInput.prepend(firstChar == "@" ? "+0" :
 					QString("%1").arg(firstChar.data()->toAscii()-'A'+1)) ;
 				yvals << yInput.toDouble()*yfactor ;
@@ -245,14 +216,12 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 			}
 			else if (negSQZdigits.exactMatch(firstChar))
 			{
-				qDebug() << "negSQZ" ;
 				yInput.prepend(QString("-%1").arg(firstChar.data()->toAscii()-'a'+1)) ;
 				yvals << yInput.toDouble()*yfactor ;
 				wasDiff = false ;
 			}
 			else if (posDIFdigits.exactMatch(firstChar))
 			{
-				qDebug() << "posDIF" ;
 				yInput.prepend(firstChar == "%" ? "+0" :
 						QString("%1").arg(firstChar.data()->toAscii()-'I')) ;
 				yvals << yInput.toDouble()*yfactor + (yvals.isEmpty() ? NAN : yvals.last()) ;
@@ -260,14 +229,12 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 			}
 			else if (negDIFdigits.exactMatch(firstChar))
 			{
-				qDebug() << "negDIF" ;
 				yInput.prepend(QString("-%1").arg(firstChar.data()->toAscii()-'i')) ;
 				yvals << yInput.toDouble()*yfactor + (yvals.isEmpty() ? NAN : yvals.last()) ;
 				wasDiff = true ;
 			}
 			else if (posDUPdigits.exactMatch(firstChar))
 			{
-				qDebug() << "posDUP" ;
 				yInput.prepend(firstChar == QString('s') ? "9" : QString("%1").arg(firstChar.data()->toAscii()-'R')) ;
 				int count = yInput.toInt()-1 ;
 				if (wasDiff)
@@ -292,10 +259,8 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 			// maybe just a regular number...
 			else
 			{
-				qDebug("regular number") ;
 				yvals << QString("%1%2").arg(firstChar,yInput).toDouble()*yfactor ;
 			}
-			qDebug() << "control: " << yvals.last() ;
 			
 			// fill up xvals
 			while(xvals.size() < yvals.size())
@@ -303,14 +268,11 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 		}
 	}
 	
-	qDebug() << "filling data" << xvals.size() << yvals.size() ;
 	// turn vectors into data
 	if (yvals.size() != xvals.size()) return ; // should not be necessary
 	
-	qDebug() << "data size before" << data.size() ;
 	for (int i = 0 ; i < xvals.size() ; i++)
 		data << specDataPoint(0,xvals[i],yvals[i],0) ;
-	qDebug() << " and after" << data.size() ;
 }
 
 QHash<QString,specDescriptor> fileHeader(QTextStream& in) {
@@ -336,7 +298,6 @@ QVector<double> waveNumbers(QTextStream& in) {
 
 QList<specModelItem*> readHVFile(QFile& file)
 {
-	qDebug() << "reading file" << file.fileName() ;
 	QTextStream in(&file) ;
 	
 	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system
@@ -369,7 +330,6 @@ QList<specModelItem*> readHVFile(QFile& file)
 			specData.last()->invalidate(); ;
 		}
 	}
-	qDebug() << "returning read file content" << specData ;
 	return specData ;
 }
 
@@ -457,7 +417,6 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 
 QList<specModelItem*> (*fileFilter(QString& fileName)) (QFile&)
 {
-	qDebug() << "Getting filter for" << fileName ;
 	QFile file(fileName) ;
 	file.open(QFile::ReadOnly | QFile::Text) ;
 	QTextStream in(&file) ;
@@ -474,7 +433,6 @@ QList<specModelItem*> (*fileFilter(QString& fileName)) (QFile&)
 
 QList<specModelItem*> readPEFile(QFile& file)
 {
-	qDebug("Reading PE file") ;
 	QTextStream in(&file) ;
 	
 	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system

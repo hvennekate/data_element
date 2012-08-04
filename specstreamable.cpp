@@ -1,5 +1,4 @@
 #include "specstreamable.h"
-#include <QDebug>
 
 specStreamable::type specStreamable::effectiveId() const
 {
@@ -10,10 +9,8 @@ QDataStream& operator<<(QDataStream& out, const specStreamable& item)
 {
 	QByteArray ba ;
 	QDataStream stream(&ba,QIODevice::WriteOnly) ;
-	qDebug() << "writing type" << item.effectiveId() ;
 	stream << item.effectiveId() ;
 	item.writeToStream(stream) ;
-	qDebug() << "writing byte array" << ba.size() ;
 	out << ba ;
 	if (item.isContainer())
 	{
@@ -27,11 +24,9 @@ QDataStream& operator>>(QDataStream& in, specStreamable& item)
 {
 	QByteArray ba ;
 	in >> ba ;
-	qDebug() << "read byte array" << ba.size() ;
 	QDataStream stream(ba) ;
 	specStreamable::type t ;
 	stream >> t ;
-	qDebug() << "type read:" << t ;
 	if (t != item.effectiveId())
 	{
 		if (specStreamable::isContainer(t))

@@ -248,7 +248,6 @@ void specDataItem::scaleBy(const double& mul)
 
 void specDataItem::addToSlope(const double& off)
 {
-	qDebug() << "Adding to slope" ;
 	slope += off ;
 	invalidate();
 }

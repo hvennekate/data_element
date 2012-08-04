@@ -1,6 +1,5 @@
 #include "specdescriptor.h"
 #include <QRegExp>
-#include <QDebug>
 
 void specDescriptor::writeToStream(QDataStream &out) const
 {

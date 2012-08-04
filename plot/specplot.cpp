@@ -90,11 +90,9 @@ void specPlot::changeXLabel(QString newTitle)
 
 void specPlot::changeTextLabel()
 {
-	qDebug("testing sender") ;
 	if (sender() != titleAction && sender() != xlabelAction && sender() != ylabelAction) return ;
 	QString oldText = (sender() == titleAction ? title().text() :
 						  (sender() == xlabelAction ? axisTitle(QwtPlot::xBottom) : axisTitle(QwtPlot::yLeft))).text() ;
-	qDebug() << "old text:" << oldText ;
 	///// First Try  TODO change into in-place editor
 	QDialog textDialog ; // TODO subclass this
 	textDialog.setLayout(new QVBoxLayout(&textDialog)) ;
@@ -142,7 +140,6 @@ void specPlot::replot()
 	selectRanges->clear();
 	QList<specCanvasItem*> newMetaRanges; // TODO local variable
 	QVector<specSVGItem*> svgitems ;
-	qDebug() << "rebuilding plot item pointer lists" << allItems << metaPicker ;
 	foreach(QwtPlotItem* item, allItems)
 	{
 		if (dynamic_cast<specMetaRange*>(item))
@@ -162,7 +159,6 @@ void specPlot::replot()
 		metaPicker->removeSelectable();
 		metaPicker->addSelectable(metaRanges) ;
 	}
-	qDebug() << "Checking if refresh necessary" << this ;
 	if (allItems.isEmpty())
 	{
 		QwtPlot::replot() ;
@@ -179,7 +175,6 @@ void specPlot::replot()
 
 	
 	QRectF boundaries ; //= allItems[0]->boundingRect() ; // DANGER: actually we must check, if the item plots on yLeft
-	qDebug() << "adapting plot ranges" << allItems << "SVGs:" << svgitems ;
 	foreach(QwtPlotItem *item, allItems) // TODO omit this if fixing of axis is enabled
 		if(item->yAxis() == QwtPlot::yLeft
 				&& !dynamic_cast<specSVGItem*>(item)
@@ -217,7 +212,6 @@ void specPlot::replot()
 	boundaries.setTop(top);
 	boundaries.setBottom(bottom);//*/
 	
-	qDebug() << "new boundaries" << boundaries ;
 	zoom->changeZoomBase(boundaries) ;
 
 	QRectF zoomRect = zoom->zoomRect() ;
@@ -225,7 +219,6 @@ void specPlot::replot()
 	       yfactor = zoomRect.height() / canvasMap(QwtPlot::yLeft).pDist() ;
 	foreach(specSVGItem* svgitem, svgitems)
 		svgitem->refreshSVG(xfactor, yfactor) ;
-	qDebug() << "----- replotting" << this ;
 	QwtPlot::replot() ;
 	emit replotted();
 	replotting = false ;

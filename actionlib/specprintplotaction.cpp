@@ -28,7 +28,6 @@ specPrintPlotAction::~specPrintPlotAction()
 
 void specPrintPlotAction::execute()
 {
-	qDebug("executing print action") ;
 	specPlot *plot = (specPlot*) parentWidget() ;
 	QSize plotSize = plot->size() ;
 	double aspectRatio = (double) plotSize.width() / plotSize.height() ;

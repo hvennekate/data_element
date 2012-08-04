@@ -3,7 +3,6 @@
 specLogMessage::specLogMessage(QHash<QString,specDescriptor> description, specFolderItem* par, QString tag)
 	: specLogEntryItem(description, par, tag)
 {
-	qDebug() << "Log string:" << tag ;
 }
 
 

@@ -140,13 +140,11 @@ void specCanvasItem::highlight(bool highlight)
 
 QColor specCanvasItem::penColor()
 {
-	qDebug() << "old pen color:" << pen().color() ;
 	return pen().color() ;
 }
 
 void specCanvasItem::setPenColor(const QColor& newColor)
 {
-	qDebug() << "new pen color:" << newColor ;
 	QPen newPen(pen());
 	newPen.setColor(newColor);
 	setPen(newPen) ;

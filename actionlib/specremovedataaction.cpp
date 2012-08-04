@@ -37,7 +37,6 @@ void specRemoveDataAction::execute()
 
 	delete dialog ;
 
-	qDebug() << "Pushing group command with" << groupCommand->childCount() << "children." ;
 
 	library->push(groupCommand);
 }

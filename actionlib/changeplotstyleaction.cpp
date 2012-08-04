@@ -2,7 +2,6 @@
 #include <QDialog>
 #include <QGridLayout>
 #include <QVBoxLayout>
-#include <QDebug>
 #include "specgenealogy.h"
 #include <QColorDialog>
 #include <qwt_symbol.h>
@@ -42,7 +41,6 @@ changePlotStyleAction::changePlotStyleAction(QObject *parent) :
 
 void changePlotStyleAction::execute()
 {
-	qDebug("triggered master action") ;
 	specView *view = (specView*) parent() ;
 	QModelIndexList items = view->getSelection() ;
 
@@ -56,14 +54,12 @@ void changePlotStyleAction::execute()
 
 void changePlotStyleAction::actionTriggered()
 {
-	qDebug("////////////style action");
 	specView *view = (specView*) parent() ;
 	specStyleCommand *newCommand = 0 ;
 	QObject *source = sender() ;
 	specDataItem item(QVector<specDataPoint>(),QHash<QString,specDescriptor>(),0,"") ;
 	if (source == lineColorAction)
 	{
-		qDebug("new pen color command") ;
 		newCommand = generateStyleCommand(specStreamable::penColorCommandId) ;
 		QColor color = QColorDialog::getColor() ;
 		if (!color.isValid()) return ;
@@ -71,16 +67,12 @@ void changePlotStyleAction::actionTriggered()
 	}
 	else if (symbolActions.contains((QAction*) source))
 	{
-		qDebug("new symbol id") ;
 		newCommand = generateStyleCommand(specStreamable::symbolStyleCommandId) ;
-		qDebug("setting style of item %d", symbolActions.indexOf((QAction*) source) ) ;
 		item.setSymbolStyle(QwtSymbol::Style(symbolActions.indexOf((QAction*) source))) ;
 	}
 	else return ;
 
-	qDebug() << "commiting style" << &item ;
 	newCommand->obtainStyle(&item) ;
-	qDebug("committing action") ;
 	newCommand->setParentObject(view) ;
 	newCommand->setItems(view->getSelection()) ;
 	library->push(newCommand) ;

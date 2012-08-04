@@ -149,7 +149,6 @@ void specPlotWidget::createToolbars()
 
 void specPlotWidget::closeEvent(QCloseEvent* event)
 {
-	qDebug("checking if user needs/wants to save") ;
 	int needToSave = QMessageBox::No ;
 	if (windowTitle().right(1) == "*") // Pruefe, ob Aenderungsindikator gesetzt.  Wenn ja, fragen ob speichern.
 	{
@@ -166,7 +165,6 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 	}
 	else
 	{
-		qDebug() << "accepting close event" << event ;
 		event->accept() ;
 //		qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(kineticWidget) ;
 //		qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(this) ;
@@ -176,7 +174,6 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 		return ;
 	}
 
-	qDebug("performing action %d", needToSave) ;
 	switch (needToSave)
 	{
 		case QMessageBox::Yes :
@@ -193,7 +190,6 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 			event->ignore() ;
 			break ;
 	}
-	qDebug("done closing dock") ;
 }
 
 bool specPlotWidget::saveFile()
@@ -249,7 +245,6 @@ void specPlotWidget::selectionChanged(const QItemSelection & selected, const QIt
 			((specModelItem*) index.internalPointer())->attach(plot) ;
 	
 // 	QTextStream cout(stdout, QIODevice::WriteOnly) ;
-// 	qDebug("Selection changed  %d", selected.indexes().size()) ;
 // 	if(selected.indexes().size() > 1)
 // 	{
 // 		QModelIndex index = selected.indexes()[1] ;

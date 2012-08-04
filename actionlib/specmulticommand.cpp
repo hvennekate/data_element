@@ -48,7 +48,6 @@ bool specMultiCommand::mergeWith(const QUndoCommand *other)
 {
 	if (!mayMerge)
 		return false ;
-	qDebug() << "merging multi command" ;
 //	const specMultiCommand *command = (const specMultiCommand*) other ;
 	if (other->childCount() != childCount()) return false ;
 	bool mergeable = true ;

@@ -41,14 +41,10 @@ bool specManageConnectionsCommand::ok() const
 
 void specManageConnectionsCommand::restore()
 {
-	qDebug() << "restoring connections" ;
 	QVector<specModelItem*> pointers = itemPointers() ;
-	qDebug() << "got itemPointers" << pointers ;
 	specMetaItem* client = targetPointer() ;
-	qDebug() << "got target" << client ;
 	foreach(specModelItem *pointer, pointers)
 		client->connectServer(pointer); // TODO consider removal from list if false is returned.
-	qDebug() << "done." ;
 }
 
 void specManageConnectionsCommand::take()

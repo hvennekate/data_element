@@ -15,7 +15,6 @@ void specStyleCommandImplFuncTemplate::setItems(QModelIndexList items)
 	//	for (int i = 0 ; i < items.size() ; ++i)
 	//		if (!dynamic_cast<specCanvasItem*>(model->itemPointer(items[i])))
 	//			items.takeAt(i--) ;
-	qDebug() << "list size: " << items ;
 
 	specView *view = (specView*) parentObject() ;
 	specModel *model = view->model() ;
@@ -37,7 +36,6 @@ void specStyleCommandImplFuncTemplate::setItems(QModelIndexList items)
 
 	saveStyles(Genealogies) ;
 
-	qDebug() << "styles: " << oldProperties << newProperty ;
 }
 
 specStyleCommandImplTemplate
@@ -130,7 +128,6 @@ specStyleCommandImplTemplate
 void specStyleCommandImplFuncTemplate::obtainStyle(specCanvasItem *item)
 {
 	newProperty = (item->*getProperty)();
-	qDebug() << "getting property from: " << item << newProperty << "original:" << (item->*getProperty)() ;
 }
 
 specStyleCommand *generateStyleCommand(specStreamable::streamableType id)

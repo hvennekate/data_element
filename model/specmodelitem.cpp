@@ -5,7 +5,6 @@
 #include "speclogmessage.h"
 #include <QTextStream>
 #include <QTime>
-#include <QDebug>
 #include "kinetic/specmetaitem.h"
 #include "utility-functions.h"
 #include <QPainter>
@@ -239,9 +238,7 @@ bool specModelItem::connectClient(specMetaItem *clnt)
 		return false ;
 	if (!clnt->connectServer(this))
 		return false ;
-	qDebug() << "connecting client" << clnt << this ;
 	clients << clnt ;
-	qDebug() << "done connecting client" ;
 	return true ;
 }
 

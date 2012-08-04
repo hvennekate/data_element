@@ -17,15 +17,11 @@ const std::type_info &specDeleteAction::possibleParent()
 
 void specDeleteAction::execute()
 {
-	qDebug("starting action") ;
 	specDataView *currentView = (specDataView*) parent() ;
 	QModelIndexList indexes = currentView->selectionModel()->selectedIndexes() ;
-	qDebug("=== getting selection") ;
 	specDeleteCommand *command = new specDeleteCommand() ;
 	command->setItems(indexes) ;
-	qDebug("=== prepared command") ;
 	currentView->selectionModel()->clearSelection();
-	qDebug("=== cleared selection") ;
 
 	command->setParentObject((QWidget*)parent());
 
@@ -34,5 +30,4 @@ void specDeleteAction::execute()
 	else
 		delete command ;
 //		command->redo();
-	qDebug("=== pushed command onto stack") ;
 }

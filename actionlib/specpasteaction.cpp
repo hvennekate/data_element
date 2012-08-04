@@ -24,10 +24,8 @@ void specPasteAction::execute()
 	QModelIndex index = currentView->currentIndex() ;
 	specModelItem *item = model->itemPointer(index) ;
 	int row = 0 ;
-	qDebug("checking if item is folder") ;
 	if (!item->isFolder())
 	{
-		qDebug("item is not a folder") ;
 		row = index.row()+1 ;
 		index = index.parent() ;
 	}

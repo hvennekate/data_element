@@ -73,7 +73,6 @@ specMetaVariable::specMetaVariable()
 
 bool specMetaVariable::setIndexRange(int &start, int &finish, int &step, int max) const
 {
-	qDebug() << "RANGE: " << begin << end << inc ;
 	start  = qBound(0,begin,max) ;
 	finish = qBound(start,end,max) ;
 	step   = qBound(1, inc, finish-start) ;
@@ -101,7 +100,6 @@ QVector<double> specMetaVariable::values(specModelItem *item, const QVector<doub
 bool specMetaVariable::extractXs(specModelItem *item, QVector<double> &xvals) const
 {
 	item->revalidate() ;
-	qDebug() << "DATASIZE" << item->dataSize() << "RANGE" << minValue() << maxValue();
 	if (xvals.size() == 1 && isnan(xvals[0]))
 	{
 		double value ;
@@ -112,7 +110,6 @@ bool specMetaVariable::extractXs(specModelItem *item, QVector<double> &xvals) co
 		return false ;
 	}
 
-	qDebug() << "xvals" << xvals << xvals.size() << (isnan(xvals[0]));
 	QVector<double> newXVals ;
 	foreach(double value, xvals) // TODO:  quick compare if same size
 	{
@@ -141,12 +138,9 @@ void specMetaVariable::clearRanges()
 
 void specMetaVariable::produceRanges(QSet<specPlot *> plots)
 {
-	qDebug() << "producing ranges" << plots ;
 	if (!QwtInterval::isValid()) return ; // TODO consider just disposing of the ranges
-	qDebug() << "checking range list" ;
 	if (plots.size() != ranges.size())
 	{
-		qDebug() << "creating new ranges" ;
 		clearRanges();
 		foreach(specPlot* plot, plots)
 		{
@@ -154,11 +148,9 @@ void specMetaVariable::produceRanges(QSet<specPlot *> plots)
 			ranges << range ;
 			range->attach((QwtPlot*) plot) ;
 		}
-		qDebug() << "ranges produced" << ranges ;
 	}
 	else
 	{
-		qDebug() << "attaching old ranges" << ranges ;
 		int i = 0 ;
 		foreach(specPlot* plot, plots)
 			ranges[i++]->attach((QwtPlot*) plot) ;
@@ -173,7 +165,6 @@ void specMetaVariable::detachRanges()
 
 void specMetaVariable::rangeChanged(specMetaRange* range) // TODO just take two double s
 {
-	qDebug() << "rangeChanged" << parent;
 	setInterval(range->minValue(),range->maxValue()) ;
 	if (parent)
 		parent->evaluatorIntervalChanged() ;

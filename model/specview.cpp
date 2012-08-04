@@ -66,7 +66,6 @@ void specView::exportItems()
 
 void specView::deleteItems()
 { 
-	qDebug("triggered delete action") ;
 	QModelIndexList list = getSelection() ;
 	model()->eliminateChildren(list) ;
 	selectionModel()->clearSelection() ;
@@ -74,15 +73,11 @@ void specView::deleteItems()
 	{
 		QModelIndexList sameParent ;
 		QModelIndex parent = model()->parent(list.first()) ;
-		foreach(QModelIndex index, list)
-			qDebug("orig line: %d",index.row()) ;
 		sameParent << list.takeFirst() ;
 		for (int i = 0 ; i < list.size() ; i++)
 			if (model()->parent(list[i]) == parent)
 				sameParent << list.takeAt(i--) ;
 		qSort(sameParent) ;
-		foreach(QModelIndex index, sameParent)
-			qDebug("line: %d",index.row()) ;
 		while(!sameParent.empty())
 		{
 			int last = sameParent.takeLast().row() ;
@@ -123,22 +118,17 @@ void specView::mergeItems() // TODO maybe change currentIndex
 	selectionModel()->select(QModelIndex(),QItemSelectionModel::Clear) ;
 	list = model()->mergeItems(list) ;
 	// TODO reselect merged items
-// 	qDebug("selecting merged indexes") ;
 // 	QItemSelection newSelection ;
-// 	qDebug("preparing selection") ;
 // 	foreach(QModelIndex index, list)
 // 	{
-// 		qDebug("selecting index") ;
 // 		newSelection.select(index,index.model()->index(index.row(),index.model()->columnCount(index.parent())-1,index.parent())) ;
 // 	}
-// 	qDebug("applying selection") ;
 // 	selectionModel()->select(newSelection,QItemSelectionModel::Select) ;
 // 	
 // // 	foreach(QModelIndex index, list)
 // // 		selectionModel()->select(
 // // 			QItemSelection(index, model()->index(index.row(),model()->columnCount(index)-1,index.parent())),
 // // 			QItemSelectionModel::Select) ;
-// 	qDebug("Done selecting") ;
 }
 
 void specView::changePen()
@@ -161,7 +151,6 @@ void specView::keyPressEvent(QKeyEvent* event)
 	
 	else if (event->key() == Qt::Key_A && event->modifiers() == Qt::ControlModifier)
 	{
-		qDebug("Checking if folder") ;
 		QModelIndex index = currentIndex() ;
 		if (!model()->isFolder(currentIndex()))
 			index = index.parent() ;
@@ -171,12 +160,9 @@ void specView::keyPressEvent(QKeyEvent* event)
 				QItemSelectionModel::Deselect); // TODO deselect folder
 		QItemSelection newSelection ;
 		int columnCount = model()->columnCount(index) ;
-		qDebug("preparing new selection") ;
 		for (int i = 0 ; i < model()->rowCount(index) ; i++)
 			newSelection.select(model()->index(i,0,index),model()->index(i,columnCount-1,index)) ;
-		qDebug("selecting") ;
 		selectionModel()->select(newSelection,QItemSelectionModel::Select) ;
-		qDebug("done selecting") ;
 	}
 
 	else QTreeView::keyPressEvent(event) ;
@@ -332,9 +318,7 @@ void specView::averageItems()
 	connect(buttons,SIGNAL(accepted()),numberDialog,SLOT(accept())) ;
 	connect(buttons,SIGNAL(rejected()),numberDialog,SLOT(reject())) ;
 
-	qDebug("executing dialog") ;
 	numberDialog->exec() ;
-	qDebug("dialog done") ;
 
 	if (numberDialog->result() == QDialog::Accepted)
 	{
@@ -348,7 +332,6 @@ void specView::averageItems()
 	}
 
 	delete numberDialog ;
-	qDebug("done averaging") ;
 }
 
 void specView::currentlySelectedToSubMap()
@@ -390,18 +373,15 @@ void specView::prepareReset()
 {
 	state = new specViewState(this) ;
 	state->getState();
-	qDebug("====== saving state");
 }
 
 void specView::resetDone()
 {
 	if (!state) return ;
-	qDebug("======= reconstructing state") ;
 	state->restoreState();
 	delete state ;
 }
 
 void specView::dragEnterEvent(QDragEnterEvent *event)
 {
-	qDebug() << "Proposed action:" << event->proposedAction() ;
 }

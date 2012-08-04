@@ -16,21 +16,16 @@ const std::type_info &specAddConnectionsAction::possibleParent()
 
 void specAddConnectionsAction::execute()
 {
-	qDebug("adding connections") ;
 	specMetaView *view = (specMetaView*) parent() ;
-	qDebug("got view") ;
 	specView *serverView = view->getDataView() ;
-	qDebug("got server view") ;
 
 	QModelIndex target = view->currentIndex() ;
 	QModelIndexList servers = serverView->getSelection() ;
 	if (!target.isValid() || servers.isEmpty()) return ;
-	qDebug("prepared target list") ;
 
 	specAddConnectionsCommand *command = new specAddConnectionsCommand ;
 	command->setParentObject((QObject*) parent()) ;
 	command->setItems(target,servers) ;
-	qDebug("prepared command") ;
 
 	if (command->ok())
 		library->push(command) ;

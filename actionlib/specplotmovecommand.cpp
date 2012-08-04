@@ -11,10 +11,8 @@ void specPlotMoveCommand::doIt()
 	if (!items) return ;
 	items->seekParent() ;
 	if (!items->valid()) return ;
-	qDebug("correcting items") ;
 	foreach(specCanvasItem* item, items->items())
 	{
-		qDebug("applying corrections from undo command") ;
 		item->moveXBy(shift) ;
 		item->scaleBy(scale) ; // TODO prevent scaling by zero.
 		item->moveYBy(offset) ;
@@ -24,11 +22,9 @@ void specPlotMoveCommand::doIt()
 
 void specPlotMoveCommand::undoIt()
 {
-	qDebug("undoing plot move command") ;
 	if (!items) return ;
 	items->seekParent() ;
 	if (!items->valid()) return ;
-	qDebug("starting to undo...") ;
 	foreach(specCanvasItem* item, items->items())
 	{
 		item->addToSlope(-slope) ;
@@ -41,9 +37,7 @@ void specPlotMoveCommand::undoIt()
 
 bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
 {
-	qDebug("trying merge of move commands") ;
 	const specPlotMoveCommand *other = (const specPlotMoveCommand*) ot ;
-	qDebug("merging...") ;
 	if (! (this->items && other->items)) return false ;
 	if (*(other->items) != *(this->items)) return false ;
 	slope += other->slope * scale ;

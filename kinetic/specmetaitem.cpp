@@ -66,7 +66,6 @@ bool specMetaItem::connectServer(specModelItem *server)
 		return false ;
 	if (shortCircuit(server))
 		return false ;
-	qDebug() << "connecting server" << server << this;
 	currentlyConnectingServer = server ;
 	if (!server->connectClient(this))
 	{
@@ -76,7 +75,6 @@ bool specMetaItem::connectServer(specModelItem *server)
 	currentlyConnectingServer = 0 ;
 	items << server ;
 	invalidate() ;
-	qDebug() << "done connecting server" << this ;
 	return true ;
 }
 
@@ -101,14 +99,12 @@ void specMetaItem::refreshOtherPlots()
 		otherPlots << ((specPlot*) item->plot()) ;
 	otherPlots.remove(0) ;
 	filter->attachRanges(otherPlots)  ;
-	qDebug() << "Attaching meta item " << otherPlots ;
 	foreach(QwtPlot *otherPlot, otherPlots)
 		otherPlot->replot();
 }
 
 void specMetaItem::attach(QwtPlot *plot)
 {
-	qDebug() << "attaching meta item to plot" << plot ;
 	if (!plot)
 	{
 		detach() ;
@@ -120,7 +116,6 @@ void specMetaItem::attach(QwtPlot *plot)
 
 void specMetaItem::detach()
 {
-	qDebug() << "detaching meta item" ;
 //	specModelItem::detach() ;
 	filter->detachRanges();
 }
@@ -148,9 +143,6 @@ void specMetaItem::refreshPlotData()
 	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
 	setData(processData(filter->evaluate(items.toList().toVector()))) ; // TODO use vector
 	variables["errors"] = filter->warnings() ;
-	qDebug() << "Filter data size:" << dataSize() ;
-	for (size_t i = 0 ; i < dataSize() ; ++i)
-		qDebug() << "Filter data:" << sample(i) ;
 	refreshOtherPlots() ;
 }
 
@@ -180,7 +172,6 @@ QString specMetaItem::descriptor(const QString &key, bool full) const
 //	if (key == "variables")
 //	int pos = descriptorIndex(key) ;
 //	if (pos < 0) return QString() ;
-//	qDebug() << "descriptor sizes:" << descriptorKeys() << filter->variableValues() ;
 //	return filter->variableValues().at(pos) ;
 }
 

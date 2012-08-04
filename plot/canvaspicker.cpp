@@ -21,7 +21,6 @@
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <qwt_plot_directpainter.h>
-#include <QDebug>
 
 CanvasPicker::CanvasPicker ( specPlot *plot )
 	: QObject ( plot ),
@@ -205,7 +204,6 @@ bool CanvasPicker::eventFilter ( QObject *object, QEvent *e )
 
 void CanvasPicker::select ( const QPoint &pos )
 {
-	qDebug("CanvasPicker::select") ;
 	specCanvasItem *curve = NULL;
 	double dist = 10e10;
 	int index = -1;
@@ -230,9 +228,7 @@ void CanvasPicker::select ( const QPoint &pos )
 //		}
 	}
 
-	qDebug("showing cursor") ;
 	showCursor ( false );
-	qDebug() << "done showing cursor; distance: " << dist ;
 
 	if ( curve && dist < 10 ) // 10 pixels tolerance
 	{
@@ -242,7 +238,6 @@ void CanvasPicker::select ( const QPoint &pos )
 	}
 	lastSelected = d_selectedCurve ;
 
-	qDebug("done selecting") ;
 // 	d_selectedCurve->selectPoint ( d_selectedPoint ) ; // TODO create parent of both range and modelitem, must be child of QwtPlotCurve
 }
 
@@ -298,14 +293,12 @@ void CanvasPicker::move ( const QPoint &pos )
 	if ( !d_selectedCurve )
 		return;
 
-	qDebug("moving point") ;
 	emit pointMoved(d_selectedCurve,d_selectedPoint,
 			plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
 			plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ;
 //	d_selectedCurve->pointMoved ( d_selectedPoint,
 //	                              plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
 //	                              plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ;
-	qDebug("emitting signal") ;
 	emit moved(d_selectedCurve) ; // TODO remove this signal
 	/* 	if ( mode == spec::newZero ) // TODO
 		{
@@ -375,7 +368,6 @@ Q_UNUSED(showIt)
 // Select the next/previous curve
 void CanvasPicker::shiftCurveCursor ( bool up )
 {
-	qDebug("CanvasPicker::shiftCurveCursor") ;
 	QList<specCanvasItem*>::iterator it;
 
 	if ( selectable.isEmpty() )
@@ -483,7 +475,6 @@ void CanvasPicker::removeSelectable(specCanvasItem *item)
 
 void CanvasPicker::addSelectable(const QList<specCanvasItem *> &list)
 {
-	qDebug() << "adding selectables" << list ;
 	selectable << list ;
 //	foreach(specCanvasItem* item, list)  // TODO consider this version.
 //		if (!list.contains(item))
@@ -500,7 +491,6 @@ void CanvasPicker::removeSelectable(QList<specCanvasItem *> &list)
 		d_selectedCurve = 0 ;
 		d_selectedPoint = -1 ;
 	}
-	qDebug() << "Owning: " << owning << "list size:" << list.size() ;
 	if (owning)
 	{
 		foreach(specCanvasItem* item, list)

@@ -15,10 +15,8 @@ QList<specModelItem*> specLogToData(const QMimeData* data)
 
 	// TODO this is highly redundant with the specmodel implementation
 	QList<specModelItem*> list ;
-	qDebug("starting insert from stream") ;
 	while(!stream.atEnd())
 	{
-		qDebug("dropping an item") ;
 		specStreamable::type t ;
 		stream >> t ;
 		specModelItem *newItem = specModelItem::itemFactory(t) ;

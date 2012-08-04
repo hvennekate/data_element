@@ -12,7 +12,6 @@ specMetaRange::specMetaRange(double x1, double x2, specMetaVariable *par)
 
 void specMetaRange::refreshPlotData()
 {
-	qDebug() << "refreshing meta plot data" ;
 	specRange::refreshPlotData() ;
 	if (parent)
 		parent->rangeChanged(this);

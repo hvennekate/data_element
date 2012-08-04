@@ -36,7 +36,6 @@ void specSVGItem::attach(QwtPlot *plot)
 
 void specSVGItem::setBoundingRect(const QRectF &rect)
 {
-	qDebug() << "Setting SVG bounding rect" << rect << rect.width() << rect.height();
 	if (!data || !image) return ;
 	image->loadData(rect,*data) ;
 	highlight(highlighting) ;
@@ -49,7 +48,6 @@ void specSVGItem::highlight(bool highlight)
 	QVector<QPointF> points(specSVGItem::size) ;
 	for (int i = 0 ; i < specSVGItem::size ; ++i)
 		points[i] = anchorPoint((SVGCornerPoints) i) ;
-	qDebug() << "bounding points:" << points ;
 	setSamples(points) ;
 	if (!highlight)
 		setSymbol(0) ;
@@ -106,12 +104,10 @@ void specSVGItem::setAnchor(QRectF& bounds, const QPointF & anchor, const SVGCor
 
 void specSVGItem::refreshSVG(double xfactor, double yfactor)
 {
-	qDebug() << "Refreshing SVG plot data" ;
 	if (!plot()) return ;
 	if (!image) return ;
 	QPointF fixPoint = anchorPoint(fix) ;
 	QRectF bounds = image->boundingRect() ;
-	qDebug() << "bottom" << plot()->canvasMap(QwtPlot::xBottom).sDist() << plot()->canvasMap(QwtPlot::xBottom).pDist() ;
 	if (width  >= 0) bounds.setWidth(width * xfactor) ;
 	if (height >= 0) bounds.setHeight(height * yfactor) ;
 	if (fix >= 0)    setAnchor(bounds, fixPoint, fix) ;

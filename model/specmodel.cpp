@@ -18,7 +18,6 @@
 #include "specdataitem.h"
 #include "exportdialog.h"
 #include <QTime>
-#include <QDebug>
 #include "actionlib/specmovecommand.h"
 #include "actionlib/specaddfoldercommand.h"
 #include "actionlib/speceditdescriptorcommand.h"
@@ -184,7 +183,6 @@ QModelIndexList specModel::merge(QModelIndexList& list, const QList<QPair<QStrin
 	{
 		//QHash<QString,specDescriptor> temp ;
 		//temp.insert(QString(""),specDescriptor(QString(""),spec::editable)) ;
-		qDebug("initial descriptor is editable: %d",int(itemPointer(mergeList.first())->descriptorProperties("") & spec::editable)) ;
 		QByteArray *firstItemData = new QByteArray() ;
 		QDataStream outStream(firstItemData,QIODevice::WriteOnly) ;
 		outStream << *(itemPointer(mergeList.takeFirst())) ;
@@ -194,7 +192,6 @@ QModelIndexList specModel::merge(QModelIndexList& list, const QList<QPair<QStrin
 		specModelItem *newItem = specModelItem::itemFactory(t) ;
 		inStream >> *newItem ;
 		newItems << newItem ;
-		qDebug("initial descriptor of copy is editable: %d",int(newItem->descriptorProperties("") & spec::editable)) ;
 //		newItems << new specDataItem(* (specDataItem*) itemPointer(mergeList.takeFirst())) ;
 		//newItems << new specDataItem(QList<specDataPoint>(),  temp) ;// TODO Default constructor?
 		specDataItem *pointer = (specDataItem*) newItems.last() ;
@@ -211,7 +208,6 @@ QModelIndexList specModel::merge(QModelIndexList& list, const QList<QPair<QStrin
 //// TODO BAUSTELLE
 //				}
 //			}
-			qDebug("initial descriptor of copy before merging is editable: %d",int(pointer->descriptorProperties("") & spec::editable)) ;
 			*pointer += *(currentItem) ;
 //			pointer->changeDescriptor("",pointer->descriptor("").append(currentItem->descriptor(""))) ;
 		}
@@ -287,7 +283,6 @@ QModelIndexList specModel::merge(QModelIndexList& list, const QList<QPair<QStrin
 			for(int i = 0 ; i < toBeInserted.size() ; i++)
 				returnList << index(row+i,0,parentAndPos.first) ;
 	}
-	qDebug("done merging") ;
 	return returnList ;
 }
 
@@ -319,9 +314,7 @@ void specModel::importFile(QModelIndex index)
 			QFile fileToImport(fileName) ;
 			fileToImport.open(QFile::ReadOnly | QFile::Text) ;
 			QList<specModelItem*> importedItems = importFunction(fileToImport) ;
-			qDebug("%d msecs to import",timer.restart()) ;
 			insertItems(importedItems,index) ;
-			qDebug("%d msecs to get header info",timer.elapsed()) ;
 		}
 	}
 }
@@ -361,13 +354,9 @@ specModel::specModel(QObject *par)
 	  dropBuddy(0),
 	  dontDelete(false)
 {
-	qDebug("initializing model") ;
 	root = new specFolderItem ;
-	qDebug("new root item") ;
 	Descriptors += "" ;
-	qDebug("new descriptor") ;
 	DescriptorProperties += spec::editable ;
-	qDebug() << "Model root item:" << root ;
 }
 
 specModel::~specModel()
@@ -438,14 +427,11 @@ bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int 
 	}
 	row = row < rowCount(parent) ? row : rowCount(parent) ;
 	
-	qDebug("inserting %d",timer.restart()) ;
 	emit layoutAboutToBeChanged() ;
 	beginInsertRows(parent, row, row+list.size()-1);
-	qDebug("assigning to folder %d amount: %d", timer.restart(), list.size()) ;
 	if (itemPointer(parent)->isFolder())
 		((specFolderItem*) itemPointer(parent))->haltRefreshes(true) ;
 	bool retVal = itemPointer(parent)->addChildren(list,row) ;
-	qDebug("done %d",timer.restart()) ;
 	endInsertRows();
 	emit layoutChanged() ;
 	
@@ -533,7 +519,6 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 			changed = true ;
 			specEditDescriptorCommand *command = new specEditDescriptorCommand ;
 			command->setParentObject(this) ;
-			qDebug() << "!!!!!! assigning item" << pointer ;
 			if (value.canConvert(QVariant::List))
 			{
 				QList<QVariant> list = value.toList() ;
@@ -600,7 +585,6 @@ bool specModel::removeRows(int position, int rows, const QModelIndex &parent)
 // 	QList<specModelItem*> list = itemPointer(index)->takeChildren(position,rows) ;
 	QList<specModelItem*> list ;
 	specFolderItem *parentPointer = (specFolderItem*) itemPointer(parent) ;
-	qDebug("removing %d rows at %d", rows, position) ;
 	for (int i = 0 ; i < rows ; i++)
 		list << itemPointer(index(position+i,0,parent)) ;
 	parentPointer->haltRefreshes(true) ;
@@ -629,11 +613,9 @@ void specModel::setMimeTypes(const QStringList& types)
 
 void specModel::eliminateChildren(QModelIndexList& list) const
 {
-	qDebug("before removing children: %d",list.size()) ;
 	for( QModelIndexList::size_type j = 0 ; j < list.size() ; j++)
 		if(list[j].column())
 			list.removeAt(j--) ;
-	qDebug("after removing other columns: %d", list.size()) ;
 	for( QModelIndexList::size_type j = 0 ; j < list.size() ; j++)
 	{
 		QModelIndexList parents = ancestry(list[j]) ;
@@ -655,12 +637,10 @@ QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 //	QTextStream textStream(&textData, QIODevice::WriteOnly) ;
 //	QDataStream stream(&encodedData,QIODevice::WriteOnly) ;
 	QModelIndexList list = indices ;
-	qDebug("originally in list: %d",list.size()) ;
 	eliminateChildren(list) ;
 // 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
 // 	cout << "mimeData list size:  " << list.size() << endl ;
 	
-	qDebug() << "exporting items of mime" << list ;
 	if (dropBuddy)
 		dropBuddy->setLastRequested(list) ;
 //	// For text export
@@ -676,16 +656,13 @@ QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 
 //	foreach(QModelIndex index,list) // TODO eliminate children
 //	{
-//		qDebug("checking item") ;
 //		if(index.isValid() && index.column() == 0)
 //		{
-//			qDebug("writing item") ;
 //			itemPointer(index)->writeOut(stream) ;
 //			itemPointer(index)->exportData(headerFormat, dataFormat, textStream);
 //		}
 //	}
 	
-// 	qDebug("setting mime data") ;
 
 //	foreach(const QString& type, mimeConverters)
 	for (QHash<QString,specMimeConverter*>::const_iterator i = mimeConverters.begin() ; i != mimeConverters.end() ; ++i)
@@ -699,7 +676,6 @@ QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 
 //	mimeData->setData(mime.first(),encodedData) ;
 //	mimeData->setData("text/plain",textData) ;
-// 	qDebug("returning mime data") ;
 	return mimeData ;
 }
 
@@ -736,9 +712,7 @@ bool specModel::dropMimeData(const QMimeData *data,
 
 	QByteArray encodedData = data->data(typeToUse) ;
 	QDataStream stream(&encodedData, QIODevice::ReadOnly) ;
-	qDebug() << "dropping mime from stream.  Type:" << typeToUse ;
 	QList<specModelItem*> newItems = converter->convert(stream) ;
-	qDebug() << "inserting" << newItems.size() << "items via mime" << newItems ;
 	insertItems(newItems,parent,row) ;
 	QModelIndexList newIndexes = indexList(newItems) ;
 
@@ -746,7 +720,6 @@ bool specModel::dropMimeData(const QMimeData *data,
 	{
 		specAddFolderCommand *command = new specAddFolderCommand ;
 		command->setParentObject(dropSource) ;
-		qDebug() << ")))) parent widget: " << dropSource << "Adding new undo command with these items:" << newItems ;
 		command->setItems(newIndexes) ;
 		dropBuddy->push(command);
 	}
@@ -757,10 +730,8 @@ bool specModel::dropMimeData(const QMimeData *data,
 void specModel::insertFromStream(QDataStream& stream, const QModelIndex& parent, int row)
 {
 	QList<specModelItem*> list ;
-	qDebug("starting insert from stream") ;
 	while(!stream.atEnd())
 	{
-		qDebug("dropping an item") ;
 		type t ;
 		stream >> t ;
 		specModelItem* pointer = specModelItem::itemFactory(t);
@@ -797,13 +768,10 @@ void specModel::applySubMap(const QModelIndexList & indexList)
 specModelItem* specModel::itemPointer(const QVector<int> &indexes) const
 {
 	specModelItem* pointer = root ;
-	qDebug() << "getting pointer from index vector of size " << indexes.size() << indexes ;
 	for (int i =  indexes.size() - 1 ; i >= 0 ; --i)
 	{
-		qDebug("getting pointer %d",indexes[i]) ;
 		pointer = ((specFolderItem*) pointer)->child(indexes[i]) ;
 	}
-	qDebug("got pointer") ;
 	return pointer ;
 }
 

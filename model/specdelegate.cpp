@@ -11,7 +11,6 @@ specDelegate::specDelegate(QObject *parent)
 
 bool specDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
 {
-	qDebug("Editor event") ;
 	return QItemDelegate::editorEvent(event,model,option,index) ;
 }
 
@@ -43,7 +42,6 @@ void specDelegate::setEditorData(QWidget *editor, const QModelIndex &index) cons
 
 void specDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-	qDebug("setting model data") ;
 	int activeLine = 0 ;
 	int lastNewLine = ((QTextEdit*) editor)->textCursor().position() ;
 	while ((lastNewLine = ((QTextEdit*) editor)->toPlainText().lastIndexOf(QRegExp("\n"),lastNewLine) - 1) > -1)
@@ -58,7 +56,6 @@ void specDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, cons
 
 void specDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-	qDebug("updating editor geometry") ;
 	QRect geom = option.rect ;
 	if(!index.column()) // TODO :  Improve!!
 		geom.setX(geom.x()+option.decorationSize.width()+3) ;

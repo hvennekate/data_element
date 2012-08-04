@@ -33,7 +33,6 @@ bool specFolderItem::addChildren(QList<specModelItem*> list, QList<specModelItem
 	
 QList<specModelItem*>::size_type specFolderItem::children() const
 {
-//	qDebug("checking children list size") ;
 	return childrenList.size() ;
 }
 
@@ -69,7 +68,6 @@ void specFolderItem::refreshPlotData()
 	QTime timer ;
 	timer.start();
 	if (suspendRefresh) return ;
-	qDebug("refreshing plot data %d",suspendRefresh)  ;
 	QVector<double> x, y ;
 	foreach(specModelItem* item, childrenList)
 	{
@@ -79,11 +77,8 @@ void specFolderItem::refreshPlotData()
 			y << item->sample(i).y() ;
 		}
 	}
-	qDebug("got data %d", timer.restart()) ;
 	processData(x,y) ;
-//	qDebug("processed data %d", timer.restart()) ;
 	setSamples(x,y) ;
-//	qDebug("set samples %d",timer.restart()) ;
 //	processData() ;
 }
 
@@ -242,7 +237,6 @@ void specFolderItem::exportData(const QList<QPair<bool,QString> >& headerFormat,
 
 void specFolderItem::haltRefreshes(bool halt) // TODO redundant
 {
-	qDebug("called suspend refresh %d %d",halt,children()) ;
 	suspendRefresh = halt ;
 	refreshPlotData() ;
 }

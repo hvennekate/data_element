@@ -23,7 +23,6 @@ void specAppWindow::closeEvent(QCloseEvent* event)
 	bool allClosed = true ;
 	while(!docks.isEmpty())
 	{
-		qDebug() << "cycling closing" ;
 		if (!docks.first()->close())
 		{
 			return ;

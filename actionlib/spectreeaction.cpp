@@ -2,7 +2,6 @@
 #include "specmulticommand.h"
 #include "specaddfoldercommand.h"
 #include "specmovecommand.h"
-#include <QDebug>
 
 specTreeAction::specTreeAction(QObject *parent) :
 	specUndoAction(parent)
@@ -24,7 +23,6 @@ void specTreeAction::execute()
 
 	// preparing new tree directories
 	moveTargets << QPair<specFolderItem*,QList<specModelItem*> >(new specFolderItem(),model->pointerList(view->getSelection())) ;
-	qDebug() << "headers" << headers << "indexes:" << moveTargets ;
 
 	for (int i = 0 ; i < headers.size() ; ++i)
 	{
@@ -59,10 +57,8 @@ void specTreeAction::execute()
 	QModelIndex index = view->currentIndex() ;
 	specModelItem *item = model->itemPointer(index) ;
 	int row = 0 ;
-	qDebug("checking if item is folder") ;
 	if (!item->isFolder())
 	{
-		qDebug("item is not a folder") ;
 		row = index.row()+1 ;
 		index = index.parent() ;
 	}
@@ -74,7 +70,6 @@ void specTreeAction::execute()
 	specAddFolderCommand *insertion = new specAddFolderCommand(command) ;
 	insertion->setItems(QModelIndexList() << model->index(row,0,index)) ;
 	insertion->setParentObject(view) ;
-	qDebug() << moveTargets ;
 
 	library->push(command);
 
@@ -84,7 +79,6 @@ void specTreeAction::execute()
 			continue ;
 		QModelIndexList targets = model->indexList(moveTargets[i].second) ;
 		QModelIndex parent = model->index(moveTargets[i].first) ;
-		qDebug() << "parent: " << parent << "target list:" << targets ;
 		specMoveCommand *moveCommand = new specMoveCommand(targets,parent,0,command) ;
 		moveCommand->setParentObject(view);
 		moveCommand->redo();

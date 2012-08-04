@@ -119,14 +119,12 @@ void specMergeAction::execute()
 	// preparing insertion command
 	specAddFolderCommand *insertionCommand = new specAddFolderCommand(command) ;
 	QModelIndexList insertList = model->indexList(newlyInserted.toList()) ;
-	qDebug() << "******* insert" << insertList ;
 	insertionCommand->setItems(insertList) ;
 	insertionCommand->setParentObject(view) ;
 
 	// prepare to delete the old items
 	specDeleteCommand *deletionCommand = new specDeleteCommand(command) ;
 	QModelIndexList deleteList = model->indexList(toBeDeleted.toList()) ;
-	qDebug() << "******* delete" << deleteList ;
 	deletionCommand->setItems(deleteList) ;
 	deletionCommand->setParentObject(view) ;
 
@@ -191,7 +189,6 @@ bool specMergeAction::itemsAreEqual(specModelItem* first, specModelItem* second,
 	bool equal = true ;
 	for(QList<QPair<QStringList::size_type, double> >::size_type i = 0 ; i < criteria.size() ; i++)
 	{
-		qDebug() << "comparing" << i << descriptors[criteria[i].first] << first->descriptor(descriptors[criteria[i].first]) << second->descriptor(descriptors[criteria[i].first]) ;
 		QStringList::size_type descriptor = criteria[i].first ;
 		double tolerance = criteria[i].second ;
 		if (descriptorProperties[descriptor] & spec::numeric)
