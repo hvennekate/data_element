@@ -32,6 +32,21 @@ void specRange::pointMoved(const int& point, const double& x, const double& y)
 	refreshPlotData() ;
 }
 
+void specRange::writeToStream(QDataStream &out) const
+{
+	specCanvasItem::writeToStream(out) ;
+	out << qreal(yVal) << qreal(minValue()) << qreal(maxValue()) ;
+}
+
+void specRange::readFromStream(QDataStream &in)
+{
+	qreal y, min, max ;
+	in >> y >> min >> max ;
+	yVal = y ;
+	setInterval(min, max, QwtInterval::IncludeBorders) ;
+	refreshPlotData();
+}
+
 void specRange::refreshPlotData()
 {
 	QVector<double> xarr, yarr ;

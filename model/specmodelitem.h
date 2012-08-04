@@ -11,14 +11,13 @@
 #include <QTextStream>
 #include "specrange.h"
 #include "specdescriptor.h"
-#include "specstreamable.h"
 
 class specModelItem ;
 class specFolderItem ;
 class specMetaItem ;
 
 /*! Base class of list items. */
-class specModelItem : public specCanvasItem, public specStreamable
+class specModelItem : public specCanvasItem
 {
 private:
 	specFolderItem* iparent ;

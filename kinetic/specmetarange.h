@@ -10,6 +10,7 @@ class specMetaRange : public specRange
 private:
 	int selected ;
 	specMetaVariable *parent ;
+	type typeId() const { return specStreamable::metaRange ; }
 public:
 	specMetaRange(double x1, double x2, specMetaVariable *parent) ;
 	void refreshPlotData();

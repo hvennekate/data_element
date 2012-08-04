@@ -3,6 +3,8 @@
 
 #include <QDataStream>
 
+// TODO Pimpl this class.
+
 class specStreamable
 {
 public:
@@ -57,7 +59,9 @@ public:
 		metaView = 49,
 		metaWidget = 50,
 		logModel = 51,
-		logView = 52
+		logView = 52,
+		range = 53,
+		metaRange = 54
 	};
 protected:
 	virtual void writeToStream(QDataStream& out) const = 0;

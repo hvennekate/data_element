@@ -1,4 +1,5 @@
 #include "specstreamable.h"
+#include <QDebug>
 
 specStreamable::type specStreamable::effectiveId() const
 {

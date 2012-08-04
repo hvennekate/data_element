@@ -384,4 +384,5 @@ void specView::resetDone()
 
 void specView::dragEnterEvent(QDragEnterEvent *event)
 {
+	Q_UNUSED(event)
 }

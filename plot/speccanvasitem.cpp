@@ -4,6 +4,7 @@
 #include <QTextStream>
 #include <QInputDialog>
 #include <qwt_symbol.h>
+#include "specplotstyle.h"
 
 specCanvasItem::specCanvasItem( QString description)
 		: QwtPlotCurve(description)
@@ -141,6 +142,18 @@ void specCanvasItem::highlight(bool highlight)
 QColor specCanvasItem::penColor()
 {
 	return pen().color() ;
+}
+
+void specCanvasItem::writeToStream(QDataStream &out) const
+{
+	out << specPlotStyle(this) ;
+}
+
+void specCanvasItem::readFromStream(QDataStream &in)
+{
+	specPlotStyle style(this) ;
+	in >> style ;
+	style.apply(this) ;
 }
 
 void specCanvasItem::setPenColor(const QColor& newColor)

@@ -99,9 +99,10 @@ void specFolderItem::readFromStream(QDataStream& in)
 	quint64 numChildren ;
 	specModelItem::readFromStream(in) ;
 	in >> numChildren ;
-	childrenList.fill(0,numChildren) ;
-	for (int i = 0 ; i < childrenList.size() ; ++i)
-		childrenList[i] = (specModelItem*) produceItem(in) ; // TODO remove all zeros
+	QList<specModelItem*> newChildren ;
+	for (int i = 0 ; i < numChildren ; ++i)
+		newChildren << (specModelItem*) produceItem(in) ; // TODO remove all zeros
+	addChildren(newChildren) ;
 }
 
 void specFolderItem::writeToStream(QDataStream& out) const

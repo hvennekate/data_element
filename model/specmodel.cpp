@@ -814,6 +814,7 @@ QModelIndex specModel::index(const QVector<int> &ancestry,int column) const
 
 QModelIndex specModel::index(specModelItem *pointer, int column) const
 {
+	if (!pointer) return QModelIndex() ;
 	specModelItem* parent = pointer ;
 	// Test if item is indeed part of THIS model
 	while (parent->parent()) parent = parent->parent() ;

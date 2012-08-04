@@ -198,16 +198,17 @@ QStringList specModelItem::descriptorKeys() const
 
 void specModelItem::writeToStream(QDataStream &out) const
 {
+	specCanvasItem::writeToStream(out) ;
 	out << mergePlotData << sortPlotData
-	    << description << specPlotStyle(this) ;
+		<< description ;
 }
 
 void specModelItem::readFromStream(QDataStream & in)
 {
-	specPlotStyle style(this) ;
+	specCanvasItem::readFromStream(in) ;
 	in >> mergePlotData >> sortPlotData
-	   >> description >> style ;
-	style.apply(this);
+	   >> description ;
+	invalidate() ;
 }
 
 spec::descriptorFlags specModelItem::descriptorProperties(const QString& key) const

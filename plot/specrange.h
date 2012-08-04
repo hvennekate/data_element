@@ -7,6 +7,10 @@
 
 class specRange : public specCanvasItem, public QwtInterval // TODO make private and channel/wrap required functionality
 {
+private:
+	void writeToStream(QDataStream &out) const ;
+	void readFromStream(QDataStream &in) ;
+	type typeId() const { return specStreamable::range ; }
 protected:
 	double yVal ;
 public:

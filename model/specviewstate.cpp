@@ -102,7 +102,9 @@ void specViewState::restoreState()
 	// restore selection
 	QItemSelection selectedIndexes ;
 	for (int i = 0 ; i < selectedItems.size() ; ++i)
+	{
 		selectedIndexes << QItemSelectionRange(model()->index(selectedItems[i])) ;
+	}
 
 	parent->selectionModel()->select(selectedIndexes,QItemSelectionModel::Select) ;
 
@@ -130,6 +132,8 @@ void specViewState::writeToStream(QDataStream &out) const
 
 void specViewState::readFromStream(QDataStream &in)
 {
+	openFolders.clear();
+	selectedItems.clear();
 	quint32 openFoldersSize ;
 	quint32 selectedItemsSize ;
 	in >> openFoldersSize
@@ -137,8 +141,6 @@ void specViewState::readFromStream(QDataStream &in)
 	   >> hierarchyOfTopItem
 	   >> hierarchyOfCurrentItem
 	   >> widths ;
-	openFolders.resize(openFoldersSize) ;
-	selectedItems.resize(selectedItemsSize);
 	QVector<int> hierarchy ;
 	if (!model())
 	{
@@ -146,16 +148,17 @@ void specViewState::readFromStream(QDataStream &in)
 		return ; // TODO cause error here.
 	}
 
-	for (int i = 0 ; i < openFolders.size() ; ++i)
+	for (int i = 0 ; i < openFoldersSize ; ++i)
 	{
 		in >> hierarchy ;
-		openFolders[i] = (specFolderItem*) model()->itemPointer(hierarchy) ;
+		specFolderItem* p = dynamic_cast<specFolderItem*>(model()->itemPointer(hierarchy)) ;
+		if (p) openFolders << p ;
 	}
-	for (int i = 0 ; i < selectedItems.size() ; ++i)
+	for (int i = 0 ; i < selectedItemsSize ; ++i)
 	{
 		in >> hierarchy ;
-		selectedItems[i] = model()->itemPointer(hierarchy) ;
+		specModelItem *p = model()->itemPointer(hierarchy) ;
+		if (p) selectedItems << p ;
 	}
-
 	// TODO maybe implicit restore
 }

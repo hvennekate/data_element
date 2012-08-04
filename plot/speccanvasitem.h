@@ -8,11 +8,15 @@
 #include "names.h"
 #include <QMenu>
 #include <qwt_symbol.h>
+#include "specstreamable.h"
 
-class specCanvasItem : public QwtPlotCurve
+class specCanvasItem : public QwtPlotCurve, public specStreamable
 {
 	private:
 		QList<int> selectedPoints ;
+	protected:
+		void writeToStream(QDataStream &out) const;
+		void readFromStream(QDataStream &in) ;
 	public:
 		specCanvasItem(QString description="");
 		virtual void pointMoved(const int&, const double&, const double&) ;
@@ -37,7 +41,6 @@ class specCanvasItem : public QwtPlotCurve
 		void setSymbolStyle(const int&) ;
 		QColor symbolPenColor() ;
 		void setSymbolPenColor(const QColor&) ;
-
 };
 
 #endif
