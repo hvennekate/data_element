@@ -100,7 +100,7 @@ void specFolderItem::readFromStream(QDataStream& in)
 	specModelItem::readFromStream(in) ;
 	in >> numChildren ;
 	QList<specModelItem*> newChildren ;
-	for (int i = 0 ; i < numChildren ; ++i)
+	for (quint64 i = 0 ; i < numChildren ; ++i)
 		newChildren << (specModelItem*) produceItem(in) ; // TODO remove all zeros
 	addChildren(newChildren) ;
 }

@@ -5,7 +5,7 @@
 specLogWidget::specLogWidget(QWidget *parent)
 	: QDockWidget("Logs", parent),
 	  view(new specLogView(this)),
-	  layout(new QVBoxLayout(this))
+	  layout(new QVBoxLayout)
 {
 	setFloating(true) ;
 	QWidget* content = new QWidget(this) ;

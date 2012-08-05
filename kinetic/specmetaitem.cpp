@@ -116,7 +116,7 @@ void specMetaItem::attach(QwtPlot *plot)
 
 void specMetaItem::detach()
 {
-//	specModelItem::detach() ;
+//	specModelItem::detach() ; // TODO detach myself?
 	filter->detachRanges();
 }
 

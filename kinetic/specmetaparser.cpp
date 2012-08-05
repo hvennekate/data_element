@@ -65,13 +65,13 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 		QString value  = expression.section(assignment,1,1) ;
 		if (!name.exactMatch(symbol))
 		{
-			errors << QString("Not an acceptable variable name:  %1").arg(symbol) ;
+			errors << QString("Not an acceptable variable name:  ") + symbol ;
 			valid = false ;
 			continue ;
 		}
 		if (!acceptable.exactMatch(value))
 		{
-			errors << QString("Not an acceptable value:  %1").arg(value) ;
+			errors << QString("Not an acceptable value:  ") + value ;
 			valid = false ;
 			continue ;
 		}
@@ -84,7 +84,6 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 //	y = prepare("y") ;
 	xExp = xExpression ;
 	yExp = yExpression ;
-	std::cerr << "x-Expression: " << x << "\ny-Expression: " << y << "\n" ;
 }
 
 QwtSeriesData<QPointF>* specMetaParser::evaluate(const QVector<specModelItem*>& items)
@@ -191,8 +190,11 @@ void specMetaParser::evaluatorIntervalChanged()
 	if (parent)
 	{
 		QStringList descriptor;
-		foreach(specMetaVariable* evaluator, evaluators)
-			descriptor += evaluator->codeValue() ;
+		GiNaC::container<std::list>::const_iterator j = symbols.begin() ;
+		for (QList<specMetaVariable*>::const_iterator i = evaluators.begin() ;
+		     i < evaluators.end() && j != symbols.end() ; ++i, ++j)
+			descriptor += QString::fromStdString(GiNaC::ex_to<GiNaC::symbol>(*j).get_name())
+					+ " = " + (*i)->codeValue() ; // TODO this is a pain...
 		parent->changeDescriptor("variables", descriptor.join("\n")) ;
 	}
 	changingRange = false ;

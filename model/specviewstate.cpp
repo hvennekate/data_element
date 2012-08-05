@@ -148,13 +148,13 @@ void specViewState::readFromStream(QDataStream &in)
 		return ; // TODO cause error here.
 	}
 
-	for (int i = 0 ; i < openFoldersSize ; ++i)
+	for (quint32 i = 0 ; i < openFoldersSize ; ++i)
 	{
 		in >> hierarchy ;
 		specFolderItem* p = dynamic_cast<specFolderItem*>(model()->itemPointer(hierarchy)) ;
 		if (p) openFolders << p ;
 	}
-	for (int i = 0 ; i < selectedItemsSize ; ++i)
+	for (quint32 i = 0 ; i < selectedItemsSize ; ++i)
 	{
 		in >> hierarchy ;
 		specModelItem *p = model()->itemPointer(hierarchy) ;

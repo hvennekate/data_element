@@ -141,7 +141,7 @@ void specMetaVariable::produceRanges(QSet<specPlot *> plots)
 	if (!QwtInterval::isValid()) return ; // TODO consider just disposing of the ranges
 	if (plots.size() != ranges.size())
 	{
-		clearRanges();
+		clearRanges(); // TODO : consider replotting
 		foreach(specPlot* plot, plots)
 		{
 			specMetaRange *range = new specMetaRange(minValue(),maxValue(),this) ;
