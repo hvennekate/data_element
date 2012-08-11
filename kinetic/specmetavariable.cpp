@@ -68,6 +68,7 @@ specMetaVariable::specMetaVariable()
 	  begin(0),
 	  end(int(INFINITY)),
 	  inc(1),
+	  refreshingRanges(false),
 	  descriptor("")
 {}
 
@@ -165,14 +166,17 @@ void specMetaVariable::detachRanges()
 
 void specMetaVariable::rangeChanged(specMetaRange* range) // TODO just take two double s
 {
+	if (refreshingRanges) return ;
+	refreshingRanges = true ;
 	setInterval(range->minValue(),range->maxValue()) ;
 	if (parent)
 		parent->evaluatorIntervalChanged() ;
 	foreach(specRange* range, ranges)
 	{
 		range->setInterval(minValue(),maxValue()) ;
-		range->specRange::refreshPlotData() ;
+		range->refreshPlotData() ;
 	}
+	refreshingRanges = false ;
 }
 
 QString specMetaVariable::codeValue()

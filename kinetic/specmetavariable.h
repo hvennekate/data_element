@@ -12,6 +12,7 @@ class CanvasPicker ;
 class specMetaVariable : public QwtInterval // TODO change to specInterval
 {
 	int begin, end, inc ;
+	bool refreshingRanges ;
 	static QString extract(QString&, const QRegExp&) ;
 	specMetaParser* parent ; // TODO extract templated version of parent, child to inherit from
 				// template <class parent, class child> class parent
