@@ -19,19 +19,20 @@ private:
 	void readFromStream(QDataStream & in) ;
 	void writeToStream(QDataStream & out) const ;
 public:
-
 	bool disconnectServer(specModelItem*) ;
 	bool connectServer(specModelItem*) ;
 	explicit specMetaItem(specFolderItem* par=0, QString description="");
 	QList<specModelItem*> purgeConnections() ;
 	void attach(QwtPlot *plot) ;
-	void refreshPointers(const QHash<specModelItem*,specModelItem*>& mapping) ;
+	void refreshPointers(const QHash<specModelItem*,specModelItem*>& mapping) ; // TODO restore connections, maybe by hierarchy...
 	void refreshPlotData();
 	QStringList descriptorKeys() const ;
 	QString descriptor(const QString &key, bool full=false) const ;
 	bool changeDescriptor(QString key, QString value) ; // TODO add changeDescriptor(key,specDescriptor)
 	spec::descriptorFlags descriptorProperties(const QString& key) const ;
 	QIcon decoration() const ;
+	void getRangePoint(int variable, int range, int point, double& x, double& y) const ;
+	void setRange(int variableNo, int rangeNo, int pointNo, double newX, double newY) ;
 };
 
 /* TODO in other classes

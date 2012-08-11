@@ -69,6 +69,7 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	actions->addPlot(plot) ;
 
 	kineticWidget->view()->assignDataView(items) ;
+	kineticWidget->view()->setUndoPartner(actions) ;
 	kineticWidget->addToolbar(actions) ;
 	kineticsAction->setIcon(QIcon(":/kineticwindow.png"));
 
@@ -230,6 +231,8 @@ void specPlotWidget::setConnections()
 	connect(actions,SIGNAL(stackChanged()), this, SLOT(modified())) ; // TODO check
 
 	connect(kineticWidget->internalPlot(),SIGNAL(replotted()),plot,SLOT(replot())) ;
+	connect(kineticWidget->internalPlot(), SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(), SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
+	connect(plot, SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(),SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
 }
 
 #include <QPainter>

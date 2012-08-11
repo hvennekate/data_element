@@ -7,6 +7,7 @@
 #include <specmodelitem.h>
 #include <names.h>
 #include <specrange.h>
+#include <QSet>
 
 class QPoint;
 class QCustomEvent;
@@ -29,7 +30,7 @@ private:
 	void movePointExplicitly() ;
 	bool owning ;
 	specPlot *plot() { return (specPlot *)parent(); }
-	QList<specCanvasItem*> selectable ;
+	QSet<specCanvasItem*> selectable ;
 	void highlightSelectable(bool) ;
 
 	specCanvasItem *d_selectedCurve, *lastSelected;
@@ -41,13 +42,12 @@ public:
 	virtual bool eventFilter(QObject *, QEvent *);
 
 	virtual bool event(QEvent *);
-	specCanvasItem* current() ;
-	inline const QList<specCanvasItem*> getSelectable() { return selectable ;}
-	void addSelectable(const QList<specCanvasItem*>&) ;
+	void addSelectable(const QSet<specCanvasItem*>&) ;
 	void addSelectable(specCanvasItem*) ;
-	void removeSelectable(QList<specCanvasItem*>&) ;
+	void removeSelectable(QSet<specCanvasItem*>&) ;
 	void removeSelectable(specCanvasItem*) ;
 	void removeSelectable();
+	void setSelectable(const QSet<specCanvasItem*>&) ;
 	void removeSelected() ;
 	inline void setOwning(bool Owning =true) { owning = Owning ; } // TODO do this more skilfully.
 

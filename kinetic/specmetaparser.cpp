@@ -9,6 +9,7 @@ specMetaParser::specMetaParser(const QString &expressionList, const QString& xEx
 	: parent(par),
 	  changingRange(false)
 {
+	qDebug() << "creating parser" << this ;
 	setAssignments(expressionList, xExpression, yExpression) ;
 }
 
@@ -24,10 +25,12 @@ void specMetaParser::clear()
 
 void specMetaParser::setAssignments(const QString &expressionList, const QString& xExpression, const QString& yExpression)
 {
+	qDebug() << "setting assignments" ;
 	if (changingRange) return ;
 	valid = true ;
 	const QRegExp name("[a-zA-Z][a-zA-Z0-9]*") ;
 	clear() ;
+	qDebug() << "cleared old variables" ;
 	// Syntax:
 	//  [start:stop:incr]"string"
 	// oder:
@@ -184,22 +187,6 @@ bool specMetaParser::containsNan(const QVector<double> &vector)
 	return false ;
 }
 
-void specMetaParser::evaluatorIntervalChanged()
-{
-	changingRange = true ;
-	if (parent)
-	{
-		QStringList descriptor;
-		GiNaC::container<std::list>::const_iterator j = symbols.begin() ;
-		for (QList<specMetaVariable*>::const_iterator i = evaluators.begin() ;
-		     i < evaluators.end() && j != symbols.end() ; ++i, ++j)
-			descriptor += QString::fromStdString(GiNaC::ex_to<GiNaC::symbol>(*j).get_name())
-					+ " = " + (*i)->codeValue() ; // TODO this is a pain...
-		parent->changeDescriptor("variables", descriptor.join("\n")) ;
-	}
-	changingRange = false ;
-}
-
 void specMetaParser::attachRanges(QSet<specPlot *> plots)
 {
 	foreach(specMetaVariable* evaluator, evaluators)
@@ -210,4 +197,38 @@ void specMetaParser::detachRanges()
 {
 	foreach(specMetaVariable* evaluator, evaluators)
 		evaluator->detachRanges();
+}
+
+specMetaRange::addressObject specMetaParser::addressOf(specMetaVariable * v) const
+{
+	specMetaRange::addressObject a ;
+	a.item = parent ;
+	a.range = -1 ;
+	a.variable = evaluators.indexOf(v) ;
+	return a ;
+}
+
+void specMetaParser::getRangePoint(int variable, int range, int point, double &x, double &y) const
+{
+	if (variable < 0 || variable >= evaluators.size()) return ;
+	evaluators[variable]->getRangePoint(range,point,x,y) ;
+}
+
+void specMetaParser::setRange(int variableNo, int rangeNo, int pointNo, double newX, double newY)
+{
+	if (variableNo < 0 || variableNo >= evaluators.size()) return ;
+	evaluators[variableNo]->setRange(rangeNo, pointNo, newX, newY) ;
+	changingRange = true ;
+	if (parent)
+	{
+		QStringList descriptor;
+		GiNaC::container<std::list>::const_iterator j = symbols.begin() ;
+		for (QList<specMetaVariable*>::const_iterator i = evaluators.begin() ;
+			 i < evaluators.end() && j != symbols.end() ; ++i, ++j)
+			descriptor += QString::fromStdString(GiNaC::ex_to<GiNaC::symbol>(*j).get_name())
+					+ " = " + (*i)->codeValue() ; // TODO this is a pain...
+		parent->changeDescriptor("variables", descriptor.join("\n")) ;
+	}
+	changingRange = false ;
+
 }

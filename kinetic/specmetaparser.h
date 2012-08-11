@@ -24,7 +24,6 @@ private:
 	bool changingRange ;
 public:
 	specMetaParser(const QString &expressionList, const QString& xExpression, const QString& yExpression, specMetaItem* parent);
-	void evaluatorIntervalChanged() ;
 	QString warnings() const ;
 	~specMetaParser() { clear() ; }
 	bool ok() const ;
@@ -32,6 +31,9 @@ public:
 	QwtSeriesData<QPointF>* evaluate(const QVector<specModelItem*>&);
 	void attachRanges(QSet<specPlot*>) ;
 	void detachRanges() ;
+	specMetaRange::addressObject addressOf(specMetaVariable*) const ;
+	void getRangePoint(int variable, int range, int point, double &x, double &y) const ;
+	void setRange(int variableNo, int rangeNo, int pointNo, double newX, double newY) ;
 };
 
 #endif // SPECMETAPARSER_H

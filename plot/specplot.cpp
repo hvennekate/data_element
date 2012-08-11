@@ -23,7 +23,7 @@ specPlot::specPlot(QWidget *parent)
 	  textEdit(new specSimpleTextEdit(this)),
 	  select(false)
 {
-	connect(metaPicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SLOT(metaRangeMoved(specCanvasItem*,int,double,double))) ;
+	connect(metaPicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SIGNAL(metaRangeModified(specCanvasItem*,int,double,double))) ;
 	setAutoReplot(false) ;
 	zoom  = new specZoomer(this->canvas()) ;
 	ranges = new QList<specCanvasItem*> ;
@@ -138,12 +138,12 @@ void specPlot::replot()
 	ranges->clear() ;
 	ordinary->clear() ;
 	selectRanges->clear();
-	QList<specCanvasItem*> newMetaRanges; // TODO local variable
+	QSet<specCanvasItem*> newMetaRanges; // TODO local variable
 	QVector<specSVGItem*> svgitems ;
 	foreach(QwtPlotItem* item, allItems)
 	{
 		if (dynamic_cast<specMetaRange*>(item))
-			newMetaRanges << ((specCanvasItem*) item) ;
+			newMetaRanges += ((specCanvasItem*) item) ;
 		else if (dynamic_cast<specSelectRange*>(item))
 			selectRanges->append((specCanvasItem*) item) ;
 		else if (dynamic_cast<specRange*>(item))
@@ -153,12 +153,7 @@ void specPlot::replot()
 		else if (dynamic_cast<specCanvasItem*>( item))
 			ordinary->append((specCanvasItem*) item) ;
 	}
-	if (metaRanges != newMetaRanges)
-	{
-		metaRanges = newMetaRanges ;
-		metaPicker->removeSelectable();
-		metaPicker->addSelectable(metaRanges) ;
-	}
+	metaPicker->setSelectable(newMetaRanges);
 	if (allItems.isEmpty())
 	{
 		QwtPlot::replot() ;
@@ -320,12 +315,6 @@ void specPlot::addRange()
 
 void specPlot::deleteRange()
 {
-//	if(picker()->current() && ranges->indexOf(picker()->current()) >= 0)
-//		delete ranges->takeAt(ranges->indexOf(picker()->current())) ;
-//	else if(picker()->current() && selectRanges->indexOf(picker()->current()) >= 0)
-//		delete selectRanges->takeAt(selectRanges->indexOf(picker()->current())) ;
-//	else if(picker()->current() && kineticRanges->indexOf(picker()->current()) >= 0)
-//		delete kineticRanges->takeAt(kineticRanges->indexOf(picker()->current())) ;
 	refreshRanges() ;
 }
 
@@ -350,13 +339,6 @@ void specPlot::refreshRanges()
 		pointer->applyRanges(rangeArray) ;
 	deleteZeroRangeAction->setEnabled(ranges->size()) ;
 	replot() ;
-}
-
-void specPlot::metaRangeMoved(specCanvasItem *item, int point, double x, double y)
-{
-	if (metaRanges.contains((specCanvasItem*) item))
-		((specMetaRange*) item)->pointMoved(point,x,y) ;
-	// TODO emit signal for metaview update
 }
 
 void specPlot::writeToStream(QDataStream &out) const

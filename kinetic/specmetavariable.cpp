@@ -63,14 +63,17 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 	return product ;
 }
 
-specMetaVariable::specMetaVariable()
+specMetaVariable::specMetaVariable(specMetaParser *p)
 	: QwtInterval(-INFINITY,INFINITY,QwtInterval::IncludeBorders),
 	  begin(0),
 	  end(int(INFINITY)),
 	  inc(1),
 	  refreshingRanges(false),
+	  parent(p),
 	  descriptor("")
-{}
+{
+	qDebug() << "creating meta variable" << this ;
+}
 
 bool specMetaVariable::setIndexRange(int &start, int &finish, int &step, int max) const
 {
@@ -164,23 +167,41 @@ void specMetaVariable::detachRanges()
 		range->detach();
 }
 
-void specMetaVariable::rangeChanged(specMetaRange* range) // TODO just take two double s
-{
-	if (refreshingRanges) return ;
-	refreshingRanges = true ;
-	setInterval(range->minValue(),range->maxValue()) ;
-	if (parent)
-		parent->evaluatorIntervalChanged() ;
-	foreach(specRange* range, ranges)
-	{
-		range->setInterval(minValue(),maxValue()) ;
-		range->refreshPlotData() ;
-	}
-	refreshingRanges = false ;
-}
-
-QString specMetaVariable::codeValue()
+QString specMetaVariable::codeValue() const
 {
 	if (!QwtInterval::isValid()) return code ;
 	return code + QString::number(minValue()) + ":" + QString::number(maxValue()) ;
+}
+
+specMetaRange::addressObject specMetaVariable::address(specMetaRange* r)
+{
+	if (!parent) return specMetaRange::addressObject{0,-1,-1} ;
+	qDebug() << "querying address from" << parent << "Queried by" << this ;
+	specMetaRange::addressObject a = parent->addressOf(this) ;
+	a.range = ranges.indexOf(r) ;
+	return a;
+}
+
+void specMetaVariable::getRangePoint(int range, int point, double &x, double &y) const
+{
+	if (range <0 || range >= ranges.size()) return ;
+	if (point != 0 && point != 1) return ;
+	x = point == 0 ? minValue() : maxValue() ;
+	y = ranges[range]->sample(0).x() ; // TODO this is uggahh...
+}
+
+void specMetaVariable::setRange(int rangeNo, int pointNo, double newX, double newY)
+{
+	if (pointNo != 0 && pointNo != 1) return ;
+	if (pointNo == 0) setMinValue(newX) ;
+	if (pointNo == 1) setMaxValue(newX) ;
+	if (!isValid())
+		setInterval(maxValue(),minValue()) ;
+	foreach (specMetaRange* range, ranges)
+	{
+		range->setInterval(minValue(),maxValue());
+		range->refreshPlotData();
+	}
+	if (rangeNo < 0 || rangeNo >= ranges.size()) return ;
+	ranges[rangeNo]->pointMoved(pointNo, newX, newY);
 }

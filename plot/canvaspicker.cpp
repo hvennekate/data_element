@@ -67,8 +67,13 @@ CanvasPicker::CanvasPicker ( specPlot *plot )
 //	shiftCurveCursor ( true );  // What is this good for?  Happy debugging?!
 }
 
-specCanvasItem* CanvasPicker::current()
-{ return lastSelected ; }
+void CanvasPicker::setSelectable(const QSet<specCanvasItem *> &toSet)
+{
+	QSet<specCanvasItem*> toRemove(selectable - toSet),
+						  toAdd(toSet - selectable) ;
+	removeSelectable(toRemove) ;
+	addSelectable(toAdd) ;
+}
 
 bool CanvasPicker::event ( QEvent *e )
 {
@@ -211,7 +216,7 @@ void CanvasPicker::select ( const QPoint &pos )
 	d_selectedPoint = -1;
 //	if ( plot()->itemList().isEmpty() ) return ;
 
-	for ( QList<specCanvasItem*>::iterator it = selectable.begin(); it != selectable.end(); ++it )
+	for ( QSet<specCanvasItem*>::iterator it = selectable.begin(); it != selectable.end(); ++it )
 	{
 //		if ( ( *it )->rtti() == QwtPlotCurve::Rtti_PlotCurve ) // TODO do we need an adapted version?
 //		{
@@ -368,7 +373,7 @@ Q_UNUSED(showIt)
 // Select the next/previous curve
 void CanvasPicker::shiftCurveCursor ( bool up )
 {
-	QList<specCanvasItem*>::iterator it;
+	QSet<specCanvasItem*>::iterator it;
 
 	if ( selectable.isEmpty() )
 		return;
@@ -455,27 +460,27 @@ void CanvasPicker::movePointExplicitly()
 void CanvasPicker::highlightSelectable(bool highlight)
 {
 	// TODO enable highlighting on selectable items
-	for (int i = 0 ; i < selectable.size() ; ++i)
-		selectable[i]->highlight(highlight) ;
+	foreach(specCanvasItem* item, selectable)
+		item->highlight(highlight) ;
 }
 
 void CanvasPicker::addSelectable(specCanvasItem *item)
 {
-	QList<specCanvasItem*> list ;
+	QSet<specCanvasItem*> list ;
 	list << item ;
 	addSelectable(list) ;
 }
 
 void CanvasPicker::removeSelectable(specCanvasItem *item)
 {
-	QList<specCanvasItem*> list ;
+	QSet<specCanvasItem*> list ;
 	list << item ;
 	removeSelectable(list) ;
 }
 
-void CanvasPicker::addSelectable(const QList<specCanvasItem *> &list)
+void CanvasPicker::addSelectable(const QSet<specCanvasItem *> &list)
 {
-	selectable << list ;
+	selectable += list ;
 //	foreach(specCanvasItem* item, list)  // TODO consider this version.
 //		if (!list.contains(item))
 //			list << item ;
@@ -483,7 +488,7 @@ void CanvasPicker::addSelectable(const QList<specCanvasItem *> &list)
 	plot()->replot();
 }
 
-void CanvasPicker::removeSelectable(QList<specCanvasItem *> &list)
+void CanvasPicker::removeSelectable(QSet<specCanvasItem *> &list)
 {
 	highlightSelectable(false) ;
 	if (list.contains(d_selectedCurve))
@@ -500,7 +505,7 @@ void CanvasPicker::removeSelectable(QList<specCanvasItem *> &list)
 		}
 	}
 	foreach(specCanvasItem* item, list)
-		selectable.removeOne(item) ;
+		selectable.remove(item) ;
 
 	highlightSelectable(true) ;
 	plot()->replot() ;
@@ -510,7 +515,7 @@ void CanvasPicker::removeSelected()
 {
 	if (d_selectedCurve)
 	{
-		QList<specCanvasItem*> toRemove ;
+		QSet<specCanvasItem*> toRemove ;
 		toRemove << d_selectedCurve ;
 		removeSelectable(toRemove) ;
 	}

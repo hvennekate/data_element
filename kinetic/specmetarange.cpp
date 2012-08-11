@@ -5,14 +5,11 @@
 
 specMetaRange::specMetaRange(double x1, double x2, specMetaVariable *par)
 	: specRange(x1,x2),
-	  selected(-1),
 	  parent(par)
 {
 }
 
-void specMetaRange::refreshPlotData()
+specMetaRange::addressObject specMetaRange::address()
 {
-	specRange::refreshPlotData() ;
-	if (parent)
-		parent->rangeChanged(this);
+	return parent->address(this) ;
 }

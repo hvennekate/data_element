@@ -118,7 +118,6 @@ void specMetaItem::refreshPlotData()
 	// TODO do some more checks on valid items etc.
 	foreach(specModelItem *item, items)
 		item->revalidate();
-	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
 	setData(processData(filter->evaluate(items.toList().toVector()))) ; // TODO use vector
 	variables["errors"] = filter->warnings() ;
 	refreshOtherPlots() ;
@@ -142,6 +141,7 @@ bool specMetaItem::changeDescriptor(QString key, QString value)
 	if (key == "") return specModelItem::changeDescriptor(key,value) ;
 	if (!descriptorKeys().contains(key)) return false ;
 	variables[key] = value ;
+	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
 	invalidate();
 	return true ;
 }
@@ -158,4 +158,14 @@ QIcon specMetaItem::decoration() const
 		return QIcon::fromTheme("dialog-warning") ;
 
 	return QIcon(":/kinetic.png") ;
+}
+
+void specMetaItem::getRangePoint(int variable, int range, int point, double &x, double &y) const
+{
+	filter->getRangePoint(variable, range,point,x,y) ;
+}
+
+void specMetaItem::setRange(int variableNo, int rangeNo, int pointNo, double newX, double newY)
+{
+	filter->setRange(variableNo, rangeNo, pointNo, newX, newY) ;
 }

@@ -24,7 +24,6 @@ private:
 	QList<specCanvasItem*>* ordinary ;
 	QList<specCanvasItem*>* kineticRanges ;
 	QList<specCanvasItem*>* selectRanges ;
-	QList<specCanvasItem*> metaRanges ;
 	specZoomer   *zoom ;
 	bool scaleX, scaleY ;
 	void contextMenuEvent ( QContextMenuEvent* ) ;
@@ -52,7 +51,6 @@ private slots:
 	void changeTitle(QString) ;
 	void changeXLabel(QString) ;
 	void changeYLabel(QString) ;
-	void metaRangeMoved(specCanvasItem*, int, double, double) ;
 public:
 	bool select ;
 	QList<specCanvasItem*>* selectable() ;
@@ -65,6 +63,7 @@ public:
 signals:
 	void startingReplot() ;
 	void replotted() ;
+	void metaRangeModified(specCanvasItem*,int,double,double) ;
 public slots :
 	void replot() ;
 	void changeTextLabel() ;

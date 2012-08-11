@@ -3,10 +3,10 @@
 #include <QString>
 #include "model/specmodelitem.h"
 #include <qwt_interval.h>
+#include <specmetarange.h>
 
 class specPlot ;
 class specMetaParser ;
-class specMetaRange ;
 class CanvasPicker ;
 
 class specMetaVariable : public QwtInterval // TODO change to specInterval
@@ -19,7 +19,7 @@ class specMetaVariable : public QwtInterval // TODO change to specInterval
 				// template <class parent, class child> class child
 				// class specMetaVariable : public child<specMetaParser, specMetaVariable>
 				// also: template<class container, class T> clearPointers(container<T*>&)
-	QVector<specRange*> ranges ;
+	QVector<specMetaRange*> ranges ;
 	QString code ;
 	void clearRanges() ;
 protected:
@@ -27,15 +27,17 @@ protected:
 	QString descriptor ;
 	bool extractXs(specModelItem *item, QVector<double> & xvals) const ;
 public:
-	specMetaVariable();
+	explicit specMetaVariable(specMetaParser *parent = 0);
 	virtual bool xValues(specModelItem*, QVector<double>&) const;
 	virtual QVector<double> values(specModelItem*, const QVector<double>&) const ;
 	bool setIndexRange(int& begin, int& end, int& increment, int max) const;
 	static specMetaVariable* factory(QString, specMetaParser* parent = 0) ;
-	void rangeChanged(specMetaRange*) ;
 	void produceRanges(QSet<specPlot*>) ;
 	void detachRanges();
-	QString codeValue() ;
+	QString codeValue() const ;
+	specMetaRange::addressObject address(specMetaRange*) ;
+	void getRangePoint(int range, int point, double& x, double& y) const ;
+	void setRange(int rangeNo, int pointNo, double newX, double newY) ;
 };
 
 #endif // SPECMETAVARIABLE_H

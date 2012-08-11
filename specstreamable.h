@@ -61,7 +61,8 @@ public:
 		logModel = 51,
 		logView = 52,
 		range = 53,
-		metaRange = 54
+		metaRange = 54,
+		metaRangeCommand = 55
 	};
 protected:
 	virtual void writeToStream(QDataStream& out) const = 0;

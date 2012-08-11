@@ -4,16 +4,22 @@
 #include <QObject>
 
 class specMetaVariable ;
+class specMetaItem ;
 
 class specMetaRange : public specRange
 {
 private:
-	int selected ;
 	specMetaVariable *parent ;
 	type typeId() const { return specStreamable::metaRange ; }
 public:
+	struct addressObject
+	{
+		specMetaItem* item;
+		int variable, range ;
+	};
+
 	specMetaRange(double x1, double x2, specMetaVariable *parent) ;
-	void refreshPlotData();
+	addressObject address() ;
 };
 
 #endif // SPECMETARANGE_H

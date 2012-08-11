@@ -213,7 +213,7 @@ void specSpectrumPlot::correctionsChanged()
 			foreach(QwtPlotItem* item, onPlot)
 				items << dynamic_cast<specDataItem*>(item) ;
 			items.removeAll(0) ;
-			correctionPicker->addSelectable(items);
+			correctionPicker->addSelectable(items.toSet());
 		}
 	}
 	else
@@ -414,7 +414,7 @@ void specSpectrumPlot::modifyingSVGs(const bool &modify)
 	foreach(QwtPlotItem *item, itemList())
 		SVGitems << dynamic_cast<specSVGItem*>(item) ;
 	SVGitems.removeAll(0) ;
-	SVGpicker->addSelectable(SVGitems) ;
+	SVGpicker->addSelectable(SVGitems.toSet()) ;
 	connect(SVGpicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)),this,SLOT(resizeSVG(specCanvasItem*,int,double,double))) ;
 }
 
