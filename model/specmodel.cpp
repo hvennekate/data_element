@@ -348,7 +348,6 @@ specModelItem* specModel::itemPointer(const QModelIndex& index) const
 
 specModel::specModel(QObject *par)
 	: QAbstractItemModel(par),
-	  mime("application/spec.model.items"),
 	  internalDrop(false),
 	  dropSource(0),
 	  dropBuddy(0),
@@ -506,6 +505,11 @@ QVariant specModel::data(const QModelIndex &index, int role) const
 	return QVariant() ;
 }
 
+QList<specMimeConverter*> specModel::mimeConverters() const
+{
+	return findChildren<specMimeConverter*>() ;
+}
+
 bool specModel::setData(const QModelIndex &index, const QVariant &value, int role)
 {
 	bool changed = false ;
@@ -631,7 +635,7 @@ QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 		dropBuddy->setLastRequested(list) ;
 
 	QList<specModelItem*> pointers = pointerList(list) ;
-	foreach (specMimeConverter* converter, mimeConverters)
+	foreach (specMimeConverter* converter, mimeConverters())
 		converter->exportData(pointers,mimeData) ;
 
 	return mimeData ;
@@ -639,7 +643,7 @@ QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 
 bool specModel::mimeAcceptable(const QMimeData *data) const
 {
-	foreach(specMimeConverter* converter, mimeConverters)
+	foreach(specMimeConverter* converter, mimeConverters())
 		if (converter->canImport(data))
 			return true ;
 	return false ;
@@ -664,11 +668,11 @@ bool specModel::dropMimeData(const QMimeData *data,
 
 
 	QList<specModelItem*> newItems ;
-	foreach(specMimeConverter* converter, mimeConverters)
+	foreach(specMimeConverter* converter, mimeConverters())
 	{
 		if (converter->canImport(data))
 		{
-			newItems = converter->fromMimeData(data);
+			newItems = converter->importData(data) ;
 			break ;
 		}
 	}
@@ -805,9 +809,4 @@ QModelIndexList specModel::indexList(const QList<specModelItem *>& pointers) con
 void specModel::setDropSource(specView *view)
 {
 	dropSource = view ;
-}
-
-void specModel::addMimeConverter(specMimeConverter *c)
-{
-	if (!mimeConverters.contains(c)) mimeConverters << c ;
 }

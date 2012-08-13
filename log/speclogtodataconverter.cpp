@@ -4,6 +4,7 @@
 #include <QStack>
 #include <QMessageBox>
 #include <QMimeData>
+#include "speclogmodel.h"
 
 specLogToDataConverter::specLogToDataConverter(QObject *parent)
 	: specMimeConverter(parent)
@@ -31,7 +32,7 @@ void specLogToDataConverter::toStream(specModelItem *item, QDataStream & out)
 		entry.first = 2 ;
 		specFolderItem* folder = (specFolderItem*) item ;
 		for (int i = 0 ; i < folder->children() ; ++i)
-			toStream(folder->child(i)) ;
+			toStream(folder->child(i),out) ;
 	}
 	else
 	{
@@ -41,19 +42,19 @@ void specLogToDataConverter::toStream(specModelItem *item, QDataStream & out)
 	out << entry ;
 }
 
-QString specLogToDataConverter::exportData(QList<specModelItem *> &items, QMimeData *data)
+void specLogToDataConverter::exportData(QList<specModelItem *> &items, QMimeData *data)
 {
 	QByteArray ba ;
-	QDataStream out(ba, QIODevice::WriteOnly) ;
-	for (specModelItem* item, items)
+	QDataStream out(&ba, QIODevice::WriteOnly) ;
+	foreach (specModelItem* item, items)
 		toStream(item, out) ;
 	data->setData("application/spec.logged.files",ba) ;
 }
 
 QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
 {
-	QByteArray ba (data->data("application/spec.logged.files")) ;
-	QDataStream in(ba,QIODevice::ReadOnly) ;
+	QByteArray ba(data->data("application/spec.logged.files")) ;
+	QDataStream in(&ba,QIODevice::ReadOnly) ;
 	QPair<qint8, QString> entry ;
 	in >> entry ;
 	QStack<specFolderItem*> parents ;
@@ -111,7 +112,7 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
 			}
 			specFolderItem *newItem = new specFolderItem(0,fileName) ;
 
-			QList<specModelItem*> (*filter(QFile& ))  = fileFilter(file.fileName()) ;
+			QList<specModelItem*> (*filter)(QFile& )  = fileFilter(file.fileName()) ;
 			if (!filter)
 			{
 				QMessageBox::warning(0,

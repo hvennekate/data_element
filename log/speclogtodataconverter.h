@@ -2,10 +2,12 @@
 #define SPECLOGTODATACONVERTER_H
 #include "specmimeconverter.h"
 #include <QFileDialog>
-#include <specstreamable.h>
+#include "specstreamable.h"
+#include "specmodelitem.h"
 
 class specLogToDataConverter : public specMimeConverter, private specStreamable
 {
+	Q_OBJECT
 private:
 	specModelItem* getData(specModelItem*) ;
 	QDir currentDirectory ;

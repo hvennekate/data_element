@@ -49,9 +49,8 @@ private:
 	void writeToStream(QDataStream &out) const ;
 	void readFromStream(QDataStream &in) ;
 	type typeId() const { return specStreamable::model ; }
-	QVector<specMimeConverter*> mimeConverters ;
+	QList<specMimeConverter*> mimeConverters() const ;
 public:
-	void addMimeConverter(specMimeConverter*) ;
 	specModel(QObject *par = 0) ;
 	~specModel() ;
 	

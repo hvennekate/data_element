@@ -1,10 +1,9 @@
 #include "specgenericmimeconverter.h"
-#include "specmodelitem.h"
 #include "specmetamodel.h"
 #include "speclogmodel.h"
 #include "specmodel.h"
 
-specGenericMimeConverter::specGenericMimeConverter(QOjbect *parent)
+specGenericMimeConverter::specGenericMimeConverter(QObject *parent)
 	: specMimeConverter(parent)
 {
 }
@@ -18,7 +17,7 @@ QList<specModelItem*> specGenericMimeConverter::importData(const QMimeData *data
 {
 	QList<specModelItem*> items ;
 	QByteArray ba(data->data(ownType())) ;
-	QDataStream in(ba,QIODevice::ReadOnly) ;
+	QDataStream in(&ba,QIODevice::ReadOnly) ;
 	while (!in.atEnd())
 		items << (specModelItem*) produceItem(in) ;
 	items.removeAll(0) ;
@@ -34,22 +33,22 @@ void specGenericMimeConverter::exportData(QList<specModelItem *> &items, QMimeDa
 	data->setData(ownType(),ba) ;
 }
 
-QString specGenericMimeConverter::ownType()
+QString specGenericMimeConverter::ownType() const
 {
 	specModel *model = 0 ;
-	if (model = qobject_cast<specLogModel*>(parent()))
+	if ((model = qobject_cast<specLogModel*>(parent())))
 		return "application/spec.log.items" ;
-	if (model = qobject_cast<specMetaModel*>(parent()))
+	if ((model = qobject_cast<specMetaModel*>(parent())))
 		return "application/spec.meta.items" ;
-	if (model = qobject_cast<specModel*>(parent()))
+	if ((model = qobject_cast<specModel*>(parent())))
 		return "application/spec.spectral.items" ;
 	return QString() ;
 }
 
 bool specGenericMimeConverter::canImport(const QStringList &types)
 {
-	QString type = ownType ;
-	if (ownType != QString())
+	QString type = ownType() ;
+	if (type != "")
 		return types.contains(type) ;
 	return false ;
 }

@@ -2,9 +2,11 @@
 #define SPECGENERICMIMECONVERTER_H
 #include "specmimeconverter.h"
 #include "specstreamable.h"
+#include "specmodelitem.h"
 
 class specGenericMimeConverter : public specMimeConverter, private specStreamable
 {
+	Q_OBJECT
 private:
 	specModelItem* factory(const type &t) const ;
 	void writeToStream(QDataStream &out) const { Q_UNUSED(out) }
@@ -12,11 +14,10 @@ private:
 	specStreamable::type typeId() const { return specStreamable::none ;}
 	QString ownType() const ;
 public:
-	explicit specGenericMimeConverter(QOjbect *parent = 0);
+	explicit specGenericMimeConverter(QObject *parent = 0);
 	QList<specModelItem*> importData(const QMimeData *);
 	void exportData(QList<specModelItem *> &, QMimeData*) ;
-	bool canExport() = 0 ;
-	bool canImport(const QStringList&) = 0 ;
+	bool canImport(const QStringList&) ;
 };
 
 #endif // SPECGENERICMIMECONVERTER_H

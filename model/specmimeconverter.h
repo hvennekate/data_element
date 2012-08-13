@@ -3,8 +3,9 @@
 #include <QObject>
 
 class QMimeData ;
+class specModelItem ;
 
-class specMimeConverter : QObject
+class specMimeConverter : public QObject
 {
 	Q_OBJECT
 public:

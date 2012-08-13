@@ -1,6 +1,7 @@
 #include "speckineticwidget.h"
 #include <QTextStream>
 #include "speccanvasitem.h"
+#include "specgenericmimeconverter.h"
 
 specMetaView* specKineticWidget::view()
 { return items ; }
@@ -33,7 +34,7 @@ specKineticWidget::specKineticWidget(QString title, QWidget *parent)
 	plot->setAxisTitle(QwtPlot::xBottom,"ps") ;
 	
 	items->setModel(new specMetaModel(items)) ;
-	items->model()->setMimeType("application/spec.meta.items") ;
+	new specGenericMimeConverter(items->model());
 	
 	splitter->setOrientation(Qt::Vertical) ;
 	splitter->addWidget(plot) ;

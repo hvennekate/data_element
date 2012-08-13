@@ -1,5 +1,6 @@
 #include "specmimeconverter.h"
 #include <QMimeData>
+#include <QStringList>
 
 specMimeConverter::specMimeConverter(QObject *parent)
 	: QObject(parent)

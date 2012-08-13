@@ -20,7 +20,7 @@ specModelItem* readJCAMPBlock(QTextStream& in) ;
 void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, double xfactor, double yfactor) ;
 QVector<double> waveNumbers(QTextStream&) ;
 QHash<QString,specDescriptor> fileHeader(QTextStream&) ;
-QList<specModelItem*> (*fileFilter(QString& fileName)) (QFile&);
+QList<specModelItem*> (*fileFilter(const QString& fileName)) (QFile&);
 QList<double> gaussjinv(QList<QList<double> >&,QList<double>&) ;
 
 bool comparePoints(const QPointF&, const QPointF&) ;

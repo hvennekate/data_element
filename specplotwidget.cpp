@@ -17,6 +17,7 @@
 #include <names.h>
 #include <QSettings>
 #include "speclogtodataconverter.h"
+#include "specgenericmimeconverter.h"
 
 
 void specPlotWidget::changeFileName(const QString& name)
@@ -62,9 +63,8 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	plot->setView(items) ;
 	plot->setUndoPartner(actions) ;
 
-	items->model()->addMimeConverter(new specMimeConverter) ;
-	items->model()->addMimeConverter(new specLogToDataConverter);
-	items->model()->setMimeType("application/spec.spectral.items");
+	new specGenericMimeConverter(items->model()) ;
+	new specLogToDataConverter(items->model()) ;
 
 	actions->addDragDropPartner(items->model()) ;
 	actions->addPlot(plot) ;

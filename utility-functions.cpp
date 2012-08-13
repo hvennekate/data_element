@@ -415,7 +415,7 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 	return logData ;
 }
 
-QList<specModelItem*> (*fileFilter(QString& fileName)) (QFile&)
+QList<specModelItem*> (*fileFilter(const QString& fileName)) (QFile&)
 {
 	QFile file(fileName) ;
 	file.open(QFile::ReadOnly | QFile::Text) ;

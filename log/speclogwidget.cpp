@@ -1,6 +1,8 @@
 #include "speclogwidget.h"
 #include <QVBoxLayout>
 #include "speclogtodataconverter.h"
+#include "specgenericmimeconverter.h"
+#include "speclogtodataconverter.h"
 
 specLogWidget::specLogWidget(QWidget *parent)
 	: QDockWidget("Logs", parent),
@@ -10,7 +12,8 @@ specLogWidget::specLogWidget(QWidget *parent)
 	setFloating(true) ;
 	QWidget* content = new QWidget(this) ;
 	view->setModel(new specLogModel(view));
-	view->model()->addMimeConverter(new specLogToDataConverter);
+	new specGenericMimeConverter(view->model()) ;
+	new specLogToDataConverter(view->model()) ;
 	layout->addWidget(view) ;
 	content->setLayout(layout);
 	setWidget(content);
