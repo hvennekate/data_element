@@ -1,14 +1,18 @@
 #ifndef SPECMIMECONVERTER_H
 #define SPECMIMECONVERTER_H
-#include "specmodelitem.h"
+#include <QObject>
 
-class specMimeConverter
+class QMimeData ;
+
+class specMimeConverter : QObject
 {
+	Q_OBJECT
 public:
-        specMimeConverter();
-        virtual QList<specModelItem*> convert(QDataStream&) ;
-        virtual QDataStream& convert(QList<specModelItem*>&, QDataStream &) ;
-//        virtual QDataStream& convert(QList<specModelItem*>&, QMimeData*) ;
+	explicit specMimeConverter(QObject* parent = 0) ;
+	virtual QList<specModelItem*> importData(const QMimeData*) = 0 ;
+	virtual void exportData(QList<specModelItem*>&, QMimeData*) = 0 ;
+	virtual bool canImport(const QStringList&) ;
+	virtual bool canImport(const QMimeData*) ;
 };
 
 #endif // SPECMIMECONVERTER_H

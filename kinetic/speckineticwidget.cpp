@@ -33,7 +33,7 @@ specKineticWidget::specKineticWidget(QString title, QWidget *parent)
 	plot->setAxisTitle(QwtPlot::xBottom,"ps") ;
 	
 	items->setModel(new specMetaModel(items)) ;
-	items->model()->setMimeTypes(QStringList("application/spec.kinetic.item")) ;
+	items->model()->setMimeType("application/spec.meta.items") ;
 	
 	splitter->setOrientation(Qt::Vertical) ;
 	splitter->addWidget(plot) ;

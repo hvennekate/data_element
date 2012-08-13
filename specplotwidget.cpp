@@ -62,8 +62,9 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	plot->setView(items) ;
 	plot->setUndoPartner(actions) ;
 
-	items->model()->mimeConverters[QString("application/spec.spectral.item")] = new specMimeConverter ;
-	items->model()->mimeConverters[QString("application/spec.log.item")] = new specLogToDataConverter ;
+	items->model()->addMimeConverter(new specMimeConverter) ;
+	items->model()->addMimeConverter(new specLogToDataConverter);
+	items->model()->setMimeType("application/spec.spectral.items");
 
 	actions->addDragDropPartner(items->model()) ;
 	actions->addPlot(plot) ;

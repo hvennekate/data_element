@@ -28,6 +28,7 @@ protected:
 	bool extractXs(specModelItem *item, QVector<double> & xvals) const ;
 public:
 	explicit specMetaVariable(specMetaParser *parent = 0);
+	~specMetaVariable() ;
 	virtual bool xValues(specModelItem*, QVector<double>&) const;
 	virtual QVector<double> values(specModelItem*, const QVector<double>&) const ;
 	bool setIndexRange(int& begin, int& end, int& increment, int max) const;

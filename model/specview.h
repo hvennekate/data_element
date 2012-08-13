@@ -28,6 +28,8 @@ private:
 	void readFromStream(QDataStream &in) ;
 	void writeToStream(QDataStream &out) const ;
 	type typeId() const { return specStreamable::mainView ; }
+	bool acceptData(const QMimeData*) ;
+	void dragMoveEvent(QDragMoveEvent *event) ;
 	void dragEnterEvent(QDragEnterEvent *event) ;
 private slots:
 	void averageItems() ;

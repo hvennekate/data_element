@@ -100,7 +100,7 @@ void specGenealogy::readFromStream(QDataStream &in)
 			Items[i] = (specModelItem*) produceItem(in) ;
 }
 
-specStreamable* specGenealogy::factory(const type &t) const
+specModelItem* specGenealogy::factory(const type &t) const
 {
 	return specModelItem::itemFactory(t) ;
 }

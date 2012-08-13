@@ -41,7 +41,6 @@ private:
 	bool itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria) ;
 	QModelIndexList merge(QModelIndexList& list, const QList<QPair<QStringList::size_type, double> >& criteria) ;
 	QModelIndexList allChildren(const QModelIndex&) const ;
-	QStringList mime ;
 	QMap<double,double> subMap ;
 	bool internalDrop ;
 	specView* dropSource ;
@@ -50,8 +49,9 @@ private:
 	void writeToStream(QDataStream &out) const ;
 	void readFromStream(QDataStream &in) ;
 	type typeId() const { return specStreamable::model ; }
+	QVector<specMimeConverter*> mimeConverters ;
 public:
-	QHash<QString, specMimeConverter*> mimeConverters ;
+	void addMimeConverter(specMimeConverter*) ;
 	specModel(QObject *par = 0) ;
 	~specModel() ;
 	
@@ -96,10 +96,9 @@ public:
 	void setDropSource(specView*) ;
 	void setDropBuddy(specActionLibrary*) ;
 	Qt::DropActions supportedDropActions() const ;
-	QStringList mimeTypes() const ;
-	void setMimeTypes(const QStringList&) ; // TODO: replace with add converter/remove conv.
 	QMimeData *mimeData(const QModelIndexList &) const;
 	bool dropMimeData(const QMimeData*, Qt::DropAction, int row, int column, const QModelIndex &parent) ;
+	bool mimeAcceptable(const QMimeData*) const ;
 	
 	// Comfort
 	bool buildTree(const QModelIndex&) ;

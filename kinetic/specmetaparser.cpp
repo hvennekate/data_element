@@ -228,6 +228,7 @@ void specMetaParser::setRange(int variableNo, int rangeNo, int pointNo, double n
 			descriptor += QString::fromStdString(GiNaC::ex_to<GiNaC::symbol>(*j).get_name())
 					+ " = " + (*i)->codeValue() ; // TODO this is a pain...
 		parent->changeDescriptor("variables", descriptor.join("\n")) ;
+		parent->setActiveLine("variables",variableNo) ;
 	}
 	changingRange = false ;
 

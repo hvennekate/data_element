@@ -1,24 +1,17 @@
 #include "specmimeconverter.h"
+#include <QMimeData>
 
-specMimeConverter::specMimeConverter()
+specMimeConverter::specMimeConverter(QObject *parent)
+	: QObject(parent)
 {
 }
 
-QList<specModelItem*> specMimeConverter::convert(QDataStream &stream)
+bool specMimeConverter::canImport(const QMimeData *data)
 {
-	QList<specModelItem*> list ;
-	while(!stream.atEnd())
-	{
-		specModelItem* pointer ;
-		stream >> *pointer ;
-		list << pointer ;
-	}
-	return list ;
+	return canImport(data->formats()) ;
 }
 
-QDataStream& specMimeConverter::convert(QList<specModelItem *> &list, QDataStream &stream)
+bool specMimeConverter::canImport(const QStringList &)
 {
-    for (QList<specModelItem*>::iterator i = list.begin() ; i != list.end() ; ++i)
-	    stream << *i ;
-    return stream ;
+	return false ;
 }

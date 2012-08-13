@@ -15,6 +15,7 @@ public:
 	enum streamableType : type
 	{
 		container = 32768,
+		none = 0,
 		folder = 1,
 		logEntry = 2,
 		sysEntry = 3,

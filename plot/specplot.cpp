@@ -157,6 +157,7 @@ void specPlot::replot()
 	if (allItems.isEmpty())
 	{
 		QwtPlot::replot() ;
+		emit replotted() ;
 		replotting = false ;
 		return ;
 	}

@@ -10,7 +10,7 @@ specLogWidget::specLogWidget(QWidget *parent)
 	setFloating(true) ;
 	QWidget* content = new QWidget(this) ;
 	view->setModel(new specLogModel(view));
-	view->model()->mimeConverters[QString("application/spec.log.item")] = new specLogToDataConverter ;
+	view->model()->addMimeConverter(new specLogToDataConverter);
 	layout->addWidget(view) ;
 	content->setLayout(layout);
 	setWidget(content);

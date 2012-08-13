@@ -382,7 +382,24 @@ void specView::resetDone()
 	delete state ;
 }
 
+void specView::dragMoveEvent(QDragMoveEvent *event)
+{
+	if (!acceptData(event->mimeData()))
+		event->ignore() ;
+	else
+		event->acceptProposedAction();
+}
+
 void specView::dragEnterEvent(QDragEnterEvent *event)
 {
-	Q_UNUSED(event)
+	if (!acceptData(event->mimeData()))
+		event->ignore();
+	else
+		event->acceptProposedAction();
+}
+
+bool specView::acceptData(const QMimeData *data)
+{
+	if (!model()) return false ;
+	return model()->mimeAcceptable(data) ;
 }

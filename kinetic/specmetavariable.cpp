@@ -9,6 +9,7 @@
 #include "specmetarange.h"
 #include "specmetaparser.h"
 #include "canvaspicker.h"
+#include <QDebug>
 
 QString specMetaVariable::extract(QString & source, const QRegExp& expression)
 {
@@ -55,8 +56,13 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 	}
 
 	// setup the interval
-	product->setMinValue( xlower.isEmpty() ? -INFINITY : xlower.toDouble()) ;
-	product->setMaxValue( xupper.isEmpty() ?  INFINITY : xupper.toDouble()) ;
+	qDebug() << "Processing variable" << init << xlower.isEmpty() << xupper.isEmpty() ;
+	if (!xlower.isEmpty() || !xupper.isEmpty())
+	{
+		product->setMinValue( xlower.isEmpty() ? -INFINITY : xlower.toDouble()) ;
+		product->setMaxValue( xupper.isEmpty() ?  INFINITY : xupper.toDouble()) ;
+		product->setBorderFlags(QwtInterval::IncludeBorders);
+	}
 
 	product->parent = par ;
 	product->code = range + descString ;
@@ -169,6 +175,7 @@ void specMetaVariable::detachRanges()
 
 QString specMetaVariable::codeValue() const
 {
+	qDebug() << "code:" << code << QwtInterval::isValid() ;
 	if (!QwtInterval::isValid()) return code ;
 	return code + QString::number(minValue()) + ":" + QString::number(maxValue()) ;
 }
@@ -204,4 +211,9 @@ void specMetaVariable::setRange(int rangeNo, int pointNo, double newX, double ne
 	}
 	if (rangeNo < 0 || rangeNo >= ranges.size()) return ;
 	ranges[rangeNo]->pointMoved(pointNo, newX, newY);
+}
+
+specMetaVariable::~specMetaVariable()
+{
+	clearRanges();
 }

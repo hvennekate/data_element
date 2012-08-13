@@ -1,96 +1,126 @@
 #include "speclogtodataconverter.h"
 #include "speclogentryitem.h"
 #include "utility-functions.h"
+#include <QStack>
+#include <QMessageBox>
+#include <QMimeData>
 
-specLogToDataConverter::specLogToDataConverter()
+specLogToDataConverter::specLogToDataConverter(QObject *parent)
+	: specMimeConverter(parent)
 {
 }
 
-specLogToDataConverter::~specLogToDataConverter()
+specModelItem* specLogToDataConverter::factory(const type &t) const
 {
+	return specModelItem::itemFactory(t) ;
 }
 
-QDataStream &specLogToDataConverter::convert(QList<specModelItem *> &list, QDataStream &stream)
+bool specLogToDataConverter::canImport(const QStringList &types)
 {
-	return specMimeConverter::convert(list,stream) ;
+	return qobject_cast<specLogModel*>(parent()) && types.contains("application/spec.logged.files") ;
 }
 
-QList<specModelItem*> specLogToDataConverter::convert(QDataStream &stream)
+void specLogToDataConverter::toStream(specModelItem *item, QDataStream & out)
 {
-	QList<specModelItem*> items = specMimeConverter::convert(stream) ;
-	for (int i = 0 ; i < items.size() ; ++i)
-	{
-		specModelItem *logItem = dynamic_cast<specLogEntryItem*>(items[i]) ;
-		//item may be a folder
-		if (!logItem)
-			logItem = dynamic_cast<specFolderItem*>(items[i]) ;
-		//item may possibly not be a log item...
-		if (!logItem)
-			delete items.takeAt(i--) ;
-		else
-		{
-			specModelItem *newItem = getData(items[i]) ;
-			if (newItem != items[i])
-			{
-				delete items[i] ;
-				if (newItem)
-					items[i] = newItem ;
-				else
-					items.takeAt(i --) ;
-			}
-		}
-	}
-	return items ;
-}
-
-specModelItem* specLogToDataConverter::getData(specModelItem *item)
-{
-	// item may be a folder
+	QPair<qint8, QString> entry ;
 	if (item->isFolder())
 	{
-		specFolderItem *folder = (specFolderItem*) item ;
-		QVector<specModelItem*> children ;
-		for (int i = 0 ; i < item->children() ; ++i)
-		{
-			specModelItem* child = folder->child(i) ;
-			specModelItem* newChild = getData(child) ;
-			if (newChild)
-			{
-				folder->addChild(newChild,folder->childNo(child)) ;
-				delete child ;
-			}
-		}
-		return folder ;
+		entry.first = 1 ;
+		entry.second = item->descriptor("",true) ;
+		out << entry ;
+		entry.first = 2 ;
+		specFolderItem* folder = (specFolderItem*) item ;
+		for (int i = 0 ; i < folder->children() ; ++i)
+			toStream(folder->child(i)) ;
 	}
-
-
-	//if item is a log item, try to open corresponding file
-	QString fileName = item->descriptor("Datei",false) ;
-	fileName = fileName.section("\\",-1,-1) ;
-
-	QDir::setCurrent(currentDirectory.absolutePath()) ;
-	QFile file(fileName) ;
-	if (!file.exists())
+	else
 	{
-		QFileDialog path ;
-		path.setWindowTitle("Datei zum Importieren angeben") ;
-		path.setDirectory(currentDirectory) ;
-		path.setFileMode(QFileDialog::ExistingFile);
-		path.selectFile(fileName) ;
-		path.setNameFilters(QStringList(QString("%1 (%1)").arg(fileName))) ;
-		if (!path.exec())
-			return 0 ;
-		currentDirectory = path.directory() ;
-
-		if (path.selectedFiles().isEmpty())
-			return 0 ;
-
-		file.setFileName(path.selectedFiles().first()) ;
+		entry.first = 0 ;
+		entry.second = item->descriptor("Datei") ;
 	}
-	file.open(QFile::ReadOnly | QFile::Text) ;
-	specFolderItem *newItem = new specFolderItem(0,fileName) ;
-	fileName = file.fileName() ;
-	newItem->addChildren(fileFilter(fileName)(file)) ; // TODO take care that there actually is a file filter...
+	out << entry ;
+}
 
-	return newItem ;
+QString specLogToDataConverter::exportData(QList<specModelItem *> &items, QMimeData *data)
+{
+	QByteArray ba ;
+	QDataStream out(ba, QIODevice::WriteOnly) ;
+	for (specModelItem* item, items)
+		toStream(item, out) ;
+	data->setData("application/spec.logged.files",ba) ;
+}
+
+QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
+{
+	QByteArray ba (data->data("application/spec.logged.files")) ;
+	QDataStream in(ba,QIODevice::ReadOnly) ;
+	QPair<qint8, QString> entry ;
+	in >> entry ;
+	QStack<specFolderItem*> parents ;
+	QList<specModelItem*> items ;
+	while (!in.atEnd())
+	{
+		if (entry.first == 1)
+		{
+			specFolderItem* folder = new specFolderItem(0,entry.second) ;
+			parents.push(folder) ;
+			items << folder ;
+		}
+		else if (entry.first == 2)
+			parents.pop() ;
+		else
+		{
+			//if item is a log item, try to open corresponding file
+			QString fileName = entry.second ;
+			fileName = fileName.section("\\",-1,-1) ;
+
+			QDir::setCurrent(currentDirectory.absolutePath()) ;
+			QFile file(fileName) ;
+			if (!file.exists())
+			{
+				QFileDialog path ;
+				path.setWindowTitle("Datei zum Importieren angeben") ;
+				path.setDirectory(currentDirectory) ;
+				path.setFileMode(QFileDialog::ExistingFile);
+				path.selectFile(fileName) ;
+				path.setNameFilters(QStringList(QString("%1 (%1)").arg(fileName))) ;
+				if (path.exec() == QDialog::Rejected || path.selectedFiles().isEmpty())
+				{
+					if (QMessageBox::question(0,
+								  "Import abbrechen?",
+								  "Soll der Import von Datendateien abgebrochen werden?",
+								  QMessageBox::Yes | QMessageBox::No,
+								  QMessageBox::No) == QMessageBox::Yes)
+					{
+						foreach(specModelItem* item, items)
+							delete item ;
+						items.clear();
+						return items ;
+					}
+					continue ;
+				}
+				currentDirectory = path.directory() ;
+				file.setFileName(path.selectedFiles().first()) ;
+			}
+			if (!file.open(QFile::ReadOnly | QFile::Text))
+			{
+				QMessageBox::warning(0,
+						     "Fehler",
+						     "Kann Datei nicht oeffnen: " + fileName) ;
+				continue ;
+			}
+			specFolderItem *newItem = new specFolderItem(0,fileName) ;
+
+			QList<specModelItem*> (*filter(QFile& ))  = fileFilter(file.fileName()) ;
+			if (!filter)
+			{
+				QMessageBox::warning(0,
+						     "Fehler",
+						     "Kein gueltiger Dateityp:" + fileName) ;
+			}
+			newItem->addChildren(filter(file)) ;
+		}
+		in >> entry ;
+	}
+	return items ;
 }

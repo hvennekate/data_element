@@ -10,7 +10,7 @@ specLogModel::specLogModel(QObject *parent)
 
 QList<specModelItem*> specLogToData(const QMimeData* data)
 {
-	QByteArray encodedData = data->data("application/spec.log.item") ;
+	QByteArray encodedData = data->data("application/spec.log.items") ;
 	QDataStream stream(&encodedData, QIODevice::ReadOnly) ;
 
 	// TODO this is highly redundant with the specmodel implementation

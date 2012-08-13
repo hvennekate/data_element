@@ -2,17 +2,23 @@
 #define SPECLOGTODATACONVERTER_H
 #include "specmimeconverter.h"
 #include <QFileDialog>
+#include <specstreamable.h>
 
-class specLogToDataConverter : public specMimeConverter
+class specLogToDataConverter : public specMimeConverter, private specStreamable
 {
 private:
-    specModelItem* getData(specModelItem*) ;
-    QDir currentDirectory ;
+	specModelItem* getData(specModelItem*) ;
+	QDir currentDirectory ;
+	specModelItem* factory(const type &t) const ;
+	void writeToStream(QDataStream &out) const { Q_UNUSED(out) }
+	void readFromStream(QDataStream &in) { Q_UNUSED(in) }
+	specStreamable::type typeId() const { return specStreamable::none ;}
+	void toStream(specModelItem *, QDataStream &) ;
 public:
-    specLogToDataConverter();
-    ~specLogToDataConverter() ;
-    QDataStream& convert(QList<specModelItem *> &, QDataStream &) ;
-    QList<specModelItem*> convert(QDataStream&) ;
+	explicit specLogToDataConverter(QObject *parent = 0);
+	QList<specModelItem*> importData(const QMimeData *) ;
+	void exportData(QList<specModelItem *> &, QMimeData *) ;
+	bool canImport(const QStringList &) ;
 };
 
 #endif // SPECLOGTODATACONVERTER_H

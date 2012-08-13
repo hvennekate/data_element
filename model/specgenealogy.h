@@ -16,7 +16,7 @@ private:
 	void writeToStream(QDataStream &out) const ;
 	void readFromStream(QDataStream &in) ;
 	type typeId() const { return specStreamable::genealogyId ; }
-	specStreamable* factory(const type &t) const ;
+	specModelItem* factory(const type &t) const ;
 public:
 	explicit specGenealogy(QModelIndexList&);
 	virtual ~specGenealogy() ;

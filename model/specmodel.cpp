@@ -348,7 +348,7 @@ specModelItem* specModel::itemPointer(const QModelIndex& index) const
 
 specModel::specModel(QObject *par)
 	: QAbstractItemModel(par),
-	  mime("application/spec.model.item"),
+	  mime("application/spec.model.items"),
 	  internalDrop(false),
 	  dropSource(0),
 	  dropBuddy(0),
@@ -603,14 +603,6 @@ void specModel::setInternalDrop(bool val)
 Qt::DropActions specModel::supportedDropActions() const
 { return Qt::CopyAction | Qt::MoveAction; }
 
-QStringList specModel::mimeTypes() const
-{
-	return mimeConverters.keys() ;
-}
-
-void specModel::setMimeTypes(const QStringList& types)
-{ mime = types ; }
-
 void specModel::eliminateChildren(QModelIndexList& list) const
 {
 	for( QModelIndexList::size_type j = 0 ; j < list.size() ; j++)
@@ -633,50 +625,24 @@ void specModel::eliminateChildren(QModelIndexList& list) const
 QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 {
 	QMimeData *mimeData = new QMimeData() ;
-//	QByteArray encodedData, textData ;
-//	QTextStream textStream(&textData, QIODevice::WriteOnly) ;
-//	QDataStream stream(&encodedData,QIODevice::WriteOnly) ;
 	QModelIndexList list = indices ;
 	eliminateChildren(list) ;
-// 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
-// 	cout << "mimeData list size:  " << list.size() << endl ;
-	
 	if (dropBuddy)
 		dropBuddy->setLastRequested(list) ;
-//	// For text export
-//	QList<QPair<bool,QString> > headerFormat ;
-//	headerFormat << QPair<bool,QString>(false,"")
-//			<< QPair<bool,QString>(true,"\n")
-//			<< QPair<bool,QString>(true,"Time/ps\tWavenumbers/cm-1\tSignal/DmOD\tmax. Int.") ;
-//	QList<QPair<spec::value,QString> > dataFormat ;
-//	dataFormat << QPair<spec::value,QString>(spec::time,"\t")
-//			<< QPair<spec::value,QString>(spec::wavenumber,"\t")
-//			<< QPair<spec::value,QString>(spec::signal,"\t")
-//			<< QPair<spec::value,QString>(spec::maxInt,"\n") ;
 
-//	foreach(QModelIndex index,list) // TODO eliminate children
-//	{
-//		if(index.isValid() && index.column() == 0)
-//		{
-//			itemPointer(index)->writeOut(stream) ;
-//			itemPointer(index)->exportData(headerFormat, dataFormat, textStream);
-//		}
-//	}
-	
+	QList<specModelItem*> pointers = pointerList(list) ;
+	foreach (specMimeConverter* converter, mimeConverters)
+		converter->exportData(pointers,mimeData) ;
 
-//	foreach(const QString& type, mimeConverters)
-	for (QHash<QString,specMimeConverter*>::const_iterator i = mimeConverters.begin() ; i != mimeConverters.end() ; ++i)
-	{
-		QByteArray encodedData ;
-		QDataStream stream(&encodedData,QIODevice::WriteOnly) ;
-		QList<specModelItem*> pointers = pointerList(list) ;
-		(*i)->convert(pointers,stream) ;
-		mimeData->setData(i.key(), encodedData) ;
-	}
-
-//	mimeData->setData(mime.first(),encodedData) ;
-//	mimeData->setData("text/plain",textData) ;
 	return mimeData ;
+}
+
+bool specModel::mimeAcceptable(const QMimeData *data) const
+{
+	foreach(specMimeConverter* converter, mimeConverters)
+		if (converter->canImport(data))
+			return true ;
+	return false ;
 }
 
 bool specModel::dropMimeData(const QMimeData *data,
@@ -696,32 +662,28 @@ bool specModel::dropMimeData(const QMimeData *data,
 		return true ;
 	}
 
-	specMimeConverter* converter = 0;
-	QString typeToUse ;
-//	for (QHash<QString,specMimeConverter*>::iterator i = mimeConverters->begin() ; i != mimeConverters->end() ;++i)
-	foreach(const QString& type, mimeConverters.keys())
+
+	QList<specModelItem*> newItems ;
+	foreach(specMimeConverter* converter, mimeConverters)
 	{
-//		QString type = i.key() ;
-		if (data->hasFormat(type))
+		if (converter->canImport(data))
 		{
-			converter = mimeConverters[type] ;
-			typeToUse = type ;
+			newItems = converter->fromMimeData(data);
 			break ;
 		}
 	}
 
-	QByteArray encodedData = data->data(typeToUse) ;
-	QDataStream stream(&encodedData, QIODevice::ReadOnly) ;
-	QList<specModelItem*> newItems = converter->convert(stream) ;
-	insertItems(newItems,parent,row) ;
-	QModelIndexList newIndexes = indexList(newItems) ;
-
-	if (dropBuddy)
+	if (!newItems.isEmpty())
 	{
-		specAddFolderCommand *command = new specAddFolderCommand ;
-		command->setParentObject(dropSource) ;
-		command->setItems(newIndexes) ;
-		dropBuddy->push(command);
+		insertItems(newItems,parent,row) ;
+		QModelIndexList newIndexes = indexList(newItems) ;
+		if (dropBuddy)
+		{
+			specAddFolderCommand *command = new specAddFolderCommand ;
+			command->setParentObject(dropSource) ;
+			command->setItems(newIndexes) ;
+			dropBuddy->push(command);
+		}
 	}
 	dropSource = 0 ;
 	return true ;
@@ -843,4 +805,9 @@ QModelIndexList specModel::indexList(const QList<specModelItem *>& pointers) con
 void specModel::setDropSource(specView *view)
 {
 	dropSource = view ;
+}
+
+void specModel::addMimeConverter(specMimeConverter *c)
+{
+	if (!mimeConverters.contains(c)) mimeConverters << c ;
 }
