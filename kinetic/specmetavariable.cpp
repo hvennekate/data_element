@@ -64,7 +64,7 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 }
 
 specMetaVariable::specMetaVariable(specMetaParser *p)
-	: QwtInterval(-INFINITY,INFINITY,QwtInterval::IncludeBorders),
+	: //QwtInterval(-INFINITY,INFINITY,QwtInterval::IncludeBorders),
 	  begin(0),
 	  end(int(INFINITY)),
 	  inc(1),
@@ -95,7 +95,7 @@ QVector<double> specMetaVariable::values(specModelItem *item, const QVector<doub
 	QVector<QPointF> points ;
 	QPointF point ;
 	for (size_t i = 0 ; i < item->dataSize() ; ++i)
-		if (contains((point = item->sample(i)).x()))
+		if (!isValid() || contains((point = item->sample(i)).x()))
 			points << point ;
 	if (points.empty()) return QVector<double>(xvals.size(),NAN) ;
 	return QVector<double>(xvals.size(), processPoints(points)) ;

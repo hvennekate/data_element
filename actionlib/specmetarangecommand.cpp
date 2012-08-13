@@ -51,6 +51,7 @@ void specMetaRangeCommand::setItem(QModelIndex index, int variableIndex, int ran
 	newX = nX ;
 	newY = nY ;
 	((specMetaItem*) (item->items().first()))->getRangePoint(variableNo, rangeNo, pointNo, oldX, oldY) ;
+	qDebug() << "linking to range:" << variableNo << rangeNo << pointNo ;
 }
 
 void specMetaRangeCommand::writeToStream(QDataStream &out) const

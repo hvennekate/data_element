@@ -169,3 +169,13 @@ void specMetaItem::setRange(int variableNo, int rangeNo, int pointNo, double new
 {
 	filter->setRange(variableNo, rangeNo, pointNo, newX, newY) ;
 }
+
+bool specMetaItem::setActiveLine(const QString &s, int i)
+{
+	if (variables.contains(s))
+	{
+		variables[s].setActiveLine(i) ;
+		return true ;
+	}
+	return specModelItem::setActiveLine(s,i) ;
+}

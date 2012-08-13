@@ -33,6 +33,7 @@ public:
 	QIcon decoration() const ;
 	void getRangePoint(int variable, int range, int point, double& x, double& y) const ;
 	void setRange(int variableNo, int rangeNo, int pointNo, double newX, double newY) ;
+	bool setActiveLine(const QString &, int) ;
 };
 
 /* TODO in other classes
