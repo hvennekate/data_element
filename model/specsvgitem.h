@@ -7,8 +7,6 @@
 
 class specSVGItem : public specModelItem
 {
-public:
-
 	enum SVGCornerPoints : qint8 { undefined = -1,
 		center      = 0,
 		left        = 1,
@@ -20,12 +18,16 @@ public:
 		topRight    = 7,
 		bottomRight = 8,
 		size        = 9 } ;
-private:
-	QwtPlotSvgItem *image ;
-	QByteArray *data ;
+	typedef QPair<qint8,qreal> dimension ;
+	QwtPlotSvgItem image ;
+	QByteArray data ;
 	bool highlighting ;
-	int width, height;
-	SVGCornerPoints fix ;
+	dimension x, y, width, height ;
+	QPair<QBool,qreal> aspect ;
+	SVGCornerPoints anchor ;
+	void redrawImage() ;
+	double transform(const dimension&) ;
+
 	QPointF anchorPoint(const SVGCornerPoints& point) const;
 	void setAnchor(QRectF &bounds, const QPointF&, const SVGCornerPoints& point) const ;
 	type typeId() const { return specStreamable::svgItem ; }
@@ -35,7 +37,7 @@ public:
 	specSVGItem(specFolderItem* par=0, QString description="") ;
 	int rtti() const { return spec::SVGItem ; }
 	void attach(QwtPlot *plot) ;
-	void setImage(const QRectF&, const QByteArray&) ;
+	void setImage(const QByteArray&) ;
 	void setBoundingRect(const QRectF&) ;
 	void highlight(bool highlight) ;
 	void refreshSVG(double,double);

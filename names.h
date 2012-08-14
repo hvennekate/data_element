@@ -29,7 +29,7 @@ namespace spec{
 	enum undoActionIds{ } ;
 	enum itemRoles { activeLineRole = 50, fullContentRole = 51 } ;
 
-	enum rtti {canvasItem = 1001, spectrum = 1010, zeroRange = 1020, kineticCurve = 1030, kineticRange = 1040, SVGItem = 1050, metaRange = 1060 } ;
+	enum rtti {canvasItem = 1001, spectrum = 1010, zeroRange = 1020, metaItem = 1030, kineticRange = 1040, SVGItem = 1050, metaRange = 1060 } ;
 }
 
 #endif

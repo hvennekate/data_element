@@ -1,43 +1,11 @@
 #include "specsvgitem.h"
 #include <qwt/qwt_plot.h>
 
-specSVGItem::specSVGItem(specFolderItem *par, QString description)
-	: specModelItem(par,description),
-	  image(0),
-	  data(0),
-	  highlighting(0),
-	  width(-1),
-	  height(-1),
-	  fix(center)
-{
-	width = 100 ;
-	height = 100 ;
-	setStyle(QwtPlotCurve::NoCurve);
-}
-
-void specSVGItem::setImage(const QRectF &rect, const QByteArray &newData)
-{
-	if (data) delete data ;
-	data = new QByteArray(newData) ;
-	if (!image)
-		image = new QwtPlotSvgItem ;
-	image->loadData(rect,*data) ;
-}
-
-
-
 void specSVGItem::attach(QwtPlot *plot)
 {
 	if (image)
 		image->attach(plot) ;
 	specCanvasItem::attach(plot) ;
-	highlight(highlighting) ;
-}
-
-void specSVGItem::setBoundingRect(const QRectF &rect)
-{
-	if (!data || !image) return ;
-	image->loadData(rect,*data) ;
 	highlight(highlighting) ;
 }
 
@@ -53,6 +21,49 @@ void specSVGItem::highlight(bool highlight)
 		setSymbol(0) ;
 	else
 		setSymbol(new QwtSymbol(QwtSymbol::Ellipse,QBrush(Qt::black),QPen(Qt::white),QSize(5,5))) ;
+}
+
+double specSVGItem::transform(const dimension& value)
+{
+	if (plot())
+		return plot()->invTransform(value.first, value.second) ;
+	return dimension.second ;
+}
+
+specSVGItem::specSVGItem(specFolderItem *par, QString description, double w, double h, double xp, double yp)
+	: specModelItem(par,description),
+	  highlighting(0),
+	  anchor(center),
+	  width(qMakePair(QwtPlot::axisCnt,0)),
+	  height(qMakePair(QwtPlot::axisCnt,0)),
+	  x(qMakePair(QwtPlot::axisCnt,0)),
+	  y(qMakePair(QwtPlot::axisCnt,0)),
+	  aspect(qMakePair(true,1.))
+{
+	setStyle(QwtPlotCurve::NoCurve);
+}
+
+void specSVGItem::setImage(const QByteArray &newData)
+{
+	data = newData ;
+	redrawImage();
+}
+
+void specSVGItem::redrawImage()
+{
+	double nw = xPixels ?  : width,
+	       nh = yPixels ?  : height ;
+}
+
+
+
+
+
+void specSVGItem::setBoundingRect(const QRectF &rect)
+{
+	if (!data || !image) return ;
+	image->loadData(rect,*data) ;
+	highlight(highlighting) ;
 }
 
 QPointF specSVGItem::anchorPoint(const SVGCornerPoints &point) const
