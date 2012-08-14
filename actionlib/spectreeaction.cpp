@@ -79,8 +79,9 @@ void specTreeAction::execute()
 			continue ;
 		QModelIndexList targets = model->indexList(moveTargets[i].second) ;
 		QModelIndex parent = model->index(moveTargets[i].first) ;
-		specMoveCommand *moveCommand = new specMoveCommand(targets,parent,0,command) ;
+		specMoveCommand *moveCommand = new specMoveCommand(command) ;
 		moveCommand->setParentObject(view);
+		moveCommand->setItems(targets,parent,0) ;
 		moveCommand->redo();
 	}
 }

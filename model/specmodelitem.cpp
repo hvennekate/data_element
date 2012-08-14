@@ -29,8 +29,8 @@ specModelItem::~specModelItem()
 		
 void specModelItem::setParent(specFolderItem* par)
 {
-	if (par == iparent)
-		return ;
+//	if (par == iparent)
+//		return ;
 	if (iparent)
 		iparent->removeChild(this) ;
 	if (!par) // TODO review and maybe find better place

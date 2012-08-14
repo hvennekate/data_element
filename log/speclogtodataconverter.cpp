@@ -18,7 +18,9 @@ specModelItem* specLogToDataConverter::factory(const type &t) const
 
 bool specLogToDataConverter::canImport(const QStringList &types)
 {
-	return qobject_cast<specLogModel*>(parent()) && types.contains("application/spec.logged.files") ;
+	return qobject_cast<specModel*>(parent()) &&
+	       !qobject_cast<specLogModel*>(parent()) &&
+	       types.contains("application/spec.logged.files") ;
 }
 
 void specLogToDataConverter::toStream(specModelItem *item, QDataStream & out)
@@ -56,16 +58,19 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
 	QByteArray ba(data->data("application/spec.logged.files")) ;
 	QDataStream in(&ba,QIODevice::ReadOnly) ;
 	QPair<qint8, QString> entry ;
-	in >> entry ;
 	QStack<specFolderItem*> parents ;
 	QList<specModelItem*> items ;
 	while (!in.atEnd())
 	{
+		in >> entry ;
 		if (entry.first == 1)
 		{
-			specFolderItem* folder = new specFolderItem(0,entry.second) ;
-			parents.push(folder) ;
-			items << folder ;
+			specFolderItem *newItem = new specFolderItem(0,entry.second) ;
+			if (parents.empty())
+				items << newItem ;
+			else
+				parents.top()->addChild(newItem,parents.top()->children());
+			parents.push(newItem) ;
 		}
 		else if (entry.first == 2)
 			parents.pop() ;
@@ -110,18 +115,22 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
 						     "Kann Datei nicht oeffnen: " + fileName) ;
 				continue ;
 			}
-			specFolderItem *newItem = new specFolderItem(0,fileName) ;
-
 			QList<specModelItem*> (*filter)(QFile& )  = fileFilter(file.fileName()) ;
 			if (!filter)
 			{
 				QMessageBox::warning(0,
 						     "Fehler",
 						     "Kein gueltiger Dateityp:" + fileName) ;
+				continue ;
 			}
+			specFolderItem* newItem = new specFolderItem(0,fileName) ;
 			newItem->addChildren(filter(file)) ;
+			if (parents.isEmpty())
+				items << newItem ;
+			else
+				parents.top()->addChild(newItem,parents.top()->children());
 		}
-		in >> entry ;
 	}
+	qDebug() << "Returning items:" << items ;
 	return items ;
 }

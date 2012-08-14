@@ -2,8 +2,7 @@
 #include "specmodel.h"
 #include "specview.h"
 
-specMoveCommand::specMoveCommand(QModelIndexList &sources, const QModelIndex &target,int row, specUndoCommand *parent)
-	: specUndoCommand(parent)
+void specMoveCommand::setItems(QModelIndexList &sources, const QModelIndex &target, int row)
 {
 	number = 0 ;
 	targetIndex << row ;//< 0 ? 0 : row ; // TODO maybe change to last row.
@@ -25,6 +24,25 @@ specMoveCommand::specMoveCommand(QModelIndexList &sources, const QModelIndex &ta
 		sourceIndexes.last().second = count ;
 		number += count ;
 	}
+	specModel* model = ((specView*) parentObject())->model() ; // TODO put into function
+	qDebug() << "Model for move" << model << target ;
+	specModelItem* targetFolder = (specFolderItem*) model->itemPointer(targetIndex.mid(1)) ;
+	if (!targetFolder->isFolder())
+		targetFolder = targetFolder->parent() ;
+	QList<specModelItem*> items ;
+	for (int i = 0 ; i < sourceIndexes.size() ; ++i)
+	{
+		QVector<int> indexes = sourceIndexes[i].first ;
+		for (int j = 0 ; j < sourceIndexes[i].second ; ++j)
+		{
+			items << model->itemPointer(indexes) ;
+			++ indexes[0] ;
+		}
+
+	}
+	foreach (specModelItem* item, items)
+		if (item->parent() == targetFolder && ((specFolderItem*) targetFolder)->childNo(item) < targetIndex[0])
+			--targetIndex[0] ;
 }
 
 specMoveCommand::specMoveCommand(specUndoCommand *parent)
@@ -52,12 +70,17 @@ void specMoveCommand::doIt()
 		}
 
 	}
+	// halting parents
 	QVector<specFolderItem*> parents ;
 	foreach(specModelItem* item, items)
 		if (!parents.contains(item->parent()))
 			parents << item->parent() ;
 	foreach(specFolderItem* parent, parents)
 		parent->haltRefreshes(true) ;
+	// Precautions if moving within the same folder
+	foreach(specModelItem* item, items)
+		item->setParent(0) ;
+	qDebug() << "moving to" << targetIndex ;
 	if (targetIndex[0] < 0) targetIndex[0] = target->children() ;
 	((specFolderItem*) target)->addChildren(items,targetIndex[0]) ;
 	foreach(specFolderItem* parent, parents)

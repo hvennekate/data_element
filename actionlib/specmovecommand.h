@@ -19,7 +19,7 @@ private:
 	void readFromStream(QDataStream &in) ;
 	type typeId() const { return specStreamable::moveItemsCommandId ; }
 public:
-	specMoveCommand(QModelIndexList& sources, const QModelIndex& target, int row, specUndoCommand* parent=0) ;
+	void setItems(QModelIndexList& sources, const QModelIndex& target, int row) ;
 	specMoveCommand(specUndoCommand* parent = 0) ;
 };
 
