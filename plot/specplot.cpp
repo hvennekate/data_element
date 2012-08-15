@@ -357,3 +357,49 @@ void specPlot::readFromStream(QDataStream &in)
 	setAxisTitle(QwtPlot::xBottom, xlabel) ;
 	setAxisTitle(QwtPlot::yLeft, ylabel) ;
 }
+
+void specSpectrumPlot::resizeSVG(specCanvasItem *item, int point, double x, double y)
+{
+	specSVGItem *pointer = dynamic_cast<specSVGItem*>(item) ;
+	if (!pointer || !view || !undoPartner) return ;
+	QRectF bounds = pointer->boundingRect() ;
+	double aspectRatio = bounds.width()/bounds.height() ;
+	QPoint newPoint(x,y) ;
+
+	switch (point)
+	{
+	case specSVGItem::center :
+		bounds.moveCenter(QPoint(x,y)); ; break ;
+	case specSVGItem::left :
+		bounds.setLeft(x) ; break ;
+	case specSVGItem::right :
+		bounds.setRight(x) ; break ;
+	case specSVGItem::top :
+		bounds.setTop(y) ; break ;
+	case specSVGItem::bottom :
+		bounds.setBottom(y) ; break ;
+	case specSVGItem::topLeft :
+		bounds.setTopLeft(newPoint) ; break ;
+	case specSVGItem::topRight :
+		bounds.setTopRight(newPoint) ; break ;
+	case specSVGItem::bottomLeft :
+		bounds.setBottomLeft(newPoint) ; break ;
+	case specSVGItem::bottomRight :
+		bounds.setBottomRight(newPoint); break ;
+	}
+	bounds = bounds.normalized() ;
+	double newAspect = bounds.width()/bounds.height() ;
+	if (newAspect < aspectRatio && (point == specSVGItem::topLeft || point == specSVGItem::bottomLeft))
+		bounds.setLeft(bounds.right()-bounds.height()*aspectRatio) ;
+	else if (newAspect < aspectRatio && (point == specSVGItem::topRight || point == specSVGItem::bottomRight))
+		bounds.setRight(bounds.left()+bounds.height()*aspectRatio) ;
+	else if (newAspect > aspectRatio && (point == specSVGItem::topRight || point == specSVGItem::topLeft))
+		bounds.setTop(bounds.bottom()-bounds.width()/aspectRatio) ;
+	else if (newAspect > aspectRatio && (point == specSVGItem::bottomLeft || point == specSVGItem::bottomRight))
+		bounds.setBottom(bounds.top()+bounds.width()/aspectRatio) ;
+
+	specResizeSVGcommand *command = new specResizeSVGcommand ;
+	command->setParentObject(this) ;
+	command->setItem(view->model()->index(pointer),bounds) ;
+	undoPartner->push(command) ;
+}

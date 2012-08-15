@@ -28,7 +28,12 @@ private:
 	bool scaleX, scaleY ;
 	void contextMenuEvent ( QContextMenuEvent* ) ;
 	QMenu *contextMenu ;
-	QAction *titleAction, *ylabelAction, *xlabelAction, *fixXAxisAction, *fixYAxisAction ;
+	QAction *titleAction,
+		*ylabelAction,
+		*xlabelAction,
+		*fixXAxisAction,
+		*fixYAxisAction,
+		*modifySVGs ;
 	QAction *scaleAction,
 	*offsetAction,
 	*offlineAction,
