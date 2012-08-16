@@ -59,7 +59,7 @@ private:
 	specActionLibrary *undoP ;
 protected:
 	specView *view ;
-	specActionLibrary* undoPartner() ;
+	specActionLibrary* undoPartner() const ;
 private slots:
 	void changeTitle(QString) ;
 	void changeXLabel(QString) ;

@@ -26,10 +26,8 @@ private:
 	QwtPlotSvgItem image ;
 	QByteArray data ;
 	bool highlighting ;
-	bool keepAspect ;
 	SVGCornerPoint anchor ;
 
-	void redrawImage() ;
 	double transform(const dimension&) const ;
 	void setDimension(dimension&, double) ;
 
@@ -37,32 +35,23 @@ private:
 	void readFromStream(QDataStream &in) ;
 	void writeToStream(QDataStream &out) const;
 	QRectF boundRect() const ;
-	QPointF getPoint(SVGCornerPoint) const ;
-	double resizeDimension(double dim,
-					    double delta,
-					    const QVector<SVGCornerPoint>& lower,
-					    const QVector<SVGCornerPoint>& upper,
-					    SVGCornerPoint point) ;
-	void resizeDimension(dimension& dim,
-						 double delta,
-						 const QVector<SVGCornerPoint>& lower,
-						 const QVector<SVGCornerPoint>& upper,
-						 SVGCornerPoint point) ;
+	QPointF getPoint(SVGCornerPoint, const QRectF&) const ;
+	void setBoundRect(const QRectF&) ;
 public:
 	specSVGItem(specFolderItem* par=0, QString description="") ;
 	int rtti() const { return spec::SVGItem ; }
 	void attach(QwtPlot *plot) ;
 	void setImage(const QByteArray&) ;
 	void highlight(bool highlight) ;
-	void refreshSVG(double,double);
+	void refreshSVG();
 	void pointMoved(const int &, const double &, const double &);
-	bool setKeepAspectRatio(bool keep) ;
 	struct bounds
 	{
 		dimension x, y, width, height ;
 	};
 	bounds getBounds() const ;
 	void setBounds(const bounds&) ;
+	QIcon decoration() const ;
 private:
 	bounds ownBounds ;
 };

@@ -13,6 +13,7 @@ void specResizeSVGcommand::setItem(const QModelIndex &index, const specSVGItem::
 		delete item ;
 	item = new specGenealogy(QModelIndexList() << index) ;
 	other = bounds ;
+	doIt() ;
 }
 
 bool specResizeSVGcommand::ok()
@@ -36,6 +37,8 @@ void specResizeSVGcommand::doIt()
 	specSVGItem *pointer = ((specSVGItem*) item->firstItem()) ;
 	specSVGItem::bounds oldBounds = pointer->getBounds() ;
 	pointer->setBounds(other);
+	qDebug() << "Old bounds:" << oldBounds.x.second << oldBounds.y.second << oldBounds.width.second << oldBounds.height.second ;
+	qDebug() << "New bounds:" << other.x.second << other.y.second << other.width.second << other.height.second ;
 	other = oldBounds ;
 	if (pointer->plot())
 		pointer->plot()->replot();

@@ -219,14 +219,13 @@ void specPlot::replot()
 	boundaries.setRight(right) ;
 	boundaries.setTop(top);
 	boundaries.setBottom(bottom);//*/
-	
-	zoom->changeZoomBase(boundaries) ;
+
+	zoom->changeZoomBase(boundaries.isValid() ? boundaries : QRectF(-10,-10,20,20)) ;
 
 	QRectF zoomRect = zoom->zoomRect() ;
-	double xfactor = zoomRect.width()  / canvasMap(QwtPlot::xBottom).pDist(),
-	       yfactor = zoomRect.height() / canvasMap(QwtPlot::yLeft).pDist() ;
+	QwtPlot::replot() ; // TODO optimize
 	foreach(specSVGItem* svgitem, svgitems)
-		svgitem->refreshSVG(xfactor, yfactor) ;
+		svgitem->refreshSVG() ;
 	QwtPlot::replot() ;
 	emit replotted();
 	replotting = false ;
@@ -407,4 +406,9 @@ void specPlot::modifyingSVGs(const bool &modify)
 void specPlot::setUndoPartner(specActionLibrary *lib)
 {
 	undoP = lib ; ((specUndoAction*) printAction)->setLibrary(lib);
+}
+
+specActionLibrary* specPlot::undoPartner() const
+{
+	return undoP ;
 }

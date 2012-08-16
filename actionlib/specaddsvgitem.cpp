@@ -21,7 +21,10 @@ const std::type_info &specAddSVGItemAction::possibleParent()
 
 void specAddSVGItemAction::execute()
 {
-	QFile input(QFileDialog::getOpenFileName(parentWidget(),"Open SVG file")) ;
+	QFile input(QFileDialog::getOpenFileName(parentWidget(),
+						 "Select SVG file",
+						 "",
+						 "SVG images (*.svg)")) ;
 	if (!(input.exists() && input.open(QIODevice::ReadOnly)))
 		return ;
 	QByteArray fileContent(input.readAll()) ;
