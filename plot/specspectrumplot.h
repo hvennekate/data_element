@@ -5,9 +5,6 @@
 #include <QHash>
 #include <QList>
 #include <QActionGroup>
-#include "actionlib/specactionlibrary.h"
-#include "specview.h"
-#include "actionlib/specundoaction.h"
 
 class specMultiCommand ;
 
@@ -25,14 +22,11 @@ private:
 		*addRangeAction,
 		*removeRangeAction,
 		*noSlopeAction,
-		*modifySVGs,
 		*subInterpolatedAction ;
 	QActionGroup *correctionActions, *alignmentActions ;
-	CanvasPicker *correctionPicker, *alignmentPicker, *SVGpicker ;
-	specActionLibrary *undoPartner ;
+	CanvasPicker *correctionPicker, *alignmentPicker ;
 	QHash<specCanvasItem*, QList<int> > pointHash ;
 	QList<specRange*> zeroRanges ;
-	specView *view ;
 	specDataItem *reference ;
 	void toggleAligning(bool on=true) ;
 	void invalidateReference() ;
@@ -44,9 +38,7 @@ private:
 
 public:
 	explicit specSpectrumPlot(QWidget *parent = 0);
-	QList<QAction*> actions() { return QList<QAction*>() << correctionActions->actions() << setReferenceAction << alignmentActions->actions() << printAction << modifySVGs; }
-	void setView(specView* mod) { view = mod ; }
-	void setUndoPartner(specActionLibrary* lib) { undoPartner = lib ; ((specUndoAction*) printAction)->setLibrary(lib);}
+	QList<QAction*> actions() { return specPlot::actions() << correctionActions->actions() << setReferenceAction << alignmentActions->actions() << printAction ; }
 	static specMultiCommand* generateCorrectionCommand(const QwtPlotItemList& zeroRanges, const QwtPlotItemList& spectra, const QMap<double, double>& referenceSpectrum, specView*, bool noSlope = false) ;
 signals:
 
@@ -55,8 +47,6 @@ private slots:
 	void alignmentChanged(QAction*) ;
 	void pointMoved(specCanvasItem*,int point, double x, double y) ;
 	void applyZeroRanges(specCanvasItem* range,int point, double x, double y) ;
-	void resizeSVG(specCanvasItem*, int point, double x, double y) ;
-	void modifyingSVGs(const bool&) ;
 	void multipleSubtraction() ;
 };
 

@@ -26,11 +26,11 @@ private:
 	QwtPlotSvgItem image ;
 	QByteArray data ;
 	bool highlighting ;
-	QBool keepAspect ;
+	bool keepAspect ;
 	SVGCornerPoint anchor ;
 
 	void redrawImage() ;
-	double transform(const dimension&) ;
+	double transform(const dimension&) const ;
 	void setDimension(dimension&, double) ;
 
 	type typeId() const { return specStreamable::svgItem ; }
@@ -43,6 +43,11 @@ private:
 					    const QVector<SVGCornerPoint>& lower,
 					    const QVector<SVGCornerPoint>& upper,
 					    SVGCornerPoint point) ;
+	void resizeDimension(dimension& dim,
+						 double delta,
+						 const QVector<SVGCornerPoint>& lower,
+						 const QVector<SVGCornerPoint>& upper,
+						 SVGCornerPoint point) ;
 public:
 	specSVGItem(specFolderItem* par=0, QString description="") ;
 	int rtti() const { return spec::SVGItem ; }
@@ -62,14 +67,7 @@ private:
 	bounds ownBounds ;
 };
 
-QDataStream& operator<<(QDataStream& out, const specSVGItem::bounds& b)
-{
-	return out << b.x << b.y << b.width << b.height ;
-}
-
-QDataStream& operator>>(QDataStream& in, const specSVGItem::bounds& b)
-{
-	return in >> b.x >> b.y >> b.width >> b.height ;
-}
+QDataStream& operator<<(QDataStream& out, const specSVGItem::bounds& b) ;
+QDataStream& operator>>(QDataStream& in, specSVGItem::bounds& b) ;
 
 #endif // SPECSVGITEM_H

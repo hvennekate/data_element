@@ -10,8 +10,6 @@
 #include <QLabel>
 #include <qwt_scale_draw.h>
 #include "actionlib/specprintplotaction.h"
-#include "specsvgitem.h"
-#include "actionlib/specresizesvgcommand.h"
 #include "actionlib/specexchangedatacommand.h"
 
 void specSpectrumPlot::toggleAligning(bool on)
@@ -39,8 +37,6 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	specPlot(parent),
 	correctionPicker(0),
 	alignmentPicker(0),
-	SVGpicker(0),
-	view(0),
 	reference(0)
 {
 	correctionActions = new QActionGroup(this) ;
@@ -50,7 +46,6 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	scaleAction   = new QAction(QIcon(":/scale.png"),"Scale", correctionActions) ;
 	shiftAction   = new QAction("shift x",correctionActions) ;
 	printAction   = new specPrintPlotAction(this) ;
-	modifySVGs    = new QAction("Modify SVGs",this) ;
 	subInterpolatedAction = new QAction(QIcon(":/multiminus.png"), "Subtraction",this) ;
 
 	correctionActions->addAction(offsetAction) ;
@@ -61,7 +56,6 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	connect(correctionActions,SIGNAL(triggered(QAction*)),this,SLOT(correctionsChanged())) ;
 	foreach(QAction *action, correctionActions->actions())
 		action->setCheckable(true) ;
-	modifySVGs->setCheckable(true) ;
 
 	alignmentActions = new QActionGroup(this) ;
 	alignmentActions->setExclusive(false) ;
@@ -93,8 +87,7 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	connect(alignWithReferenceAction,SIGNAL(toggled(bool)),correctionActions,SLOT(setDisabled(bool))) ;
 	connect(alignWithReferenceAction,SIGNAL(toggled(bool)),this,SLOT(correctionsChanged())) ;
 	connect(alignmentActions,SIGNAL(triggered(QAction*)),this,SLOT(alignmentChanged(QAction*))) ;
-	connect(modifySVGs,SIGNAL(triggered(bool)),this,SLOT(modifyingSVGs(bool))) ;
-	connect(subInterpolatedAction, SIGNAL(triggered()), this, SLOT(multipleSubtraction())) ;
+		connect(subInterpolatedAction, SIGNAL(triggered()), this, SLOT(multipleSubtraction())) ;
 }
 
 QList<specDataItem*> specSpectrumPlot::folderContent(specModelItem *folder)
@@ -233,7 +226,7 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 	selectedPoints.prepend(selectedPoints.contains(no) ? selectedPoints.takeAt(selectedPoints.indexOf(no)) : no) ;
 
 	// TODO take care of the case where there is no undo stack available...
-	if (!undoPartner) return ;
+	if (!undoPartner()) return ;
 
 	// collect correction parameters
 	// x shift:
@@ -280,7 +273,7 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 	command->setItem(view->model()->index( (specModelItem*) item)) ; // TODO do dynamic cast first!!
 	command->setCorrections(shift,offset,offline,scale) ;
 	command->setParentObject(view) ;
-	undoPartner->push(command) ;
+	undoPartner()->push(command) ;
 }
 
 specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
@@ -394,28 +387,8 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double n
 
 	specMultiCommand *zeroCommand = generateCorrectionCommand(zeroRanges, spectra, referenceSpectrum, view, noSlopeAction->isChecked()) ;
 	zeroCommand->setParentObject(view) ;
-	undoPartner->push(zeroCommand) ;
+	undoPartner()->push(zeroCommand) ;
 	replot() ;
-}
-
-void specSpectrumPlot::modifyingSVGs(const bool &modify)
-{
-	if (SVGpicker)
-	{
-		disconnect(SVGpicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)),this,SLOT(resizeSVG(specCanvasItem*,int,double,double))) ;
-		delete SVGpicker ;
-		SVGpicker = 0 ;
-	}
-	if (!modify) return ;
-
-	SVGpicker = new CanvasPicker(this) ;
-	QList<specCanvasItem*> SVGitems ;
-
-	foreach(QwtPlotItem *item, itemList())
-		SVGitems << dynamic_cast<specSVGItem*>(item) ;
-	SVGitems.removeAll(0) ;
-	SVGpicker->addSelectable(SVGitems.toSet()) ;
-	connect(SVGpicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)),this,SLOT(resizeSVG(specCanvasItem*,int,double,double))) ;
 }
 
 void specSpectrumPlot::multipleSubtraction()
@@ -458,6 +431,6 @@ void specSpectrumPlot::multipleSubtraction()
 	}
 
 	subCommand->setParentObject(view) ;
-	undoPartner->push(subCommand) ;
+	undoPartner()->push(subCommand) ;
 	replot() ;
 }

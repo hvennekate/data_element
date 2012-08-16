@@ -10,9 +10,12 @@
 #include "names.h"
 #include "speccanvasitem.h"
 #include "specstreamable.h"
+#include "specview.h"
 
 class specMetaRange ;
 class specSimpleTextEdit ;
+class specActionLibrary ;
+class specView ;
 
 class specPlot : public QwtPlot, public specStreamable
 {
@@ -33,7 +36,8 @@ private:
 		*xlabelAction,
 		*fixXAxisAction,
 		*fixYAxisAction,
-		*modifySVGs ;
+		*modifySVGs,
+		*printAction ;
 	QAction *scaleAction,
 	*offsetAction,
 	*offlineAction,
@@ -45,17 +49,23 @@ private:
 	*multipleCorrections ;
 	QActionGroup *zero, *modifications ;
 	spec::moveMode mm ;
-	CanvasPicker *metaPicker ;
+	CanvasPicker *metaPicker, *SVGpicker ;
 	specSimpleTextEdit *textEdit ;
 	void setupActions() ;
 	void highlightSelectable(bool highlight=true) ;
 	void readFromStream(QDataStream &in);
 	void writeToStream(QDataStream &out) const ;
 	type typeId() const {return specStreamable::mainPlot ;}
+	specActionLibrary *undoP ;
+protected:
+	specView *view ;
+	specActionLibrary* undoPartner() ;
 private slots:
 	void changeTitle(QString) ;
 	void changeXLabel(QString) ;
 	void changeYLabel(QString) ;
+	void resizeSVG(specCanvasItem*, int point, double x, double y) ;
+	void modifyingSVGs(const bool&) ;
 public:
 	bool select ;
 	QList<specCanvasItem*>* selectable() ;
@@ -65,6 +75,8 @@ public:
 	virtual QList<QAction*> actions() ;
 	spec::moveMode moveMode() ;
 	void refreshRanges() ;
+	void setView(specView* mod) { view = mod ; }
+	void setUndoPartner(specActionLibrary* lib) ;
 signals:
 	void startingReplot() ;
 	void replotted() ;
