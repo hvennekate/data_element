@@ -11,6 +11,9 @@
 #include "specmetaitem.h"
 #include "specsvgitem.h"
 #include "specmetarange.h"
+#include "specsvgitem.h"
+#include "actionlib/specresizesvgcommand.h"
+#include "actionlib/specprintplotaction.h"
 
 // TODO solve the myth of autoscaleaxis...
 // TODO remove kineticRanges
@@ -21,8 +24,15 @@ specPlot::specPlot(QWidget *parent)
 	  canBeSelected(NULL),
 	  metaPicker(new CanvasPicker(this)),
 	  textEdit(new specSimpleTextEdit(this)),
-	  select(false)
+	  select(false),
+	  SVGpicker(0),
+	  undoP(0),
+	  view(0)
 {
+	modifySVGs    = new QAction("Modify SVGs",this) ;
+	modifySVGs->setCheckable(true) ;
+	connect(modifySVGs,SIGNAL(triggered(bool)),this,SLOT(modifyingSVGs(bool))) ;
+
 	connect(metaPicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SIGNAL(metaRangeModified(specCanvasItem*,int,double,double))) ;
 	setAutoReplot(false) ;
 	zoom  = new specZoomer(this->canvas()) ;
@@ -58,6 +68,8 @@ specPlot::specPlot(QWidget *parent)
 	fixXAxisAction->setStatusTip(tr("Fix x axis scaling"));
 	fixXAxisAction->setCheckable(true) ;
 	fixXAxisAction->setChecked(false) ;
+
+	printAction = new specPrintPlotAction(this) ;
 	
 	setupActions() ;
 	
@@ -236,7 +248,7 @@ void specPlot::contextMenuEvent(QContextMenuEvent* event)
 
 QList<QAction*> specPlot::actions()
 {
-	return (QList<QAction*>() << multipleCorrections << modifications->actions() << zeroCorrectionAction << zero->actions()) ;
+	return (QList<QAction*>() << modifySVGs) ;
 }
 
 void specPlot::setupActions()
@@ -358,48 +370,41 @@ void specPlot::readFromStream(QDataStream &in)
 	setAxisTitle(QwtPlot::yLeft, ylabel) ;
 }
 
-void specSpectrumPlot::resizeSVG(specCanvasItem *item, int point, double x, double y)
+void specPlot::resizeSVG(specCanvasItem *item, int point, double x, double y)
 {
 	specSVGItem *pointer = dynamic_cast<specSVGItem*>(item) ;
-	if (!pointer || !view || !undoPartner) return ;
-	QRectF bounds = pointer->boundingRect() ;
-	double aspectRatio = bounds.width()/bounds.height() ;
-	QPoint newPoint(x,y) ;
+	if (!pointer || !view || !undoPartner()) return ;
 
-	switch (point)
-	{
-	case specSVGItem::center :
-		bounds.moveCenter(QPoint(x,y)); ; break ;
-	case specSVGItem::left :
-		bounds.setLeft(x) ; break ;
-	case specSVGItem::right :
-		bounds.setRight(x) ; break ;
-	case specSVGItem::top :
-		bounds.setTop(y) ; break ;
-	case specSVGItem::bottom :
-		bounds.setBottom(y) ; break ;
-	case specSVGItem::topLeft :
-		bounds.setTopLeft(newPoint) ; break ;
-	case specSVGItem::topRight :
-		bounds.setTopRight(newPoint) ; break ;
-	case specSVGItem::bottomLeft :
-		bounds.setBottomLeft(newPoint) ; break ;
-	case specSVGItem::bottomRight :
-		bounds.setBottomRight(newPoint); break ;
-	}
-	bounds = bounds.normalized() ;
-	double newAspect = bounds.width()/bounds.height() ;
-	if (newAspect < aspectRatio && (point == specSVGItem::topLeft || point == specSVGItem::bottomLeft))
-		bounds.setLeft(bounds.right()-bounds.height()*aspectRatio) ;
-	else if (newAspect < aspectRatio && (point == specSVGItem::topRight || point == specSVGItem::bottomRight))
-		bounds.setRight(bounds.left()+bounds.height()*aspectRatio) ;
-	else if (newAspect > aspectRatio && (point == specSVGItem::topRight || point == specSVGItem::topLeft))
-		bounds.setTop(bounds.bottom()-bounds.width()/aspectRatio) ;
-	else if (newAspect > aspectRatio && (point == specSVGItem::bottomLeft || point == specSVGItem::bottomRight))
-		bounds.setBottom(bounds.top()+bounds.width()/aspectRatio) ;
+	specSVGItem::bounds oldBounds = pointer->getBounds() ;
+	pointer->pointMoved(point,x,y) ;
 
 	specResizeSVGcommand *command = new specResizeSVGcommand ;
 	command->setParentObject(this) ;
-	command->setItem(view->model()->index(pointer),bounds) ;
-	undoPartner->push(command) ;
+	command->setItem(view->model()->index(pointer),oldBounds) ;
+	undoPartner()->push(command) ;
+}
+
+void specPlot::modifyingSVGs(const bool &modify)
+{
+	if (SVGpicker)
+	{
+		disconnect(SVGpicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)),this,SLOT(resizeSVG(specCanvasItem*,int,double,double))) ;
+		delete SVGpicker ;
+		SVGpicker = 0 ;
+	}
+	if (!modify) return ;
+
+	SVGpicker = new CanvasPicker(this) ;
+	QList<specCanvasItem*> SVGitems ;
+
+	foreach(QwtPlotItem *item, itemList())
+		SVGitems << dynamic_cast<specSVGItem*>(item) ;
+	SVGitems.removeAll(0) ;
+	SVGpicker->addSelectable(SVGitems.toSet()) ;
+	connect(SVGpicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)),this,SLOT(resizeSVG(specCanvasItem*,int,double,double))) ;
+}
+
+void specPlot::setUndoPartner(specActionLibrary *lib)
+{
+	undoP = lib ; ((specUndoAction*) printAction)->setLibrary(lib);
 }

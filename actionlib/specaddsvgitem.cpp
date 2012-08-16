@@ -26,7 +26,7 @@ void specAddSVGItemAction::execute()
 		return ;
 	QByteArray fileContent(input.readAll()) ;
 	specSVGItem *newItem = new specSVGItem() ;
-	newItem->setImage(QRectF(1660,1,100,3),fileContent) ; // TODO remove
+	newItem->setImage(fileContent) ; // TODO remove
 
 	specDataView *currentView = (specDataView*) parent() ; // TODO consolidate with addfolderaction
 	specModel *model = currentView->model() ;

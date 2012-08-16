@@ -7,17 +7,17 @@ specResizeSVGcommand::specResizeSVGcommand(specUndoCommand *parent)
 {
 }
 
-void specResizeSVGcommand::setItem(const QModelIndex &index, const QRectF &rect)
+void specResizeSVGcommand::setItem(const QModelIndex &index, const specSVGItem::bounds &bounds)
 {
 	if (item)
 		delete item ;
 	item = new specGenealogy(QModelIndexList() << index) ;
-	other = rect ;
+	other = bounds ;
 }
 
 bool specResizeSVGcommand::ok()
 {
-	return item && other.isValid() ;
+	return item ; // maybe check validity of size
 }
 
 void specResizeSVGcommand::writeToStream(QDataStream &out) const
@@ -33,22 +33,17 @@ void specResizeSVGcommand::readFromStream(QDataStream &in)
 
 void specResizeSVGcommand::doIt()
 {
-	exchange();
+	specSVGItem *pointer = ((specSVGItem*) item->firstItem()) ;
+	specSVGItem::bounds oldBounds = pointer->getBounds() ;
+	pointer->setBounds(other);
+	other = oldBounds ;
+	if (pointer->plot())
+		pointer->plot()->replot();
 }
 
 void specResizeSVGcommand::undoIt()
 {
-	exchange();
-}
-
-void specResizeSVGcommand::exchange()
-{
-	specSVGItem *pointer = ((specSVGItem*) item->firstItem()) ;
-	QRectF old = pointer->boundingRect() ;
-	pointer->setBoundingRect(other) ;
-	other = old ;
-	if (pointer->plot())
-		pointer->plot()->replot();
+	doIt() ;
 }
 
 bool specResizeSVGcommand::mergeable(const specUndoCommand *other)

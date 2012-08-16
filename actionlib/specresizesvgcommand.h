@@ -3,13 +3,13 @@
 
 #include "specundocommand.h"
 #include "model/specgenealogy.h"
+#include "model/specsvgitem.h"
 
 class specResizeSVGcommand : public specUndoCommand
 {
 private:
 	specGenealogy *item ;
-	QRectF other ;
-	void exchange() ;
+	specSVGItem::bounds other ;
 	void doIt() ;
 	void undoIt() ;
 	void writeToStream(QDataStream &out) const;
@@ -17,7 +17,7 @@ private:
 	type typeId() const { return specStreamable::resizeSVGCommandId ; }
 public:
 	explicit specResizeSVGcommand(specUndoCommand *parent = 0) ;
-	void setItem(const QModelIndex&, const QRectF&) ;
+	void setItem(const QModelIndex&, const specSVGItem::bounds&) ;
 	bool ok() ;
 	bool mergeable(const specUndoCommand *other) ;
 	bool mergeWith(const QUndoCommand *other) ;
