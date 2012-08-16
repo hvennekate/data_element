@@ -198,7 +198,7 @@ void specSVGItem::pointMoved(const int & p, const double &x, const double &y)
 
 bool specSVGItem::setKeepAspectRatio(bool keep)
 {
-	qSwap(keep,keepAspect)
+	qSwap(keep,keepAspect) ;
 	return keep ;
 }
 
