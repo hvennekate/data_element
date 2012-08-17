@@ -347,13 +347,7 @@ void specDataItem::setData(const QVector<specDataPoint> &newData)
 	invalidate();
 }
 
-//specDataItem::specDataItem(const specDataItem & other)
-//	: specModelItem(other),
-//	  offset(other.offset),
-//	  slope(other.slope),
-//	  factor(other.factor),
-//	  xshift(other.xshift),
-//	  zeroMultiplications(other.zeroMultiplications),
-//	  description(other.description),
-//	  data(other.data)
-//{}
+specUndoCommand *specDataItem::itemPropertiesAction()
+{
+
+}

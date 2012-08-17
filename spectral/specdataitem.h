@@ -67,6 +67,7 @@ public:
 	/* Functions to be deleted soon: */
 	void subMap(const QMap<double, double>&) ;
 	int removeData(QList<specRange*>*) ; // TODO remove
+	specUndoCommand *itemPropertiesAction() ;
 };
 
 #endif

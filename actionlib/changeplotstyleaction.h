@@ -24,10 +24,24 @@ protected:
 //	void specStyleCommand *command() = 0 ;
 
 private:
-	QAction *lineColorAction, *symbolAction ;
-	QVector<QAction*> symbolActions ;
+	QMenu *lineColorMenu,
+		*symbolMenu,
+		*symbolInnerColorMenu,
+		*symbolOuterColorMenu,
+		*symbolSizeMenu,
+		*lineWidthMenu ;
+	QVector<Qt::GlobalColor> colors ;
+	QVector<double> sizes ;
+	QVector<QAction*> symbolActions,
+		lineWidthActions,
+		lineColorActions,
+		symbolInnerColorActions,
+		symbolOuterColorActions,
+		symbolSizeActions ;
+	QColor getColor(int index) ;
+	double getSize(int index, bool& ok) ;
 private slots:
-	void actionTriggered() ;
+	void actionTriggered(QAction*) ;
 
 };
 

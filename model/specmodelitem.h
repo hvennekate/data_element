@@ -15,6 +15,7 @@
 class specModelItem ;
 class specFolderItem ;
 class specMetaItem ;
+class specUndoCommand ;
 
 /*! Base class of list items. */
 class specModelItem : public specCanvasItem
@@ -84,6 +85,7 @@ public:
 	int rtti() const { return spec::spectrum ; }
 	
 	static specModelItem* itemFactory(specStreamable::type) ;
+	virtual specUndoCommand* itemPropertiesAction() { return 0 ; }
 };
 
 #endif

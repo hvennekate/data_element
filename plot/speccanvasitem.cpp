@@ -118,17 +118,16 @@ specCanvasItem::~specCanvasItem()
 	if (pointer) pointer->replot() ;
 }
 
-void specCanvasItem::setLineWidth()
+void specCanvasItem::setLineWidth(const double& w)
 {
-	bool ok = false ; // TODO: QTextEdit
-	double newWidth = QInputDialog::getDouble((QWidget*) plot(),"Line width","New line width:",pen().widthF() , 0., 200.,1., &ok) ;
-	if (ok)
-	{
-		QPen newPen(pen()) ;
-		newPen.setWidthF(newWidth) ;
-		setPen(newPen) ;
-		if (plot()) plot()->replot() ;
-	}
+	QPen newPen(pen()) ;
+	newPen.setWidthF(w) ;
+	setPen(newPen) ;
+}
+
+double specCanvasItem::lineWidth()
+{
+	return pen().widthF() ;
 }
 
 QMenu* specCanvasItem::contextMenu()
@@ -182,14 +181,49 @@ void specCanvasItem::setSymbolStyle(const int& newStyle)
 
 QColor specCanvasItem::symbolPenColor()
 {
+	if (!symbol()) return QColor() ;
 	return symbol()->pen().color() ;
 }
 
 void specCanvasItem::setSymbolPenColor(const QColor& newColor)
 {
-	QwtSymbol *newSymbol = new QwtSymbol(*symbol()) ;
+	qDebug() << "setting symbol pen color" << newColor ;
+	QwtSymbol *newSymbol = symbol() ? (new QwtSymbol(*symbol())) : (new QwtSymbol()) ;
 	QPen newPen = newSymbol->pen() ;
 	newPen.setColor(newColor) ;
 	newSymbol->setPen(newPen) ;
+	setSymbol(newSymbol) ;
+}
+
+void specCanvasItem::setSymbolBrushColor(const QColor &newColor)
+{
+	QwtSymbol *newSymbol = symbol() ? (new QwtSymbol(*symbol())) : (new QwtSymbol()) ;
+	newSymbol->setBrush(newColor) ;
+	setSymbol(newSymbol) ;
+}
+
+QColor specCanvasItem::symbolBrushColor()
+{
+	if (!symbol()) return QColor() ;
+	return symbol()->brush().color() ;
+}
+
+QSize specCanvasItem::symbolSize()
+{
+	if (!symbol()) return QSize() ;
+	return symbol()->size() ;
+}
+
+void specCanvasItem::setSymbolSize(int w, int h)
+{
+	QwtSymbol *newSymbol = symbol() ? (new QwtSymbol(*symbol())) : (new QwtSymbol()) ;
+	newSymbol->setSize(w,h) ;
+	setSymbol(newSymbol) ;
+}
+
+void specCanvasItem::setSymbolSize(const QSize& s)
+{
+	QwtSymbol *newSymbol = symbol() ? (new QwtSymbol(*symbol())) : (new QwtSymbol()) ;
+	newSymbol->setSize(s) ;
 	setSymbol(newSymbol) ;
 }

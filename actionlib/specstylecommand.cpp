@@ -49,7 +49,6 @@ void specStyleCommandImplFuncTemplate::doIt()
 				plot = (specPlot*) Genealogies[i].items()[j]->plot() ;
 		applyStyle(Genealogies[i],-1) ;
 	}
-	plot->replot();
 }
 
 specStyleCommandImplTemplate
@@ -63,8 +62,6 @@ void specStyleCommandImplFuncTemplate::undoIt()
 				plot = (specPlot*) Genealogies[i].items()[j]->plot() ;
 		applyStyle(Genealogies[i],i) ;
 	}
-	plot->replot();
-
 }
 
 specStyleCommandImplTemplate
@@ -140,6 +137,12 @@ specStyleCommand *generateStyleCommand(specStreamable::streamableType id)
 		return new specStyleCommandImplementation<int, &specCanvasItem::symbolStyle, &specCanvasItem::setSymbolStyle, specStreamable::symbolStyleCommandId > ;
 	case specStreamable::symbolPenColorCommandId :
 		return new specStyleCommandImplementation<QColor, &specCanvasItem::symbolPenColor, &specCanvasItem::setSymbolPenColor, specStreamable::symbolPenColorCommandId > ;
+	case specStreamable::symbolBrushColorCommandId:
+		return new specStyleCommandImplementation<QColor, &specCanvasItem::symbolBrushColor, &specCanvasItem::setSymbolBrushColor, specStreamable::symbolBrushColorCommandId> ;
+	case specStreamable::symbolSizeCommandId:
+		return new specStyleCommandImplementation<QSize, &specCanvasItem::symbolSize, &specCanvasItem::setSymbolSize, specStreamable::symbolSizeCommandId > ;
+	case specStreamable::lineWidthCommandId:
+		return new specStyleCommandImplementation<double, &specCanvasItem::lineWidth, &specCanvasItem::setLineWidth, specStreamable::lineWidthCommandId> ;
 	default:
 		return 0 ;
 	}
