@@ -21,19 +21,13 @@ private:
 	int huevalue ;
 private slots:
 	void addRange() ;
+	void removeRange() ;
 	void rangeModified(specCanvasItem* range, int point, double newX, double newY) ;
 public:
 	explicit cutByIntensityDialog(QWidget *parent = 0);
 	~cutByIntensityDialog() ;
 	void assignSpectra(QList<specModelItem*>) ;
 	QList<specRange*> ranges() ;
-public slots :
-	void performDeletion() ;
-
-signals:
-
-public slots:
-
 };
 
 #endif // CUTBYINTENSITYDIALOG_H

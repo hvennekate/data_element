@@ -39,7 +39,7 @@ private:
 	*kineticsAction,
 	*saveAsAction,
 	*logAction,
-	*printAction ;
+	move;
 	specActionLibrary *actions ;
 	void createToolbars();
 	void setConnections() ;

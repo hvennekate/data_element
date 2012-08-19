@@ -264,34 +264,6 @@ void CanvasPicker::moveBy ( int dx, int dy )
 	move ( QPoint ( x, y ) );
 }
 
-// void CanvasPicker::addRange()
-// {
-// 	ranges << new specRange ( plot()->axisScaleDiv ( 2 )->lowerBound(),plot()->axisScaleDiv ( 2 )->upperBound() ) ;
-// 	QPen pen ( QColor ( 255,139,15,100 ) ) ;
-// 	pen.setWidth ( 5 ) ;
-// 	ranges.last()->setPen ( pen ) ;
-// 	pen.setColor ( QColor ( 255,139,15 ) ) ;
-// 	ranges.last()->setSymbol ( QwtSymbol ( QwtSymbol::Ellipse,pen.brush(), ( QPen ) pen.color(),QSize ( 5,5 ) ) ) ;
-// 	ranges.last()->attach ( plot() ) ;
-// // 	emit rangesModified ( &ranges ) ;
-// // 	emit haveZeroRanges ( true ) ;
-// }
-//
-// void CanvasPicker::deleteRange()
-// {
-// 	if ( selectedRange >= 0 )
-// 	{
-// 		ranges[selectedRange]->detach() ;
-// 		delete ranges[selectedRange] ;
-// 		ranges.removeAt ( selectedRange ) ;
-// 		selectedRange = -1 ; // TODO evtl. select last range, also upon adding ranges...
-// 		emit rangesModified ( &ranges ) ;
-// 		plot()->replot() ;
-// 	}
-// 	if ( ranges.isEmpty() )
-// 		emit haveZeroRanges ( false ) ;
-// }
-
 // Move the selected point
 void CanvasPicker::move ( const QPoint &pos )
 {
@@ -513,12 +485,8 @@ void CanvasPicker::removeSelectable(QSet<specCanvasItem *> &list)
 
 void CanvasPicker::removeSelected()
 {
-	if (d_selectedCurve)
-	{
-		QSet<specCanvasItem*> toRemove ;
-		toRemove << d_selectedCurve ;
-		removeSelectable(toRemove) ;
-	}
+	if (selectable.contains(lastSelected))
+		removeSelectable(lastSelected);
 }
 
 void CanvasPicker::removeSelectable()

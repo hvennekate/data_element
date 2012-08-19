@@ -25,5 +25,5 @@ void specKRContextMenu::deleteItem()
 
 void specKRContextMenu::changeLineWidth()
 {
-	if(pointer) pointer->setLineWidth() ;
+
 }

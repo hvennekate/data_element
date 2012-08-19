@@ -216,4 +216,5 @@ QT += svg
 QMAKE_CXXFLAGS += -std=c++0x
 
 FORMS += \
-    kinetic/connectionsManager.ui
+    kinetic/connectionsManager.ui \
+    spectral/dataItemProperties.ui

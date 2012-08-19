@@ -7,12 +7,12 @@ specResizeSVGcommand::specResizeSVGcommand(specUndoCommand *parent)
 {
 }
 
-void specResizeSVGcommand::setItem(const QModelIndex &index, const specSVGItem::bounds &bounds)
+void specResizeSVGcommand::setItem(const QModelIndex &index)
 {
 	if (item)
 		delete item ;
 	item = new specGenealogy(QModelIndexList() << index) ;
-	other = bounds ;
+	other = ((specSVGItem*) item->firstItem())->getBounds() ;
 	doIt() ;
 }
 
@@ -37,8 +37,6 @@ void specResizeSVGcommand::doIt()
 	specSVGItem *pointer = ((specSVGItem*) item->firstItem()) ;
 	specSVGItem::bounds oldBounds = pointer->getBounds() ;
 	pointer->setBounds(other);
-	qDebug() << "Old bounds:" << oldBounds.x.second << oldBounds.y.second << oldBounds.width.second << oldBounds.height.second ;
-	qDebug() << "New bounds:" << other.x.second << other.y.second << other.width.second << other.height.second ;
 	other = oldBounds ;
 	if (pointer->plot())
 		pointer->plot()->replot();
@@ -57,4 +55,12 @@ bool specResizeSVGcommand::mergeable(const specUndoCommand *other)
 bool specResizeSVGcommand::mergeWith(const QUndoCommand *other)
 {
 	return mergeable((specUndoCommand*) other) ;
+}
+
+void specResizeSVGcommand::parentAssigned()
+{
+	if (!parentObject()) return ;
+	specModel *model = qobject_cast<specModel*>(parentObject()) ;
+	if (!model) return ;
+	genealogy->setModel(model) ;
 }

@@ -15,9 +15,10 @@ private:
 	void writeToStream(QDataStream &out) const;
 	void readFromStream(QDataStream &in) ;
 	type typeId() const { return specStreamable::resizeSVGCommandId ; }
+	void parentAssigned();
 public:
 	explicit specResizeSVGcommand(specUndoCommand *parent = 0) ;
-	void setItem(const QModelIndex&, const specSVGItem::bounds&) ;
+	void setItem(const QModelIndex&) ;
 	bool ok() ;
 	bool mergeable(const specUndoCommand *other) ;
 	bool mergeWith(const QUndoCommand *other) ;

@@ -19,6 +19,7 @@ private:
 	specModelItem* factory(const type &t) const ;
 public:
 	explicit specGenealogy(QModelIndexList&);
+	explicit specGenealogy(const QModelIndex&) ;
 	virtual ~specGenealogy() ;
 	specGenealogy(specModel*, QDataStream&) ;
 	specGenealogy() ;
