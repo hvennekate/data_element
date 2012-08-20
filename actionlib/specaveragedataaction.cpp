@@ -83,7 +83,7 @@ void specAverageDataAction::execute()
 		}
 		item->reverseCorrection(newData);
 		specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
-		command->setParentObject(view) ;
+		command->setParentObject(view->model()) ;
 		command->setItem(index,newData);
 //		QVector<int> take, leave ;
 //		for (int i = 0 ; i < oldData.size() ; ++i)

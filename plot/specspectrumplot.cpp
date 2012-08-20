@@ -400,6 +400,8 @@ void specSpectrumPlot::multipleSubtraction()
 		referenceSpectrum[reference->sample(i).x()] = reference->sample(i).y() ;
 	// TODO more efficient undo:  generate added/subtracted spectrum (interpolated points included)
 	specMultiCommand* subCommand = new specMultiCommand ;
+	if (view && view->model())
+		subCommand->setParentObject(view->model());
 	for (int i = 0 ; i < spectra.size() ; ++i)
 	{
 		specDataItem* spectrum = dynamic_cast<specDataItem*>(spectra[i]) ;
@@ -427,10 +429,13 @@ void specSpectrumPlot::multipleSubtraction()
 		spectrum->reverseCorrection(data) ;
 		specExchangeDataCommand *command = new specExchangeDataCommand(subCommand) ;
 		if (view && view->model())
+		{
+			command->setParentObject(view->model());
 			command->setItem(view->model()->index(spectrum),data);
+		}
 	}
 
-	subCommand->setParentObject(view) ;
+	subCommand->setParentObject(view->model()) ;
 	undoPartner()->push(subCommand) ;
 	replot() ;
 }

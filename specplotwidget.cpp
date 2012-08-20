@@ -236,6 +236,9 @@ void specPlotWidget::setConnections()
 	connect(kineticWidget->internalPlot(),SIGNAL(replotted()),plot,SLOT(replot())) ;
 	connect(kineticWidget->internalPlot(), SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(), SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
 	connect(plot, SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(),SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
+
+	connect(items,SIGNAL(newUndoCommand(specUndoCommand*)), actions, SLOT(push(specUndoCommand*))) ;
+	connect(kineticWidget->view(),SIGNAL(newUndoCommand(specUndoCommand*)), actions, SLOT(push(specUndoCommand*))) ;
 }
 
 #include <QPainter>

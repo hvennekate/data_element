@@ -1,40 +1,62 @@
 #include "specmetaitem.h"
 #include "specplot.h"
+#include "metaitemproperties.h"
 
 specMetaItem::specMetaItem(specFolderItem *par, QString description)
 	: specModelItem(par,description),
 	  filter(0),
-	  currentlyConnectingServer(0)
+	  currentlyConnectingServer(0),
+	  metaModel(0),
+	  dataModel(0)
 {
 	filter = new specMetaParser("","","",this) ;
 	invalidate() ;
 }
 
+void specMetaItem::setModels(specModel *m, specModel *d)
+{
+	metaModel = m ;
+	dataModel = d ;
+
+	for (int i = 0 ; i < oldConnections.size() ; ++i)
+	{
+		oldConnections[i].first.setModel(oldConnections[i].second ? m : d) ;
+		foreach(specModelItem* item, oldConnections[i].first.items())
+			connectServer(item) ;
+	}
+	oldConnections.clear();
+	invalidate();
+}
+
 void specMetaItem::writeToStream(QDataStream &out) const
 {
 	specModelItem::writeToStream(out) ;
-	out << variables << quint16(items.size()) ;
+	out << variables ;
+	if (!metaModel || !dataModel) return ;
+	QVector<QPair<specGenealogy,qint8> > currentConnections ;
 	foreach(specModelItem* item, items)
-		out << quint64(item) ;
+	{
+		QModelIndex index = metaModel->index(item) ;
+		if (index.isValid())
+			currentConnections << qMakePair<specGenealogy,qint8>(
+						specGenealogy(QModelIndexList() << index), true) ;
+		else currentConnections << qMakePair<specGenealogy,qint8>(
+					specGenealogy(QModelIndexList() <<
+						      dataModel->index(item)), false) ;
+	}
+	out << currentConnections ;
 }
 
 void specMetaItem::readFromStream(QDataStream &in)
 {
 	specModelItem::readFromStream(in) ;
-	quint16 toRead ;
-	in >> variables >> toRead ;
-	quint64 p ;
-	for (int i = 0 ; i < toRead ; ++i)
-	{
-		in >> p ;
-		items << (specModelItem*) p ;
-	}
+	in >> variables >> oldConnections;
 	invalidate() ; // TODO maybe insert in data item or just model item.
 }
 
 QList<specModelItem*> specMetaItem::purgeConnections()
 {
-	QList<specModelItem*> list = items.toList() ;
+	QList<specModelItem*> list = items ;
 	foreach(specModelItem* item, items)
 		item->disconnectClient(this) ;
 	items.clear();
@@ -55,7 +77,7 @@ bool specMetaItem::disconnectServer(specModelItem *server) // TODO template ? ->
 		return false ;
 	}
 	currentlyConnectingServer = 0 ;
-	items.remove(server) ;
+	items.removeOne(server) ;
 	invalidate() ;
 	return true ;
 }
@@ -102,23 +124,12 @@ void specMetaItem::attach(QwtPlot *plot)
 	refreshOtherPlots() ;
 }
 
-
-void specMetaItem::refreshPointers(const QHash<specModelItem *, specModelItem *> &mapping)
-{// TODO this could be problematic with 32bit vs. 64bit systems...
-	invalidate() ;
-	QSet<specModelItem*> newPointers ;
-	foreach(specModelItem* pointer, items)
-		newPointers << mapping[pointer] ;
-	newPointers.remove(0) ;
-	items = newPointers ;
-}
-
 void specMetaItem::refreshPlotData()
 {
 	// TODO do some more checks on valid items etc.
 	foreach(specModelItem *item, items)
 		item->revalidate();
-	setData(processData(filter->evaluate(items.toList().toVector()))) ; // TODO use vector
+	setData(processData(filter->evaluate(items.toVector()))) ; // TODO use vector
 	variables["errors"] = filter->warnings() ;
 	refreshOtherPlots() ;
 }
@@ -178,4 +189,12 @@ bool specMetaItem::setActiveLine(const QString &s, int i)
 		return true ;
 	}
 	return specModelItem::setActiveLine(s,i) ;
+}
+
+specUndoCommand* specMetaItem::itemPropertiesAction(QObject *parentObject)
+{
+	metaItemProperties propertiesDialog(this) ;
+	propertiesDialog.exec() ;
+	if (propertiesDialog.result() != QDialog::Accepted) return 0 ;
+	return propertiesDialog.changedConnections(parentObject) ;
 }

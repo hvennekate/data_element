@@ -28,7 +28,6 @@ public:
 //	QMenuBar *menuBar(QObject*) ;
 	QToolBar *toolBar(QWidget*) ;
 //	QMenu *contextMenu(const QItemSelection&, specModel*) ; // actionLibrary bekommt Clients in fester Reihenfolge; speichert diese mit den Commands und restauriert so deren Referenz.
-	void push(specUndoCommand*) ;
 	QObject* parentId(int) ;
 	void addDragDropPartner(specModel*) ;
 	void setLastRequested(const QModelIndexList&) ;
@@ -38,6 +37,8 @@ public:
 	static specUndoCommand* commandById(int id, specUndoCommand* parent = 0) ;
 	QAction* undoAction(QObject*) ;
 	QAction* redoAction(QObject*) ;
+public slots:
+	void push(specUndoCommand*) ;
 
 signals:
 	void stackChanged() ;

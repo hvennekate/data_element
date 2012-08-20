@@ -27,10 +27,10 @@ void specNewMetaItemAction::execute()
 	{
 		row = index.row()+1 ;
 		index = index.parent() ;
-
 	}
 
 	specMetaItem *pointer = new specMetaItem ;
+	pointer->setModels(model,view->getDataView()->model());
 	if (! model->insertItems(QList<specModelItem*>() << pointer, index,row))
 	{
 		delete pointer ;

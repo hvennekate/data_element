@@ -88,7 +88,9 @@ SOURCES += main.cpp \
     specstreamable.cpp \
     actionlib/specmetarangecommand.cpp \
     model/specgenericmimeconverter.cpp \
-    model/spectextmimeconverter.cpp
+    model/spectextmimeconverter.cpp \
+    spectral/dataitemproperties.cpp \
+    kinetic/metaitemproperties.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -178,7 +180,9 @@ HEADERS += cutbyintensitydialog.h \
     specstreamable.h \
     actionlib/specmetarangecommand.h \
     model/specgenericmimeconverter.h \
-    model/spectextmimeconverter.h
+    model/spectextmimeconverter.h \
+    spectral/dataitemproperties.h \
+    kinetic/metaitemproperties.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -216,5 +220,5 @@ QT += svg
 QMAKE_CXXFLAGS += -std=c++0x
 
 FORMS += \
-    kinetic/connectionsManager.ui \
-    spectral/dataItemProperties.ui
+    spectral/dataitemproperties.ui \
+    kinetic/metaitemproperties.ui

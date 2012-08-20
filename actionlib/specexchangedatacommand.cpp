@@ -9,14 +9,21 @@ specExchangeDataCommand::specExchangeDataCommand(specUndoCommand *parent)
 void specExchangeDataCommand::setItem(const QModelIndex & index, const QVector<specDataPoint> &newData)
 {
 	data = newData ;
-	if (!parentObject()) return ; // TODO dynamic cast
-	specDataItem *pointer = dynamic_cast<specDataItem*>(((specView*) parentObject())->model()->itemPointer(index)) ;
+	if (!parentObject()) return ; // TODO dynamic cast/ obtain model from index
+	specDataItem *pointer = dynamic_cast<specDataItem*>(((specModel*) parentObject())->itemPointer(index)) ;
 	if (item)
 		delete item ;
 	item = 0 ;
 	if (!pointer)
 		return ;
 	item = new specGenealogy(QModelIndexList() << index) ;
+}
+
+void specExchangeDataCommand::parentAssigned()
+{
+	if (!parentObject()) return ;
+	if (!item) return ;
+	item->setModel(qobject_cast<specModel*>(parentObject())) ;
 }
 
 void specExchangeDataCommand::undoIt()

@@ -4,13 +4,15 @@
 #include "specmodelitem.h"
 #include "specmetaparser.h"
 #include "model/specdescriptor.h"
+#include "specgenealogy.h"
 
 class specPlot ;
 
 class specMetaItem : public specModelItem
 {
+	friend class metaItemProperties ;
 private:
-	QSet<specModelItem*> items ;
+	QList<specModelItem*> items ;
 	specMetaParser *filter ;
 	QHash<QString,specDescriptor> variables ;
 	specModelItem *currentlyConnectingServer ;
@@ -18,7 +20,10 @@ private:
 	type typeId() const { return specStreamable::metaItem ; }
 	void readFromStream(QDataStream & in) ;
 	void writeToStream(QDataStream & out) const ;
+	specModel* metaModel, *dataModel ;
+	QVector<QPair<specGenealogy,qint8> > oldConnections ;
 public:
+	void setModels(specModel* meta, specModel* data) ;
 	bool disconnectServer(specModelItem*) ;
 	bool connectServer(specModelItem*) ;
 	explicit specMetaItem(specFolderItem* par=0, QString description="");
@@ -35,6 +40,7 @@ public:
 	void setRange(int variableNo, int rangeNo, int pointNo, double newX, double newY) ;
 	bool setActiveLine(const QString &, int) ;
 	int rtti() { return spec::metaItem ; }
+	specUndoCommand* itemPropertiesAction(QObject *parentObject) ;
 };
 
 /* TODO in other classes

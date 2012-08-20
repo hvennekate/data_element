@@ -85,7 +85,7 @@ public:
 	int rtti() const { return spec::spectrum ; }
 	
 	static specModelItem* itemFactory(specStreamable::type) ;
-	virtual specUndoCommand* itemPropertiesAction() { return 0 ; }
+	virtual specUndoCommand* itemPropertiesAction(QObject *parentObject) { Q_UNUSED(parentObject) ; return 0 ; }
 };
 
 #endif
