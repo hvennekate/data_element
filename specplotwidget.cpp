@@ -184,6 +184,7 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 			if (! saveFile())
 			{
 				modified() ;
+				event->ignore();
 				break ;
 			}
 		case QMessageBox::No :

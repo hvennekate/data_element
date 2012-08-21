@@ -57,3 +57,8 @@ specDataPoint& specDataPoint::operator/(const double& toDiv)
 	*this /= toDiv ;
 	return *this ;
 }
+
+bool specDataPoint::exactlyEqual(const specDataPoint &o) const
+{
+	return t == o.t && nu == o.nu && sig == o.sig && mint == o.mint ;
+}

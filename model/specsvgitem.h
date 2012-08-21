@@ -8,9 +8,9 @@
 
 class specSVGItem : public specModelItem
 {
+	friend class svgItemProperties ;
 public:
 	typedef QPair<qint8,qreal> dimension ;
-private:
 	enum SVGCornerPoint { undefined = -1,
 		center      = 0,
 		left        = 1,
@@ -22,7 +22,7 @@ private:
 		topRight    = 7,
 		bottomRight = 8,
 		size        = 9 } ;
-
+private:
 	QwtPlotSvgItem image ;
 	QByteArray data ;
 	bool highlighting ;
@@ -48,10 +48,13 @@ public:
 	struct bounds
 	{
 		dimension x, y, width, height ;
+		bool operator==(const bounds&) const ;
 	};
 	bounds getBounds() const ;
 	void setBounds(const bounds&) ;
+	SVGCornerPoint setAnchor(const SVGCornerPoint&) ;
 	QIcon decoration() const ;
+	specUndoCommand *itemPropertiesAction(QObject *parentObject) ;
 private:
 	bounds ownBounds ;
 };

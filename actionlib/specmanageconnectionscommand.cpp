@@ -29,7 +29,7 @@ void specManageConnectionsCommand::setItems(const QModelIndex &client, QModelInd
 	clear() ;
 	target = new specGenealogy(QModelIndexList() << client) ;
 	((specModel*) servers.first().model())->eliminateChildren(servers);
-	qSort(servers) ;
+//	qSort(servers) ;
 	while(!servers.isEmpty())
 		items << new specGenealogy(servers) ;
 }
@@ -42,7 +42,7 @@ bool specManageConnectionsCommand::ok() const
 void specManageConnectionsCommand::restore()
 {
 	QVector<specModelItem*> pointers = itemPointers() ;
-	qDebug() << this << "restoring:" << pointers ;
+	qDebug() << this << "restoring:" << pointers << "Genealogies:" << items;
 	specMetaItem* client = targetPointer() ;
 	foreach(specModelItem *pointer, pointers)
 		client->connectServer(pointer); // TODO consider removal from list if false is returned.
@@ -51,7 +51,7 @@ void specManageConnectionsCommand::restore()
 void specManageConnectionsCommand::take()
 {
 	QVector<specModelItem*> pointers = itemPointers() ;
-	qDebug() << this << "taking:" << pointers ;
+	qDebug() << this << "taking:" << pointers << "Genealogies:" << items;
 	specMetaItem* client = targetPointer() ;
 	foreach(specModelItem *pointer, pointers)
 		pointer->disconnectClient(client) ;

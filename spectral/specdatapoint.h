@@ -23,6 +23,7 @@ struct specDataPoint{
 // Comparison operators
 	bool operator<(const specDataPoint&) const ;
 	bool operator==(const specDataPoint&) const ;
+	bool exactlyEqual(const specDataPoint&) const ;
 	bool operator>(const specDataPoint&) const ;
 	bool operator!=(const specDataPoint& toCompare) const ;
 	specDataPoint& operator+=(const specDataPoint&);

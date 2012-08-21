@@ -90,7 +90,9 @@ SOURCES += main.cpp \
     model/specgenericmimeconverter.cpp \
     model/spectextmimeconverter.cpp \
     spectral/dataitemproperties.cpp \
-    kinetic/metaitemproperties.cpp
+    kinetic/metaitemproperties.cpp \
+    model/svgitemproperties.cpp \
+    model/specsvgunitbutton.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -182,7 +184,9 @@ HEADERS += cutbyintensitydialog.h \
     model/specgenericmimeconverter.h \
     model/spectextmimeconverter.h \
     spectral/dataitemproperties.h \
-    kinetic/metaitemproperties.h
+    kinetic/metaitemproperties.h \
+    model/svgitemproperties.h \
+    model/specsvgunitbutton.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -221,4 +225,5 @@ QMAKE_CXXFLAGS += -std=c++0x
 
 FORMS += \
     spectral/dataitemproperties.ui \
-    kinetic/metaitemproperties.ui
+    kinetic/metaitemproperties.ui \
+    model/svgitemproperties.ui

@@ -1,6 +1,7 @@
 #include "specsvgitem.h"
 #include <qwt/qwt_plot.h>
 #include <QSvgRenderer>
+#include "svgitemproperties.h"
 
 void specSVGItem::attach(QwtPlot *plot)
 {
@@ -26,7 +27,7 @@ void specSVGItem::highlight(bool highlight)
 specSVGItem::specSVGItem(specFolderItem *par, QString description)
 	: specModelItem(par,description),
 	  highlighting(false),
-	  anchor(center)
+	  anchor(topLeft)
 {
 	ownBounds.width=qMakePair<qint8,qreal>(QwtPlot::axisCnt,0) ;
 	ownBounds.height=qMakePair<qint8,qreal>(QwtPlot::axisCnt,0) ;
@@ -77,9 +78,9 @@ QRectF specSVGItem::boundRect() const
 	// shift y
 	switch(anchor)
 	{
-	case bottom:
-	case bottomLeft:
-	case bottomRight:
+	case top:
+	case topLeft:
+	case topRight:
 		py -= h / 2 ;
 	case center:
 	case left:
@@ -219,4 +220,26 @@ QDataStream& operator>>(QDataStream& in, specSVGItem::bounds& b)
 QIcon specSVGItem::decoration() const
 {
 	return QIcon::fromTheme("image-x-generic") ;
+}
+
+specUndoCommand* specSVGItem::itemPropertiesAction(QObject *parentObject)
+{
+	svgItemProperties propertiesDialog(this) ;
+	if (propertiesDialog.exec() != QDialog::Accepted) return 0 ;
+	return propertiesDialog.generateCommand(parentObject) ;
+}
+
+specSVGItem::SVGCornerPoint specSVGItem::setAnchor(const SVGCornerPoint & p)
+{
+	SVGCornerPoint old = anchor ;
+	anchor = p ;
+	return old ;
+}
+
+bool specSVGItem::bounds::operator ==(const specSVGItem::bounds& other) const
+{
+	return x      == other.x     &&
+	       y      == other.y     &&
+	       width  == other.width &&
+	       height == other.height ;
 }

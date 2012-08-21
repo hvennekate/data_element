@@ -99,10 +99,9 @@ specUndoCommand* dataItemProperties::changeCommands(QObject* parent)
 {
 	bool dataUnchanged = true, correctionUnchanged = true ;
 	if (item.data.size() == originalItem->data.size())
-	{
 		for (size_t i = 0 ; i < item.dataSize() ; ++i)
-			dataUnchanged = dataUnchanged && (item.data[i] == originalItem->data[i]) ;
-	}
+			dataUnchanged = dataUnchanged &&
+				    item.data[i].exactlyEqual(originalItem->data[i]) ;
 	else dataUnchanged = false ;
 
 	correctionUnchanged = (item.slope == originalItem->slope &&
