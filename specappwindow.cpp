@@ -1,5 +1,6 @@
 #include "specappwindow.h"
 #include <QFile>
+#include <QLabel>
 
 specAppWindow::specAppWindow()
  : QMainWindow(), settings()
@@ -10,6 +11,10 @@ specAppWindow::specAppWindow()
 	createMenus();
 	createToolBars();
 	restoreGeometry(settings.value("mainWindow/geometry").toByteArray()) ;
+
+//	setToolTip("TesttoolTip");
+	setWhatsThis("Test What's this?");
+	setWindowFlags(windowFlags() | Qt::WindowContextHelpButtonHint);
 }
 
 
