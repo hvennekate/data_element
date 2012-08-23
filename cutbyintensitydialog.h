@@ -27,13 +27,6 @@ public:
 	~cutByIntensityDialog() ;
 	void assignSpectra(QList<specModelItem*>) ;
 	QList<specRange*> ranges() ;
-public slots :
-	void performDeletion() ;
-
-signals:
-
-public slots:
-
 };
 
 #endif // CUTBYINTENSITYDIALOG_H

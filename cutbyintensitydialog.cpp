@@ -71,16 +71,6 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 	plot->replot() ;
 }
 
-void cutByIntensityDialog::performDeletion()
-{
-	QList<specCanvasItem*>* selectable = plot->selectable() ;
-	QList<specRange*>* ranges = new QList<specRange*> ;
-	for (int i = 0 ; i < selectable->size() ; i++)
-		ranges->append((specRange*) selectable->at(i)) ;
-	foreach(specModelItem* item, items)
-		item->removeData(ranges) ;
-}
-
 QList<specRange*> cutByIntensityDialog::ranges() // TODO create access function in canvas picker
 {
 	QList<specCanvasItem*>* selectable = plot->selectable() ;
