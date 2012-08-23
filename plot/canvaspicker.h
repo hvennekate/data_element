@@ -49,10 +49,10 @@ public:
 	void removeSelectable();
 	void setSelectable(const QSet<specCanvasItem*>&) ;
 	void removeSelected() ;
+	QList<specCanvasItem*> items() const ;
 	inline void setOwning(bool Owning =true) { owning = Owning ; } // TODO do this more skilfully.
 
 signals:
-	void moved(specCanvasItem*) ;
 	void pointMoved(specCanvasItem*, int, double, double) ;
 };
 

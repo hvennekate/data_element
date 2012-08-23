@@ -20,6 +20,8 @@ public:
 
 	specMetaRange(double x1, double x2, specMetaVariable *parent) ;
 	addressObject address() ;
+	void attach(QwtPlot *plot);
+	void detach();
 };
 
 #endif // SPECMETARANGE_H

@@ -21,6 +21,7 @@ private:
 	int huevalue ;
 private slots:
 	void addRange() ;
+	void removeRange() ;
 	void rangeModified(specCanvasItem* range, int point, double newX, double newY) ;
 public:
 	explicit cutByIntensityDialog(QWidget *parent = 0);

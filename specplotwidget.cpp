@@ -32,7 +32,6 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	  kineticsAction(kineticWidget->toggleViewAction()),
 	  saveAsAction(new QAction(QIcon::fromTheme("document-save-as"), tr("Save as..."), this)),
 	  logAction(logWidget->toggleViewAction()),
-	  printAction(new QAction(QIcon::fromTheme("document-print"), tr("Print..."), this)),
 	  actions(new specActionLibrary(this))
 {
 	items->setModel(new specModel(items));
@@ -116,7 +115,6 @@ void specPlotWidget::createToolbars()
 
 	toolbar-> addAction(saveAction) ;
 	toolbar-> addAction(saveAsAction) ;
-	toolbar-> addAction(printAction) ;
 	toolbar-> addSeparator() ;
 	toolbar-> addAction(logAction) ;
 	toolbar-> addAction(kineticsAction) ;
@@ -124,6 +122,7 @@ void specPlotWidget::createToolbars()
 	toolbar-> addAction(actions->undoAction(this)) ;
 	toolbar-> addAction(actions->redoAction(this)) ;
 	toolbar-> addSeparator() ;
+
 	foreach(QAction* action, plot->actions())
 		toolbar->addAction(action) ;
 }
@@ -211,6 +210,7 @@ void specPlotWidget::setConnections()
 
 	connect(items,SIGNAL(newUndoCommand(specUndoCommand*)), actions, SLOT(push(specUndoCommand*))) ;
 	connect(kineticWidget->view(),SIGNAL(newUndoCommand(specUndoCommand*)), actions, SLOT(push(specUndoCommand*))) ;
+	connect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
 }
 
 void specPlotWidget::selectionChanged(const QItemSelection & selected, const QItemSelection & deselected)

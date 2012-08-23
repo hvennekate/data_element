@@ -1,5 +1,6 @@
 #include "specresizesvgcommand.h"
 #include "specsvgitem.h"
+#include "specgenealogy.h"
 
 specResizeSVGcommand::specResizeSVGcommand(specUndoCommand *parent)
 	: specUndoCommand(parent),
@@ -63,4 +64,12 @@ bool specResizeSVGcommand::mergeable(const specUndoCommand *other)
 bool specResizeSVGcommand::mergeWith(const QUndoCommand *other)
 {
 	return mergeable((specUndoCommand*) other) ;
+}
+
+void specResizeSVGcommand::parentAssigned()
+{
+	if (!parentObject()) return ;
+	specModel *model = qobject_cast<specModel*>(parentObject()) ;
+	if (!model) return ;
+	item->setModel(model) ;
 }

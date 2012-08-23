@@ -1,5 +1,6 @@
 #include "cutbyintensitydialog.h"
 #include <qwt_scale_div.h>
+#include "canvaspicker.h"
 
 cutByIntensityDialog::cutByIntensityDialog(QWidget *parent) :
     QDialog(parent), huevalue(0)
@@ -16,8 +17,6 @@ cutByIntensityDialog::cutByIntensityDialog(QWidget *parent) :
 	layout->addWidget(deleteRange) ;
 	layout->addWidget(buttons) ;
 
-	plot->select = true ;
-	plot->refreshMoveMode();
 	plot->enableAxis(QwtPlot::yRight,true) ;
 	plot->setAxisScale(QwtPlot::yRight,0,33e3) ;
 	plot->setAutoReplot(false) ;
@@ -25,7 +24,7 @@ cutByIntensityDialog::cutByIntensityDialog(QWidget *parent) :
 
 	picker->setOwning() ;
 
-	connect(deleteRange,SIGNAL(clicked()),plot,SLOT(deleteRange())) ;
+	connect(deleteRange,SIGNAL(clicked()),this,SLOT(removeRange())) ;
 	connect(newRange,SIGNAL(clicked()),this,SLOT(addRange())) ;
 	connect(buttons,SIGNAL(accepted()),this,SLOT(accept())) ;
 	connect(buttons,SIGNAL(rejected()),this,SLOT(reject())) ;
@@ -67,16 +66,15 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 		y1max = qMax(y1max,boundaries.bottom()) ;
 	}
 	plot->setAxisScale(QwtPlot::yLeft,y1min,10.) ;
-//	plot->updateAxes();
 	plot->replot() ;
 }
 
 QList<specRange*> cutByIntensityDialog::ranges() // TODO create access function in canvas picker
 {
-	QList<specCanvasItem*>* selectable = plot->selectable() ;
+	QList<specCanvasItem*> selectable = picker->items() ;
 	QList<specRange*> allRanges ;
-	for (int i = 0 ; i < selectable->size() ; i++)
-		allRanges.append((specRange*) selectable->at(i)) ;
+	foreach(specCanvasItem* pointer, selectable)
+		allRanges << (specRange*) pointer ;
 	return allRanges ;
 }
 
@@ -86,11 +84,15 @@ void cutByIntensityDialog::addRange()
 	specRange* range = new specSelectRange(min+.1*(max-min),max-.1*(max-min)) ;
 	range->attach(plot) ;
 	picker->addSelectable(range) ;
-//	plot->refreshRanges();
 }
+
+void cutByIntensityDialog::removeRange()
+{
+	picker->removeSelected();
+}
+
 cutByIntensityDialog::~cutByIntensityDialog()
 {
-	delete picker ;
 }
 
 void cutByIntensityDialog::rangeModified(specCanvasItem *range, int point, double newX, double newY)

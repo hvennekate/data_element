@@ -23,7 +23,6 @@ protected:
 	virtual void execute() = 0 ;
 private slots:
 	void gotTrigger() ;
-
 };
 
 #endif // SPECUNDOACTION_H

@@ -1,5 +1,6 @@
 #include "specsvgitem.h"
-#include <qwt/qwt_plot.h>
+#include "specplot.h"
+#include "canvaspicker.h"
 #include <QSvgRenderer>
 #include "svgitemproperties.h"
 
@@ -22,6 +23,13 @@ void specSVGItem::highlight(bool highlight)
 		setSymbol(0) ;
 	else
 		setSymbol(new QwtSymbol(QwtSymbol::Ellipse,QBrush(Qt::black),QPen(Qt::white),QSize(5,5))) ;
+
+	specPlot *sp = qobject_cast<specPlot*> (plot()) ; // TODO make function (also specMetaRange)
+	if (sp && sp->svgPicker())
+	{
+		if (highlight) sp->svgPicker()->addSelectable(this) ;
+		else sp->svgPicker()->removeSelectable(this) ;
+	}
 }
 
 specSVGItem::specSVGItem(specFolderItem *par, QString description)
@@ -43,6 +51,7 @@ void specSVGItem::setImage(const QByteArray &newData)
 	ownBounds.height = qMakePair<qint8,qreal>(QwtPlot::yLeft, defaultSize.height()) ;
 	ownBounds.x = qMakePair<qint8,qreal>(QwtPlot::xBottom, 0) ;
 	ownBounds.y = qMakePair<qint8,qreal>(QwtPlot::yLeft, 0) ;
+	anchor = center ;
 	data = newData ;
 }
 

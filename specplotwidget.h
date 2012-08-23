@@ -36,8 +36,7 @@ private:
 	QAction *saveAction,
 	*kineticsAction,
 	*saveAsAction,
-	*logAction,
-	*printAction ;
+	*logAction;
 	specActionLibrary *actions ;
 	void createToolbars();
 	void setConnections() ;

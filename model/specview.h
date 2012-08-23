@@ -59,7 +59,6 @@ public slots:
 	void changePen() ;
 	void mergeFolder() ;
 	void mergeItems() ;
-	void cutByIntensity() ;
 	void currentlySelectedToSubMap() ;
 	void applySubMapToSelection() ;
 	void exportItems() ;

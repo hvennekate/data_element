@@ -116,6 +116,7 @@ public:
 public slots:
 	void importFile(QModelIndex) ;
 	bool exportData(QModelIndexList& list) ;
+	void svgMoved(specCanvasItem*, int, double, double) ;
 // 	bool insertRows(int position, int rows, const QModelIndex &parent = QModelIndex());
 };
 

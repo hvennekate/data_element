@@ -14,14 +14,9 @@ public:
 	explicit changePlotStyleAction(QObject *parent = 0);
 	const std::type_info& possibleParent() { return typeid(specView) ; }
 
-signals:
-
-public slots:
-
 protected:
 
 	void execute() ;
-//	void specStyleCommand *command() = 0 ;
 
 private:
 	QMenu *lineColorMenu,

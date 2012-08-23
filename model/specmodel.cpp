@@ -21,6 +21,7 @@
 #include "actionlib/specmovecommand.h"
 #include "actionlib/specaddfoldercommand.h"
 #include "actionlib/speceditdescriptorcommand.h"
+#include "actionlib/specresizesvgcommand.h"
 // TODO replace isFolder() by addChildren(empty list,0)
 
 bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria)
@@ -810,3 +811,17 @@ void specModel::setDropSource(specView *view)
 {
 	dropSource = view ;
 }
+
+void specModel::svgMoved(specCanvasItem *i, int point, double x, double y)
+{
+	specSVGItem *item = dynamic_cast<specSVGItem*>(i) ;
+	if (!item || !dropBuddy) return ;
+
+	specResizeSVGcommand *command = new specResizeSVGcommand ;
+	command->setParentObject(this) ;
+	command->setItem(index(item)) ;
+	item->pointMoved(point,x,y) ;
+	command->undo();
+	dropBuddy->push(command) ;
+}
+

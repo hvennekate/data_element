@@ -1,9 +1,11 @@
 #ifndef SPECRESIZESVGCOMMAND_H
 #define SPECRESIZESVGCOMMAND_H
 
+#include <QModelIndex>
 #include "specundocommand.h"
-#include "model/specgenealogy.h"
 #include "model/specsvgitem.h"
+
+class specGenealogy ;
 
 class specResizeSVGcommand : public specUndoCommand
 {
@@ -16,6 +18,7 @@ private:
 	void writeToStream(QDataStream &out) const;
 	void readFromStream(QDataStream &in) ;
 	type typeId() const { return specStreamable::resizeSVGCommandId ; }
+	void parentAssigned();
 public:
 	explicit specResizeSVGcommand(specUndoCommand *parent = 0) ;
 	void setItem(const QModelIndex&, const specSVGItem::bounds&,

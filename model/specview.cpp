@@ -8,12 +8,12 @@
 #include <specdelegate.h>
 #include <QtAlgorithms>
 #include "specfolderitem.h"
-#include "cutbyintensitydialog.h"
 #include <QSpinBox>
 #include <QDialogButtonBox>
 #include "specviewstate.h"
 #include <QClipboard>
 #include "specmodel.h"
+#include <QVBoxLayout>
 using std::min ;
 using std::max ;
 
@@ -204,7 +204,7 @@ void specView::createContextMenus()
 
 QList<QAction*> specView::actions()
 {
-	return QList<QAction*>() << newItemAction << deleteAction << treeAction << changePenAction << mergeFolderAction << mergeAction << exportAction << cutByIntensityAction << averageAction << movingAverageAction << getSubtractionDataAction << applySubtractionAction;
+	return QList<QAction*>() << newItemAction << deleteAction << treeAction << changePenAction << mergeFolderAction << mergeAction << exportAction << averageAction << movingAverageAction << getSubtractionDataAction << applySubtractionAction;
 }
 
 void specView::contextMenuEvent(QContextMenuEvent* event)
@@ -279,9 +279,6 @@ void specView::createActions()
 	exportAction->setStatusTip(tr("Daten exportieren")) ;
 	connect(exportAction,SIGNAL(triggered()),this,SLOT(exportItems())) ;
 
-	cutByIntensityAction = new QAction(QIcon(":/cbi.png"), tr("Nach Intensität beschneiden"), this) ;
-	connect(cutByIntensityAction,SIGNAL(triggered()),this,SLOT(cutByIntensity())) ;
-
 	averageAction = new QAction(QIcon(":/ave.png"), tr("Mitteln"), this) ;
 	connect(averageAction,SIGNAL(triggered()),this,SLOT(averageItems())) ;
 
@@ -297,23 +294,6 @@ void specView::createActions()
 
 specView::~specView()
 {
-}
-
-void specView::cutByIntensity()
-{
-	QModelIndexList list = getSelection() ;
-	if (list.isEmpty())
-		return ;
-	QList<specModelItem*> items ;
-	foreach(QModelIndex index, list)
-		items << (specModelItem*) (index.internalPointer()) ;
-	cutByIntensityDialog *dialog = new cutByIntensityDialog(this) ;
-	dialog->assignSpectra(items) ;
-	dialog->setModal(true) ;
-	dialog->exec() ;
-	if(dialog->result() == QDialog::Accepted)
-		dialog->performDeletion();
-	delete dialog ;
 }
 
 void specView::averageItems()
