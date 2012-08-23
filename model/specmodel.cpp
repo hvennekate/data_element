@@ -684,7 +684,7 @@ bool specModel::dropMimeData(const QMimeData *data,
 		if (dropBuddy)
 		{
 			specAddFolderCommand *command = new specAddFolderCommand ;
-			command->setParentObject(dropSource) ;
+			command->setParentObject(this) ;
 			command->setItems(newIndexes) ;
 			dropBuddy->push(command);
 		}

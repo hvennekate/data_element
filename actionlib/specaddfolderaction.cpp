@@ -12,12 +12,12 @@ specAddFolderAction::specAddFolderAction(QObject *parent)
 
 const std::type_info &specAddFolderAction::possibleParent()
 {
-	return typeid(specDataView) ;
+	return typeid(specView) ;
 }
 
 void specAddFolderAction::execute()
 {
-	specDataView *currentView = (specDataView*) parent() ;
+	specView *currentView = (specView*) parent() ;
 	specModel *model = currentView->model() ;
 	QModelIndex index = currentView->currentIndex() ;
 	specModelItem *item = model->itemPointer(index) ;
@@ -32,7 +32,7 @@ void specAddFolderAction::execute()
 	specAddFolderCommand *command = new specAddFolderCommand ;
 	command->setItems(QModelIndexList() << model->index(row,0,index)) ;
 
-	command->setParentObject((QWidget*)parent()) ;
+	command->setParentObject(model) ;
 
 	if (command->ok())
 		library->push(command) ;

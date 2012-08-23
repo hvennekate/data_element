@@ -69,7 +69,7 @@ void specTreeAction::execute()
 
 	specAddFolderCommand *insertion = new specAddFolderCommand(command) ;
 	insertion->setItems(QModelIndexList() << model->index(row,0,index)) ;
-	insertion->setParentObject(view) ;
+	insertion->setParentObject(model) ;
 
 	library->push(command);
 

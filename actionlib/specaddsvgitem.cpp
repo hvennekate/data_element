@@ -31,7 +31,7 @@ void specAddSVGItemAction::execute()
 	specSVGItem *newItem = new specSVGItem() ;
 	newItem->setImage(fileContent) ; // TODO remove
 
-	specDataView *currentView = (specDataView*) parent() ; // TODO consolidate with addfolderaction
+	specView *currentView = (specView*) parent() ; // TODO consolidate with addfolderaction
 	specModel *model = currentView->model() ;
 	QModelIndex index = currentView->currentIndex() ;
 	specModelItem *item = model->itemPointer(index) ;
@@ -51,7 +51,7 @@ void specAddSVGItemAction::execute()
 	specAddFolderCommand *command = new specAddFolderCommand ;
 	command->setItems(QModelIndexList() << model->index(row,0,index)) ;
 
-	command->setParentObject((QWidget*)parent()) ;
+	command->setParentObject(model) ;
 
 	if (command->ok())
 		library->push(command) ;

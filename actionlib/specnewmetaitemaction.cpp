@@ -38,7 +38,7 @@ void specNewMetaItemAction::execute()
 	}
 	specAddFolderCommand *command = new specAddFolderCommand ;
 	command->setItems(QModelIndexList() << model->index(pointer)) ;
-	command->setParentObject((QWidget*) parent()) ;
+	command->setParentObject(model) ;
 
 	if (command->ok())
 		library->push(command) ;

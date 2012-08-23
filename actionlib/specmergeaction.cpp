@@ -120,13 +120,13 @@ void specMergeAction::execute()
 	specAddFolderCommand *insertionCommand = new specAddFolderCommand(command) ;
 	QModelIndexList insertList = model->indexList(newlyInserted.toList()) ;
 	insertionCommand->setItems(insertList) ;
-	insertionCommand->setParentObject(view) ;
+	insertionCommand->setParentObject(view->model()) ;
 
 	// prepare to delete the old items
 	specDeleteCommand *deletionCommand = new specDeleteCommand(command) ;
 	QModelIndexList deleteList = model->indexList(toBeDeleted.toList()) ;
 	deletionCommand->setItems(deleteList) ;
-	deletionCommand->setParentObject(view) ;
+	deletionCommand->setParentObject(view->model()) ;
 
 	library->push(command) ;
 }
