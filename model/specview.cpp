@@ -226,6 +226,9 @@ void specView::contextMenuEvent(QContextMenuEvent* event)
 void specView::setModel(specModel* model)
 {
 	QTreeView::setModel(model) ;
+	// TODO change this to plain old functions.
+	connect(model, SIGNAL(modelAboutToBeReset()), this, SLOT(prepareReset())) ;
+	connect(model, SIGNAL(modelReset()), this, SLOT(resetDone())) ;
 }
 
 void specView::itemProperties()

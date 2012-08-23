@@ -230,8 +230,6 @@ void specPlotWidget::setConnections()
 	connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 	connect(items->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),this,SLOT(selectionChanged(const QItemSelection&, const QItemSelection&))) ;
 
-	connect(items->model(),SIGNAL(modelAboutToBeReset()),items,SLOT(prepareReset())) ;
-	connect(items->model(),SIGNAL(modelReset()),items,SLOT(resetDone())) ;
 	connect(actions,SIGNAL(stackChanged()), this, SLOT(modified())) ; // TODO check
 
 	connect(kineticWidget->internalPlot(),SIGNAL(replotted()),plot,SLOT(replot())) ;
