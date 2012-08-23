@@ -217,6 +217,18 @@ void specSpectrumPlot::correctionsChanged()
 	}
 }
 
+void specSpectrumPlot::attachToPicker(specCanvasItem* item)
+{
+	if (correctionPicker)
+		correctionPicker->addSelectable(item) ;
+}
+
+void specSpectrumPlot::detachFromPicker(specCanvasItem* item)
+{
+	if (correctionPicker)
+		correctionPicker->removeSelectable(item) ;
+}
+
 void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double y)
 {
 	if (!view) return ;

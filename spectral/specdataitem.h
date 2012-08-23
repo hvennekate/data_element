@@ -63,6 +63,10 @@ public:
 	QVector<double> intensityData() const ;
 	void refreshPlotData() ;
 
+	/* for plot picker*/
+	void attach(QwtPlot *plot) ;
+	void detach() ;
+
 	/* not reviewed */
 	void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) const ;
 

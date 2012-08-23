@@ -412,3 +412,19 @@ specActionLibrary* specPlot::undoPartner() const
 {
 	return undoP ;
 }
+
+void specPlot::resizeEvent(QResizeEvent *e)
+{
+	QwtPlot::resizeEvent(e) ;
+	replot() ;
+}
+
+void specPlot::attachToPicker(specCanvasItem *i)
+{
+	Q_UNUSED(i)
+}
+
+void specPlot::detachFromPicker(specCanvasItem *i)
+{
+	Q_UNUSED(i)
+}

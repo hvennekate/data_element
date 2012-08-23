@@ -27,7 +27,7 @@ public:
 	virtual void moveYBy(const double&) {}
 	virtual void moveXBy(const double&) {}
 	virtual void attach(QwtPlot *plot) { QwtPlotCurve::attach(plot) ; }
-	virtual void detach() { attach(0) ; }
+	virtual void detach() { QwtPlotCurve::detach() ; }
 	virtual QMenu* contextMenu() ;
 	void setLineWidth(const double&) ;
 	double lineWidth() ;

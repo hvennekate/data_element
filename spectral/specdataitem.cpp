@@ -3,6 +3,7 @@
 #include <utility-functions.h>
 #include <algorithm>
 #include "dataitemproperties.h"
+#include "specplot.h"
 
 
 void specDataItem::applyCorrection(specDataPoint& point) const
@@ -357,7 +358,6 @@ specDataItem::specDataItem(const specDataItem &other)
 	  description(other.description),
 	  data(other.data)
 {
-
 }
 
 specUndoCommand *specDataItem::itemPropertiesAction(QObject *parentObject)
@@ -366,4 +366,20 @@ specUndoCommand *specDataItem::itemPropertiesAction(QObject *parentObject)
 	propertiesDialog.exec() ;
 	if (propertiesDialog.result() != QDialog::Accepted) return 0 ;
 	return propertiesDialog.changeCommands(parentObject) ;
+}
+
+void specDataItem::attach(QwtPlot *pl)
+{
+	specModelItem::attach(pl) ;
+	specPlot *p = qobject_cast<specPlot*>(plot()) ;
+	if (p)
+		p->attachToPicker(this) ;
+}
+
+void specDataItem::detach()
+{
+	specPlot *p = qobject_cast<specPlot*>(plot()) ;
+	if (p)
+		p->detachFromPicker(this) ;
+	specModelItem::detach() ;
 }

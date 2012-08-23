@@ -57,6 +57,7 @@ private:
 	void writeToStream(QDataStream &out) const ;
 	type typeId() const {return specStreamable::mainPlot ;}
 	specActionLibrary *undoP ;
+	void resizeEvent(QResizeEvent *e) ;
 protected:
 	specView *view ;
 	specActionLibrary* undoPartner() const ;
@@ -77,6 +78,8 @@ public:
 	void refreshRanges() ;
 	void setView(specView* mod) { view = mod ; }
 	void setUndoPartner(specActionLibrary* lib) ;
+	virtual void attachToPicker(specCanvasItem*) ;
+	virtual void detachFromPicker(specCanvasItem*) ;
 signals:
 	void startingReplot() ;
 	void replotted() ;

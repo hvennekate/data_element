@@ -40,6 +40,9 @@ public:
 	explicit specSpectrumPlot(QWidget *parent = 0);
 	QList<QAction*> actions() { return specPlot::actions() << correctionActions->actions() << setReferenceAction << alignmentActions->actions() << printAction ; }
 	static specMultiCommand* generateCorrectionCommand(const QwtPlotItemList& zeroRanges, const QwtPlotItemList& spectra, const QMap<double, double>& referenceSpectrum, specView*, bool noSlope = false) ;
+
+	void attachToPicker(specCanvasItem*) ;
+	void detachFromPicker(specCanvasItem*) ;
 signals:
 
 private slots:
