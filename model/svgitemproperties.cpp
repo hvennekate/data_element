@@ -4,6 +4,7 @@
 #include "qwt_plot.h"
 #include <QSvgRenderer>
 #include "actionlib/specresizesvgcommand.h"
+#include "specmodel.h"
 
 svgItemProperties::svgItemProperties(specSVGItem* i, QWidget *parent) :
 	QDialog(parent),

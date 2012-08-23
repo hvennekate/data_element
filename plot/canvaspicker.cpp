@@ -12,6 +12,7 @@
 #include <QTextStream>
 #include <QBrush>
 #include <QColor>
+#include <QDoubleValidator>
 
 #include "speccanvasitem.h"
 #include <QGridLayout>

@@ -819,8 +819,8 @@ void specModel::svgMoved(specCanvasItem *i, int point, double x, double y)
 
 	specResizeSVGcommand *command = new specResizeSVGcommand ;
 	command->setParentObject(this) ;
-	command->setItem(index(item)) ;
 	item->pointMoved(point,x,y) ;
+	command->setItem(index(item), item->getBounds()) ;
 	command->undo();
 	dropBuddy->push(command) ;
 }

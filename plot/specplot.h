@@ -33,9 +33,6 @@ private:
 protected:
 	specView *view ;
 	specActionLibrary* undoPartner() const ;
-private slots:
-	void resizeSVG(specCanvasItem*, int point, double x, double y) ;
-	void modifyingSVGs(const bool&) ;
 public:
 	explicit specPlot ( QWidget *parent=NULL );
 	~specPlot();
@@ -52,7 +49,6 @@ signals:
 	void metaRangeModified(specCanvasItem*,int,double,double) ;
 public slots :
 	void replot() ;
-	void changeTextLabel() ;
 };
 
 #endif

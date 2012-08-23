@@ -14,7 +14,6 @@ SOURCES += main.cpp \
     model/specdelegate.cpp \
     model/specview.cpp \
     model/specdescriptor.cpp \
-    model/specdescriptordelegate.cpp \
     model/specmodel.cpp \
     model/specmodelitem.cpp \
     model/specfolderitem.cpp \
@@ -104,7 +103,6 @@ HEADERS += cutbyintensitydialog.h \
     model/specdelegate.h \
     model/specview.h \
     model/specdescriptor.h \
-    model/specdescriptordelegate.h \
     model/specmodel.h \
     model/specmodelitem.h \
     model/specfolderitem.h \

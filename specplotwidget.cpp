@@ -16,6 +16,7 @@
 #include "specdataview.h"
 #include "specspectrumplot.h"
 #include "speclogwidget.h"
+#include "canvaspicker.h"
 
 specPlotWidget::specPlotWidget(QWidget *parent)
 	: QDockWidget(tr("untitled"),parent),
