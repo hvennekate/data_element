@@ -19,8 +19,7 @@ protected:
 	void readFromStream(QDataStream &in) ;
 public:
 	specCanvasItem(QString description="");
-	virtual void pointMoved(const int&, const double&, const double&) ;
-	virtual void applyRanges(QList<QwtInterval*>&) ;
+	virtual void pointMoved(const int&, const double&, const double&) {} ;
 	virtual void refreshPlotData() =0;
 	virtual void scaleBy(const double&) {}
 	virtual void addToSlope(const double&) {}

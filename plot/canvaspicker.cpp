@@ -64,7 +64,6 @@ CanvasPicker::CanvasPicker ( specPlot *plot )
 	QWhatsThis::add ( canvas, text );
 #endif
 
-//	shiftCurveCursor ( true );  // What is this good for?  Happy debugging?!
 }
 
 void CanvasPicker::setSelectable(const QSet<specCanvasItem *> &toSet)
@@ -214,23 +213,19 @@ void CanvasPicker::select ( const QPoint &pos )
 	int index = -1;
 	d_selectedCurve = NULL;
 	d_selectedPoint = -1;
-//	if ( plot()->itemList().isEmpty() ) return ;
 
 	for ( QSet<specCanvasItem*>::iterator it = selectable.begin(); it != selectable.end(); ++it )
 	{
-//		if ( ( *it )->rtti() == QwtPlotCurve::Rtti_PlotCurve ) // TODO do we need an adapted version?
-//		{
-			specCanvasItem *c = ( specCanvasItem* ) ( *it );
+		specCanvasItem *c = ( specCanvasItem* ) ( *it );
 
-			double d;
-			int idx = c->closestPoint ( pos, &d );
-			if ( d < dist )
-			{
-				curve = c;
-				index = idx;
-				dist = d;
-			}
-//		}
+		double d;
+		int idx = c->closestPoint ( pos, &d );
+		if ( d < dist )
+		{
+			curve = c;
+			index = idx;
+			dist = d;
+		}
 	}
 
 	showCursor ( false );
@@ -242,8 +237,6 @@ void CanvasPicker::select ( const QPoint &pos )
 		showCursor ( true );
 	}
 	lastSelected = d_selectedCurve ;
-
-// 	d_selectedCurve->selectPoint ( d_selectedPoint ) ; // TODO create parent of both range and modelitem, must be child of QwtPlotCurve
 }
 
 
@@ -273,45 +266,7 @@ void CanvasPicker::move ( const QPoint &pos )
 	emit pointMoved(d_selectedCurve,d_selectedPoint,
 			plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
 			plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ;
-//	d_selectedCurve->pointMoved ( d_selectedPoint,
-//	                              plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
-//	                              plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ;
-	emit moved(d_selectedCurve) ; // TODO remove this signal
-	/* 	if ( mode == spec::newZero ) // TODO
-		{
-			( ( specRange* ) d_selectedCurve )->pointMoved ( mode, d_selectedPoint,
-			        plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
-			        plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ;
-			emit rangesModified ( &ranges ) ;
-			plot()->replot() ;
-		}
-		else
-			( ( specModelItem* ) d_selectedCurve ) ->pointMoved ( mode, d_selectedPoint,
-			        plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
-			        plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ; */
 
-	/*    QwtArray<double> xData(d_selectedCurve->dataSize());
-	    QwtArray<double> yData(d_selectedCurve->dataSize());
-
-	    for ( int i = 0; i < d_selectedCurve->dataSize(); i++ )
-	    {
-	        if ( i == d_selectedPoint )
-	        {
-	            xData[i] = plot()->invTransform(d_selectedCurve->xAxis(), pos.x());;
-	            yData[i] = plot()->invTransform(d_selectedCurve->yAxis(), pos.y());;
-	        }
-	        else
-	        {
-	            xData[i] = d_selectedCurve->x(i);
-	            yData[i] = d_selectedCurve->y(i);
-	        }
-	    }
-	    d_selectedCurve->setData(xData, yData);
-	QTextStream cout(stdout, QIODevice::WriteOnly);
-	for (int i = 0 ; i < d_selectedCurve->dataSize() ; i++)
-		cout << "(" << d_selectedCurve->x(i) << " " << d_selectedCurve->y(i) << ")  " ;
-	cout << endl ;
-	    plot()->replot();*/
 	showCursor ( true );
 }
 
@@ -426,7 +381,7 @@ void CanvasPicker::movePointExplicitly()
 	layout->addWidget(buttons,2,0,1,2) ;
 	query->setLayout(layout) ;
 	if(query->exec() == QDialog::Accepted)
-		curve->pointMoved(point, xBox->text().toDouble(), yBox->text().toDouble()) ;
+		emit pointMoved(curve, point, xBox->text().toDouble(), yBox->text().toDouble());
 }
 
 void CanvasPicker::highlightSelectable(bool highlight)
@@ -453,9 +408,6 @@ void CanvasPicker::removeSelectable(specCanvasItem *item)
 void CanvasPicker::addSelectable(const QSet<specCanvasItem *> &list)
 {
 	selectable += list ;
-//	foreach(specCanvasItem* item, list)  // TODO consider this version.
-//		if (!list.contains(item))
-//			list << item ;
 	highlightSelectable(true) ;
 	plot()->replot();
 }
@@ -497,4 +449,9 @@ void CanvasPicker::removeSelectable()
 CanvasPicker::~CanvasPicker()
 {
 	removeSelectable(selectable);
+}
+
+QList<specCanvasItem*> CanvasPicker::items() const
+{
+	return selectable.toList() ;
 }

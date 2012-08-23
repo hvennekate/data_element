@@ -5,9 +5,11 @@
 #include "canvaspicker.h"
 #include "actionlib/specactionlibrary.h"
 #include "specview.h"
+#include "actionlib/specprintplotaction.h"
+#include "specsvgitem.h"
+#include "specmetaitem.h"
 
 // TODO solve the myth of autoscaleaxis...
-// TODO remove kineticRanges
 
 specPlot::specPlot(QWidget *parent)
 	: QwtPlot(parent),
@@ -23,7 +25,7 @@ specPlot::specPlot(QWidget *parent)
 	modifySVGs->setCheckable(true) ;
 	connect(modifySVGs,SIGNAL(triggered(bool)),this,SLOT(modifyingSVGs(bool))) ;
 
-	connect(metaPicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SIGNAL(metaRangeModified(specCanvasItem*,int,double,double))) ;
+	connect(MetaPicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SIGNAL(metaRangeModified(specCanvasItem*,int,double,double))) ;
 	setAutoReplot(false) ;
 	zoom  = new specZoomer(this->canvas()) ;
 
@@ -40,17 +42,9 @@ specPlot::specPlot(QWidget *parent)
 	fixXAxisAction->setChecked(false) ;
 
 	printAction = new specPrintPlotAction(this) ;
-	
-	setupActions() ;
-	
+
 	setAxisTitle(QwtPlot::yLeft,"<font face=\"Symbol\">D</font>mOD") ;
 	setAxisTitle(QwtPlot::xBottom,"cm<sup>-1</sup>") ;
-	refreshMoveMode() ;
-}
-
-specZoomer *specPlot::zoomer()
-{
-	return zoom ;
 }
 
 void specPlot::replot()
@@ -59,25 +53,16 @@ void specPlot::replot()
 	replotting = true ;
 	emit startingReplot();
 	QwtPlotItemList allItems = itemList();
-	ranges->clear() ;
-	ordinary->clear() ;
-	selectRanges->clear();
 	QSet<specCanvasItem*> newMetaRanges; // TODO local variable
 	QVector<specSVGItem*> svgitems ;
 	foreach(QwtPlotItem* item, allItems)
 	{
 		if (dynamic_cast<specMetaRange*>(item))
 			newMetaRanges += ((specCanvasItem*) item) ;
-		else if (dynamic_cast<specSelectRange*>(item))
-			selectRanges->append((specCanvasItem*) item) ;
-		else if (dynamic_cast<specRange*>(item))
-			ranges->append((specCanvasItem*) item) ;
 		else if (dynamic_cast<specSVGItem*>(item))
 			svgitems << (specSVGItem*) item ;
-		else if (dynamic_cast<specCanvasItem*>( item))
-			ordinary->append((specCanvasItem*) item) ;
 	}
-	metaPicker->setSelectable(newMetaRanges);
+	MetaPicker->setSelectable(newMetaRanges);
 	if (allItems.isEmpty())
 	{
 		QwtPlot::replot() ;
@@ -101,7 +86,6 @@ void specPlot::replot()
 	boundaries.translate(-.05*boundaries.width(),-.5*boundaries.height()) ;
 	boundaries.setWidth(1.1*boundaries.width());
 	boundaries.setHeight(1.1*boundaries.height());
-	double xOffset = boundaries.width()*.05, yOffset = boundaries.height()*.05, left, right, top, bottom ;
 	if (fixXAxisAction->isChecked())
 	{
 		boundaries.setLeft(zoomBase.left()) ;

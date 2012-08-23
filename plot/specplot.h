@@ -38,7 +38,6 @@ private slots:
 public:
 	explicit specPlot ( QWidget *parent=NULL );
 	~specPlot();
-	specZoomer *zoomer() ;
 	CanvasPicker *metaPicker() ;
 	CanvasPicker *svgPicker() ;
 	virtual QList<QAction*> actions() ;
