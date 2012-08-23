@@ -136,40 +136,6 @@ void specPlot::readFromStream(QDataStream &in)
 	setAxisTitle(QwtPlot::yRight, y2label) ;
 }
 
-void specPlot::resizeSVG(specCanvasItem *item, int point, double x, double y)
-{
-	specSVGItem *pointer = dynamic_cast<specSVGItem*>(item) ;
-	if (!pointer || !view || !undoPartner()) return ;
-
-	specSVGItem::bounds oldBounds = pointer->getBounds() ;
-	pointer->pointMoved(point,x,y) ;
-
-	specResizeSVGcommand *command = new specResizeSVGcommand ;
-	command->setParentObject(view->model()) ;
-	command->setItem(view->model()->index(pointer),oldBounds) ;
-	undoPartner()->push(command) ;
-}
-
-void specPlot::modifyingSVGs(const bool &modify)
-{
-	if (SVGpicker)
-	{
-		disconnect(SVGpicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)),this,SLOT(resizeSVG(specCanvasItem*,int,double,double))) ;
-		delete SVGpicker ;
-		SVGpicker = 0 ;
-	}
-	if (!modify) return ;
-
-	SVGpicker = new CanvasPicker(this) ;
-	QList<specCanvasItem*> SVGitems ;
-
-	foreach(QwtPlotItem *item, itemList())
-		SVGitems << dynamic_cast<specSVGItem*>(item) ;
-	SVGitems.removeAll(0) ;
-	SVGpicker->addSelectable(SVGitems.toSet()) ;
-	connect(SVGpicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)),this,SLOT(resizeSVG(specCanvasItem*,int,double,double))) ;
-}
-
 void specPlot::setUndoPartner(specActionLibrary *lib)
 {
 	undoP = lib ;
@@ -184,4 +150,14 @@ specActionLibrary* specPlot::undoPartner() const
 void specPlot::setView(specView *mod)
 {
 	view = mod ;
+}
+
+CanvasPicker* specPlot::metaPicker()
+{
+	return MetaPicker ;
+}
+
+CanvasPicker* specPlot::svgPicker()
+{
+	return SVGpicker ;
 }

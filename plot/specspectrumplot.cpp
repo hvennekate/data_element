@@ -1,16 +1,20 @@
 #include "specspectrumplot.h"
-#include "actionlib/specplotmovecommand.h"
-#include "actionlib/specmulticommand.h"
-#include "utility-functions.h"
+
+#include <QActionGroup>
 #include <QBuffer>
-#include "qwt/qwt_plot_renderer.h"
-#include <qwt_scale_div.h>
-#include <QDialog>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <qwt_scale_draw.h>
-#include "actionlib/specprintplotaction.h"
-#include "actionlib/specexchangedatacommand.h"
+#include "qwt_scale_draw.h"
+#include "specmulticommand.h"
+#include "specrange.h"
+#include "specdataitem.h"
+#include "canvaspicker.h"
+#include "specprintplotaction.h"
+#include "specfolderitem.h"
+#include "specview.h"
+#include "qwt_plot_renderer.h"
+#include "utility-functions.h"
+#include "specplotmovecommand.h"
+#include "specactionlibrary.h"
+#include "specexchangedatacommand.h"
 
 void specSpectrumPlot::toggleAligning(bool on)
 {
@@ -433,4 +437,12 @@ void specSpectrumPlot::multipleSubtraction()
 	subCommand->setParentObject(view) ;
 	undoPartner()->push(subCommand) ;
 	replot() ;
+}
+
+QList<QAction*> specSpectrumPlot::actions()
+{
+	return specPlot::actions() << correctionActions->actions()
+				   << setReferenceAction
+				   << alignmentActions->actions()
+				   << printAction ;
 }

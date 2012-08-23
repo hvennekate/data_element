@@ -1,9 +1,11 @@
 #ifndef SPECRESIZESVGCOMMAND_H
 #define SPECRESIZESVGCOMMAND_H
 
+#include <QModelIndex>
 #include "specundocommand.h"
-#include "model/specgenealogy.h"
 #include "model/specsvgitem.h"
+
+class specGenealogy ;
 
 class specResizeSVGcommand : public specUndoCommand
 {

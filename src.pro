@@ -184,7 +184,8 @@ INCLUDEPATH += kinetic \
 	log \
 	model \
 	plot \
-	spectral
+	spectral \
+	actionlib
 
 
 TEMPLATE = app

@@ -23,7 +23,7 @@ void specSVGItem::highlight(bool highlight)
 	else
 		setSymbol(new QwtSymbol(QwtSymbol::Ellipse,QBrush(Qt::black),QPen(Qt::white),QSize(5,5))) ;
 
-	specPlot *sp = qobject_cast<specPlot*> plot() ; // TODO make function (also specMetaRange)
+	specPlot *sp = qobject_cast<specPlot*> (plot()) ; // TODO make function (also specMetaRange)
 	if (sp && sp->svgPicker())
 	{
 		if (highlight) sp->svgPicker()->addSelectable(this) ;
