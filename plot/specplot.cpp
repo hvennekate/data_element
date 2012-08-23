@@ -1,6 +1,5 @@
 #include "specplot.h"
 #include <QTextStream>
-#include <speclabeldialog.h>
 #include <QInputDialog>
 #include <qwt_text_label.h>
 #include <qwt_scale_div.h>

@@ -14,7 +14,6 @@
 #include <QColor>
 
 #include "speccanvasitem.h"
-#include "specminmaxvalidator.h"
 #include <QGridLayout>
 #include <QDialog>
 #include <QLineEdit>

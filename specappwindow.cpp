@@ -1,6 +1,5 @@
 #include "specappwindow.h"
 #include <QFile>
-#include <QLabel>
 
 specAppWindow::specAppWindow()
  : QMainWindow(), settings()
@@ -12,9 +11,11 @@ specAppWindow::specAppWindow()
 	createToolBars();
 	restoreGeometry(settings.value("mainWindow/geometry").toByteArray()) ;
 
-//	setToolTip("TesttoolTip");
-	setWhatsThis("Test What's this?");
+	setObjectName("specDataElementApplicationWindow") ;
+	setWindowTitle("SpecDataElement");
 	setWindowFlags(windowFlags() | Qt::WindowContextHelpButtonHint);
+
+	setWhatsThis("This is the main application window.  It can be used for docking data windows, log windows, and kinetic windows to it. to it.\nStart by creating a new file or by opening a saved file. Use the \"What's this?\" help from the title bar for further hints.");
 }
 
 
@@ -67,12 +68,12 @@ void specAppWindow::openFile()
 
 void specAppWindow::createActions()
 {
-	newAction = new QAction(QIcon(":/filenew.png"), tr("&New"), this);
+	newAction = new QAction(QIcon::fromTheme("document-new"), tr("&New"), this);
 	newAction->setShortcut(tr("Ctrl+N"));
 	newAction->setStatusTip(tr("Create a new file"));
 	connect(newAction, SIGNAL(triggered()), this, SLOT(newFile()));
 	
-	openAction = new QAction(QIcon(":/fileopen.png"), tr("&Open"), this);
+	openAction = new QAction(QIcon::fromTheme("document-open"), tr("&Open"), this);
 	openAction->setShortcut(tr("Ctrl+O"));
 	openAction->setStatusTip(tr("Open an existing file"));
 	connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));

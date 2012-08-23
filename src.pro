@@ -3,10 +3,6 @@ include(prefix.pri)
 SOURCES += main.cpp \
     cutbyintensitydialog.cpp \
     specappwindow.cpp \
-    specdocktitle.cpp \
-    speckrcontextmenu.cpp \
-    speclabeldialog.cpp \
-    specminmaxvalidator.cpp \
     specplotwidget.cpp \
     utility-functions.cpp \
     kinetic/speckineticwidget.cpp \
@@ -96,10 +92,6 @@ SOURCES += main.cpp \
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
-    specdocktitle.h \
-    speckrcontextmenu.h \
-    speclabeldialog.h \
-    specminmaxvalidator.h \
     specplotwidget.h \
     names.h \
     utility-functions.h \
@@ -192,7 +184,8 @@ INCLUDEPATH += kinetic \
 	log \
 	model \
 	plot \
-	spectral
+	spectral \
+	actionlib
 
 
 TEMPLATE = app

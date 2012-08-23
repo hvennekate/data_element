@@ -1,44 +1,21 @@
 #include "specplotwidget.h"
-#include <qwt_plot_curve.h>
-#include <qwt_symbol.h>
-#include <QLabel>
-#include <QFont>
-#include <QFontDialog>
-#include <QFileDialog>
-#include <utility-functions.h>
-#include <QTextStream>
-#include <specdelegate.h>
-#include <QContextMenuEvent>
+
+#include <QVBoxLayout>
+#include <QToolBar>
+#include <QAction>
+#include <QSplitter>
+#include <QFile>
 #include <QFileInfo>
-#include <QDataStream>
-#include <QTextStream>
-#include <QMainWindow>
 #include <QMessageBox>
-#include <names.h>
-#include <QSettings>
-#include "speclogtodataconverter.h"
+#include <QMainWindow>
 #include "specgenericmimeconverter.h"
+#include "speclogtodataconverter.h"
 #include "spectextmimeconverter.h"
-
-
-void specPlotWidget::changeFileName(const QString& name)
-{
-	file->setFileName(name) ;
-	setWindowTitle(QFileInfo(name).fileName()) ;
-	kineticWidget->setWindowTitle(QString("Kinetics of ").append(QFileInfo(name).fileName())) ;
-	logWidget->setWindowTitle(QString("Logs of ").append(QFileInfo(name).fileName())) ;
-}
-
-void specPlotWidget::contextMenuEvent(QContextMenuEvent* event)
-{
-	if(splitter->geometry().contains(event->x(),event->y()))
-	{
-		if (splitter->orientation() == Qt::Horizontal)
-			splitter->setOrientation(Qt::Vertical) ;
-		else
-			splitter->setOrientation(Qt::Horizontal) ;
-	}
-}
+#include "speckineticwidget.h"
+#include "specactionlibrary.h"
+#include "specdataview.h"
+#include "specspectrumplot.h"
+#include "speclogwidget.h"
 
 specPlotWidget::specPlotWidget(QWidget *parent)
 	: QDockWidget(tr("untitled"),parent),
@@ -170,10 +147,6 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 	else
 	{
 		event->accept() ;
-//		qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(kineticWidget) ;
-//		qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(this) ;
-//		qobject_cast<QMainWindow*>(parentWidget())->repaint() ;
-//		destroy(true,true) ;
 		delete this ;
 		return ;
 	}
@@ -240,8 +213,6 @@ void specPlotWidget::setConnections()
 	connect(kineticWidget->view(),SIGNAL(newUndoCommand(specUndoCommand*)), actions, SLOT(push(specUndoCommand*))) ;
 }
 
-#include <QPainter>
-
 void specPlotWidget::selectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
 {
 	foreach(QModelIndex index, deselected.indexes())
@@ -252,17 +223,29 @@ void specPlotWidget::selectionChanged(const QItemSelection & selected, const QIt
 		if (!index.column())
 			((specModelItem*) index.internalPointer())->attach(plot) ;
 	
-// 	QTextStream cout(stdout, QIODevice::WriteOnly) ;
-// 	if(selected.indexes().size() > 1)
-// 	{
-// 		QModelIndex index = selected.indexes()[1] ;
-// 		QItemDelegate *delegate = new QItemDelegate(items) ;
-// 		QPainter *painter = new QPainter ;
-// 		items->setItemDelegateForRow(index.row(), delegate) ;
-// 		painter->begin(items) ;
-// 		painter->setBrush(QBrush(Qt::darkGreen)) ;
-// 		delegate->drawBackground(painter,QStyleOptionViewItem(),index) ;
-// 	}
-	
 	plot->replot() ;
+}
+
+specView* specPlotWidget::mainView()
+{
+	return items ;
+}
+
+void specPlotWidget::changeFileName(const QString& name)
+{
+	file->setFileName(name) ;
+	setWindowTitle(QFileInfo(name).fileName()) ;
+	kineticWidget->setWindowTitle(QString("Kinetics of ").append(QFileInfo(name).fileName())) ;
+	logWidget->setWindowTitle(QString("Logs of ").append(QFileInfo(name).fileName())) ;
+}
+
+void specPlotWidget::contextMenuEvent(QContextMenuEvent* event)
+{
+	if(splitter->geometry().contains(event->x(),event->y()))
+	{
+		if (splitter->orientation() == Qt::Horizontal)
+			splitter->setOrientation(Qt::Vertical) ;
+		else
+			splitter->setOrientation(Qt::Horizontal) ;
+	}
 }

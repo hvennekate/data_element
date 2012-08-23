@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <QtGui>
-#include <QObject>
 #include <QList>
 #include "specplotwidget.h"
 #include <QSettings>
