@@ -146,7 +146,6 @@ void specPlotWidget::createToolbars()
 	toolbar-> addAction(actions->undoAction(this)) ;
 	toolbar-> addAction(actions->redoAction(this)) ;
 	toolbar-> addSeparator() ;
-	toolbar-> addAction()
 
 	foreach(QAction* action, plot->actions())
 		toolbar->addAction(action) ;

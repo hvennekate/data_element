@@ -5,6 +5,8 @@
 #include <QHash>
 #include <QList>
 #include <QActionGroup>
+#include "specrange.h"
+#include "specdataitem.h"
 
 class specMultiCommand ;
 

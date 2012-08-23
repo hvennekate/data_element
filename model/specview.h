@@ -17,7 +17,7 @@ class specView : public QTreeView, public specStreamable
 Q_OBJECT
 private:
 	QMenu *itemContextMenu, *folderContextMenu ;
-	QAction *deleteAction, *newItemAction, *treeAction, *changePenAction, *mergeFolderAction, *mergeAction, *exportAction, *cutByIntensityAction, *averageAction, *movingAverageAction, *getSubtractionDataAction, *applySubtractionAction ;
+	QAction *deleteAction, *newItemAction, *treeAction, *changePenAction, *mergeFolderAction, *mergeAction, *exportAction, *averageAction, *movingAverageAction, *getSubtractionDataAction, *applySubtractionAction ;
 	specViewState *state ;
 
 	void createContextMenus() ;
@@ -57,7 +57,6 @@ public slots:
 	void changePen() ;
 	void mergeFolder() ;
 	void mergeItems() ;
-	void cutByIntensity() ;
 	void currentlySelectedToSubMap() ;
 	void applySubMapToSelection() ;
 	void exportItems() ;

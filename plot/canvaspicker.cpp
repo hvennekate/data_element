@@ -498,3 +498,8 @@ CanvasPicker::~CanvasPicker()
 {
 	removeSelectable(selectable);
 }
+
+QList<specCanvasItem*> CanvasPicker::items() const
+{
+	return selectable.toList() ;
+}

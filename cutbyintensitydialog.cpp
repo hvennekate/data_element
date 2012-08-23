@@ -1,5 +1,6 @@
 #include "cutbyintensitydialog.h"
 #include <qwt_scale_div.h>
+#include "canvaspicker.h"
 
 cutByIntensityDialog::cutByIntensityDialog(QWidget *parent) :
     QDialog(parent), huevalue(0)
@@ -16,7 +17,6 @@ cutByIntensityDialog::cutByIntensityDialog(QWidget *parent) :
 	layout->addWidget(deleteRange) ;
 	layout->addWidget(buttons) ;
 
-	plot->select = true ;
 	plot->enableAxis(QwtPlot::yRight,true) ;
 	plot->setAxisScale(QwtPlot::yRight,0,33e3) ;
 	plot->setAutoReplot(false) ;
@@ -71,10 +71,10 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 
 QList<specRange*> cutByIntensityDialog::ranges() // TODO create access function in canvas picker
 {
-	QList<specCanvasItem*>* selectable = plot->selectable() ;
+	QList<specCanvasItem*> selectable = picker->items() ;
 	QList<specRange*> allRanges ;
-	for (int i = 0 ; i < selectable->size() ; i++)
-		allRanges.append((specRange*) selectable->at(i)) ;
+	foreach(specCanvasItem* pointer, selectable)
+		allRanges << (specRange*) pointer ;
 	return allRanges ;
 }
 
@@ -93,7 +93,6 @@ void cutByIntensityDialog::removeRange()
 
 cutByIntensityDialog::~cutByIntensityDialog()
 {
-	delete picker ;
 }
 
 void cutByIntensityDialog::rangeModified(specCanvasItem *range, int point, double newX, double newY)
