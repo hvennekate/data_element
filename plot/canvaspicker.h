@@ -31,16 +31,16 @@ private:
 	bool owning ;
 	specPlot *plot() { return (specPlot *)parent(); }
 	QSet<specCanvasItem*> selectable ;
-	void highlightSelectable(bool) ;
+	void highlightSelectable() ;
 
 	specCanvasItem *d_selectedCurve, *lastSelected;
 	int d_selectedPoint;
+	bool highlighting ;
 
 public:
 	explicit CanvasPicker(specPlot *plot);
 	~CanvasPicker() ;
-	virtual bool eventFilter(QObject *, QEvent *);
-
+	virtual bool eventFilter(QObject *, QEvent *);	
 	virtual bool event(QEvent *);
 	void addSelectable(const QSet<specCanvasItem*>&) ;
 	void addSelectable(specCanvasItem*) ;
@@ -49,6 +49,7 @@ public:
 	void removeSelectable();
 	void setSelectable(const QSet<specCanvasItem*>&) ;
 	void removeSelected() ;
+	void highlightSelectable(bool) ;
 	QList<specCanvasItem*> items() const ;
 	inline void setOwning(bool Owning =true) { owning = Owning ; } // TODO do this more skilfully.
 

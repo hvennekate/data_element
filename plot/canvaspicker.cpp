@@ -26,7 +26,8 @@ CanvasPicker::CanvasPicker ( specPlot *plot )
 	: QObject ( plot ),
 	  owning(false),
 	  d_selectedCurve ( NULL ),
-	  d_selectedPoint ( -1 )
+	  d_selectedPoint ( -1 ),
+	  highlighting(true)
 //     mode(spec::none)
 {
 	QwtPlotCanvas *canvas = plot->canvas();
@@ -51,13 +52,10 @@ CanvasPicker::CanvasPicker ( specPlot *plot )
 	canvas->setFocus();
 
 	const char *text =
-	    "All points can be moved using the left mouse button "
-	    "or with these keys:\n\n"
-	    "- Up:\t\tSelect next curve\n"
-	    "- Down:\t\tSelect previous curve\n"
-	    "- Left, �-�:\tSelect next point\n"
-	    "- Right, �+�:\tSelect previous point\n"
-	    "- 7, 8, 9, 4, 6, 1, 2, 3:\tMove selected point";
+	    "Points in this plot may be moved by dragging (if indicated) or positioned precisely by "
+	    "double clicking on them.  If zooming is enabled, step-wise zoom may be performed using "
+	    "the middle mouse button (click and drag the zoom region).  Clicking the right mouse "
+	    "button will go back one zoom step.";
 #if QT_VERSION >= 0x040000
 	canvas->setWhatsThis ( text );
 #else
@@ -386,9 +384,15 @@ void CanvasPicker::movePointExplicitly()
 
 void CanvasPicker::highlightSelectable(bool highlight)
 {
+	highlighting = highlight ;
+	highlightSelectable();
+}
+
+void CanvasPicker::highlightSelectable()
+{
 	// TODO enable highlighting on selectable items
 	foreach(specCanvasItem* item, selectable)
-		item->highlight(highlight) ;
+		item->highlight(highlighting) ;
 }
 
 void CanvasPicker::addSelectable(specCanvasItem *item)

@@ -36,13 +36,16 @@ private:
 	QAction *saveAction,
 	*kineticsAction,
 	*saveAsAction,
-	*logAction;
+	*logAction,
+	*undoAction,
+	*redoAction;
 	specActionLibrary *actions ;
 	void createToolbars();
 	void setConnections() ;
 	void changeFileName(const QString&) ;
 private slots:
 	void modified() ;
+	void svgModification(bool) ;
 protected :
 	void contextMenuEvent(QContextMenuEvent*) ;
 	void closeEvent(QCloseEvent*) ;

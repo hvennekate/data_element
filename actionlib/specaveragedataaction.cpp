@@ -13,6 +13,8 @@ specAverageDataAction::specAverageDataAction(QObject *parent) :
     specUndoAction(parent)
 {
 	setIcon(QIcon(":/ave.png")) ;
+	setToolTip(tr("Average Data")) ;
+	setWhatsThis(tr("Smooth data by averaging.  You can choose between plainly averaging any number of data points or calculating a moving average."));
 }
 
 void specAverageDataAction::execute()

@@ -35,6 +35,17 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	  logAction(logWidget->toggleViewAction()),
 	  actions(new specActionLibrary(this))
 {
+	setWhatsThis(tr("Data Dock Window - This is the main window for managing data.  Right-clicking on it will change the arrangement of its contents from vertical to horizontal and back.\nSince this is a dock window, you may remove it from the application's main window and move it around within the main window.  To do so, \"grab\" it by its title bar and drag it to where you need it to be.\nThere are also a dock window for managing logs and \"meta-data\" (i.e. data based on processing the primary data) associated with this data dock window.  To show these, click the log or meta buttons (to the right of the save as button).\nTo start working, check out the help of the data list at the bottom (or right) of this window or of the list in the log dock window."));
+	saveAsAction->setWhatsThis(tr("Save As... - This button will allow you to save your work asking you for a file name explicitly."));
+	saveAction->setWhatsThis(tr("Save - Clicking this button will save your work and only ask for a file name if none has been specified so far."));
+
+	undoAction = actions->undoAction(this) ;
+	redoAction = actions->redoAction(this) ;
+	undoAction->setToolTip(tr("Undo")) ;
+	redoAction->setToolTip(tr("Redo")) ;
+	undoAction->setToolTip(tr("Undo - By clicking this button you can revert changes.  To \"undo the undo\" click the redo button right next door.\nNote that all of your undo history will be saved along with your work and will be available again upon loading your file again."));
+	redoAction->setToolTip(tr("Redo - Redoes what has been undone by clicking the undo button.\nNote that all of your undo history (including possible redos) will be saved along with your work and will be available again upon loading your file again."));
+
 	items->setModel(new specModel(items));
 
 	plot->setMinimumSize(100,100) ;
@@ -64,8 +75,11 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	splitter->setOpaqueResize(false) ;
 
 	layout -> addWidget(toolbar) ;
-	layout -> addWidget(actions->toolBar(items)) ;
-	layout -> addWidget(actions->toolBar(plot)) ;
+	QToolBar *itemToolBar = actions->toolBar(items) ;
+	itemToolBar->addSeparator() ;
+	itemToolBar->addActions(plot->actions()) ;
+	layout -> addWidget(itemToolBar) ;
+
 	layout -> addWidget(splitter)  ;
 	layout -> setContentsMargins(0,0,0,0) ;
 
@@ -120,12 +134,8 @@ void specPlotWidget::createToolbars()
 	toolbar-> addAction(logAction) ;
 	toolbar-> addAction(kineticsAction) ;
 	toolbar-> addSeparator() ;
-	toolbar-> addAction(actions->undoAction(this)) ;
-	toolbar-> addAction(actions->redoAction(this)) ;
-	toolbar-> addSeparator() ;
-
-	foreach(QAction* action, plot->actions())
-		toolbar->addAction(action) ;
+	toolbar-> addAction(undoAction) ;
+	toolbar-> addAction(redoAction) ;
 }
 
 void specPlotWidget::closeEvent(QCloseEvent* event)
@@ -137,10 +147,10 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 		wantToSave.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel) ;
 		wantToSave.setDefaultButton(QMessageBox::Cancel) ;
 		wantToSave.setEscapeButton(QMessageBox::Cancel) ;
-		wantToSave.setWindowTitle("Speichern?") ;
-		wantToSave.setText(QString("Wollen Sie die Änderungen an ").
-				append(windowTitle() != " *" ? windowTitle() : "der unbenannten Datei").
-				append(" speichern?")) ;
+		wantToSave.setWindowTitle("Save data?") ;
+		wantToSave.setText(QString("Do you want to save changes made to ").
+				append(windowTitle() != " *" ? windowTitle() : "a new file").
+				append(" ?")) ;
 		wantToSave.setIcon(QMessageBox::Warning) ;
 		needToSave = wantToSave.exec() ;
 	}
@@ -211,7 +221,15 @@ void specPlotWidget::setConnections()
 
 	connect(items,SIGNAL(newUndoCommand(specUndoCommand*)), actions, SLOT(push(specUndoCommand*))) ;
 	connect(kineticWidget->view(),SIGNAL(newUndoCommand(specUndoCommand*)), actions, SLOT(push(specUndoCommand*))) ;
-	connect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
+	connect(plot->svgAction(),SIGNAL(toggled(bool)),this,SLOT(svgModification(bool))) ;
+}
+
+void specPlotWidget::svgModification(bool mod)
+{
+	if (mod) connect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
+	else disconnect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
+
+	plot->svgPicker()->highlightSelectable(mod) ;
 }
 
 void specPlotWidget::selectionChanged(const QItemSelection & selected, const QItemSelection & deselected)

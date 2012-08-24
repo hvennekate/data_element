@@ -8,6 +8,8 @@ specImportSpecAction::specImportSpecAction(QObject *parent) :
     specUndoAction(parent)
 {
 	setIcon(QIcon(":/fileimport.png"));
+	setToolTip(tr("Import files")) ;
+	setWhatsThis(tr("Import data files.  Use this button to get started by directly importing data."));
 }
 
 const std::type_info &specImportSpecAction::possibleParent()

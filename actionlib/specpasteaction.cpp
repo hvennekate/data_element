@@ -10,6 +10,8 @@ specPasteAction::specPasteAction(QObject *parent) :
     specUndoAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("edit-paste")) ;
+	setToolTip(tr("Paste")) ;
+	setWhatsThis(tr("Paste data from clipboard, if possible")) ;
 }
 
 const std::type_info &specPasteAction::possibleParent()

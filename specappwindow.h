@@ -35,6 +35,8 @@ private:
 	QAction *newAction;
 	QAction *openAction;
 	QList<specPlotWidget*> docks ;
+private slots:
+	void about() ;
 };
 
 #endif

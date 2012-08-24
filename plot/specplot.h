@@ -36,6 +36,7 @@ protected:
 public:
 	explicit specPlot ( QWidget *parent=NULL );
 	~specPlot();
+	QAction* svgAction() const ;
 	CanvasPicker *metaPicker() ;
 	CanvasPicker *svgPicker() ;
 	virtual QList<QAction*> actions() ;

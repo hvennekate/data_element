@@ -12,6 +12,8 @@ specAddSVGItemAction::specAddSVGItemAction(QObject *parent) :
     specUndoAction(parent)
 {
 	setIcon(QIcon::fromTheme("insert-image")) ;
+	setToolTip(tr("Add SVG image")) ;
+	setWhatsThis(tr("Insert an image to be displayed as an annotation to the plot canvas.  Currently, SVG images are supported.")) ;
 }
 
 const std::type_info &specAddSVGItemAction::possibleParent()

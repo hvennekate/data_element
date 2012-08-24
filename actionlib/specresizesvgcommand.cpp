@@ -71,5 +71,6 @@ void specResizeSVGcommand::parentAssigned()
 	if (!parentObject()) return ;
 	specModel *model = qobject_cast<specModel*>(parentObject()) ;
 	if (!model) return ;
-	item->setModel(model) ;
+	if (item)
+		item->setModel(model) ;
 }

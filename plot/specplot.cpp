@@ -21,23 +21,26 @@ specPlot::specPlot(QWidget *parent)
 {
 	MetaPicker = new CanvasPicker(this) ;
 	SVGpicker  = new CanvasPicker(this) ;
-	modifySVGs    = new QAction("Modify SVGs",this) ;
+	modifySVGs    = new QAction(QIcon(":/resizeImage.png"),"Modify SVGs",this) ;
+	modifySVGs->setToolTip(tr("Resize image items")) ;
+	modifySVGs->setWhatsThis(tr("Modify the size of images displayed on the plot's canvas.")) ;
 	modifySVGs->setCheckable(true) ;
-	connect(modifySVGs,SIGNAL(triggered(bool)),this,SLOT(modifyingSVGs(bool))) ;
 
 	connect(MetaPicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SIGNAL(metaRangeModified(specCanvasItem*,int,double,double))) ;
 	setAutoReplot(false) ;
 	zoom  = new specZoomer(this->canvas()) ;
 
-	fixYAxisAction = new QAction(QIcon(":/fixyaxis.png"), tr("&y-Achsenskalierung fixieren"), this);
+	fixYAxisAction = new QAction(QIcon(":/fixyaxis.png"), tr("fixate &y axis"), this);
 	fixYAxisAction->setShortcut(tr("Ctrl+y"));
-	fixYAxisAction->setStatusTip(tr("Fix y axis scaling"));
+	fixYAxisAction->setWhatsThis(tr("Disables auto scaling for the y axis and fixates the current axis range."));
+	fixYAxisAction->setIcon(QIcon(":/fixYAxis.png")) ;
 	fixYAxisAction->setCheckable(true) ;
 	fixYAxisAction->setChecked(false) ;
 	
-	fixXAxisAction = new QAction(QIcon(":/fixxaxis.png"), tr("&x-Achsenskalierung fixieren"), this);
+	fixXAxisAction = new QAction(QIcon(":/fixxaxis.png"), tr("fixate &x axis"), this);
 	fixXAxisAction->setShortcut(tr("Ctrl+x"));
-	fixXAxisAction->setStatusTip(tr("Fix x axis scaling"));
+	fixXAxisAction->setWhatsThis(tr("Disables auto scaling for the y axis and fixates the current axis range.")) ;
+	fixXAxisAction->setIcon(QIcon(":/fixXAxis.png")) ;
 	fixXAxisAction->setCheckable(true) ;
 	fixXAxisAction->setChecked(false) ;
 
@@ -176,4 +179,9 @@ void specPlot::attachToPicker(specCanvasItem *i)
 void specPlot::detachFromPicker(specCanvasItem *i)
 {
 	Q_UNUSED(i)
+}
+
+QAction* specPlot::svgAction() const
+{
+	return modifySVGs ;
 }

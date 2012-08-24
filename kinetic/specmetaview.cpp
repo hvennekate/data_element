@@ -14,6 +14,7 @@ specMetaView::specMetaView(QWidget *parent) :
 	QAbstractItemDelegate *olddel = itemDelegate() ;
 	setItemDelegate(new specMetaDelegate) ;
 	delete olddel ;
+	setWhatsThis(tr("This list contains meta entries which obtain their data from data items.  Use the connect button to connect meta items to data items.  Manage items by dragging and dropping.  Add a new item by using the appropriate button.  Connection to data items may also be established using the appropriate button and changed by right clicking on the respective meta item.\nThe first column is for your comments/descriptions; the \"variables\" column lets you define how to obtain data from data items (see below); the \"x\" and \"y\" columns may contain a formula for calculating the x and y values, respectively, of an item from the variables defined in the \"variables\" column.  Any errors in evaluating these will be displayed in the \"errors\" column.\nIf a field contains multiple lines, an indicator will appear.  The full contents is available as tool tip text (just rest the mous cursor on the field).\n\nSyntax for defining variables:\n name = [from:to:step]\"column\"\nor:\nname = [from:to:step]ABeginning:End\n where \"A\" may be \"x\" (meaning x values), \"y\" (y values),\"i\" (integral), \"u\" (max y value), \"l\" (min y value);\n \"column\" may be any column name; \"from\", \"to\", and \"step\" define the range of connected data items to use amd \"Beginning\" and \"End\" define the x range of values to use."));
 }
 
 void specMetaView::setUndoPartner(specActionLibrary *l)

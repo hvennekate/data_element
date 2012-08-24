@@ -8,6 +8,8 @@ specNewMetaItemAction::specNewMetaItemAction(QObject *parent) :
     specUndoAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("document-new")) ;
+	setToolTip(tr("New item"));
+	setWhatsThis(tr("Create a new item in this dock window's list."));
 }
 
 const std::type_info &specNewMetaItemAction::possibleParent()

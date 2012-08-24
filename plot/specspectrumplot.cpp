@@ -45,17 +45,23 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 {
 	correctionActions = new QActionGroup(this) ;
 	correctionActions->setExclusive(false);
-	offsetAction  = new QAction(QIcon(":/offset.png"), "Offset", correctionActions) ;
-	offlineAction = new QAction(QIcon(":/offline.png"), "Slope",correctionActions) ;
-	scaleAction   = new QAction(QIcon(":/scale.png"),"Scale", correctionActions) ;
-	shiftAction   = new QAction("shift x",correctionActions) ;
-	printAction   = new specPrintPlotAction(this) ;
-	subInterpolatedAction = new QAction(QIcon(":/multiminus.png"), "Subtraction",this) ;
+	offsetAction  = new QAction(QIcon(":/offset.png"), tr("Offset"), correctionActions) ;
+	offlineAction = new QAction(QIcon(":/offline.png"), tr("Slope"),correctionActions) ;
+	scaleAction   = new QAction(QIcon(":/scale.png"), tr("Scale"), correctionActions) ;
+	shiftAction   = new QAction(QIcon(":/xshift.png"), tr("Shift x"),correctionActions) ;
+	subInterpolatedAction = new QAction(QIcon(":/multiminus.png"), tr("Subtract Reference"),this) ;
+
+	subInterpolatedAction->setWhatsThis(tr("Subtract the reference data from selected data sets (applying interpolation if necessary)."));
 
 	correctionActions->addAction(offsetAction) ;
 	correctionActions->addAction(offlineAction) ;
 	correctionActions->addAction(scaleAction) ;
 	correctionActions->addAction(shiftAction) ;
+	offsetAction->setWhatsThis(tr("When this button is enabled, you can correct your data for any offset by individually moving any point of a data curve to where it ought to be."));
+	offlineAction->setWhatsThis(tr("By enabling this button, you enable detrending correction.  Pick any point of a data curve and move it to subtract a trend."));
+	scaleAction->setWhatsThis(tr("This button lets you scale data by moving a data point."));
+	shiftAction->setWhatsThis(tr("This button enables shifting data along the x axis by moving a data point."));
+
 
 	connect(correctionActions,SIGNAL(triggered(QAction*)),this,SLOT(correctionsChanged())) ;
 	foreach(QAction *action, correctionActions->actions())
@@ -63,16 +69,22 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 
 	alignmentActions = new QActionGroup(this) ;
 	alignmentActions->setExclusive(false) ;
-	setReferenceAction = new QAction("set reference",alignmentActions) ;
-	alignWithReferenceAction = new QAction("align",alignmentActions) ;
+	setReferenceAction = new QAction(QIcon(":/data.png"),tr("Set Reference"),this) ;
+	alignWithReferenceAction = new QAction(QIcon(":/zeroCorrection.png"),tr("Align"),alignmentActions) ;
 	alignWithReferenceAction->setCheckable(true) ;
 	alignWithReferenceAction->setChecked(false) ;
-	addRangeAction = new QAction("new range",alignmentActions) ;
-	removeRangeAction = new QAction("delete range",alignmentActions) ;
-	noSlopeAction = new QAction("no slope",alignmentActions) ;
+	addRangeAction = new QAction(QIcon(":/addZeroRange.png"),tr("Add Aligning Range"),alignmentActions) ;
+	removeRangeAction = new QAction(QIcon(":/deleteZeroRange.png"),tr("Delete Aligning Range"),alignmentActions) ;
+	noSlopeAction = new QAction(QIcon(":/offset.png"),tr("Disable Slope"),alignmentActions) ;
 	noSlopeAction->setCheckable(true) ;
 	noSlopeAction->setChecked(false) ;
 	toggleAligning(false) ;
+
+	setReferenceAction->setWhatsThis(tr("Sets the reference for interpolated subtractions and/or for aligning other data sets."));
+	alignWithReferenceAction->setWhatsThis(tr("Enables aligning selected data sets with the reference defined (or with the x axis if no reference has been set).\nFor aligning, a linear function will be subtracted, unless the correction has been limited to subtracting an offset."));
+	addRangeAction->setWhatsThis(tr("Add a range for alignment.  The alignment correction of data sets selected will be calculated based on the points that lie within at least one of those ranges.")) ;
+	removeRangeAction->setWhatsThis(tr("Delete a range for alignment.  The alignment correction of data sets selected will be calculated based on the points that lie within at least one of those ranges."));
+	noSlopeAction->setWhatsThis(tr("Use only an offset for aligning data sets with the reference data."));
 
 
 	QImage image(":/add.png") ;
@@ -461,5 +473,5 @@ QList<QAction*> specSpectrumPlot::actions()
 	return specPlot::actions() << correctionActions->actions()
 				   << setReferenceAction
 				   << alignmentActions->actions()
-				   << printAction ;
+				   << subInterpolatedAction ;
 }

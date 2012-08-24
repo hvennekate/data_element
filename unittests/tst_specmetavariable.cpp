@@ -9,7 +9,7 @@ void tst_specMetaVariable::init()
 	description["Zeit"] = specDescriptor(42) ;
 	description["Name"] = specDescriptor("testitem") ;
 
-	QList<specDataPoint> data ;
+	QVector<specDataPoint> data ;
 	for (int i = 1500 ; i < 2000 ; i += 30)
 		data << specDataPoint(42, i, i/10, 1000) ;
 
@@ -31,7 +31,7 @@ void tst_specMetaVariable::setRange()
 	QFETCH(int, max) ;
 	QFETCH(int, inc) ;
 	int a,b,c ;
-	specMetaVariable testVar(variableString) ;
+	specMetaVariable testVar( & (specMetaVariable::factory(variableString))) ;
 	testVar.setIndexRange(a,b,c,10) ;
 	QCOMPARE(a,min) ;
 	QCOMPARE(b,max) ;
@@ -54,7 +54,7 @@ void tst_specMetaVariable::setRange_data()
 void tst_specMetaVariable::xValues()
 {
 	QFETCH(QString, variableString) ;
-	specMetaVariable var(variableString) ;
+	specMetaVariable var(&(specMetaVariable::factory(variableString))) ;
 	QFETCH(QVector<double>, input) ;
 	QFETCH(QVector<double>, output) ;
 	QFETCH(bool, returns) ;
@@ -95,7 +95,7 @@ void tst_specMetaVariable::values()
 
 	qDebug() << "XVALUES (ITEM)" << testItem->dataSize() ;
 
-	specMetaVariable var(variableString) ;
+	specMetaVariable var(&(specMetaVariable::factory(variableString))) ;
 	qDebug() << "Soll:" << output << "Ist:" << var.values(testItem,xValues) << "Gleich:" ;
 	for (int i = 0 ; i < output.size() ; ++i)
 		qDebug() << QString().setNum(output[i],'g',18) << QString().setNum(var.values(testItem,xValues)[i],'g',18) << (output[i] == var.values(testItem,xValues)[i]) ;

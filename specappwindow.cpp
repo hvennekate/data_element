@@ -91,5 +91,18 @@ void specAppWindow::createMenus()
 	fileMenu = menuBar()->addMenu(tr("&File"));
 	fileMenu->addAction(newAction);
 	fileMenu->addAction(openAction);
+
+	helpMenu = menuBar()->addMenu(tr("&Help")) ;
+	QAction *aboutQtAction = new QAction(tr("About &Qt..."),helpMenu) ;
+	helpMenu->addAction(aboutQtAction) ;
+	QAction *aboutAction = new QAction(tr("&About..."),helpMenu) ;
+	helpMenu->addAction(aboutAction) ;
+	connect(aboutQtAction, SIGNAL(triggered()),qApp,SLOT(aboutQt())) ;
+	connect(aboutAction, SIGNAL(triggered()), this, SLOT(about())) ;
+}
+
+void specAppWindow::about()
+{
+	QMessageBox::about(this, tr("About SpecDataElement"), tr("This is a simple program for efficiently managing two dimensional data and keeping track of experimental logs.")) ;
 }
 

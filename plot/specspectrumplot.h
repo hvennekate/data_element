@@ -19,7 +19,6 @@ private:
 		*offlineAction,
 		*scaleAction,
 		*shiftAction,
-		*printAction,
 		*setReferenceAction,
 		*alignWithReferenceAction,
 		*addRangeAction,

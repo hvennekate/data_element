@@ -7,6 +7,8 @@ specRemoveDataAction::specRemoveDataAction(QObject *parent)
 	: specUndoAction(parent)
 {
 	setIcon(QIcon(":/cbi.png")) ;
+	setToolTip(tr("Remove data")) ;
+	setWhatsThis(tr("Remove data from the selected items.  You will be prompted to determined which data points to delete by setting up ranges along the x axis."));
 }
 
 void specRemoveDataAction::execute()
