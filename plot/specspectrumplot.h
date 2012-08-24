@@ -53,6 +53,7 @@ private slots:
 	void pointMoved(specCanvasItem*,int point, double x, double y) ;
 	void applyZeroRanges(specCanvasItem* range,int point, double x, double y) ;
 	void multipleSubtraction() ;
+	void setReference() ;
 };
 
 #endif // SPECSPECTRUMPLOT_H

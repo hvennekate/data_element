@@ -47,7 +47,6 @@ private slots:
 	void modified() ;
 	void svgModification(bool) ;
 protected :
-	void contextMenuEvent(QContextMenuEvent*) ;
 	void closeEvent(QCloseEvent*) ;
 public:
 	specPlotWidget(QWidget *parent = 0);

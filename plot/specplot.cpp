@@ -78,7 +78,7 @@ void specPlot::replot()
 	specModelItem *pointer = 0 ; // TODO find a more concise version.
 	foreach(QwtPlotItem *item, allItems)
 	{
-		if((pointer = dynamic_cast<specModelItem*>(item)))
+		if(!(dynamic_cast<specSVGItem*>(item)) && (pointer = dynamic_cast<specModelItem*>(item)))
 		{
 			pointer->revalidate();
 			boundaries |= pointer->boundingRect() ;
@@ -86,7 +86,7 @@ void specPlot::replot()
 	}
 
 	boundaries = boundaries.normalized() ;
-	boundaries.translate(-.05*boundaries.width(),-.5*boundaries.height()) ;
+	boundaries.translate(-.05*boundaries.width(),-.05*boundaries.height()) ;
 	boundaries.setWidth(1.1*boundaries.width());
 	boundaries.setHeight(1.1*boundaries.height());
 	if (fixXAxisAction->isChecked())

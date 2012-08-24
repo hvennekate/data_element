@@ -79,6 +79,7 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	noSlopeAction->setCheckable(true) ;
 	noSlopeAction->setChecked(false) ;
 	toggleAligning(false) ;
+	connect(setReferenceAction,SIGNAL(triggered()),this,SLOT(setReference())) ;
 
 	setReferenceAction->setWhatsThis(tr("Sets the reference for interpolated subtractions and/or for aligning other data sets."));
 	alignWithReferenceAction->setWhatsThis(tr("Enables aligning selected data sets with the reference defined (or with the x axis if no reference has been set).\nFor aligning, a linear function will be subtracted, unless the correction has been limited to subtracting an offset."));
@@ -122,71 +123,71 @@ QList<specDataItem*> specSpectrumPlot::folderContent(specModelItem *folder)
 	return content ;
 }
 
+void specSpectrumPlot::setReference()
+{
+	if (reference) delete reference ;
+	QModelIndexList referenceItems = view->getSelection() ;
+
+	// convert indexes to pointers
+	QList<specDataItem*> referenceDataItems ;
+	for(int i = 0 ; i < referenceItems.size() ; ++i)
+		referenceDataItems << folderContent(view->model()->itemPointer(referenceItems[i])) ;
+	if (referenceDataItems.isEmpty())
+	{
+		invalidateReference();
+		return ;
+	}
+	reference = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
+	for (int i = 0 ; i < referenceDataItems.size() ; ++i)
+		reference->operator +=(*(referenceDataItems[i])) ;
+	reference->flatten();
+	reference->revalidate();
+	reference->setPen(QPen(Qt::red));
+
+	// build tooltip
+	QwtPlot toolTipPlot ;
+	toolTipPlot.setAutoDelete(false) ;
+	reference->attach(&toolTipPlot) ;
+	toolTipPlot.replot();
+
+	QFont font = axisFont(QwtPlot::xBottom) ;
+	font.setPixelSize(8) ;
+	toolTipPlot.setAxisFont(QwtPlot::xBottom,font);
+	toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setSpacing(2) ;
+	toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick,4) ;
+	toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MediumTick,3) ;
+	toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick,2) ;
+
+	font = axisFont(QwtPlot::yLeft) ;
+	font.setPixelSize(8) ;
+	toolTipPlot.setAxisFont(QwtPlot::yLeft,font) ;
+	toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setSpacing(2) ;
+	toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MajorTick,4) ;
+	toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MediumTick,3) ;
+	toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MinorTick,2) ;
+
+	toolTipPlot.replot();
+
+	QImage plotImage(200,100,QImage::Format_ARGB32) ;
+	plotImage.fill(0);
+
+	QwtPlotRenderer renderer ;
+	renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, true);
+	renderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground,true) ;
+	renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, false);
+	renderer.renderTo(&toolTipPlot,plotImage) ;
+
+	QByteArray byteArray ;
+	QBuffer buffer(&byteArray) ;
+	buffer.open(QIODevice::WriteOnly) ;
+	plotImage.save(&buffer,"PNG") ;
+
+	setReferenceAction->setToolTip(QString("Momentane Referenz:<br><img src=\"data:image/png;base64,%1\"></img>").arg(QString(buffer.data().toBase64())));
+}
+
 void specSpectrumPlot::alignmentChanged(QAction *action)
 {
-	if (action == setReferenceAction) // turn this into an undo command.
-	{
-		if (reference) delete reference ;
-		QModelIndexList referenceItems = view->getSelection() ;
-
-		// convert indexes to pointers
-		QList<specDataItem*> referenceDataItems ;
-		for(int i = 0 ; i < referenceItems.size() ; ++i)
-			referenceDataItems << folderContent(view->model()->itemPointer(referenceItems[i])) ;
-		if (referenceDataItems.isEmpty())
-		{
-			invalidateReference();
-			return ;
-		}
-		reference = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
-		for (int i = 0 ; i < referenceDataItems.size() ; ++i)
-			reference->operator +=(*(referenceDataItems[i])) ;
-		reference->flatten();
-		reference->revalidate();
-		reference->setPen(QPen(Qt::red));
-
-		// build tooltip
-		QwtPlot toolTipPlot ;
-		toolTipPlot.setAutoDelete(false) ;
-		reference->attach(&toolTipPlot) ;
-		toolTipPlot.replot();
-
-		QFont font = axisFont(QwtPlot::xBottom) ;
-		font.setPixelSize(8) ;
-		toolTipPlot.setAxisFont(QwtPlot::xBottom,font);
-		toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setSpacing(2) ;
-		toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick,4) ;
-		toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MediumTick,3) ;
-		toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick,2) ;
-
-		font = axisFont(QwtPlot::yLeft) ;
-		font.setPixelSize(8) ;
-		toolTipPlot.setAxisFont(QwtPlot::yLeft,font) ;
-		toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setSpacing(2) ;
-		toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MajorTick,4) ;
-		toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MediumTick,3) ;
-		toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MinorTick,2) ;
-
-		toolTipPlot.replot();
-
-		QImage plotImage(200,100,QImage::Format_ARGB32) ;
-		plotImage.fill(0);
-
-		QwtPlotRenderer renderer ;
-		renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, true);
-		renderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground,true) ;
-		renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, false);
-		renderer.renderTo(&toolTipPlot,plotImage) ;
-
-		QByteArray byteArray ;
-		QBuffer buffer(&byteArray) ;
-		buffer.open(QIODevice::WriteOnly) ;
-		plotImage.save(&buffer,"PNG") ;
-
-		setReferenceAction->setToolTip(QString("Momentane Referenz:<br><img src=\"data:image/png;base64,%1\"></img>").arg(QString(buffer.data().toBase64())));
-
-	}
-	else if (action == alignWithReferenceAction)
+	if (action == alignWithReferenceAction)
 	{
 		toggleAligning(alignWithReferenceAction->isChecked());
 	}

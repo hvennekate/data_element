@@ -4,15 +4,28 @@
 #include <QSvgRenderer>
 #include "svgitemproperties.h"
 
-void specSVGItem::attach(QwtPlot *plot)
+void specSVGItem::attach(QwtPlot *newPlot)
 {
-	image.attach(plot) ;
-	specCanvasItem::attach(plot) ;
-	highlight(highlighting) ;
+	detach() ;
+	image.attach(newPlot) ;
+	specCanvasItem::attach(newPlot) ;
+	specPlot* nPlot = qobject_cast<specPlot*>(newPlot) ;
+	if (nPlot && nPlot->svgPicker())
+		nPlot->svgPicker()->addSelectable(this) ;
+}
+
+void specSVGItem::detach()
+{
+	if (!plot()) return ;
+	specPlot* oldPlot = qobject_cast<specPlot*>(plot()) ;
+	if (oldPlot && oldPlot->svgPicker())
+		oldPlot->svgPicker()->removeSelectable(this);
+	image.detach();
 }
 
 void specSVGItem::highlight(bool highlight)
 {
+	qDebug() << "highlighting" << highlight << this;
 	highlighting = highlight ;
 	QVector<QPointF> points(specSVGItem::size) ;
 	QRectF br = boundRect() ;
@@ -24,12 +37,6 @@ void specSVGItem::highlight(bool highlight)
 	else
 		setSymbol(new QwtSymbol(QwtSymbol::Ellipse,QBrush(Qt::black),QPen(Qt::white),QSize(5,5))) ;
 
-	specPlot *sp = qobject_cast<specPlot*> (plot()) ; // TODO make function (also specMetaRange)
-	if (sp && sp->svgPicker())
-	{
-		if (highlight) sp->svgPicker()->addSelectable(this) ;
-		else sp->svgPicker()->removeSelectable(this) ;
-	}
 }
 
 specSVGItem::specSVGItem(specFolderItem *par, QString description)
@@ -51,7 +58,7 @@ void specSVGItem::setImage(const QByteArray &newData)
 	ownBounds.height = qMakePair<qint8,qreal>(QwtPlot::yLeft, defaultSize.height()) ;
 	ownBounds.x = qMakePair<qint8,qreal>(QwtPlot::xBottom, 0) ;
 	ownBounds.y = qMakePair<qint8,qreal>(QwtPlot::yLeft, 0) ;
-	anchor = center ;
+	anchor = topLeft ;
 	data = newData ;
 }
 

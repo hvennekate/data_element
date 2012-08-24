@@ -393,6 +393,7 @@ void CanvasPicker::highlightSelectable()
 	// TODO enable highlighting on selectable items
 	foreach(specCanvasItem* item, selectable)
 		item->highlight(highlighting) ;
+	plot()->replot();
 }
 
 void CanvasPicker::addSelectable(specCanvasItem *item)
@@ -412,8 +413,7 @@ void CanvasPicker::removeSelectable(specCanvasItem *item)
 void CanvasPicker::addSelectable(const QSet<specCanvasItem *> &list)
 {
 	selectable += list ;
-	highlightSelectable(true) ;
-	plot()->replot();
+	highlightSelectable() ;
 }
 
 void CanvasPicker::removeSelectable(QSet<specCanvasItem *> &list)
@@ -435,7 +435,7 @@ void CanvasPicker::removeSelectable(QSet<specCanvasItem *> &list)
 	foreach(specCanvasItem* item, list)
 		selectable.remove(item) ;
 
-	highlightSelectable(true) ;
+	highlightSelectable() ;
 	plot()->replot() ;
 }
 

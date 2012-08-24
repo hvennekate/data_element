@@ -41,6 +41,7 @@ public:
 	specSVGItem(specFolderItem* par=0, QString description="") ;
 	int rtti() const { return spec::SVGItem ; }
 	void attach(QwtPlot *plot) ;
+	void detach() ;
 	void setImage(const QByteArray&) ;
 	void highlight(bool highlight) ;
 	void refreshSVG();

@@ -8,6 +8,7 @@
 #include <QFileInfo>
 #include <QMessageBox>
 #include <QMainWindow>
+#include "specsplitter.h"
 #include "specgenericmimeconverter.h"
 #include "speclogtodataconverter.h"
 #include "spectextmimeconverter.h"
@@ -27,7 +28,7 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	  layout(new QVBoxLayout(content)),
 	  plot(new specSpectrumPlot(this)),
 	  toolbar(new QToolBar(tr("File"),this)),
-	  splitter(new QSplitter(Qt::Vertical,this)),
+	  splitter(new specSplitter(Qt::Vertical,this)),
 	  file(new QFile(this)),
 	  saveAction(new QAction(QIcon::fromTheme("document-save"), tr("Save"), this)),
 	  kineticsAction(kineticWidget->toggleViewAction()),
@@ -84,6 +85,7 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	layout -> setContentsMargins(0,0,0,0) ;
 
 	setWidget(content) ;
+	svgModification(false) ;
 }
 
 void specPlotWidget::read(QString fileName)
@@ -229,6 +231,7 @@ void specPlotWidget::svgModification(bool mod)
 	if (mod) connect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
 	else disconnect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
 
+	qDebug() << "toggle highlight" << mod ;
 	plot->svgPicker()->highlightSelectable(mod) ;
 }
 
@@ -256,15 +259,4 @@ void specPlotWidget::changeFileName(const QString& name)
 	setWindowTitle(QFileInfo(name).fileName()) ;
 	kineticWidget->setWindowTitle(QString("Kinetics of ").append(QFileInfo(name).fileName())) ;
 	logWidget->setWindowTitle(QString("Logs of ").append(QFileInfo(name).fileName())) ;
-}
-
-void specPlotWidget::contextMenuEvent(QContextMenuEvent* event)
-{
-	if(splitter->geometry().contains(event->x(),event->y()))
-	{
-		if (splitter->orientation() == Qt::Horizontal)
-			splitter->setOrientation(Qt::Vertical) ;
-		else
-			splitter->setOrientation(Qt::Horizontal) ;
-	}
 }
