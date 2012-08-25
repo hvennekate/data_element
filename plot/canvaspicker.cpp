@@ -391,8 +391,9 @@ void CanvasPicker::highlightSelectable(bool highlight)
 void CanvasPicker::highlightSelectable()
 {
 	// TODO enable highlighting on selectable items
+	qDebug() << "Picker highlighting:" << this << selectable << highlighting ;
 	foreach(specCanvasItem* item, selectable)
-		item->highlight(highlighting) ;
+		item->highlight(highlighting) ; // TODO crash when data + image have been imported
 	plot()->replot();
 }
 
@@ -435,7 +436,7 @@ void CanvasPicker::removeSelectable(QSet<specCanvasItem *> &list)
 	foreach(specCanvasItem* item, list)
 		selectable.remove(item) ;
 
-	highlightSelectable() ;
+	highlightSelectable(true) ;
 	plot()->replot() ;
 }
 
@@ -452,7 +453,7 @@ void CanvasPicker::removeSelectable()
 
 CanvasPicker::~CanvasPicker()
 {
-	removeSelectable(selectable);
+	if (owning) removeSelectable(selectable);
 }
 
 QList<specCanvasItem*> CanvasPicker::items() const
