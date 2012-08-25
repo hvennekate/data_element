@@ -352,7 +352,8 @@ specModel::specModel(QObject *par)
 	  internalDrop(false),
 	  dropSource(0),
 	  dropBuddy(0),
-	  dontDelete(false)
+	  dontDelete(false),
+	  metaModel(0)
 {
 	root = new specFolderItem ;
 	Descriptors += "" ;
@@ -825,3 +826,12 @@ void specModel::svgMoved(specCanvasItem *i, int point, double x, double y)
 	dropBuddy->push(command) ;
 }
 
+void specModel::setMetaModel(specMetaModel *m)
+{
+	metaModel = m ;
+}
+
+specMetaModel* specModel::getMetaModel() const
+{
+	return metaModel ;
+}

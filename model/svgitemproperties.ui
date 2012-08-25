@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>604</width>
+    <width>637</width>
     <height>430</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Image Item Properties</string>
   </property>
   <layout class="QGridLayout" name="gridLayout_3">
    <item row="0" column="0" rowspan="2">
@@ -48,7 +48,7 @@
          <string>Top Left</string>
         </property>
         <attribute name="buttonGroup">
-         <string>anchorRadioButtons</string>
+         <string notr="true">anchorRadioButtons</string>
         </attribute>
        </widget>
       </item>
@@ -58,7 +58,7 @@
          <string>Top</string>
         </property>
         <attribute name="buttonGroup">
-         <string>anchorRadioButtons</string>
+         <string notr="true">anchorRadioButtons</string>
         </attribute>
        </widget>
       </item>
@@ -68,7 +68,7 @@
          <string>TopRight</string>
         </property>
         <attribute name="buttonGroup">
-         <string>anchorRadioButtons</string>
+         <string notr="true">anchorRadioButtons</string>
         </attribute>
        </widget>
       </item>
@@ -78,7 +78,7 @@
          <string>Left</string>
         </property>
         <attribute name="buttonGroup">
-         <string>anchorRadioButtons</string>
+         <string notr="true">anchorRadioButtons</string>
         </attribute>
        </widget>
       </item>
@@ -88,7 +88,7 @@
          <string>Center</string>
         </property>
         <attribute name="buttonGroup">
-         <string>anchorRadioButtons</string>
+         <string notr="true">anchorRadioButtons</string>
         </attribute>
        </widget>
       </item>
@@ -98,7 +98,7 @@
          <string>Right</string>
         </property>
         <attribute name="buttonGroup">
-         <string>anchorRadioButtons</string>
+         <string notr="true">anchorRadioButtons</string>
         </attribute>
        </widget>
       </item>
@@ -108,7 +108,7 @@
          <string>Bottom Left</string>
         </property>
         <attribute name="buttonGroup">
-         <string>anchorRadioButtons</string>
+         <string notr="true">anchorRadioButtons</string>
         </attribute>
        </widget>
       </item>
@@ -118,7 +118,7 @@
          <string>Bottom</string>
         </property>
         <attribute name="buttonGroup">
-         <string>anchorRadioButtons</string>
+         <string notr="true">anchorRadioButtons</string>
         </attribute>
        </widget>
       </item>
@@ -128,7 +128,7 @@
          <string>Bottom Right</string>
         </property>
         <attribute name="buttonGroup">
-         <string>anchorRadioButtons</string>
+         <string notr="true">anchorRadioButtons</string>
         </attribute>
        </widget>
       </item>
@@ -141,6 +141,16 @@
       <string>Dimensions</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="yValue">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
       <item row="0" column="0">
        <widget class="QLabel" name="xLabel">
         <property name="text">
@@ -183,16 +193,6 @@
       </item>
       <item row="0" column="1">
        <widget class="QDoubleSpinBox" name="xValue">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QDoubleSpinBox" name="yValue">
         <property name="sizePolicy">
          <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
           <horstretch>0</horstretch>
@@ -270,6 +270,20 @@
         </property>
         <property name="checked">
          <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="3">
+       <widget class="QPushButton" name="widthOriginalAspect">
+        <property name="text">
+         <string>Original Aspect</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="3">
+       <widget class="QPushButton" name="heightOriginalAspect">
+        <property name="text">
+         <string>Original Aspect</string>
         </property>
        </widget>
       </item>

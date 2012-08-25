@@ -1,6 +1,6 @@
 #include "specmanageconnectionscommand.h"
-#include "kinetic/specmetaitem.h"
-#include "specplotwidget.h"
+#include "specmetaitem.h"
+#include "specmetamodel.h"
 
 specManageConnectionsCommand::specManageConnectionsCommand(specUndoCommand *parent)
 	: specUndoCommand(parent),
@@ -27,8 +27,9 @@ void specManageConnectionsCommand::setItems(const QModelIndex &client, QModelInd
 {
 	// TODO check if client is metaItem
 	clear() ;
-	target = new specGenealogy(QModelIndexList() << client) ;
-	((specModel*) servers.first().model())->eliminateChildren(servers);
+	target = new specGenealogy(client) ;
+//	((specModel*) servers.first().model())->eliminateChildren(servers); // TODO does this need to be?
+	// this previous line prevents deleting connections when deleting items from working.
 //	qSort(servers) ;
 	while(!servers.isEmpty())
 		items << new specGenealogy(servers) ;
@@ -86,8 +87,8 @@ void specManageConnectionsCommand::parentAssigned()
 	if (!parentObject()) return ;
 	if (!target) return ;
 
-	specModel *thisModel = (specModel*) (((QAbstractItemView*) parentObject())->model()) ,
-			  *otherModel= (specModel*) (((specPlotWidget*) (parentObject()->parent()->parent()))->mainView()->model()) ;
+	specModel *thisModel = (specModel*) parentObject() ;
+	specModel *otherModel = ((specMetaModel*) thisModel)->getDataModel() ;
 	foreach(specGenealogy* genealogy, items)
 		genealogy->setModel(sameModel(genealogy) ? thisModel : otherModel) ;
 	target->setModel(thisModel) ;

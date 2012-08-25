@@ -39,6 +39,8 @@ specMetaModel *specMetaView::model() const
 void specMetaView::assignDataView(specView *view)
 {
 	dataView = view ;
+	if (model())
+		((specMetaModel*) model())->setDataModel(dataView ? dataView->model() : 0) ;
 }
 
 specView *specMetaView::getDataView()

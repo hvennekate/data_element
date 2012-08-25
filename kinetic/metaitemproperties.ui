@@ -11,9 +11,16 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Connected Items</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Rearrange connected items, unchecking will break the connection.</string>
+     </property>
+    </widget>
+   </item>
    <item>
     <widget class="specSplitter" name="splitter">
      <property name="sizePolicy">

@@ -391,7 +391,6 @@ void CanvasPicker::highlightSelectable(bool highlight)
 void CanvasPicker::highlightSelectable()
 {
 	// TODO enable highlighting on selectable items
-	qDebug() << "Picker highlighting:" << this << selectable << highlighting ;
 	foreach(specCanvasItem* item, selectable)
 		item->highlight(highlighting) ; // TODO crash when data + image have been imported
 	plot()->replot();

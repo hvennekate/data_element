@@ -19,6 +19,7 @@
 #include "specmimeconverter.h"
 
 class specModel ;
+class specMetaModel ;
 
 QDataStream& operator<<(QDataStream&, specModel&);
 QDataStream& operator>>(QDataStream& in, specModel& model) ;
@@ -50,10 +51,12 @@ private:
 	void readFromStream(QDataStream &in) ;
 	type typeId() const { return specStreamable::model ; }
 	QList<specMimeConverter*> mimeConverters() const ;
+	specMetaModel* metaModel ;
 public:
 	specModel(QObject *par = 0) ;
 	~specModel() ;
-	
+	void setMetaModel(specMetaModel*) ;
+	specMetaModel* getMetaModel() const ;
 	// Own functions
 	specModelItem* itemPointer(const QModelIndex&) const;
 	specModelItem* itemPointer(const QVector<int>&) const;

@@ -191,15 +191,15 @@ specView::specView(QWidget* parent)
 void specView::createContextMenus()
 {
 	itemContextMenu = new QMenu(this) ;
-	itemContextMenu->addAction(deleteAction) ;
-	itemContextMenu->addAction(changePenAction) ;
+//	itemContextMenu->addAction(deleteAction) ;
+//	itemContextMenu->addAction(changePenAction) ;
 	itemContextMenu->addAction(propertiesAction) ;
 
 	folderContextMenu = new QMenu(this) ;
-	folderContextMenu->addAction(deleteAction) ;
-	folderContextMenu->addAction(treeAction) ;
-	folderContextMenu->addAction(changePenAction) ;
-	folderContextMenu->addAction(mergeFolderAction) ;
+//	folderContextMenu->addAction(deleteAction) ;
+//	folderContextMenu->addAction(treeAction) ;
+//	folderContextMenu->addAction(changePenAction) ;
+//	folderContextMenu->addAction(mergeFolderAction) ;
 }
 
 QList<QAction*> specView::actions()

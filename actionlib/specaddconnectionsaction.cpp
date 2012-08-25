@@ -26,7 +26,7 @@ void specAddConnectionsAction::execute()
 	if (!target.isValid() || servers.isEmpty()) return ;
 
 	specAddConnectionsCommand *command = new specAddConnectionsCommand ;
-	command->setParentObject((QObject*) parent()) ;
+	command->setParentObject((QObject*) view->model()) ;
 	command->setItems(target,servers) ;
 
 	if (command->ok())
