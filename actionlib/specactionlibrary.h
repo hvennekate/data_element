@@ -37,9 +37,9 @@ public:
 	static specUndoCommand* commandById(int id, specUndoCommand* parent = 0) ;
 	QAction* undoAction(QObject*) ;
 	QAction* redoAction(QObject*) ;
+	void purgeUndo() ;
 public slots:
 	void push(specUndoCommand*) ;
-
 signals:
 	void stackChanged() ;
 private:

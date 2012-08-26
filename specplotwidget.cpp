@@ -77,9 +77,11 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 
 	layout -> addWidget(toolbar) ;
 	QToolBar *itemToolBar = actions->toolBar(items) ;
-	itemToolBar->addSeparator() ;
-	itemToolBar->addActions(plot->actions()) ;
 	layout -> addWidget(itemToolBar) ;
+
+	QToolBar *plotToolBar = actions->toolBar(plot) ;
+	plotToolBar->addActions(plot->actions()) ;
+	layout -> addWidget(plotToolBar) ;
 
 	layout -> addWidget(splitter)  ;
 	layout -> setContentsMargins(0,0,0,0) ;
@@ -138,6 +140,22 @@ void specPlotWidget::createToolbars()
 	toolbar-> addSeparator() ;
 	toolbar-> addAction(undoAction) ;
 	toolbar-> addAction(redoAction) ;
+
+	toolbar->addSeparator() ;
+	QAction *purgeUndoStack = new QAction(QIcon::fromTheme("user-trash"),tr("Clear undo"),this) ;
+	toolbar-> addAction(purgeUndoStack) ;
+	connect(purgeUndoStack,SIGNAL(triggered()),this,SLOT(purgeUndo())) ;
+}
+
+void specPlotWidget::purgeUndo()
+{
+	if (QMessageBox::Yes ==
+			QMessageBox::question(this,
+					      tr("Really Clear Undo?"),
+					      tr("Do you really want to delete all undo and redo actions?  WARNING:  This cannot be undone."),
+					      QMessageBox::Yes | QMessageBox::No,
+					      QMessageBox::No))
+		actions->purgeUndo() ;
 }
 
 void specPlotWidget::closeEvent(QCloseEvent* event)

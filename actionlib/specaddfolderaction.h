@@ -9,11 +9,6 @@ class specAddFolderAction : public specUndoAction
 public:
 	explicit specAddFolderAction(QObject *parent = 0);
 	const std::type_info &possibleParent() ;
-
-signals:
-
-public slots:
-
 private:
 	void execute() ;
 };

@@ -4,6 +4,7 @@
 #include "specundocommand.h"
 #include "model/specgenealogy.h"
 
+// This class exists primarily for providing a pointer to the templated class below.
 class specStyleCommand : public specUndoCommand
 {
 public:
@@ -12,7 +13,7 @@ public:
 	virtual void obtainStyle(specCanvasItem*) = 0 ;
 };
 
-specStyleCommand *generateStyleCommand(specStreamable::streamableType id) ;
+specStyleCommand *generateStyleCommand(specStreamable::type id, specUndoCommand *parent = 0) ;
 
 #define specStyleCommandImplTemplate template<class property, \
 					      property (specCanvasItem::*getProperty)(), \

@@ -127,22 +127,22 @@ void specStyleCommandImplFuncTemplate::obtainStyle(specCanvasItem *item)
 	newProperty = (item->*getProperty)();
 }
 
-specStyleCommand *generateStyleCommand(specStreamable::streamableType id)
+specStyleCommand *generateStyleCommand(specStreamable::type id, specUndoCommand* parent)
 {
 	switch (id)
 	{
 	case specStreamable::penColorCommandId :
-		return new specStyleCommandImplementation<QColor, &specCanvasItem::penColor, &specCanvasItem::setPenColor, specStreamable::penColorCommandId> ;
+		return new specStyleCommandImplementation<QColor, &specCanvasItem::penColor, &specCanvasItem::setPenColor, specStreamable::penColorCommandId>(parent) ;
 	case specStreamable::symbolStyleCommandId :
-		return new specStyleCommandImplementation<int, &specCanvasItem::symbolStyle, &specCanvasItem::setSymbolStyle, specStreamable::symbolStyleCommandId > ;
+		return new specStyleCommandImplementation<int, &specCanvasItem::symbolStyle, &specCanvasItem::setSymbolStyle, specStreamable::symbolStyleCommandId >(parent) ;
 	case specStreamable::symbolPenColorCommandId :
-		return new specStyleCommandImplementation<QColor, &specCanvasItem::symbolPenColor, &specCanvasItem::setSymbolPenColor, specStreamable::symbolPenColorCommandId > ;
+		return new specStyleCommandImplementation<QColor, &specCanvasItem::symbolPenColor, &specCanvasItem::setSymbolPenColor, specStreamable::symbolPenColorCommandId >(parent) ;
 	case specStreamable::symbolBrushColorCommandId:
-		return new specStyleCommandImplementation<QColor, &specCanvasItem::symbolBrushColor, &specCanvasItem::setSymbolBrushColor, specStreamable::symbolBrushColorCommandId> ;
+		return new specStyleCommandImplementation<QColor, &specCanvasItem::symbolBrushColor, &specCanvasItem::setSymbolBrushColor, specStreamable::symbolBrushColorCommandId>(parent) ;
 	case specStreamable::symbolSizeCommandId:
-		return new specStyleCommandImplementation<QSize, &specCanvasItem::symbolSize, &specCanvasItem::setSymbolSize, specStreamable::symbolSizeCommandId > ;
+		return new specStyleCommandImplementation<QSize, &specCanvasItem::symbolSize, &specCanvasItem::setSymbolSize, specStreamable::symbolSizeCommandId >(parent) ;
 	case specStreamable::lineWidthCommandId:
-		return new specStyleCommandImplementation<double, &specCanvasItem::lineWidth, &specCanvasItem::setLineWidth, specStreamable::lineWidthCommandId> ;
+		return new specStyleCommandImplementation<double, &specCanvasItem::lineWidth, &specCanvasItem::setLineWidth, specStreamable::lineWidthCommandId>(parent) ;
 	default:
 		return 0 ;
 	}

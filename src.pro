@@ -88,7 +88,9 @@ SOURCES += main.cpp \
     kinetic/metaitemproperties.cpp \
     model/svgitemproperties.cpp \
     model/specsvgunitbutton.cpp \
-    specsplitter.cpp
+    specsplitter.cpp \
+    actionlib/specplotlabelcommand.cpp \
+    actionlib/speclabelaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -178,7 +180,9 @@ HEADERS += cutbyintensitydialog.h \
     kinetic/metaitemproperties.h \
     model/svgitemproperties.h \
     model/specsvgunitbutton.h \
-    specsplitter.h
+    specsplitter.h \
+    actionlib/specplotlabelcommand.h \
+    actionlib/speclabelaction.h
 
 INCLUDEPATH += kinetic \
 	log \

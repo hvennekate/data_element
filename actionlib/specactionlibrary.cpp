@@ -21,6 +21,14 @@
 #include "log/speclogview.h"
 #include "specimportspecaction.h"
 #include "names.h"
+#include "speclabelaction.h"
+#include "specexchangedatacommand.h"
+#include "specresizesvgcommand.h"
+#include "specaddconnectionscommand.h"
+#include "specdeleteconnectionscommand.h"
+#include "speceditdescriptorcommand.h"
+#include "specmetarangecommand.h"
+#include "specplotlabelcommand.h"
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
@@ -116,6 +124,16 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 
 		return bar ;
 	}
+	else if (dynamic_cast<specPlot*>(target))
+	{
+		QToolBar *bar = new QToolBar(target) ;
+
+		addNewAction(bar, new specTitleAction(target)) ;
+		addNewAction(bar, new specXLabelAction(target)) ;
+		addNewAction(bar, new specYLabelAction(target)) ;
+
+		return bar ;
+	}
 
 	return new QToolBar(target) ;
 }
@@ -164,6 +182,29 @@ specUndoCommand *specActionLibrary::commandById(int id, specUndoCommand* parent)
 		return new specPlotMoveCommand(parent) ;
 	case specStreamable::multiCommandId :
 		return new specMultiCommand(parent) ;
+	case specStreamable::exchangeDataCommandId:
+		return new specExchangeDataCommand(parent) ;
+	case specStreamable::resizeSVGCommandId :
+		return new specResizeSVGcommand(parent) ;
+	case specStreamable::newConnectionsCommandId :
+		return new specAddConnectionsCommand(parent) ;
+	case specStreamable::deleteConnectionsCommandId :
+		return new specDeleteConnectionsCommand(parent) ;
+	case specStreamable::editDescriptorCommandId :
+		return new specEditDescriptorCommand(parent) ;
+	case specStreamable::penColorCommandId:
+	case specStreamable::lineWidthCommandId:
+	case specStreamable::symbolStyleCommandId:
+	case specStreamable::symbolPenColorCommandId:
+	case specStreamable::symbolSizeCommandId:
+	case specStreamable::symbolBrushColorCommandId:
+		return generateStyleCommand(id,parent) ;
+	case specStreamable::metaRangeCommand :
+		return new specMetaRangeCommand(parent) ;
+	case specStreamable::plotTitleCommandId:
+	case specStreamable::plotYLabelCommandId:
+	case specStreamable::plotXLabelCommandId:
+		generatePlotLabelCommand(id,parent) ;
 	default:
 		return 0 ;
 	}
@@ -206,4 +247,9 @@ void specActionLibrary::moveInternally(const QModelIndex &parent, int row, specV
 void specActionLibrary::addPlot(specPlot *plot)
 {
 	connect(this,SIGNAL(stackChanged()),plot,SLOT(replot())) ;
+}
+
+void specActionLibrary::purgeUndo()
+{
+	undoStack->clear();
 }

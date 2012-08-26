@@ -46,6 +46,7 @@ private:
 private slots:
 	void modified() ;
 	void svgModification(bool) ;
+	void purgeUndo() ;
 protected :
 	void closeEvent(QCloseEvent*) ;
 public:
