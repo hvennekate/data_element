@@ -6,6 +6,8 @@ specDeleteAction::specDeleteAction(QObject *parent) :
     specUndoAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("edit-delete"));
+	setToolTip(tr("Delete")) ;
+	setWhatsThis(tr("Deletes selected items.")) ;
 }
 
 const std::type_info &specDeleteAction::possibleParent()
@@ -17,13 +19,13 @@ const std::type_info &specDeleteAction::possibleParent()
 
 void specDeleteAction::execute()
 {
-	specDataView *currentView = (specDataView*) parent() ;
+	specView *currentView = (specView*) parent() ;
 	QModelIndexList indexes = currentView->selectionModel()->selectedIndexes() ;
 	specDeleteCommand *command = new specDeleteCommand() ;
 	command->setItems(indexes) ;
 	currentView->selectionModel()->clearSelection();
 
-	command->setParentObject((QWidget*)parent());
+	command->setParentObject(currentView->model());
 
 	if (command->ok())
 		library->push(command) ;

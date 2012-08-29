@@ -44,5 +44,10 @@
         <file>multiminus.png</file>
         <file>newMinus.png</file>
         <file>logs.png</file>
+        <file>fixXAxis.png</file>
+        <file>fixYAxis.png</file>
+        <file>xshift.png</file>
+        <file>lineStyle.png</file>
+        <file>resizeImage.png</file>
     </qresource>
 </RCC>

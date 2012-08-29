@@ -14,6 +14,8 @@ specPrintPlotAction::specPrintPlotAction(QObject *parent) :
 	double aspectRatio = (double) plotSize.width() / plotSize.height() ;
 	printer->setOrientation(aspectRatio > 1. ? QPrinter::Landscape : QPrinter::Portrait) ;
 	setIcon(QIcon::fromTheme("document-print"));
+	setToolTip(tr("Print plot")) ;
+	setWhatsThis(tr("Print this dock window's plot as currently displayed.")) ;
 }
 
 const std::type_info &specPrintPlotAction::possibleParent()

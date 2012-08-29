@@ -19,15 +19,14 @@ protected:
 	void readFromStream(QDataStream &in) ;
 public:
 	specCanvasItem(QString description="");
-	virtual void pointMoved(const int&, const double&, const double&) ;
-	virtual void applyRanges(QList<QwtInterval*>&) ;
+	virtual void pointMoved(const int&, const double&, const double&) {} ;
 	virtual void refreshPlotData() =0;
 	virtual void scaleBy(const double&) {}
 	virtual void addToSlope(const double&) {}
 	virtual void moveYBy(const double&) {}
 	virtual void moveXBy(const double&) {}
 	virtual void attach(QwtPlot *plot) { QwtPlotCurve::attach(plot) ; }
-	virtual void detach() { attach(0) ; }
+	virtual void detach() { QwtPlotCurve::detach() ; }
 	virtual QMenu* contextMenu() ;
 	void setLineWidth(const double&) ;
 	double lineWidth() ;

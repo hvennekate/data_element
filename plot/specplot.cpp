@@ -10,7 +10,6 @@
 #include "specmetaitem.h"
 
 // TODO solve the myth of autoscaleaxis...
-// TODO remove kineticRanges
 
 specPlot::specPlot(QWidget *parent)
 	: QwtPlot(parent),
@@ -22,23 +21,26 @@ specPlot::specPlot(QWidget *parent)
 {
 	MetaPicker = new CanvasPicker(this) ;
 	SVGpicker  = new CanvasPicker(this) ;
-	modifySVGs    = new QAction("Modify SVGs",this) ;
+	modifySVGs    = new QAction(QIcon(":/resizeImage.png"),"Modify SVGs",this) ;
+	modifySVGs->setToolTip(tr("Resize image items")) ;
+	modifySVGs->setWhatsThis(tr("Modify the size of images displayed on the plot's canvas.")) ;
 	modifySVGs->setCheckable(true) ;
-	connect(modifySVGs,SIGNAL(triggered(bool)),this,SLOT(modifyingSVGs(bool))) ;
 
 	connect(MetaPicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SIGNAL(metaRangeModified(specCanvasItem*,int,double,double))) ;
 	setAutoReplot(false) ;
 	zoom  = new specZoomer(this->canvas()) ;
 
-	fixYAxisAction = new QAction(QIcon(":/fixyaxis.png"), tr("&y-Achsenskalierung fixieren"), this);
+	fixYAxisAction = new QAction(QIcon(":/fixyaxis.png"), tr("fixate &y axis"), this);
 	fixYAxisAction->setShortcut(tr("Ctrl+y"));
-	fixYAxisAction->setStatusTip(tr("Fix y axis scaling"));
+	fixYAxisAction->setWhatsThis(tr("Disables auto scaling for the y axis and fixates the current axis range."));
+	fixYAxisAction->setIcon(QIcon(":/fixYAxis.png")) ;
 	fixYAxisAction->setCheckable(true) ;
 	fixYAxisAction->setChecked(false) ;
 	
-	fixXAxisAction = new QAction(QIcon(":/fixxaxis.png"), tr("&x-Achsenskalierung fixieren"), this);
+	fixXAxisAction = new QAction(QIcon(":/fixxaxis.png"), tr("fixate &x axis"), this);
 	fixXAxisAction->setShortcut(tr("Ctrl+x"));
-	fixXAxisAction->setStatusTip(tr("Fix x axis scaling"));
+	fixXAxisAction->setWhatsThis(tr("Disables auto scaling for the y axis and fixates the current axis range.")) ;
+	fixXAxisAction->setIcon(QIcon(":/fixXAxis.png")) ;
 	fixXAxisAction->setCheckable(true) ;
 	fixXAxisAction->setChecked(false) ;
 
@@ -46,11 +48,6 @@ specPlot::specPlot(QWidget *parent)
 
 	setAxisTitle(QwtPlot::yLeft,"<font face=\"Symbol\">D</font>mOD") ;
 	setAxisTitle(QwtPlot::xBottom,"cm<sup>-1</sup>") ;
-}
-
-specZoomer *specPlot::zoomer()
-{
-	return zoom ;
 }
 
 void specPlot::replot()
@@ -81,7 +78,7 @@ void specPlot::replot()
 	specModelItem *pointer = 0 ; // TODO find a more concise version.
 	foreach(QwtPlotItem *item, allItems)
 	{
-		if((pointer = dynamic_cast<specModelItem*>(item)))
+		if(!(dynamic_cast<specSVGItem*>(item)) && (pointer = dynamic_cast<specModelItem*>(item)))
 		{
 			pointer->revalidate();
 			boundaries |= pointer->boundingRect() ;
@@ -89,10 +86,9 @@ void specPlot::replot()
 	}
 
 	boundaries = boundaries.normalized() ;
-	boundaries.translate(-.05*boundaries.width(),-.5*boundaries.height()) ;
+	boundaries.translate(-.05*boundaries.width(),-.05*boundaries.height()) ;
 	boundaries.setWidth(1.1*boundaries.width());
 	boundaries.setHeight(1.1*boundaries.height());
-	double xOffset = boundaries.width()*.05, yOffset = boundaries.height()*.05, left, right, top, bottom ;
 	if (fixXAxisAction->isChecked())
 	{
 		boundaries.setLeft(zoomBase.left()) ;
@@ -143,40 +139,6 @@ void specPlot::readFromStream(QDataStream &in)
 	setAxisTitle(QwtPlot::yRight, y2label) ;
 }
 
-void specPlot::resizeSVG(specCanvasItem *item, int point, double x, double y)
-{
-	specSVGItem *pointer = dynamic_cast<specSVGItem*>(item) ;
-	if (!pointer || !view || !undoPartner()) return ;
-
-	specSVGItem::bounds oldBounds = pointer->getBounds() ;
-	pointer->pointMoved(point,x,y) ;
-
-	specResizeSVGcommand *command = new specResizeSVGcommand ;
-	command->setParentObject(view->model()) ;
-	command->setItem(view->model()->index(pointer),oldBounds) ;
-	undoPartner()->push(command) ;
-}
-
-void specPlot::modifyingSVGs(const bool &modify)
-{
-	if (SVGpicker)
-	{
-		disconnect(SVGpicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)),this,SLOT(resizeSVG(specCanvasItem*,int,double,double))) ;
-		delete SVGpicker ;
-		SVGpicker = 0 ;
-	}
-	if (!modify) return ;
-
-	SVGpicker = new CanvasPicker(this) ;
-	QList<specCanvasItem*> SVGitems ;
-
-	foreach(QwtPlotItem *item, itemList())
-		SVGitems << dynamic_cast<specSVGItem*>(item) ;
-	SVGitems.removeAll(0) ;
-	SVGpicker->addSelectable(SVGitems.toSet()) ;
-	connect(SVGpicker,SIGNAL(pointMoved(specCanvasItem*,int,double,double)),this,SLOT(resizeSVG(specCanvasItem*,int,double,double))) ;
-}
-
 void specPlot::setUndoPartner(specActionLibrary *lib)
 {
 	undoP = lib ;
@@ -191,4 +153,35 @@ specActionLibrary* specPlot::undoPartner() const
 void specPlot::setView(specView *mod)
 {
 	view = mod ;
+}
+
+CanvasPicker* specPlot::metaPicker()
+{
+	return MetaPicker ;
+}
+
+CanvasPicker* specPlot::svgPicker()
+{
+	return SVGpicker ;
+}
+
+void specPlot::resizeEvent(QResizeEvent *e)
+{
+	QwtPlot::resizeEvent(e) ;
+	replot() ;
+}
+
+void specPlot::attachToPicker(specCanvasItem *i)
+{
+	Q_UNUSED(i)
+}
+
+void specPlot::detachFromPicker(specCanvasItem *i)
+{
+	Q_UNUSED(i)
+}
+
+QAction* specPlot::svgAction() const
+{
+	return modifySVGs ;
 }

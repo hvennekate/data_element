@@ -12,9 +12,9 @@
 #include <QTextStream>
 #include <QBrush>
 #include <QColor>
+#include <QDoubleValidator>
 
 #include "speccanvasitem.h"
-#include "specminmaxvalidator.h"
 #include <QGridLayout>
 #include <QDialog>
 #include <QLineEdit>
@@ -26,7 +26,8 @@ CanvasPicker::CanvasPicker ( specPlot *plot )
 	: QObject ( plot ),
 	  owning(false),
 	  d_selectedCurve ( NULL ),
-	  d_selectedPoint ( -1 )
+	  d_selectedPoint ( -1 ),
+	  highlighting(true)
 //     mode(spec::none)
 {
 	QwtPlotCanvas *canvas = plot->canvas();
@@ -51,20 +52,16 @@ CanvasPicker::CanvasPicker ( specPlot *plot )
 	canvas->setFocus();
 
 	const char *text =
-	    "All points can be moved using the left mouse button "
-	    "or with these keys:\n\n"
-	    "- Up:\t\tSelect next curve\n"
-	    "- Down:\t\tSelect previous curve\n"
-	    "- Left, �-�:\tSelect next point\n"
-	    "- Right, �+�:\tSelect previous point\n"
-	    "- 7, 8, 9, 4, 6, 1, 2, 3:\tMove selected point";
+	    "Points in this plot may be moved by dragging (if indicated) or positioned precisely by "
+	    "double clicking on them.  If zooming is enabled, step-wise zoom may be performed using "
+	    "the middle mouse button (click and drag the zoom region).  Clicking the right mouse "
+	    "button will go back one zoom step.";
 #if QT_VERSION >= 0x040000
 	canvas->setWhatsThis ( text );
 #else
 	QWhatsThis::add ( canvas, text );
 #endif
 
-//	shiftCurveCursor ( true );  // What is this good for?  Happy debugging?!
 }
 
 void CanvasPicker::setSelectable(const QSet<specCanvasItem *> &toSet)
@@ -214,23 +211,19 @@ void CanvasPicker::select ( const QPoint &pos )
 	int index = -1;
 	d_selectedCurve = NULL;
 	d_selectedPoint = -1;
-//	if ( plot()->itemList().isEmpty() ) return ;
 
 	for ( QSet<specCanvasItem*>::iterator it = selectable.begin(); it != selectable.end(); ++it )
 	{
-//		if ( ( *it )->rtti() == QwtPlotCurve::Rtti_PlotCurve ) // TODO do we need an adapted version?
-//		{
-			specCanvasItem *c = ( specCanvasItem* ) ( *it );
+		specCanvasItem *c = ( specCanvasItem* ) ( *it );
 
-			double d;
-			int idx = c->closestPoint ( pos, &d );
-			if ( d < dist )
-			{
-				curve = c;
-				index = idx;
-				dist = d;
-			}
-//		}
+		double d;
+		int idx = c->closestPoint ( pos, &d );
+		if ( d < dist )
+		{
+			curve = c;
+			index = idx;
+			dist = d;
+		}
 	}
 
 	showCursor ( false );
@@ -242,8 +235,6 @@ void CanvasPicker::select ( const QPoint &pos )
 		showCursor ( true );
 	}
 	lastSelected = d_selectedCurve ;
-
-// 	d_selectedCurve->selectPoint ( d_selectedPoint ) ; // TODO create parent of both range and modelitem, must be child of QwtPlotCurve
 }
 
 
@@ -273,45 +264,7 @@ void CanvasPicker::move ( const QPoint &pos )
 	emit pointMoved(d_selectedCurve,d_selectedPoint,
 			plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
 			plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ;
-//	d_selectedCurve->pointMoved ( d_selectedPoint,
-//	                              plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
-//	                              plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ;
-	emit moved(d_selectedCurve) ; // TODO remove this signal
-	/* 	if ( mode == spec::newZero ) // TODO
-		{
-			( ( specRange* ) d_selectedCurve )->pointMoved ( mode, d_selectedPoint,
-			        plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
-			        plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ;
-			emit rangesModified ( &ranges ) ;
-			plot()->replot() ;
-		}
-		else
-			( ( specModelItem* ) d_selectedCurve ) ->pointMoved ( mode, d_selectedPoint,
-			        plot()->invTransform ( d_selectedCurve->xAxis(), pos.x() ),
-			        plot()->invTransform ( d_selectedCurve->yAxis(), pos.y() ) ) ; */
 
-	/*    QwtArray<double> xData(d_selectedCurve->dataSize());
-	    QwtArray<double> yData(d_selectedCurve->dataSize());
-
-	    for ( int i = 0; i < d_selectedCurve->dataSize(); i++ )
-	    {
-	        if ( i == d_selectedPoint )
-	        {
-	            xData[i] = plot()->invTransform(d_selectedCurve->xAxis(), pos.x());;
-	            yData[i] = plot()->invTransform(d_selectedCurve->yAxis(), pos.y());;
-	        }
-	        else
-	        {
-	            xData[i] = d_selectedCurve->x(i);
-	            yData[i] = d_selectedCurve->y(i);
-	        }
-	    }
-	    d_selectedCurve->setData(xData, yData);
-	QTextStream cout(stdout, QIODevice::WriteOnly);
-	for (int i = 0 ; i < d_selectedCurve->dataSize() ; i++)
-		cout << "(" << d_selectedCurve->x(i) << " " << d_selectedCurve->y(i) << ")  " ;
-	cout << endl ;
-	    plot()->replot();*/
 	showCursor ( true );
 }
 
@@ -426,14 +379,21 @@ void CanvasPicker::movePointExplicitly()
 	layout->addWidget(buttons,2,0,1,2) ;
 	query->setLayout(layout) ;
 	if(query->exec() == QDialog::Accepted)
-		curve->pointMoved(point, xBox->text().toDouble(), yBox->text().toDouble()) ;
+		emit pointMoved(curve, point, xBox->text().toDouble(), yBox->text().toDouble());
 }
 
 void CanvasPicker::highlightSelectable(bool highlight)
 {
+	highlighting = highlight ;
+	highlightSelectable();
+}
+
+void CanvasPicker::highlightSelectable()
+{
 	// TODO enable highlighting on selectable items
 	foreach(specCanvasItem* item, selectable)
-		item->highlight(highlight) ;
+		item->highlight(highlighting) ;
+	plot()->replot();
 }
 
 void CanvasPicker::addSelectable(specCanvasItem *item)
@@ -453,11 +413,7 @@ void CanvasPicker::removeSelectable(specCanvasItem *item)
 void CanvasPicker::addSelectable(const QSet<specCanvasItem *> &list)
 {
 	selectable += list ;
-//	foreach(specCanvasItem* item, list)  // TODO consider this version.
-//		if (!list.contains(item))
-//			list << item ;
-	highlightSelectable(true) ;
-	plot()->replot();
+	highlightSelectable() ;
 }
 
 void CanvasPicker::removeSelectable(QSet<specCanvasItem *> &list)
@@ -479,7 +435,7 @@ void CanvasPicker::removeSelectable(QSet<specCanvasItem *> &list)
 	foreach(specCanvasItem* item, list)
 		selectable.remove(item) ;
 
-	highlightSelectable(true) ;
+	highlightSelectable() ;
 	plot()->replot() ;
 }
 

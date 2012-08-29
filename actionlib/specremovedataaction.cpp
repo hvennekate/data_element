@@ -7,6 +7,8 @@ specRemoveDataAction::specRemoveDataAction(QObject *parent)
 	: specUndoAction(parent)
 {
 	setIcon(QIcon(":/cbi.png")) ;
+	setToolTip(tr("Remove data")) ;
+	setWhatsThis(tr("Remove data from the selected items.  You will be prompted to determined which data points to delete by setting up ranges along the x axis."));
 }
 
 void specRemoveDataAction::execute()
@@ -22,7 +24,7 @@ void specRemoveDataAction::execute()
 	}
 
 	specMultiCommand *groupCommand = new specMultiCommand ;
-	groupCommand->setParentObject(view) ;
+	groupCommand->setParentObject(view->model()) ;
 	groupCommand->setMergeable(false) ;
 	QList<specRange*> ranges = dialog->ranges() ;
 
@@ -31,7 +33,7 @@ void specRemoveDataAction::execute()
 		specDataItem *item = dynamic_cast<specDataItem*>(view->model()->itemPointer(index)) ;
 		if (!item) continue ;
 		specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
-		command->setParentObject(view) ;
+		command->setParentObject(view->model()) ;
 		command->setItem(index,item->getDataExcept(ranges)) ;
 	}
 

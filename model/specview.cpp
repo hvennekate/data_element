@@ -193,6 +193,7 @@ void specView::createContextMenus()
 	itemContextMenu = new QMenu(this) ;
 	itemContextMenu->addAction(deleteAction) ;
 	itemContextMenu->addAction(changePenAction) ;
+	itemContextMenu->addAction(propertiesAction) ;
 
 	folderContextMenu = new QMenu(this) ;
 	folderContextMenu->addAction(deleteAction) ;
@@ -225,10 +226,24 @@ void specView::contextMenuEvent(QContextMenuEvent* event)
 void specView::setModel(specModel* model)
 {
 	QTreeView::setModel(model) ;
+	// TODO change this to plain old functions.
+	connect(model, SIGNAL(modelAboutToBeReset()), this, SLOT(prepareReset())) ;
+	connect(model, SIGNAL(modelReset()), this, SLOT(resetDone())) ;
+}
+
+void specView::itemProperties()
+{
+	if (!model()) return ;
+	specModelItem* item = 0;
+	if (!(item = model()->itemPointer(currentIndex()))) return ;
+	emit newUndoCommand(item->itemPropertiesAction(model())) ;
 }
 
 void specView::createActions()
 {// TODO connect actions to modified slot of parent
+	propertiesAction = new QAction(tr("Properties..."), this) ;
+	connect(propertiesAction, SIGNAL(triggered()), this, SLOT(itemProperties())) ;
+
 	deleteAction = new QAction(QIcon(":/item_delete.png"), tr("&Löschen"), this) ;
 	deleteAction->setShortcut(tr("Entf"));
 	deleteAction->setStatusTip(tr("Markierte Einträge löschen"));

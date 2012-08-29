@@ -3,10 +3,6 @@ include(prefix.pri)
 SOURCES += main.cpp \
     cutbyintensitydialog.cpp \
     specappwindow.cpp \
-    specdocktitle.cpp \
-    speckrcontextmenu.cpp \
-    speclabeldialog.cpp \
-    specminmaxvalidator.cpp \
     specplotwidget.cpp \
     utility-functions.cpp \
     kinetic/speckineticwidget.cpp \
@@ -18,7 +14,6 @@ SOURCES += main.cpp \
     model/specdelegate.cpp \
     model/specview.cpp \
     model/specdescriptor.cpp \
-    model/specdescriptordelegate.cpp \
     model/specmodel.cpp \
     model/specmodelitem.cpp \
     model/specfolderitem.cpp \
@@ -88,14 +83,15 @@ SOURCES += main.cpp \
     specstreamable.cpp \
     actionlib/specmetarangecommand.cpp \
     model/specgenericmimeconverter.cpp \
-    model/spectextmimeconverter.cpp
+    model/spectextmimeconverter.cpp \
+    spectral/dataitemproperties.cpp \
+    kinetic/metaitemproperties.cpp \
+    model/svgitemproperties.cpp \
+    model/specsvgunitbutton.cpp \
+    specsplitter.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
-    specdocktitle.h \
-    speckrcontextmenu.h \
-    speclabeldialog.h \
-    specminmaxvalidator.h \
     specplotwidget.h \
     names.h \
     utility-functions.h \
@@ -108,7 +104,6 @@ HEADERS += cutbyintensitydialog.h \
     model/specdelegate.h \
     model/specview.h \
     model/specdescriptor.h \
-    model/specdescriptordelegate.h \
     model/specmodel.h \
     model/specmodelitem.h \
     model/specfolderitem.h \
@@ -178,13 +173,19 @@ HEADERS += cutbyintensitydialog.h \
     specstreamable.h \
     actionlib/specmetarangecommand.h \
     model/specgenericmimeconverter.h \
-    model/spectextmimeconverter.h
+    model/spectextmimeconverter.h \
+    spectral/dataitemproperties.h \
+    kinetic/metaitemproperties.h \
+    model/svgitemproperties.h \
+    model/specsvgunitbutton.h \
+    specsplitter.h
 
 INCLUDEPATH += kinetic \
 	log \
 	model \
 	plot \
-	spectral
+	spectral \
+	actionlib
 
 
 TEMPLATE = app
@@ -216,5 +217,6 @@ QT += svg
 QMAKE_CXXFLAGS += -std=c++0x
 
 FORMS += \
-    kinetic/connectionsManager.ui \
-    spectral/dataItemProperties.ui
+    spectral/dataitemproperties.ui \
+    kinetic/metaitemproperties.ui \
+    model/svgitemproperties.ui

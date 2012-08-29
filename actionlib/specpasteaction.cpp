@@ -10,6 +10,8 @@ specPasteAction::specPasteAction(QObject *parent) :
     specUndoAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("edit-paste")) ;
+	setToolTip(tr("Paste")) ;
+	setWhatsThis(tr("Paste data from clipboard, if possible")) ;
 }
 
 const std::type_info &specPasteAction::possibleParent()
@@ -38,7 +40,7 @@ void specPasteAction::execute()
 		list << model->index(i+row,0,index) ;
 	command->setItems(list) ;
 
-	command->setParentObject((QWidget*)parent()) ;
+	command->setParentObject(model) ;
 
 	if (command->ok())
 		library->push(command) ;

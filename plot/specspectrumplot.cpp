@@ -1,16 +1,20 @@
 #include "specspectrumplot.h"
-#include "actionlib/specplotmovecommand.h"
-#include "actionlib/specmulticommand.h"
-#include "utility-functions.h"
+
+#include <QActionGroup>
 #include <QBuffer>
-#include "qwt/qwt_plot_renderer.h"
-#include <qwt_scale_div.h>
-#include <QDialog>
-#include <QVBoxLayout>
-#include <QLabel>
-#include <qwt_scale_draw.h>
-#include "actionlib/specprintplotaction.h"
-#include "actionlib/specexchangedatacommand.h"
+#include "qwt_scale_draw.h"
+#include "specmulticommand.h"
+#include "specrange.h"
+#include "specdataitem.h"
+#include "canvaspicker.h"
+#include "specprintplotaction.h"
+#include "specfolderitem.h"
+#include "specview.h"
+#include "qwt_plot_renderer.h"
+#include "utility-functions.h"
+#include "specplotmovecommand.h"
+#include "specactionlibrary.h"
+#include "specexchangedatacommand.h"
 
 void specSpectrumPlot::toggleAligning(bool on)
 {
@@ -41,17 +45,23 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 {
 	correctionActions = new QActionGroup(this) ;
 	correctionActions->setExclusive(false);
-	offsetAction  = new QAction(QIcon(":/offset.png"), "Offset", correctionActions) ;
-	offlineAction = new QAction(QIcon(":/offline.png"), "Slope",correctionActions) ;
-	scaleAction   = new QAction(QIcon(":/scale.png"),"Scale", correctionActions) ;
-	shiftAction   = new QAction("shift x",correctionActions) ;
-	printAction   = new specPrintPlotAction(this) ;
-	subInterpolatedAction = new QAction(QIcon(":/multiminus.png"), "Subtraction",this) ;
+	offsetAction  = new QAction(QIcon(":/offset.png"), tr("Offset"), correctionActions) ;
+	offlineAction = new QAction(QIcon(":/offline.png"), tr("Slope"),correctionActions) ;
+	scaleAction   = new QAction(QIcon(":/scale.png"), tr("Scale"), correctionActions) ;
+	shiftAction   = new QAction(QIcon(":/xshift.png"), tr("Shift x"),correctionActions) ;
+	subInterpolatedAction = new QAction(QIcon(":/multiminus.png"), tr("Subtract Reference"),this) ;
+
+	subInterpolatedAction->setWhatsThis(tr("Subtract the reference data from selected data sets (applying interpolation if necessary)."));
 
 	correctionActions->addAction(offsetAction) ;
 	correctionActions->addAction(offlineAction) ;
 	correctionActions->addAction(scaleAction) ;
 	correctionActions->addAction(shiftAction) ;
+	offsetAction->setWhatsThis(tr("When this button is enabled, you can correct your data for any offset by individually moving any point of a data curve to where it ought to be."));
+	offlineAction->setWhatsThis(tr("By enabling this button, you enable detrending correction.  Pick any point of a data curve and move it to subtract a trend."));
+	scaleAction->setWhatsThis(tr("This button lets you scale data by moving a data point."));
+	shiftAction->setWhatsThis(tr("This button enables shifting data along the x axis by moving a data point."));
+
 
 	connect(correctionActions,SIGNAL(triggered(QAction*)),this,SLOT(correctionsChanged())) ;
 	foreach(QAction *action, correctionActions->actions())
@@ -59,16 +69,23 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 
 	alignmentActions = new QActionGroup(this) ;
 	alignmentActions->setExclusive(false) ;
-	setReferenceAction = new QAction("set reference",alignmentActions) ;
-	alignWithReferenceAction = new QAction("align",alignmentActions) ;
+	setReferenceAction = new QAction(QIcon(":/data.png"),tr("Set Reference"),this) ;
+	alignWithReferenceAction = new QAction(QIcon(":/zeroCorrection.png"),tr("Align"),alignmentActions) ;
 	alignWithReferenceAction->setCheckable(true) ;
 	alignWithReferenceAction->setChecked(false) ;
-	addRangeAction = new QAction("new range",alignmentActions) ;
-	removeRangeAction = new QAction("delete range",alignmentActions) ;
-	noSlopeAction = new QAction("no slope",alignmentActions) ;
+	addRangeAction = new QAction(QIcon(":/addZeroRange.png"),tr("Add Aligning Range"),alignmentActions) ;
+	removeRangeAction = new QAction(QIcon(":/deleteZeroRange.png"),tr("Delete Aligning Range"),alignmentActions) ;
+	noSlopeAction = new QAction(QIcon(":/offset.png"),tr("Disable Slope"),alignmentActions) ;
 	noSlopeAction->setCheckable(true) ;
 	noSlopeAction->setChecked(false) ;
 	toggleAligning(false) ;
+	connect(setReferenceAction,SIGNAL(triggered()),this,SLOT(setReference())) ;
+
+	setReferenceAction->setWhatsThis(tr("Sets the reference for interpolated subtractions and/or for aligning other data sets."));
+	alignWithReferenceAction->setWhatsThis(tr("Enables aligning selected data sets with the reference defined (or with the x axis if no reference has been set).\nFor aligning, a linear function will be subtracted, unless the correction has been limited to subtracting an offset."));
+	addRangeAction->setWhatsThis(tr("Add a range for alignment.  The alignment correction of data sets selected will be calculated based on the points that lie within at least one of those ranges.")) ;
+	removeRangeAction->setWhatsThis(tr("Delete a range for alignment.  The alignment correction of data sets selected will be calculated based on the points that lie within at least one of those ranges."));
+	noSlopeAction->setWhatsThis(tr("Use only an offset for aligning data sets with the reference data."));
 
 
 	QImage image(":/add.png") ;
@@ -106,71 +123,71 @@ QList<specDataItem*> specSpectrumPlot::folderContent(specModelItem *folder)
 	return content ;
 }
 
+void specSpectrumPlot::setReference()
+{
+	if (reference) delete reference ;
+	QModelIndexList referenceItems = view->getSelection() ;
+
+	// convert indexes to pointers
+	QList<specDataItem*> referenceDataItems ;
+	for(int i = 0 ; i < referenceItems.size() ; ++i)
+		referenceDataItems << folderContent(view->model()->itemPointer(referenceItems[i])) ;
+	if (referenceDataItems.isEmpty())
+	{
+		invalidateReference();
+		return ;
+	}
+	reference = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
+	for (int i = 0 ; i < referenceDataItems.size() ; ++i)
+		reference->operator +=(*(referenceDataItems[i])) ;
+	reference->flatten();
+	reference->revalidate();
+	reference->setPen(QPen(Qt::red));
+
+	// build tooltip
+	QwtPlot toolTipPlot ;
+	toolTipPlot.setAutoDelete(false) ;
+	reference->attach(&toolTipPlot) ;
+	toolTipPlot.replot();
+
+	QFont font = axisFont(QwtPlot::xBottom) ;
+	font.setPixelSize(8) ;
+	toolTipPlot.setAxisFont(QwtPlot::xBottom,font);
+	toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setSpacing(2) ;
+	toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick,4) ;
+	toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MediumTick,3) ;
+	toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick,2) ;
+
+	font = axisFont(QwtPlot::yLeft) ;
+	font.setPixelSize(8) ;
+	toolTipPlot.setAxisFont(QwtPlot::yLeft,font) ;
+	toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setSpacing(2) ;
+	toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MajorTick,4) ;
+	toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MediumTick,3) ;
+	toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MinorTick,2) ;
+
+	toolTipPlot.replot();
+
+	QImage plotImage(200,100,QImage::Format_ARGB32) ;
+	plotImage.fill(0);
+
+	QwtPlotRenderer renderer ;
+	renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, true);
+	renderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground,true) ;
+	renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, false);
+	renderer.renderTo(&toolTipPlot,plotImage) ;
+
+	QByteArray byteArray ;
+	QBuffer buffer(&byteArray) ;
+	buffer.open(QIODevice::WriteOnly) ;
+	plotImage.save(&buffer,"PNG") ;
+
+	setReferenceAction->setToolTip(QString("Momentane Referenz:<br><img src=\"data:image/png;base64,%1\"></img>").arg(QString(buffer.data().toBase64())));
+}
+
 void specSpectrumPlot::alignmentChanged(QAction *action)
 {
-	if (action == setReferenceAction) // turn this into an undo command.
-	{
-		if (reference) delete reference ;
-		QModelIndexList referenceItems = view->getSelection() ;
-
-		// convert indexes to pointers
-		QList<specDataItem*> referenceDataItems ;
-		for(int i = 0 ; i < referenceItems.size() ; ++i)
-			referenceDataItems << folderContent(view->model()->itemPointer(referenceItems[i])) ;
-		if (referenceDataItems.isEmpty())
-		{
-			invalidateReference();
-			return ;
-		}
-		reference = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
-		for (int i = 0 ; i < referenceDataItems.size() ; ++i)
-			reference->operator +=(*(referenceDataItems[i])) ;
-		reference->flatten();
-		reference->revalidate();
-		reference->setPen(QPen(Qt::red));
-
-		// build tooltip
-		QwtPlot toolTipPlot ;
-		toolTipPlot.setAutoDelete(false) ;
-		reference->attach(&toolTipPlot) ;
-		toolTipPlot.replot();
-
-		QFont font = axisFont(QwtPlot::xBottom) ;
-		font.setPixelSize(8) ;
-		toolTipPlot.setAxisFont(QwtPlot::xBottom,font);
-		toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setSpacing(2) ;
-		toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MajorTick,4) ;
-		toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MediumTick,3) ;
-		toolTipPlot.axisScaleDraw(QwtPlot::xBottom)->setTickLength(QwtScaleDiv::MinorTick,2) ;
-
-		font = axisFont(QwtPlot::yLeft) ;
-		font.setPixelSize(8) ;
-		toolTipPlot.setAxisFont(QwtPlot::yLeft,font) ;
-		toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setSpacing(2) ;
-		toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MajorTick,4) ;
-		toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MediumTick,3) ;
-		toolTipPlot.axisScaleDraw(QwtPlot::yLeft)->setTickLength(QwtScaleDiv::MinorTick,2) ;
-
-		toolTipPlot.replot();
-
-		QImage plotImage(200,100,QImage::Format_ARGB32) ;
-		plotImage.fill(0);
-
-		QwtPlotRenderer renderer ;
-		renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, true);
-		renderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground,true) ;
-		renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, false);
-		renderer.renderTo(&toolTipPlot,plotImage) ;
-
-		QByteArray byteArray ;
-		QBuffer buffer(&byteArray) ;
-		buffer.open(QIODevice::WriteOnly) ;
-		plotImage.save(&buffer,"PNG") ;
-
-		setReferenceAction->setToolTip(QString("Momentane Referenz:<br><img src=\"data:image/png;base64,%1\"></img>").arg(QString(buffer.data().toBase64())));
-
-	}
-	else if (action == alignWithReferenceAction)
+	if (action == alignWithReferenceAction)
 	{
 		toggleAligning(alignWithReferenceAction->isChecked());
 	}
@@ -215,6 +232,18 @@ void specSpectrumPlot::correctionsChanged()
 		correctionPicker = 0  ;
 		pointHash.clear();
 	}
+}
+
+void specSpectrumPlot::attachToPicker(specCanvasItem* item)
+{
+	if (correctionPicker)
+		correctionPicker->addSelectable(item) ;
+}
+
+void specSpectrumPlot::detachFromPicker(specCanvasItem* item)
+{
+	if (correctionPicker)
+		correctionPicker->removeSelectable(item) ;
 }
 
 void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double y)
@@ -400,6 +429,8 @@ void specSpectrumPlot::multipleSubtraction()
 		referenceSpectrum[reference->sample(i).x()] = reference->sample(i).y() ;
 	// TODO more efficient undo:  generate added/subtracted spectrum (interpolated points included)
 	specMultiCommand* subCommand = new specMultiCommand ;
+	if (view && view->model())
+		subCommand->setParentObject(view->model());
 	for (int i = 0 ; i < spectra.size() ; ++i)
 	{
 		specDataItem* spectrum = dynamic_cast<specDataItem*>(spectra[i]) ;
@@ -427,10 +458,21 @@ void specSpectrumPlot::multipleSubtraction()
 		spectrum->reverseCorrection(data) ;
 		specExchangeDataCommand *command = new specExchangeDataCommand(subCommand) ;
 		if (view && view->model())
+		{
+			command->setParentObject(view->model());
 			command->setItem(view->model()->index(spectrum),data);
+		}
 	}
 
-	subCommand->setParentObject(view) ;
+	subCommand->setParentObject(view->model()) ;
 	undoPartner()->push(subCommand) ;
 	replot() ;
+}
+
+QList<QAction*> specSpectrumPlot::actions()
+{
+	return specPlot::actions() << correctionActions->actions()
+				   << setReferenceAction
+				   << alignmentActions->actions()
+				   << subInterpolatedAction ;
 }

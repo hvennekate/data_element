@@ -13,6 +13,8 @@ specAverageDataAction::specAverageDataAction(QObject *parent) :
     specUndoAction(parent)
 {
 	setIcon(QIcon(":/ave.png")) ;
+	setToolTip(tr("Average Data")) ;
+	setWhatsThis(tr("Smooth data by averaging.  You can choose between plainly averaging any number of data points or calculating a moving average."));
 }
 
 void specAverageDataAction::execute()
@@ -83,7 +85,7 @@ void specAverageDataAction::execute()
 		}
 		item->reverseCorrection(newData);
 		specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
-		command->setParentObject(view) ;
+		command->setParentObject(view->model()) ;
 		command->setItem(index,newData);
 //		QVector<int> take, leave ;
 //		for (int i = 0 ; i < oldData.size() ; ++i)

@@ -3,7 +3,6 @@
 
 #include <QMainWindow>
 #include <QtGui>
-#include <QObject>
 #include <QList>
 #include "specplotwidget.h"
 #include <QSettings>
@@ -36,6 +35,8 @@ private:
 	QAction *newAction;
 	QAction *openAction;
 	QList<specPlotWidget*> docks ;
+private slots:
+	void about() ;
 };
 
 #endif

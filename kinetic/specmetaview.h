@@ -12,6 +12,8 @@ class specMetaView : public specView
 	specView *dataView ;
 	type typeId() const { return specStreamable::metaView ; }
 	specActionLibrary* undoPartner ;
+protected:
+	void readFromStream(QDataStream &in) ;
 public:
 	explicit specMetaView(QWidget *parent = 0);
 	~specMetaView() ;

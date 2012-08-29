@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>dataItemProperties</class>
+ <widget class="QDialog" name="dataItemProperties">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>559</width>
+    <height>479</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="specSplitter" name="splitter">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <widget class="QwtPlot" name="dataPreview"/>
+     <widget class="QWidget" name="layoutWidget">
+      <layout class="QHBoxLayout" name="horizontalLayout">
+       <item>
+        <widget class="QTableWidget" name="dataWidget">
+         <property name="columnCount">
+          <number>3</number>
+         </property>
+         <column>
+          <property name="text">
+           <string>x-value</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>y-value</string>
+          </property>
+         </column>
+         <column>
+          <property name="text">
+           <string>max. intensity</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item>
+        <widget class="QWidget" name="correctionWidget" native="true">
+         <layout class="QGridLayout" name="gridLayout">
+          <item row="2" column="0">
+           <widget class="QLabel" name="scalingLabel">
+            <property name="text">
+             <string>Scaling &lt;i&gt; a&lt;/i&gt;</string>
+            </property>
+            <property name="buddy">
+             <cstring>scalingValue</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QLabel" name="offsetLabel">
+            <property name="text">
+             <string>Offset &lt;i&gt;b&lt;/i&gt;</string>
+            </property>
+            <property name="buddy">
+             <cstring>offsetValue</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QDoubleSpinBox" name="offsetValue"/>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="slopeLabel">
+            <property name="text">
+             <string>Slope &lt;i&gt;c&lt;/i&gt;</string>
+            </property>
+            <property name="buddy">
+             <cstring>slopeValue</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="1">
+           <widget class="QDoubleSpinBox" name="slopeValue"/>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="xShiftLabel">
+            <property name="text">
+             <string>&lt;i&gt;x&lt;/i&gt;-Shift &lt;i&gt;x&lt;sub&gt;0&lt;/sub&gt;&lt;/i&gt;</string>
+            </property>
+            <property name="buddy">
+             <cstring>xShiftValue</cstring>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QDoubleSpinBox" name="xShiftValue"/>
+          </item>
+          <item row="1" column="0" colspan="2">
+           <widget class="QLabel" name="formulaLabel">
+            <property name="text">
+             <string>&lt;b&gt;Correction:&lt;/b&gt; &lt;i&gt;y&lt;/i&gt; ' = &lt;i&gt;a y&lt;/i&gt; + &lt;i&gt;b&lt;/i&gt; + &lt;i&gt;c&lt;/i&gt; (&lt;i&gt;x&lt;/i&gt; + &lt;i&gt;x&lt;sub&gt;0&lt;/sub&gt;&lt;/i&gt;)</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QDoubleSpinBox" name="scalingValue"/>
+          </item>
+          <item row="6" column="0">
+           <spacer name="verticalSpacer">
+            <property name="orientation">
+             <enum>Qt::Vertical</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>20</width>
+              <height>40</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+         </layout>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QwtPlot</class>
+   <extends>QFrame</extends>
+   <header>qwt_plot.h</header>
+  </customwidget>
+  <customwidget>
+   <class>specSplitter</class>
+   <extends>QSplitter</extends>
+   <header>specsplitter.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>dataWidget</tabstop>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>scalingValue</tabstop>
+  <tabstop>offsetValue</tabstop>
+  <tabstop>slopeValue</tabstop>
+  <tabstop>xShiftValue</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>dataItemProperties</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>222</x>
+     <y>464</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>dataItemProperties</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>290</x>
+     <y>470</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>scalingValue</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>dataItemProperties</receiver>
+   <slot>refreshPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>467</x>
+     <y>286</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>473</x>
+     <y>478</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>offsetValue</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>dataItemProperties</receiver>
+   <slot>refreshPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>503</x>
+     <y>312</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>439</x>
+     <y>479</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>slopeValue</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>dataItemProperties</receiver>
+   <slot>refreshPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>490</x>
+     <y>339</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>333</x>
+     <y>480</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>xShiftValue</sender>
+   <signal>valueChanged(double)</signal>
+   <receiver>dataItemProperties</receiver>
+   <slot>refreshPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>529</x>
+     <y>366</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>566</x>
+     <y>367</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dataWidget</sender>
+   <signal>currentCellChanged(int,int,int,int)</signal>
+   <receiver>dataItemProperties</receiver>
+   <slot>refreshPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>89</x>
+     <y>379</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>79</x>
+     <y>476</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dataWidget</sender>
+   <signal>itemSelectionChanged()</signal>
+   <receiver>dataItemProperties</receiver>
+   <slot>refreshPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>41</x>
+     <y>300</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>0</x>
+     <y>249</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>dataWidget</sender>
+   <signal>itemChanged(QTableWidgetItem*)</signal>
+   <receiver>dataItemProperties</receiver>
+   <slot>refreshPlot()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>336</x>
+     <y>296</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>557</x>
+     <y>239</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>refreshPlot()</slot>
+ </slots>
+</ui>

@@ -10,6 +10,12 @@ specAppWindow::specAppWindow()
 	createMenus();
 	createToolBars();
 	restoreGeometry(settings.value("mainWindow/geometry").toByteArray()) ;
+
+	setObjectName("specDataElementApplicationWindow") ;
+	setWindowTitle("SpecDataElement");
+	setWindowFlags(windowFlags() | Qt::WindowContextHelpButtonHint);
+
+	setWhatsThis("This is the main application window.  It can be used for docking data windows, log windows, and kinetic windows to it. to it.\nStart by creating a new file or by opening a saved file. Use the \"What's this?\" help from the title bar for further hints.");
 }
 
 
@@ -62,12 +68,12 @@ void specAppWindow::openFile()
 
 void specAppWindow::createActions()
 {
-	newAction = new QAction(QIcon(":/filenew.png"), tr("&New"), this);
+	newAction = new QAction(QIcon::fromTheme("document-new"), tr("&New"), this);
 	newAction->setShortcut(tr("Ctrl+N"));
 	newAction->setStatusTip(tr("Create a new file"));
 	connect(newAction, SIGNAL(triggered()), this, SLOT(newFile()));
 	
-	openAction = new QAction(QIcon(":/fileopen.png"), tr("&Open"), this);
+	openAction = new QAction(QIcon::fromTheme("document-open"), tr("&Open"), this);
 	openAction->setShortcut(tr("Ctrl+O"));
 	openAction->setStatusTip(tr("Open an existing file"));
 	connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
@@ -85,5 +91,18 @@ void specAppWindow::createMenus()
 	fileMenu = menuBar()->addMenu(tr("&File"));
 	fileMenu->addAction(newAction);
 	fileMenu->addAction(openAction);
+
+	helpMenu = menuBar()->addMenu(tr("&Help")) ;
+	QAction *aboutQtAction = new QAction(tr("About &Qt..."),helpMenu) ;
+	helpMenu->addAction(aboutQtAction) ;
+	QAction *aboutAction = new QAction(tr("&About..."),helpMenu) ;
+	helpMenu->addAction(aboutAction) ;
+	connect(aboutQtAction, SIGNAL(triggered()),qApp,SLOT(aboutQt())) ;
+	connect(aboutAction, SIGNAL(triggered()), this, SLOT(about())) ;
+}
+
+void specAppWindow::about()
+{
+	QMessageBox::about(this, tr("About SpecDataElement"), tr("This is a simple program for efficiently managing two dimensional data and keeping track of experimental logs.")) ;
 }
 

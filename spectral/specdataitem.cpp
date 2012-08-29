@@ -2,6 +2,8 @@
 #include <QVariant>
 #include <utility-functions.h>
 #include <algorithm>
+#include "dataitemproperties.h"
+#include "specplot.h"
 
 
 void specDataItem::applyCorrection(specDataPoint& point) const
@@ -347,7 +349,37 @@ void specDataItem::setData(const QVector<specDataPoint> &newData)
 	invalidate();
 }
 
-specUndoCommand *specDataItem::itemPropertiesAction()
+specDataItem::specDataItem(const specDataItem &other)
+	: specModelItem(0,other.descriptor("",true)),
+	  offset(other.offset),
+	  slope(other.slope),
+	  factor(other.factor),
+	  xshift(other.xshift),
+	  description(other.description),
+	  data(other.data)
 {
+}
 
+specUndoCommand *specDataItem::itemPropertiesAction(QObject *parentObject)
+{
+	dataItemProperties propertiesDialog(this) ;
+	propertiesDialog.exec() ;
+	if (propertiesDialog.result() != QDialog::Accepted) return 0 ;
+	return propertiesDialog.changeCommands(parentObject) ;
+}
+
+void specDataItem::attach(QwtPlot *pl)
+{
+	specModelItem::attach(pl) ;
+	specPlot *p = qobject_cast<specPlot*>(plot()) ;
+	if (p)
+		p->attachToPicker(this) ;
+}
+
+void specDataItem::detach()
+{
+	specPlot *p = qobject_cast<specPlot*>(plot()) ;
+	if (p)
+		p->detachFromPicker(this) ;
+	specModelItem::detach() ;
 }

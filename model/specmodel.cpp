@@ -685,7 +685,7 @@ bool specModel::dropMimeData(const QMimeData *data,
 		if (dropBuddy)
 		{
 			specAddFolderCommand *command = new specAddFolderCommand ;
-			command->setParentObject(dropSource) ;
+			command->setParentObject(this) ;
 			command->setItems(newIndexes) ;
 			dropBuddy->push(command);
 		}
@@ -819,8 +819,8 @@ void specModel::svgMoved(specCanvasItem *i, int point, double x, double y)
 
 	specResizeSVGcommand *command = new specResizeSVGcommand ;
 	command->setParentObject(this) ;
-	command->setItem(index(item)) ;
 	item->pointMoved(point,x,y) ;
+	command->setItem(index(item), item->getBounds()) ;
 	command->undo();
 	dropBuddy->push(command) ;
 }

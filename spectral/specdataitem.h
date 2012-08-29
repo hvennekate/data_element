@@ -11,6 +11,7 @@
 /*! List item which holds data.*/
 class specDataItem : public specModelItem
 {
+	friend class dataItemProperties ;
 private:
 	double offset, slope, factor, xshift ;
 	int zeroMultiplications ;
@@ -29,6 +30,7 @@ public:
 	specDataItem(const QVector<specDataPoint> &data, // TODO change to reference/pointer
 		     const QHash<QString,specDescriptor> &description, // TODO change to reference/pointer
 		     specFolderItem* par=0, QString tag="");
+	specDataItem(const specDataItem&) ;
 	specDataItem() ;
 	/*! Copy constructor necessary because it is disabled in QwtPlotItem */
 //	specDataItem(const specDataItem&) ;
@@ -61,13 +63,17 @@ public:
 	QVector<double> intensityData() const ;
 	void refreshPlotData() ;
 
+	/* for plot picker*/
+	void attach(QwtPlot *plot) ;
+	void detach() ;
+
 	/* not reviewed */
 	void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) const ;
 
 	/* Functions to be deleted soon: */
 	void subMap(const QMap<double, double>&) ;
 	int removeData(QList<specRange*>*) ; // TODO remove
-	specUndoCommand *itemPropertiesAction() ;
+	specUndoCommand *itemPropertiesAction(QObject *parentObject) ;
 };
 
 #endif

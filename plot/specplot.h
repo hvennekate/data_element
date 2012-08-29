@@ -29,28 +29,27 @@ private:
 	void writeToStream(QDataStream &out) const ;
 	type typeId() const {return specStreamable::mainPlot ;}
 	specActionLibrary *undoP ;
+	void resizeEvent(QResizeEvent *e) ;
 protected:
 	specView *view ;
 	specActionLibrary* undoPartner() const ;
-private slots:
-	void resizeSVG(specCanvasItem*, int point, double x, double y) ;
-	void modifyingSVGs(const bool&) ;
 public:
 	explicit specPlot ( QWidget *parent=NULL );
 	~specPlot();
-	specZoomer *zoomer() ;
+	QAction* svgAction() const ;
 	CanvasPicker *metaPicker() ;
 	CanvasPicker *svgPicker() ;
 	virtual QList<QAction*> actions() ;
 	void setView(specView* mod) ;
 	void setUndoPartner(specActionLibrary* lib) ;
+	virtual void attachToPicker(specCanvasItem*) ;
+	virtual void detachFromPicker(specCanvasItem*) ;
 signals:
 	void startingReplot() ;
 	void replotted() ;
 	void metaRangeModified(specCanvasItem*,int,double,double) ;
 public slots :
 	void replot() ;
-	void changeTextLabel() ;
 };
 
 #endif

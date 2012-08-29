@@ -96,7 +96,7 @@ specManageItemsCommand::~specManageItemsCommand()
 void specManageItemsCommand::parentAssigned()
 {
 	if (!parentObject()) return ;
-	specModel *model = (specModel*) (((QAbstractItemView*) parentObject())->model()) ;
+	specModel *model = (specModel*) parentObject() ;
 	foreach(specGenealogy* genealogy, items)
 		genealogy->setModel(model) ;
 }

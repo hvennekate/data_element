@@ -2,16 +2,30 @@
 #include "specplot.h"
 #include "canvaspicker.h"
 #include <QSvgRenderer>
+#include "svgitemproperties.h"
 
-void specSVGItem::attach(QwtPlot *plot)
+void specSVGItem::attach(QwtPlot *newPlot)
 {
-	image.attach(plot) ;
-	specCanvasItem::attach(plot) ;
-	highlight(highlighting) ;
+	detach() ;
+	image.attach(newPlot) ;
+	specCanvasItem::attach(newPlot) ;
+	specPlot* nPlot = qobject_cast<specPlot*>(newPlot) ;
+	if (nPlot && nPlot->svgPicker())
+		nPlot->svgPicker()->addSelectable(this) ;
+}
+
+void specSVGItem::detach()
+{
+	if (!plot()) return ;
+	specPlot* oldPlot = qobject_cast<specPlot*>(plot()) ;
+	if (oldPlot && oldPlot->svgPicker())
+		oldPlot->svgPicker()->removeSelectable(this);
+	image.detach();
 }
 
 void specSVGItem::highlight(bool highlight)
 {
+	qDebug() << "highlighting" << highlight << this;
 	highlighting = highlight ;
 	QVector<QPointF> points(specSVGItem::size) ;
 	QRectF br = boundRect() ;
@@ -23,18 +37,12 @@ void specSVGItem::highlight(bool highlight)
 	else
 		setSymbol(new QwtSymbol(QwtSymbol::Ellipse,QBrush(Qt::black),QPen(Qt::white),QSize(5,5))) ;
 
-	specPlot *sp = qobject_cast<specPlot*> plot() ; // TODO make function (also specMetaRange)
-	if (sp && sp->svgPicker())
-	{
-		if (highlight) sp->svgPicker()->addSelectable(this) ;
-		else sp->svgPicker()->removeSelectable(this) ;
-	}
 }
 
 specSVGItem::specSVGItem(specFolderItem *par, QString description)
 	: specModelItem(par,description),
 	  highlighting(false),
-	  anchor(center)
+	  anchor(topLeft)
 {
 	ownBounds.width=qMakePair<qint8,qreal>(QwtPlot::axisCnt,0) ;
 	ownBounds.height=qMakePair<qint8,qreal>(QwtPlot::axisCnt,0) ;
@@ -50,7 +58,7 @@ void specSVGItem::setImage(const QByteArray &newData)
 	ownBounds.height = qMakePair<qint8,qreal>(QwtPlot::yLeft, defaultSize.height()) ;
 	ownBounds.x = qMakePair<qint8,qreal>(QwtPlot::xBottom, 0) ;
 	ownBounds.y = qMakePair<qint8,qreal>(QwtPlot::yLeft, 0) ;
-	anchor = center ;
+	anchor = topLeft ;
 	data = newData ;
 }
 
@@ -86,9 +94,9 @@ QRectF specSVGItem::boundRect() const
 	// shift y
 	switch(anchor)
 	{
-	case bottom:
-	case bottomLeft:
-	case bottomRight:
+	case top:
+	case topLeft:
+	case topRight:
 		py -= h / 2 ;
 	case center:
 	case left:
@@ -104,7 +112,6 @@ void specSVGItem::setBoundRect(const QRectF &br)
 {
 	if (!plot()) return ;
 	QPointF anchorPoint = getPoint(anchor,br) ;
-	qDebug() << "anchor: " << anchorPoint ;
 	ownBounds.width.second = (ownBounds.width.first == QwtPlot::axisCnt) ?  br.width() :
 			(plot()->transform(ownBounds.width.first, br.width())
 			- plot()->transform(ownBounds.width.first, 0));
@@ -116,7 +123,6 @@ void specSVGItem::setBoundRect(const QRectF &br)
 			plot()->transform(ownBounds.x.first, anchorPoint.x()) ;
 	ownBounds.y.second = (ownBounds.y.first == QwtPlot::axisCnt) ? anchorPoint.y() :
 			plot()->transform(ownBounds.y.first, anchorPoint.y()) ;
-	qDebug() << "new bounds:" << ownBounds.x.second << ownBounds.y.second << ownBounds.width.second << ownBounds.height.second ;
 	highlight(highlighting) ;
 }
 
@@ -125,21 +131,21 @@ QPointF specSVGItem::getPoint(SVGCornerPoint point, const QRectF& br) const
 	switch (point)
 	{
 	case top:
-		return QPointF(br.center().x(),br.top()) ;
-	case bottom:
 		return QPointF(br.center().x(),br.bottom()) ;
+	case bottom:
+		return QPointF(br.center().x(),br.top()) ;
 	case left:
 		return QPointF(br.left(),br.center().y()) ;
 	case right:
 		return QPointF(br.right(),br.center().y()) ;
 	case topLeft:
-		return br.topLeft() ;
-	case topRight:
-		return br.topRight() ;
-	case bottomLeft:
 		return br.bottomLeft() ;
-	case bottomRight:
+	case topRight:
 		return br.bottomRight() ;
+	case bottomLeft:
+		return br.topLeft() ;
+	case bottomRight:
+		return br.topRight() ;
 	case center:
 		return br.center() ;
 	default: ;
@@ -174,33 +180,39 @@ void specSVGItem::pointMoved(const int & p, const double &x, const double &y)
 	if (point == undefined) return ;
 	if (!plot()) return ;
 	QRectF br = boundRect() ;
-	qDebug() << "old boundingrect:" << br ;
 	QPointF newPoint(x,y) ;
-	QPointF diff(getPoint(anchor,br)- newPoint) ;
-	double aspectRatio = br.width()/br.height() ;
+
+	if ((point == topLeft ||
+	    point == topRight ||
+	    point == bottomLeft ||
+	    point == bottomRight) &&
+		br.width() && br.height())
+	{
+		QPointF oldPoint(getPoint(point,br)) ;
+		QPointF diff(newPoint - oldPoint) ;
+		if (point == bottomRight || point == topLeft)
+			diff.setY(-diff.y()) ;
+		if (br.height()*diff.x() < br.width()*diff.y())
+			diff.setX(diff.y()*br.width()/br.height());
+		else
+			diff.setY(diff.x()*br.height()/br.width());
+		if (point == bottomRight || point == topLeft)
+			diff.setY(-diff.y()) ;
+		newPoint = oldPoint + diff ;
+	}
+
 	switch (point)
 	{
 	case center:	br.moveCenter(newPoint); break ;
 	case left:	br.setLeft(x); break ;
 	case right:	br.setRight(x); break ;
-	case top:	br.setTop(y) ; break ;
-	case bottom:	br.setBottom(y) ; break ;
-	case topLeft:	br.setTopLeft(newPoint) ; break ;
-	case topRight:	br.setTopRight(newPoint) ; break ;
-	case bottomLeft:	br.setBottomLeft(newPoint) ; break ;
-	case bottomRight:	br.setBottomRight(newPoint) ; break ;
+	case top:	br.setBottom(y) ; break ;
+	case bottom:	br.setTop(y) ; break ;
+	case topLeft:	br.setBottomLeft(newPoint) ; break ;
+	case topRight:	br.setBottomRight(newPoint) ; break ;
+	case bottomLeft:	br.setTopLeft(newPoint) ; break ;
+	case bottomRight:	br.setTopRight(newPoint) ; break ;
 	default: ;
-	}
-	qDebug() << "new boundingrect:" << br ;
-	if (point == topLeft ||
-	    point == topRight ||
-	    point == bottomLeft ||
-	    point == bottomRight)
-	{
-		if (br.width()/br.height() < aspectRatio)
-			br.setWidth(br.height()*aspectRatio);
-		else
-			br.setHeight(br.width()/aspectRatio) ;
 	}
 	setBoundRect(br.normalized()) ;
 }
@@ -228,4 +240,26 @@ QDataStream& operator>>(QDataStream& in, specSVGItem::bounds& b)
 QIcon specSVGItem::decoration() const
 {
 	return QIcon::fromTheme("image-x-generic") ;
+}
+
+specUndoCommand* specSVGItem::itemPropertiesAction(QObject *parentObject)
+{
+	svgItemProperties propertiesDialog(this) ;
+	if (propertiesDialog.exec() != QDialog::Accepted) return 0 ;
+	return propertiesDialog.generateCommand(parentObject) ;
+}
+
+specSVGItem::SVGCornerPoint specSVGItem::setAnchor(const SVGCornerPoint & p)
+{
+	SVGCornerPoint old = anchor ;
+	anchor = p ;
+	return old ;
+}
+
+bool specSVGItem::bounds::operator ==(const specSVGItem::bounds& other) const
+{
+	return x      == other.x     &&
+	       y      == other.y     &&
+	       width  == other.width &&
+	       height == other.height ;
 }

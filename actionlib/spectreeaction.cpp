@@ -7,6 +7,8 @@ specTreeAction::specTreeAction(QObject *parent) :
 	specUndoAction(parent)
 {
 	setIcon(QIcon(":/tree.png")) ;
+	setToolTip(tr("Set up a directory tree")) ;
+	setWhatsThis(tr("Generates a tree of directories and moves the selected items into those directories.  The columns in this dock window's list will be used from left to right to establish the level of folders within the tree."));
 }
 
 void specTreeAction::execute()
@@ -69,7 +71,7 @@ void specTreeAction::execute()
 
 	specAddFolderCommand *insertion = new specAddFolderCommand(command) ;
 	insertion->setItems(QModelIndexList() << model->index(row,0,index)) ;
-	insertion->setParentObject(view) ;
+	insertion->setParentObject(model) ;
 
 	library->push(command);
 

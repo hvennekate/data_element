@@ -12,6 +12,8 @@ specAddSVGItemAction::specAddSVGItemAction(QObject *parent) :
     specUndoAction(parent)
 {
 	setIcon(QIcon::fromTheme("insert-image")) ;
+	setToolTip(tr("Add SVG image")) ;
+	setWhatsThis(tr("Insert an image to be displayed as an annotation to the plot canvas.  Currently, SVG images are supported.")) ;
 }
 
 const std::type_info &specAddSVGItemAction::possibleParent()
@@ -31,7 +33,7 @@ void specAddSVGItemAction::execute()
 	specSVGItem *newItem = new specSVGItem() ;
 	newItem->setImage(fileContent) ; // TODO remove
 
-	specDataView *currentView = (specDataView*) parent() ; // TODO consolidate with addfolderaction
+	specView *currentView = (specView*) parent() ; // TODO consolidate with addfolderaction
 	specModel *model = currentView->model() ;
 	QModelIndex index = currentView->currentIndex() ;
 	specModelItem *item = model->itemPointer(index) ;
@@ -51,7 +53,7 @@ void specAddSVGItemAction::execute()
 	specAddFolderCommand *command = new specAddFolderCommand ;
 	command->setItems(QModelIndexList() << model->index(row,0,index)) ;
 
-	command->setParentObject((QWidget*)parent()) ;
+	command->setParentObject(model) ;
 
 	if (command->ok())
 		library->push(command) ;

@@ -4,11 +4,12 @@
 #include "specplot.h"
 #include <QHash>
 #include <QList>
-#include <QActionGroup>
-#include "specrange.h"
-#include "specdataitem.h"
 
+class QActionGroup ;
 class specMultiCommand ;
+class specRange ;
+class specDataItem ;
+class specModelItem ;
 
 class specSpectrumPlot : public specPlot
 {
@@ -18,7 +19,6 @@ private:
 		*offlineAction,
 		*scaleAction,
 		*shiftAction,
-		*printAction,
 		*setReferenceAction,
 		*alignWithReferenceAction,
 		*addRangeAction,
@@ -40,8 +40,11 @@ private:
 
 public:
 	explicit specSpectrumPlot(QWidget *parent = 0);
-	QList<QAction*> actions() { return specPlot::actions() << correctionActions->actions() << setReferenceAction << alignmentActions->actions() << printAction ; }
+	QList<QAction*> actions() ;
 	static specMultiCommand* generateCorrectionCommand(const QwtPlotItemList& zeroRanges, const QwtPlotItemList& spectra, const QMap<double, double>& referenceSpectrum, specView*, bool noSlope = false) ;
+
+	void attachToPicker(specCanvasItem*) ;
+	void detachFromPicker(specCanvasItem*) ;
 signals:
 
 private slots:
@@ -50,6 +53,7 @@ private slots:
 	void pointMoved(specCanvasItem*,int point, double x, double y) ;
 	void applyZeroRanges(specCanvasItem* range,int point, double x, double y) ;
 	void multipleSubtraction() ;
+	void setReference() ;
 };
 
 #endif // SPECSPECTRUMPLOT_H

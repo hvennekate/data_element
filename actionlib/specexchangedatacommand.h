@@ -14,6 +14,8 @@ private:
 	void readFromStream(QDataStream &in);
 	void doIt();
 	void undoIt() ;
+	void parentAssigned();
+
 	type typeId() const { return specStreamable::exchangeDataCommandId  ; }
 public:
 	explicit specExchangeDataCommand(specUndoCommand *parent = 0) ;

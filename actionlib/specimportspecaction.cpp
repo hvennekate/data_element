@@ -8,6 +8,8 @@ specImportSpecAction::specImportSpecAction(QObject *parent) :
     specUndoAction(parent)
 {
 	setIcon(QIcon(":/fileimport.png"));
+	setToolTip(tr("Import files")) ;
+	setWhatsThis(tr("Import data files.  Use this button to get started by directly importing data."));
 }
 
 const std::type_info &specImportSpecAction::possibleParent()
@@ -46,7 +48,7 @@ void specImportSpecAction::execute()
 	for (int i = 0 ; i < importedItems.size() ; ++i)
 		newIndexes << model->index(row+i,0,index) ;
 	command->setItems(newIndexes) ;
-	command->setParentObject(currentView) ;
+	command->setParentObject(currentView->model()) ;
 
 	if (command->ok())
 		library->push(command) ;

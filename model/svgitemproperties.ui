@@ -1,0 +1,362 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>svgItemProperties</class>
+ <widget class="QDialog" name="svgItemProperties">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>604</width>
+    <height>430</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QGridLayout" name="gridLayout_3">
+   <item row="0" column="0" rowspan="2">
+    <widget class="QSvgWidget" name="itemPreview" native="true">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>300</width>
+       <height>300</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="0" column="1">
+    <widget class="QGroupBox" name="groupBox">
+     <property name="title">
+      <string>Anchor Point</string>
+     </property>
+     <property name="flat">
+      <bool>false</bool>
+     </property>
+     <property name="checkable">
+      <bool>false</bool>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
+      <item row="0" column="0">
+       <widget class="QRadioButton" name="topLeftRadio">
+        <property name="text">
+         <string>Top Left</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string>anchorRadioButtons</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QRadioButton" name="topRadio">
+        <property name="text">
+         <string>Top</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string>anchorRadioButtons</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="QRadioButton" name="topRightRadio">
+        <property name="text">
+         <string>TopRight</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string>anchorRadioButtons</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QRadioButton" name="leftRadio">
+        <property name="text">
+         <string>Left</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string>anchorRadioButtons</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QRadioButton" name="centerRadio">
+        <property name="text">
+         <string>Center</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string>anchorRadioButtons</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="QRadioButton" name="rightRadio">
+        <property name="text">
+         <string>Right</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string>anchorRadioButtons</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QRadioButton" name="bottomLeftRadio">
+        <property name="text">
+         <string>Bottom Left</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string>anchorRadioButtons</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QRadioButton" name="bottomRadio">
+        <property name="text">
+         <string>Bottom</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string>anchorRadioButtons</string>
+        </attribute>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QRadioButton" name="bottomRightRadio">
+        <property name="text">
+         <string>Bottom Right</string>
+        </property>
+        <attribute name="buttonGroup">
+         <string>anchorRadioButtons</string>
+        </attribute>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="1" column="1">
+    <widget class="QGroupBox" name="groupBox_2">
+     <property name="title">
+      <string>Dimensions</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="0" column="0">
+       <widget class="QLabel" name="xLabel">
+        <property name="text">
+         <string>x</string>
+        </property>
+        <property name="buddy">
+         <cstring>xValue</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="yLabel">
+        <property name="text">
+         <string>y</string>
+        </property>
+        <property name="buddy">
+         <cstring>yValue</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="widthLabel">
+        <property name="text">
+         <string>Width</string>
+        </property>
+        <property name="buddy">
+         <cstring>widthValue</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QLabel" name="heightLabel">
+        <property name="text">
+         <string>Height</string>
+        </property>
+        <property name="buddy">
+         <cstring>heightValue</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QDoubleSpinBox" name="xValue">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QDoubleSpinBox" name="yValue">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QDoubleSpinBox" name="widthValue">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="1">
+       <widget class="QDoubleSpinBox" name="heightValue">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="2">
+       <widget class="specSvgUnitButton" name="xPixelsButton">
+        <property name="text">
+         <string>Axis Units</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="2">
+       <widget class="specSvgUnitButton" name="yPixelsButton">
+        <property name="text">
+         <string>Axis Units</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="specSvgUnitButton" name="widthPixelsButton">
+        <property name="text">
+         <string>Axis Units</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="specSvgUnitButton" name="heightPixelsButton">
+        <property name="text">
+         <string>Axis Units</string>
+        </property>
+        <property name="checkable">
+         <bool>true</bool>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="2" column="1">
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>QSvgWidget</class>
+   <extends>QWidget</extends>
+   <header>QSvgWidget</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>specSvgUnitButton</class>
+   <extends>QPushButton</extends>
+   <header>specsvgunitbutton.h</header>
+  </customwidget>
+ </customwidgets>
+ <tabstops>
+  <tabstop>buttonBox</tabstop>
+  <tabstop>topLeftRadio</tabstop>
+  <tabstop>topRadio</tabstop>
+  <tabstop>topRightRadio</tabstop>
+  <tabstop>leftRadio</tabstop>
+  <tabstop>centerRadio</tabstop>
+  <tabstop>rightRadio</tabstop>
+  <tabstop>bottomLeftRadio</tabstop>
+  <tabstop>bottomRadio</tabstop>
+  <tabstop>bottomRightRadio</tabstop>
+  <tabstop>xValue</tabstop>
+  <tabstop>xPixelsButton</tabstop>
+  <tabstop>yValue</tabstop>
+  <tabstop>yPixelsButton</tabstop>
+  <tabstop>widthValue</tabstop>
+  <tabstop>widthPixelsButton</tabstop>
+  <tabstop>heightValue</tabstop>
+  <tabstop>heightPixelsButton</tabstop>
+ </tabstops>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>svgItemProperties</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>332</x>
+     <y>401</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>svgItemProperties</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>400</x>
+     <y>401</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <buttongroups>
+  <buttongroup name="anchorRadioButtons"/>
+ </buttongroups>
+</ui>

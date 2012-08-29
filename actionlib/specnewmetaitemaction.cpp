@@ -8,6 +8,8 @@ specNewMetaItemAction::specNewMetaItemAction(QObject *parent) :
     specUndoAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("document-new")) ;
+	setToolTip(tr("New item"));
+	setWhatsThis(tr("Create a new item in this dock window's list."));
 }
 
 const std::type_info &specNewMetaItemAction::possibleParent()
@@ -27,10 +29,10 @@ void specNewMetaItemAction::execute()
 	{
 		row = index.row()+1 ;
 		index = index.parent() ;
-
 	}
 
 	specMetaItem *pointer = new specMetaItem ;
+	pointer->setModels(model,view->getDataView()->model());
 	if (! model->insertItems(QList<specModelItem*>() << pointer, index,row))
 	{
 		delete pointer ;
@@ -38,7 +40,7 @@ void specNewMetaItemAction::execute()
 	}
 	specAddFolderCommand *command = new specAddFolderCommand ;
 	command->setItems(QModelIndexList() << model->index(pointer)) ;
-	command->setParentObject((QWidget*) parent()) ;
+	command->setParentObject(model) ;
 
 	if (command->ok())
 		library->push(command) ;

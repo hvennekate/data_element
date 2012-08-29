@@ -13,11 +13,14 @@
 #include <QLineEdit>
 #include <QDoubleValidator>
 #include <QScrollArea>
+#include <QLabel>
 
 specMergeAction::specMergeAction(QObject *parent)
 	: specUndoAction(parent)
 {
 	setIcon(QIcon(":/merge.png")) ;
+	setToolTip(tr("Merge items")) ;
+	setWhatsThis(tr("Merge selected data items.  You may define criteria and processing options for merging."));
 }
 
 void specMergeAction::execute()
@@ -120,13 +123,13 @@ void specMergeAction::execute()
 	specAddFolderCommand *insertionCommand = new specAddFolderCommand(command) ;
 	QModelIndexList insertList = model->indexList(newlyInserted.toList()) ;
 	insertionCommand->setItems(insertList) ;
-	insertionCommand->setParentObject(view) ;
+	insertionCommand->setParentObject(view->model()) ;
 
 	// prepare to delete the old items
 	specDeleteCommand *deletionCommand = new specDeleteCommand(command) ;
 	QModelIndexList deleteList = model->indexList(toBeDeleted.toList()) ;
 	deletionCommand->setItems(deleteList) ;
-	deletionCommand->setParentObject(view) ;
+	deletionCommand->setParentObject(view->model()) ;
 
 	library->push(command) ;
 }
@@ -140,22 +143,24 @@ bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, doubl
 	connect(buttons,SIGNAL(rejected()), descriptorMatch, SLOT(reject()));
 	QGridLayout *descriptorLayout = new QGridLayout ;
 	QVBoxLayout *dialogLayout = new QVBoxLayout ;
+	dialogLayout->addWidget(new QLabel(tr("Criteria selected below will be used (possibly including some numerical tolerance, if given) to determine whether items match and need to be merged."),descriptorMatch)) ;
 	//TODO Label fuer tolerance ...
+	descriptorLayout->addWidget(new QLabel(tr("To merge, ... must match"),descriptorMatch),0,0) ;
+	descriptorLayout->addWidget(new QLabel(tr("Numerical tolerance"), descriptorMatch),0,0);
 	for(QStringList::size_type i = 0 ; i < descriptors.size() ; i++)
 	{
-		descriptorLayout->addWidget(new QCheckBox(descriptors[i]),i,0) ;
-// 		((QCheckBox*) descriptorLayout->itemAt(descriptorLayout->count()-1)->widget())->setCheckState(Qt::Checked) ;
+		descriptorLayout->addWidget(new QCheckBox(descriptors[i]),i+1,0) ;
 		if(descriptorProperties[i] & spec::numeric)
 		{
 			QLineEdit *validatorLine = new QLineEdit("0") ;
 			validatorLine->setValidator(new QDoubleValidator(validatorLine)) ;
 			((QDoubleValidator*) validatorLine->validator())->setBottom(0) ;
-			descriptorLayout->addWidget(validatorLine,i,1) ;
+			descriptorLayout->addWidget(validatorLine,i+1,1) ;
 		}
 	}
 	QScrollArea *scrollArea = new QScrollArea ;
 	QWidget *areaWidget = new QWidget ;
-	QCheckBox *spectralAdaptation = new QCheckBox("Spektrale Angleichung",descriptorMatch) ;
+	QCheckBox *spectralAdaptation = new QCheckBox(tr("Try to align merged data sets\n using offset/slope correction"),descriptorMatch) ;
 	areaWidget->setLayout(descriptorLayout) ;
 	scrollArea->setWidget(areaWidget) ;
 	dialogLayout->addWidget(scrollArea) ;
@@ -165,7 +170,7 @@ bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, doubl
 	bool retval = descriptorMatch->exec() ;
 
 // 	QList<QPair<QStringList::size_type, double> > toCompare ;
-	for (int i = 0 ; i < descriptorLayout->count() ; i++)
+	for (int i = 1 ; i < descriptorLayout->count() ; i++)
 	{
 		int row, column, rowspan, columnspan ;
 		descriptorLayout->getItemPosition(i, &row, &column, &rowspan, &columnspan) ;
