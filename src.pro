@@ -200,9 +200,7 @@ CONFIG += warn_on \
 unix {
 INCLUDEPATH += . \
     /usr/include/qwt
-LIBS += -lqwt \
-    -lcln \
-    -lginac
+LIBS += -lqwt
 }
 #win32 {
 #INCLUDEPATH += . \

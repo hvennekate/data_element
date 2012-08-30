@@ -18,7 +18,7 @@ void specMetaParser::clear()
 	foreach(specMetaVariable* var, evaluators)
 		delete var ;
 	evaluators.clear();
-	symbols.remove_all() ;
+	symbols.clear();
 	errors.clear();
 
 }
@@ -78,7 +78,7 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 			valid = false ;
 			continue ;
 		}
-		symbols.append(GiNaC::symbol(symbol.toStdString())) ;
+		symbols << symbol ;
 		evaluators << specMetaVariable::factory(value,this) ;
 	}
 	x = prepare(xExpression) ;
@@ -155,11 +155,14 @@ bool specMetaParser::ok() const
 	return valid ;
 }
 
-GiNaC::ex specMetaParser::prepare(const QString &val)
+Parser specMetaParser::prepare(const QString &val)
 {
-	GiNaC::ex retVal ;
+	mu::Parser retVal ;
 	try
 	{
+		foreach(QString symbol, symbols)
+			retVal.DefineVar(symbol.toStdString(),);
+
 		GiNaC::symtab tab ;
 		foreach(GiNaC::ex expr, symbols)
 		{
@@ -222,11 +225,10 @@ void specMetaParser::setRange(int variableNo, int rangeNo, int pointNo, double n
 	if (parent)
 	{
 		QStringList descriptor;
-		GiNaC::container<std::list>::const_iterator j = symbols.begin() ;
+		QStringList::const_iterator j = symbols.begin() ;
 		for (QList<specMetaVariable*>::const_iterator i = evaluators.begin() ;
 			 i < evaluators.end() && j != symbols.end() ; ++i, ++j)
-			descriptor += QString::fromStdString(GiNaC::ex_to<GiNaC::symbol>(*j).get_name())
-					+ " = " + (*i)->codeValue() ; // TODO this is a pain...
+			descriptor += *j + " = " + (*i)->codeValue() ; // TODO this is a pain...
 		parent->changeDescriptor("variables", descriptor.join("\n")) ;
 		parent->setActiveLine("variables",variableNo) ;
 	}
