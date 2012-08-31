@@ -118,8 +118,6 @@ specUndoCommand* metaItemProperties::changedConnections(QObject *parent)
 	addCommand->setParentObject(parent) ;
 	indexList = generateConnectionList(newConnections) ;
 	addCommand->setItems(model->index(originalItem), indexList) ;
-	qDebug() << "returning:" << parentCommand << "delete:" << deleteCommand << "add:" << addCommand ;
-	qDebug() << "oldItems:" << originalItem->items << "new items:" << newConnections ;
 	return parentCommand ;
 }
 

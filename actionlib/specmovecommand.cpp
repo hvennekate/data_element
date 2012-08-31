@@ -25,7 +25,6 @@ void specMoveCommand::setItems(QModelIndexList &sources, const QModelIndex &targ
 		number += count ;
 	}
 	specModel* model = ((specView*) parentObject())->model() ; // TODO put into function
-	qDebug() << "Model for move" << model << target ;
 	specModelItem* targetFolder = (specFolderItem*) model->itemPointer(targetIndex.mid(1)) ;
 	if (!targetFolder->isFolder())
 		targetFolder = targetFolder->parent() ;

@@ -43,7 +43,6 @@ bool specManageConnectionsCommand::ok() const
 void specManageConnectionsCommand::restore()
 {
 	QVector<specModelItem*> pointers = itemPointers() ;
-	qDebug() << this << "restoring:" << pointers << "Genealogies:" << items;
 	specMetaItem* client = targetPointer() ;
 	foreach(specModelItem *pointer, pointers)
 		client->connectServer(pointer); // TODO consider removal from list if false is returned.
@@ -52,7 +51,6 @@ void specManageConnectionsCommand::restore()
 void specManageConnectionsCommand::take()
 {
 	QVector<specModelItem*> pointers = itemPointers() ;
-	qDebug() << this << "taking:" << pointers << "Genealogies:" << items;
 	specMetaItem* client = targetPointer() ;
 	foreach(specModelItem *pointer, pointers)
 		pointer->disconnectClient(client) ;

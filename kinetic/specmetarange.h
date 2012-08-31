@@ -22,6 +22,7 @@ public:
 	addressObject address() ;
 	void attach(QwtPlot *plot);
 	void detach();
+	~specMetaRange() ;
 };
 
 #endif // SPECMETARANGE_H

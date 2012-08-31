@@ -9,7 +9,6 @@ specMetaParser::specMetaParser(const QString &expressionList, const QString& xEx
 	: parent(par),
 	  changingRange(false)
 {
-	qDebug() << "creating parser" << this ;
 	setAssignments(expressionList, xExpression, yExpression) ;
 }
 
@@ -26,12 +25,10 @@ void specMetaParser::clear()
 
 void specMetaParser::setAssignments(const QString &expressionList, const QString& xExpression, const QString& yExpression)
 {
-	qDebug() << "setting assignments" ;
 	if (changingRange) return ;
 	valid = true ;
 	const QRegExp name("[a-zA-Z][a-zA-Z0-9]*") ;
 	clear() ;
-	qDebug() << "cleared old variables" ;
 	// Syntax:
 	//  [start:stop:incr]"string"
 	// oder:

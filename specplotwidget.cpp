@@ -249,7 +249,6 @@ void specPlotWidget::svgModification(bool mod)
 	if (mod) connect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
 	else disconnect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
 
-	qDebug() << "toggle highlight" << mod ;
 	plot->svgPicker()->highlightSelectable(mod) ;
 }
 

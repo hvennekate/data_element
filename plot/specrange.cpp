@@ -58,4 +58,5 @@ void specRange::refreshPlotData()
 
 specRange::~specRange()
 {
+	detach();
 }

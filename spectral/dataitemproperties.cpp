@@ -74,7 +74,6 @@ void dataItemProperties::refreshPlot()
 	item.factor = ui->scalingValue->value() ;
 
 	// get data from table
-	qDebug() << ui->dataWidget->item(0,1) ;
 
 	for (int i = 0 ; i < item.data.size() ; ++i)
 	{

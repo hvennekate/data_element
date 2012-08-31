@@ -44,8 +44,6 @@ void specResizeSVGcommand::doIt()
 	pointer->setBounds(other);
 	if (anchor != specSVGItem::undefined)
 		anchor = pointer->setAnchor(anchor) ;
-	qDebug() << "Old bounds:" << oldBounds.x.second << oldBounds.y.second << oldBounds.width.second << oldBounds.height.second ;
-	qDebug() << "New bounds:" << other.x.second << other.y.second << other.width.second << other.height.second ;
 	other = oldBounds ;
 	if (pointer->plot())
 		pointer->plot()->replot();

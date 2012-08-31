@@ -163,7 +163,6 @@ void changePlotStyleAction::actionTriggered(QAction* action)
 	}
 
 	if (!newCommand) return ;
-	qDebug() << "new command:" << newCommand ;
 	newCommand->obtainStyle(&item) ;
 	newCommand->setParentObject(view) ;
 	newCommand->setItems(view->getSelection()) ;

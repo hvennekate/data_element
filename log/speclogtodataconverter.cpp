@@ -131,6 +131,5 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
 				parents.top()->addChild(newItem,parents.top()->children());
 		}
 	}
-	qDebug() << "Returning items:" << items ;
 	return items ;
 }

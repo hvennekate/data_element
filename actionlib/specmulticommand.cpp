@@ -14,7 +14,6 @@ void specMultiCommand::setMergeable(bool mergeable)
 
 void specMultiCommand::doIt()
 {
-	qDebug() << "redoing multi command" << childCount() ;
 	QUndoCommand::redo() ;
 }
 

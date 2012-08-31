@@ -65,7 +65,7 @@ void specPlot::replot()
 		else if (dynamic_cast<specSVGItem*>(item))
 			svgitems << (specSVGItem*) item ;
 	}
-	MetaPicker->setSelectable(newMetaRanges);
+
 	if (allItems.isEmpty())
 	{
 		QwtPlot::replot() ;
@@ -157,7 +157,6 @@ void specPlot::setView(specView *mod)
 
 CanvasPicker* specPlot::metaPicker()
 {
-	qDebug() << "MetaPicker:" ;
 	return MetaPicker ;
 }
 

@@ -39,7 +39,6 @@ specActionLibrary::specActionLibrary(QObject *parent) :
 
 void specActionLibrary::push(specUndoCommand * cmd)
 {
-	qDebug() << "Pushing command:" << cmd ;
 	if (!cmd) return ;
 	undoStack->push(cmd) ;
 }

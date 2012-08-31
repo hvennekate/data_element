@@ -16,7 +16,6 @@ svgItemProperties::svgItemProperties(specSVGItem* i, QWidget *parent) :
 	ui->itemPreview->load(i->data);
 	QSize svgSize = QSvgRenderer(item->data).defaultSize() ;
 	originalAspectRatio = (double) svgSize.width()/svgSize.height() ;
-	qDebug() << "original aspect ratio:" << originalAspectRatio ;
 	svgSize.scale(300,300,Qt::KeepAspectRatio);
 	ui->itemPreview->setFixedSize(svgSize) ;
 //	ui->itemPreview
