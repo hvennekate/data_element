@@ -19,6 +19,7 @@ void specMetaParser::clear()
 		delete var ;
 	evaluators.clear();
 	symbols.clear();
+	valueVector.clear();
 	errors.clear();
 
 }
@@ -81,10 +82,10 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 		symbols << symbol ;
 		evaluators << specMetaVariable::factory(value,this) ;
 	}
+	valueVector.resize(symbols.size());
 	x = prepare(xExpression) ;
 	y = prepare(yExpression) ;
-//	x = prepare("x") ;
-//	y = prepare("y") ;
+
 	xExp = xExpression ;
 	yExp = yExpression ;
 }
@@ -101,6 +102,7 @@ QwtSeriesData<QPointF>* specMetaParser::evaluate(const QVector<specModelItem*>& 
 		QVector<specModelItem*> currentItems ;
 		QVector<double> xValues(1,NAN) ; // start value in case no arrays are among our variables
 
+		// TODO very fragile code...
 		// preparing a list of current items and overlapping xValues
 		if (indexes.isEmpty()) break ;
 		for(int i = 0 ; i < indexes.size() ; ++i)
@@ -128,16 +130,19 @@ QwtSeriesData<QPointF>* specMetaParser::evaluate(const QVector<specModelItem*>& 
 				data << QPointF(NAN, NAN) ;
 				continue ;
 			}
-			GiNaC::exmap substitution ;
-			for (int k = 0 ; k < substitutions[i].size() ; ++k)
-				substitution[symbols[k]] = substitutions[i][k] ;
 
-			GiNaC::ex xEx = GiNaC::evalf(x.subs(substitution, GiNaC::subs_options::no_pattern)),
-					yEx = GiNaC::evalf(y.subs(substitution, GiNaC::subs_options::no_pattern)) ;
-			if (GiNaC::is_a<GiNaC::numeric>(xEx) && GiNaC::is_a<GiNaC::numeric>(yEx))
+			// By all means avoid reallocation of the valueVector!!!
+			for (int k = 0 ; k < valueVector.size() ; ++k)
+				valueVector[k] = substitutions[i][k] ;
+
+			try
 			{
-				data << QPointF(GiNaC::ex_to<GiNaC::numeric>(xEx).to_double(),
-					GiNaC::ex_to<GiNaC::numeric>(yEx).to_double()) ;
+				data << QPointF(x.Eval(),y.Eval()) ;
+			}
+			catch(mu::Parser::exception_type &p)
+			{
+				errors << QString("Evaluation of muParser-Expression failed\nReason: %1").arg(p.GetMsg().c_str()) ;
+				valid = false ;
 			}
 		}
 		++j ;
@@ -155,28 +160,19 @@ bool specMetaParser::ok() const
 	return valid ;
 }
 
-Parser specMetaParser::prepare(const QString &val)
+mu::Parser specMetaParser::prepare(const QString &val)
 {
 	mu::Parser retVal ;
 	try
 	{
+		int i = 0 ;
 		foreach(QString symbol, symbols)
-			retVal.DefineVar(symbol.toStdString(),);
-
-		GiNaC::symtab tab ;
-		foreach(GiNaC::ex expr, symbols)
-		{
-			GiNaC::symbol symbol = GiNaC::ex_to<GiNaC::symbol>(expr) ;
-			tab[symbol.get_name()] = symbol ;
-		}
-		GiNaC::parser parse(tab) ;
-		parse.strict = true ;
-		retVal = parse(val.toStdString()) ;
-//		retVal = GiNaC::ex(val.toStdString(),symbols) ;
+			retVal.DefineVar(symbol.toStdString(),&(valueVector[i++]));
+		retVal.SetExpr(val.toStdString()) ;
 	}
-	catch(std::exception &p)
+	catch(mu::Parser::exception_type &p)
 	{
-		errors << QString("Evaluation of GiNaC-Expression \"%1\" failed\nReason: %2").arg(val).arg(p.what()) ;
+		errors << QString("Evaluation of muParser-Expression \"%1\" failed\nReason: %2").arg(val).arg(p.GetMsg().c_str()) ;
 		valid = false ;
 	}
 	return  retVal ;

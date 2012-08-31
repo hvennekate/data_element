@@ -14,6 +14,7 @@ private:
 	bool valid ;
 	QStringList errors ;
 	QStringList symbols ;
+	QVector<double> valueVector ;
 	QList<specMetaVariable*> evaluators ;
 	mu::Parser prepare(const QString&) ;
 	mu::Parser x, y ;

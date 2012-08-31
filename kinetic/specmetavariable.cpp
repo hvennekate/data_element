@@ -56,7 +56,7 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 	}
 
 	// setup the interval
-	qDebug() << "Processing variable" << init << xlower.isEmpty() << xupper.isEmpty() ;
+	qDebug() << "Processing variable" << init << xlower.isEmpty() << xupper.isEmpty() << product ;
 	if (!xlower.isEmpty() || !xupper.isEmpty())
 	{
 		product->setMinValue( xlower.isEmpty() ? -INFINITY : xlower.toDouble()) ;
@@ -66,6 +66,7 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 
 	product->parent = par ;
 	product->code = range + descString ;
+	qDebug() << "Variable created. returning" ;
 	return product ;
 }
 
