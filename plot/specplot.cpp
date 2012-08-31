@@ -157,6 +157,7 @@ void specPlot::setView(specView *mod)
 
 CanvasPicker* specPlot::metaPicker()
 {
+	qDebug() << "MetaPicker:" ;
 	return MetaPicker ;
 }
 

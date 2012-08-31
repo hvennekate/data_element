@@ -149,6 +149,7 @@ void specMetaVariable::clearRanges()
 
 void specMetaVariable::produceRanges(QSet<specPlot *> plots)
 {
+	qDebug() << "Attaching range" ;
 	if (!QwtInterval::isValid()) return ; // TODO consider just disposing of the ranges
 	if (plots.size() != ranges.size())
 	{
@@ -170,6 +171,7 @@ void specMetaVariable::produceRanges(QSet<specPlot *> plots)
 
 void specMetaVariable::detachRanges()
 {
+	qDebug() << "detaching range" ;
 	foreach(specRange* range, ranges)
 		range->detach();
 }

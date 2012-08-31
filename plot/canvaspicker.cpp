@@ -109,6 +109,7 @@ bool CanvasPicker::eventFilter ( QObject *object, QEvent *e )
 		}
 		case QEvent::MouseButtonPress:
 		{
+			qDebug() << this << "got mouse button press event" ;
 			select ( ( ( QMouseEvent * ) e )->pos() );
 			if(((QMouseEvent*)e)->button() == Qt::RightButton && d_selectedCurve)
 			{
@@ -121,13 +122,14 @@ bool CanvasPicker::eventFilter ( QObject *object, QEvent *e )
 				}
 				d_selectedCurve = NULL ;
 				d_selectedPoint = -1 ;
+				return true ;
 			}
-			return true;
+			return d_selectedCurve ;
 		}
 		case QEvent::MouseMove:
 		{
 			move ( ( ( QMouseEvent * ) e )->pos() );
-			return true;
+			return d_selectedCurve ;
 		}
 		case QEvent::MouseButtonRelease:
 		{
@@ -398,6 +400,7 @@ void CanvasPicker::highlightSelectable()
 
 void CanvasPicker::addSelectable(specCanvasItem *item)
 {
+	qDebug() << this << "Adding new picker item:" << item ;
 	QSet<specCanvasItem*> list ;
 	list << item ;
 	addSelectable(list) ;
