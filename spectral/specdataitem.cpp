@@ -210,14 +210,16 @@ specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 	return (*this) ;
 }
 
+bool compareDataPoints(const specDataPoint& a, const specDataPoint& b)
+{
+	return a.nu == b.nu ;
+}
 
 void specDataItem::flatten(bool oneTime)
 {
 	qSort(data) ;
 	QVector<specDataPoint> newData ;
-	bool (*comparison)(const specDataPoint&, const specDataPoint&) =
-			[](const specDataPoint& a, const specDataPoint& b) { return a.nu == b.nu ;} ;
-	averageToNew(data.begin(), data.end(), comparison, std::back_inserter(newData)) ;
+	averageToNew(data.begin(), data.end(), compareDataPoints, std::back_inserter(newData)) ;
 
 	data = newData ; // TODO swap
 	// average Time

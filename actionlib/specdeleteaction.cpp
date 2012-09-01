@@ -70,7 +70,6 @@ void specDeleteAction::execute()
 	{
 		specDeleteConnectionsCommand *connectionsCommand = new specDeleteConnectionsCommand(parentCommand) ;
 		connectionsCommand->setParentObject(metaModel) ;
-		qDebug() << "connections to remove:" << i.key() << i.value() ;
 		connectionsCommand->setItems(i.key(),i.value());
 	}
 

@@ -12,7 +12,7 @@ public:
 	friend QDataStream& operator>>(QDataStream& in, specStreamable&) ;
 	void readDirectly(QDataStream& in) { readFromStream(in) ; } // TODO improve; make factory available broadly
 	typedef quint16 type;
-	enum streamableType : type
+	enum streamableType
 	{
 		container = 32768,
 		none = 0,

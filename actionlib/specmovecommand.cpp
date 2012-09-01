@@ -79,7 +79,6 @@ void specMoveCommand::doIt()
 	// Precautions if moving within the same folder
 	foreach(specModelItem* item, items)
 		item->setParent(0) ;
-	qDebug() << "moving to" << targetIndex ;
 	if (targetIndex[0] < 0) targetIndex[0] = target->children() ;
 	((specFolderItem*) target)->addChildren(items,targetIndex[0]) ;
 	foreach(specFolderItem* parent, parents)

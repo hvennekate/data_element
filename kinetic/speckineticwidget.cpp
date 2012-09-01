@@ -65,7 +65,6 @@ specKineticWidget::~specKineticWidget()
 
 void specKineticWidget::selectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
 {
-	qDebug() << plot->itemList() ;
 	foreach(QModelIndex index, deselected.indexes())
 		if (!index.column() && index.isValid() && !((specModelItem*) index.internalPointer())->isFolder())
 			((specCanvasItem*) index.internalPointer())->detach() ; // TODO create kinetic folder or extend specFolderItem
@@ -74,7 +73,6 @@ void specKineticWidget::selectionChanged(const QItemSelection & selected, const 
 		if (!index.column() && !((specModelItem*) index.internalPointer())->isFolder())
 			((specCanvasItem*) index.internalPointer())->attach(plot) ;
 	plot->replot() ;
-	qDebug() << plot->itemList() ;
 }
 
 // TODO crash when another meta item is added after the first has been assigned servers

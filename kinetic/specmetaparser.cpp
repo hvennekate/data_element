@@ -178,7 +178,7 @@ mu::Parser specMetaParser::prepare(const QString &val)
 bool specMetaParser::containsNan(const QVector<double> &vector)
 {
 	foreach(double zahl, vector)
-		if (isnan(zahl))
+		if (std::isnan(zahl))
 			return true ;
 	return false ;
 }

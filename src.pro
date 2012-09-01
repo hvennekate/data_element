@@ -203,12 +203,19 @@ INCLUDEPATH += . \
 LIBS += -lqwt \
 	-lmuparser
 }
-#win32 {
-#INCLUDEPATH += . \
-#    C:/Qwt-5.2.1/include
-#LIBS += -LC:/Qwt-5.2.1/lib \
-#    -lqwt
-#}
+win32 {
+INCLUDEPATH += . \
+    C:/Qwt-6.0.0/include \
+    C:/Users/Hendrik/Downloads/muparser_v2_2_2/include
+LIBS += -LC:/Qwt-5.2.1/lib \
+    -lqwt \
+    C:/Users/Hendrik/Downloads/muparser_v2_2_2/lib/libmuparser.a
+DEFINES += WIN32BUILD \
+    QT_DLL \
+    QWT_DLL
+DEPENDPATH += C:/Users/Hendrik/Downloads/muparser_v2_2_2/lib
+RESOURCES += oxygen.qrc
+}
 CONFIG += qwt
 
 TARGET = data_element
@@ -217,9 +224,11 @@ RESOURCES += icons/application.qrc
 
 QT += svg
 
-QMAKE_CXXFLAGS += -std=c++0x
+#QMAKE_CXXFLAGS += -std=c++0x
 
 FORMS += \
     spectral/dataitemproperties.ui \
     kinetic/metaitemproperties.ui \
     model/svgitemproperties.ui
+
+OTHER_FILES += icons/oxygen/index.theme
