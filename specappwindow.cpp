@@ -77,6 +77,15 @@ void specAppWindow::createActions()
 	openAction->setShortcut(tr("Ctrl+O"));
 	openAction->setStatusTip(tr("Open an existing file"));
 	connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
+
+	whatsThisAction = new QAction(QIcon::fromTheme("help-contextual"), tr("&What's this"), this) ;
+	whatsThisAction->setStatusTip(tr("What's this?")) ;
+	connect(whatsThisAction, SIGNAL(triggered()), this, SLOT(whatsThisMode())) ;
+}
+
+void specAppWindow::whatsThisMode()
+{
+	QWhatsThis::enterWhatsThisMode() ;
 }
 
 void specAppWindow::createToolBars()
@@ -84,6 +93,7 @@ void specAppWindow::createToolBars()
 	fileToolBar = addToolBar(tr("File"));
 	fileToolBar->addAction(newAction);
 	fileToolBar->addAction(openAction);
+	fileToolBar->addAction(whatsThisAction) ;
 }
 
 void specAppWindow::createMenus()
@@ -93,6 +103,7 @@ void specAppWindow::createMenus()
 	fileMenu->addAction(openAction);
 
 	helpMenu = menuBar()->addMenu(tr("&Help")) ;
+	helpMenu->addAction(whatsThisAction) ;
 	QAction *aboutQtAction = new QAction(tr("About &Qt..."),helpMenu) ;
 	helpMenu->addAction(aboutQtAction) ;
 	QAction *aboutAction = new QAction(tr("&About..."),helpMenu) ;

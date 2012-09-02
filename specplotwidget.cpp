@@ -85,6 +85,7 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 
 	layout -> addWidget(splitter)  ;
 	layout -> setContentsMargins(0,0,0,0) ;
+	layout ->setSpacing(0);
 
 	setWidget(content) ;
 	svgModification(false) ;

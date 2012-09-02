@@ -231,4 +231,5 @@ FORMS += \
     kinetic/metaitemproperties.ui \
     model/svgitemproperties.ui
 
-OTHER_FILES += icons/oxygen/index.theme
+OTHER_FILES += icons/oxygen/index.theme \
+    icons/oxygen/geticons.py

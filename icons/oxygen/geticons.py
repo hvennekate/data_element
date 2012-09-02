@@ -19,7 +19,7 @@ iconNames = [i[i.find("\"",i.find("fromTheme"))+1:i.find("\"",i.find("\"",i.find
 
 print "<!DOCTYPE RCC><RCC version=\"1.0\">\n<qresource prefix=\"icons/oxygen\">\n\t<file alias=\"index.theme\">icons/oxygen/index.theme</file>\n"
 
-for iconName in iconNames:
+for iconName in set(iconNames):
     findIconCmd = "find /usr/share/icons/oxygen/16x16/ -name " + iconName
     fileName = executeCommand(findIconCmd)
     executeCommand("cp " + fileName[:-1] + " ./")

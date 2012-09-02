@@ -6,7 +6,7 @@
 specAddConnectionsAction::specAddConnectionsAction(QObject *parent) :
     specUndoAction(parent)
 {
-	this->setIcon(QIcon::fromTheme("list-new",QIcon(":/toKinetic.png"))) ;
+	this->setIcon(QIcon(":/toKinetic.png")) ;
 	setToolTip(tr("Connect current to selected."));
 	setWhatsThis(tr("Connects the current item in the meta dock window with the selected items in the data and meta dock window.\nThis is the essential action for enabling a meta item to obtain data for processing from other items."));
 }

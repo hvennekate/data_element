@@ -34,9 +34,11 @@ private:
 	QToolBar *fileToolBar;
 	QAction *newAction;
 	QAction *openAction;
+	QAction *whatsThisAction ;
 	QList<specPlotWidget*> docks ;
 private slots:
 	void about() ;
+	void whatsThisMode() ;
 };
 
 #endif
