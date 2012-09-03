@@ -28,6 +28,16 @@ QModelIndexList specView::getSelection()
 	return list ;
 }
 
+void specView::columnsInserted(const QModelIndex &parent, int start, int end)
+{
+	if (!model()) return ;
+	if (!start) return ;
+	if (end != model()->columnCount(parent)-1) return ;
+	int column = start -1 ;
+	resizeColumnToContents(column) ;
+	if (!column) setColumnWidth(column,columnWidth(column)+50);
+}
+
 /*QList<specModelItem*> specView::currentlySelected()
 {
 	QList<specModelItem*> list ;
@@ -229,6 +239,7 @@ void specView::setModel(specModel* model)
 	// TODO change this to plain old functions.
 	connect(model, SIGNAL(modelAboutToBeReset()), this, SLOT(prepareReset())) ;
 	connect(model, SIGNAL(modelReset()), this, SLOT(resetDone())) ;
+	connect(model,SIGNAL(columnsInserted(const QModelIndex&,int,int)), this, SLOT(columnsInserted(QModelIndex,int,int))) ;
 }
 
 void specView::itemProperties()

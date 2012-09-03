@@ -78,10 +78,12 @@ void specPlot::replot()
 	specModelItem *pointer = 0 ; // TODO find a more concise version.
 	foreach(QwtPlotItem *item, allItems)
 	{
-		if(!(dynamic_cast<specSVGItem*>(item)) && (pointer = dynamic_cast<specModelItem*>(item)))
+		if(!(dynamic_cast<specSVGItem*>(item))
+				&& (pointer = dynamic_cast<specModelItem*>(item)))
 		{
-			pointer->revalidate();
-			boundaries |= pointer->boundingRect() ;
+			pointer->revalidate() ;
+			if (pointer->boundingRect().isValid())
+				boundaries |= pointer->boundingRect() ;
 		}
 	}
 

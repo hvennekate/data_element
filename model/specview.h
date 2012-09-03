@@ -32,6 +32,7 @@ private:
 private slots:
 	void averageItems() ;
 	void itemProperties() ;
+	void columnsInserted(const QModelIndex& parent, int start, int end) ;
 protected:
 	void keyPressEvent(QKeyEvent*) ;
 	void dropEvent(QDropEvent *event) ;

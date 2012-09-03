@@ -14,6 +14,7 @@ specTreeAction::specTreeAction(QObject *parent) :
 void specTreeAction::execute()
 {
 	specView *view = (specView*) parentWidget() ;
+	if (view->getSelection().isEmpty()) return ; // Teil von 2. Bug von Daniel
 	specModel *model = view->model() ;
 	QVector<QPair<specFolderItem*,QList<specModelItem*> > > moveTargets ;
 

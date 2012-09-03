@@ -26,6 +26,7 @@ specMergeAction::specMergeAction(QObject *parent)
 void specMergeAction::execute()
 {
 	specView *view = (specView*) parentWidget() ;
+	if (view->getSelection().isEmpty()) return ;
 	specModel *model = view->model() ;
 
 	// let user define similarities
@@ -143,10 +144,12 @@ bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, doubl
 	connect(buttons,SIGNAL(rejected()), descriptorMatch, SLOT(reject()));
 	QGridLayout *descriptorLayout = new QGridLayout ;
 	QVBoxLayout *dialogLayout = new QVBoxLayout ;
-	dialogLayout->addWidget(new QLabel(tr("Criteria selected below will be used (possibly including some numerical tolerance, if given) to determine whether items match and need to be merged."),descriptorMatch)) ;
+	dialogLayout->addWidget(new QLabel(tr("Criteria selected below will be used\n (possibly including some numerical tolerance, if given) to determine\n whether items match and need to be merged."),descriptorMatch)) ;
 	//TODO Label fuer tolerance ...
 	descriptorLayout->addWidget(new QLabel(tr("To merge, ... must match"),descriptorMatch),0,0) ;
-	descriptorLayout->addWidget(new QLabel(tr("Numerical tolerance"), descriptorMatch),0,0);
+	QLabel *toleranceLabel = new QLabel("", descriptorMatch) ;
+	descriptorLayout->addWidget(toleranceLabel,0,1);
+	bool hasNumeric = false ;
 	for(QStringList::size_type i = 0 ; i < descriptors.size() ; i++)
 	{
 		descriptorLayout->addWidget(new QCheckBox(descriptors[i]),i+1,0) ;
@@ -156,8 +159,10 @@ bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, doubl
 			validatorLine->setValidator(new QDoubleValidator(validatorLine)) ;
 			((QDoubleValidator*) validatorLine->validator())->setBottom(0) ;
 			descriptorLayout->addWidget(validatorLine,i+1,1) ;
+			hasNumeric = true ;
 		}
 	}
+	if (hasNumeric) toleranceLabel->setText(tr("Numerical tolerance"));
 	QScrollArea *scrollArea = new QScrollArea ;
 	QWidget *areaWidget = new QWidget ;
 	QCheckBox *spectralAdaptation = new QCheckBox(tr("Try to align merged data sets\n using offset/slope correction"),descriptorMatch) ;
@@ -175,7 +180,7 @@ bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, doubl
 		int row, column, rowspan, columnspan ;
 		descriptorLayout->getItemPosition(i, &row, &column, &rowspan, &columnspan) ;
 		if (column == 0 && ((QCheckBox*) descriptorLayout->itemAt(i)->widget())->checkState() == Qt::Checked)
-			toCompare << qMakePair(row,
+			toCompare << qMakePair(row-1,
 				descriptorProperties[row] & spec::numeric ?
 						((QLineEdit*) descriptorLayout->itemAt(i+1)->widget())->text().toDouble() : 0.) ;
 	}
@@ -200,22 +205,11 @@ bool specMergeAction::itemsAreEqual(specModelItem* first, specModelItem* second,
 		{
 			double a = first->descriptor(descriptors[descriptor]).toDouble(),
 				b = second->descriptor(descriptors[descriptor]).toDouble() ;
-			equal &= b-tolerance <= a && a <= b+tolerance ;
+			equal = equal && b-tolerance <= a && a <= b+tolerance ;
 		}
 		else
-			equal &= first->descriptor(descriptors[descriptor]) ==
+			equal = equal && first->descriptor(descriptors[descriptor]) ==
 				second->descriptor(descriptors[descriptor]) ;
 	}
 	return equal ;
 }
-
-//QModelIndexList specMergeAction::allChildren(const QModelIndex& parent) const // TODO ueberarbeiten
-//{
-//	if (!parent.isValid() || !isFolder(parent))
-//		return QModelIndexList() ;
-//	QModelIndexList list ;
-//	for (int i = 0 ; i < rowCount(parent) ; i++)
-//		list << this->index(i,0,parent) ;
-//	return list ;
-//}
-

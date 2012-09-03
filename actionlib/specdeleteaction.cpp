@@ -23,6 +23,7 @@ void specDeleteAction::execute()
 {
 	specView *currentView = (specView*) parent() ;
 	QModelIndexList indexes = currentView->selectionModel()->selectedIndexes() ;
+	if (indexes.isEmpty()) return ; // 1. Bug von Daniel
 	// TODO change this if there are no connections
 	specMultiCommand *parentCommand = new specMultiCommand ;
 	parentCommand->setParentObject(currentView->model()) ;
