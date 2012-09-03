@@ -35,17 +35,8 @@ void specView::columnsInserted(const QModelIndex &parent, int start, int end)
 	if (end != model()->columnCount(parent)-1) return ;
 	int column = start -1 ;
 	resizeColumnToContents(column) ;
-	if (!column) setColumnWidth(column,columnWidth(column)+50);
+	if (!column) setColumnWidth(column,qMax(columnWidth(column),50));
 }
-
-/*QList<specModelItem*> specView::currentlySelected()
-{
-	QList<specModelItem*> list ;
-	QModelIndexList selection = getSelection() ;
-	foreach(QModelIndex index, selection)
-		list << (specModelItem*) index.internalPointer() ;
-	return list ;
-}*/
 
 void specView::columnMoved(int i, int j, int k)
 {
