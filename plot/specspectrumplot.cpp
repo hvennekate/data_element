@@ -34,6 +34,7 @@ void specSpectrumPlot::toggleAligning(bool on)
 void specSpectrumPlot::invalidateReference()
 {
 	if (reference) delete reference ;
+	reference = 0 ;
 	setReferenceAction->setToolTip(QString("Momentan keine Referenz."));
 }
 
@@ -125,7 +126,7 @@ QList<specDataItem*> specSpectrumPlot::folderContent(specModelItem *folder)
 
 void specSpectrumPlot::setReference()
 {
-	if (reference) delete reference ;
+	invalidateReference();
 	QModelIndexList referenceItems = view->getSelection() ;
 
 	// convert indexes to pointers
@@ -133,10 +134,7 @@ void specSpectrumPlot::setReference()
 	for(int i = 0 ; i < referenceItems.size() ; ++i)
 		referenceDataItems << folderContent(view->model()->itemPointer(referenceItems[i])) ;
 	if (referenceDataItems.isEmpty())
-	{
-		invalidateReference();
 		return ;
-	}
 	reference = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
 	for (int i = 0 ; i < referenceDataItems.size() ; ++i)
 		reference->operator +=(*(referenceDataItems[i])) ;

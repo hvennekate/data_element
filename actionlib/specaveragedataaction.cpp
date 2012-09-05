@@ -87,21 +87,6 @@ void specAverageDataAction::execute()
 		specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
 		command->setParentObject(view->model()) ;
 		command->setItem(index,newData);
-//		QVector<int> take, leave ;
-//		for (int i = 0 ; i < oldData.size() ; ++i)
-//			take << i ;
-//		for (int i = 0; i < newData.size() ; ++i)
-//			leave << i ;
-
-//		specRemoveDataCommand *remove = new specRemoveDataCommand(groupCommand) ;
-//		remove->setParentWidget(view) ;
-//		remove->setItem(index,take) ;
-//		remove->redo();
-//		item->insertData(newData.toVector()); // TODO criminal.
-//		specInsertDataCommand *insert = new specInsertDataCommand(groupCommand) ;
-//		insert->setParentWidget(view) ;
-//		insert->setItem(index,leave) ;
-//		item->plot()->replot();
 	}
 	library->push(groupCommand);
 }
