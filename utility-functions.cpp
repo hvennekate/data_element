@@ -289,9 +289,8 @@ QHash<QString,specDescriptor> fileHeader(QTextStream& in) {
 	return headerItems ;
 }
 
-QVector<double> waveNumbers(QTextStream& in) {
+QVector<double> waveNumbers(const QStringList& wns) {
 	QVector<double> wavenumbers ;
-	QStringList wns = in.readLine().remove(QRegExp("^\\d+ ")).split(" ") ;
 	foreach(QString wn, wns) wavenumbers += wn.toDouble() ;
 	return wavenumbers ;
 }
@@ -304,9 +303,11 @@ QList<specModelItem*> readHVFile(QFile& file)
 	
 	QHash<QString,specDescriptor> headerItems = fileHeader(in) ;
 	headerItems["Datei"] = specDescriptor(QFileInfo(file.fileName()).fileName(),spec::def) ;
-	QVector<double> wavenumbers = waveNumbers(in) ;
+	QStringList wns = in.readLine().split(" ") ;
+	bool polarisatorMessung = wns.takeFirst().toInt() ; // First value before wavenumbers denotes pol measurement
+	QVector<double> wavenumbers = waveNumbers(wns) ;
 	
-	QList<specModelItem*> specData ;
+	QList<specModelItem*> specData, otherPolarisation ;
 	while(!in.atEnd())
 	{
 		QStringList templist = in.readLine().split(" ").replaceInStrings("(","").replaceInStrings(")","") ;
@@ -317,7 +318,7 @@ QList<specModelItem*> readHVFile(QFile& file)
 		QVector<specDataPoint> dataPoints ;
 		for(QStringList::size_type i = 0 ; 2*i+1 < templist.size() ; i++)
 		{
-			data[1] = wavenumbers[i] ;
+			data[1] = wavenumbers[polarisatorMessung ? 32*((i/32)/2)+i%32 : i] ; // Funny formula for doing the wavenumbers once for each polarisation
 			data[2] = templist[2*i].toDouble() ;
 			data[3] = templist[2*i+1].toDouble() ;
 			dataPoints += specDataPoint(data) ;
@@ -325,12 +326,19 @@ QList<specModelItem*> readHVFile(QFile& file)
 		for (QVector<double>::size_type i = 0 ; i < dataPoints.size() ; i += 32)
 		{
 			headerItems["nu"] = specDescriptor((dataPoints[i].nu+dataPoints[i+31].nu)/2.) ;
-			specData += new specDataItem(dataPoints.mid(i,32),headerItems) ;
+			if (!polarisatorMessung)
+				specData += new specDataItem(dataPoints.mid(i,32),headerItems) ;
+			else
+			{
+				bool polarisation = (i/32)%2 ;
+				headerItems["polarisation"] = specDescriptor(polarisation) ;
+				(polarisation ? otherPolarisation : specData) << new specDataItem(dataPoints.mid(i,32),headerItems) ;
+			}
 			specData.last()->mergePlotData = false ;
 			specData.last()->invalidate(); ;
 		}
 	}
-	return specData ;
+	return specData + otherPolarisation ;
 }
 
 QPair<QString,QString> interpretString(QString& string)

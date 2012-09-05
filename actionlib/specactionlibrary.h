@@ -52,6 +52,7 @@ private:
 	QModelIndexList lastRequested ;
 	void addParent(QObject*) ;
 	void addNewAction(QToolBar*, specUndoAction*) ;
+
 };
 
 #endif // SPECACTIONLIBRARY_H
