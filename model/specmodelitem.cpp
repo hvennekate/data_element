@@ -17,7 +17,8 @@ specModelItem::specModelItem(specFolderItem* par, QString desc)
 	  iparent(0),
 	  description(desc, spec::editable),
 	  mergePlotData(true),
-	  sortPlotData(true)
+	  sortPlotData(true),
+	  dataValid(false)
 {
 	setParent(par) ;
 }
@@ -88,8 +89,7 @@ void specModelItem::refreshPlotData()
 
 void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 {
-	QTime timer ;
-	timer.start() ;
+	// TODO accelerate
 	if (sortPlotData)
 	{
 		QMultiMap<double,double> sortedValues;

@@ -412,8 +412,6 @@ bool specModel::removeColumns (int column,int count,const QModelIndex & parent)
 bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int row) // TODO
 {
 	// Check for possible new column headers
-	QTime timer ;
-	timer.start();
 	for (QList<specModelItem*>::size_type i = 0 ; i < list.size() ; i++)
 	{
 		for (QStringList::size_type j = 0 ; j < list[i]->descriptorKeys().size() ; j++)

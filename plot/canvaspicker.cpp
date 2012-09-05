@@ -453,6 +453,7 @@ void CanvasPicker::removeSelectable()
 
 CanvasPicker::~CanvasPicker()
 {
+	highlightSelectable(false) ;
 	if (owning) removeSelectable(selectable);
 }
 

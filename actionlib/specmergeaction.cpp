@@ -26,8 +26,14 @@ specMergeAction::specMergeAction(QObject *parent)
 void specMergeAction::execute()
 {
 	specView *view = (specView*) parentWidget() ;
-	if (view->getSelection().isEmpty()) return ;
 	specModel *model = view->model() ;
+	QModelIndexList indexes = view->getSelection() ;
+	qSort(indexes) ;
+	QList<specDataItem*> items ;
+	foreach(QModelIndex index, indexes)
+		 items << dynamic_cast<specDataItem*>(model->itemPointer(index)) ;
+	items.removeAll(0) ;
+	if (items.isEmpty()) return ;
 
 	// let user define similarities
 	QList<QPair<QStringList::size_type, double> > criteria ;
@@ -36,84 +42,81 @@ void specMergeAction::execute()
 
 	QVector<specModelItem*> toBeDeleted ;
 	QVector<specModelItem*> newlyInserted ;
-	QModelIndexList indexes = view->getSelection() ;
-//	for (QModelIndexList::size_type i = 0 ; i < indexes.size() ; ++i)
-//		if(model->isFolder(indexes[i]))
-//			indexes << allChildren(indexes.takeAt(i--)) ;
-	qSort(indexes) ;
-	QList<specModelItem*> items = model->pointerList(indexes) ;
 
 	// Create and insert new merged items
 	while (!items.isEmpty())
 	{
-		specDataItem *item = dynamic_cast<specDataItem*>(items.takeFirst()) ;
-		if (! item)
-			continue ;
-		specDataItem *newItem = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
-		*newItem += *item ; // TODO ueberarbeiten
-		toBeDeleted << item ; // TODO check possibility of immediate deletion
-		QList<specModelItem*> toMergeWith ;
-		// look for items to merge with
-		for (int i = 0 ; i < items.size() ; ++i)
+		// form chunk -> only merge if same parent! (new logic)
+		QList<specDataItem*> chunk ;
+		specFolderItem * const parent = items.first()->parent() ;
+		const int row = parent->childNo(items.first()) ;
+		while (!items.isEmpty() && items.first()->parent() == parent && parent->childNo(items.first()) == row + chunk.size())
+			chunk << items.takeFirst() ;
+
+		QVector<specModelItem*> toInsert ;
+		while (!chunk.isEmpty())
 		{
-			if (itemsAreEqual(newItem,items[i],criteria, model->descriptors(), model->descriptorProperties()))
+			specDataItem* item = chunk.takeFirst() ;
+			specDataItem *newItem = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
+			*newItem += *item ; // TODO ueberarbeiten
+			toBeDeleted << item ; // TODO check possibility of immediate deletion
+			QList<specModelItem*> toMergeWith ;
+			// look for items to merge with
+			for (int i = 0 ; i < chunk.size() ; ++i)
 			{
-				specDataItem *other = dynamic_cast<specDataItem*>(items[i]) ;
-				if (!other)
+				if (itemsAreEqual(newItem,chunk[i],criteria, model->descriptors(), model->descriptorProperties()))
 				{
-					items.takeAt(i--) ;
-					continue ;
+					specDataItem *other = dynamic_cast<specDataItem*>(chunk[i]) ;
+					if (!other)
+					{
+						chunk.takeAt(i--) ;
+						continue ;
+					}
+					toMergeWith << other ;
+					toBeDeleted << chunk.takeAt(i--) ;
 				}
-				toMergeWith << other ;
-//				*newItem += *(other) ;
-				toBeDeleted << items.takeAt(i--) ;
 			}
-		}
-		// if there are others, do the merge
-		if (!toMergeWith.isEmpty())
-		{
-			specMultiCommand *correctionCommand = 0 ;
-			if (spectralAdaptation)
+			// if there are others, do the merge
+			if (!toMergeWith.isEmpty())
 			{
-				// generate reference spectrum
-				QMap<double,double> reference ;
-				newItem->revalidate();
-				const QwtSeriesData<QPointF>* spectrum = newItem->QwtPlotCurve::data() ;
-				for (size_t i = 0 ; i < spectrum->size() ; ++i)
+				specMultiCommand *correctionCommand = 0 ;
+				if (spectralAdaptation)
 				{
-					const QPointF point = spectrum->sample(i) ;
-					reference[point.x()] = point.y() ;
+					// generate reference spectrum
+					QMap<double,double> reference ;
+					newItem->revalidate();
+					const QwtSeriesData<QPointF>* spectrum = newItem->QwtPlotCurve::data() ;
+					for (size_t i = 0 ; i < spectrum->size() ; ++i)
+					{
+						const QPointF point = spectrum->sample(i) ;
+						reference[point.x()] = point.y() ;
+					}
+
+					// define spectral ranges
+					QwtPlotItemList ranges ;
+					ranges << new specRange(reference.begin().key(), (reference.end() -1).key()) ; // DANGER
+					// TODO set up sensible ranges to account for "holes" in the spectrum
+
+					// generate list of spectra
+					// TODO generate this list directly above
+					QwtPlotItemList spectra ;
+					for (QList<specModelItem*>::iterator i = toMergeWith.begin() ; i != toMergeWith.end() ; ++i)
+						spectra << (QwtPlotItem*) *i ;
+
+					// perform spectral adaptation
+					correctionCommand= specSpectrumPlot::generateCorrectionCommand(ranges, spectra, reference, view) ;
+					correctionCommand->redo();
 				}
-
-				// define spectral ranges
-				QwtPlotItemList ranges ;
-				ranges << new specRange(reference.begin().key(), (reference.end() -1).key()) ; // DANGER
-				// TODO set up sensible ranges to account for "holes" in the spectrum
-
-				// generate list of spectra
-				// TODO generate this list directly above
-				QwtPlotItemList spectra ;
-				for (QList<specModelItem*>::iterator i = toMergeWith.begin() ; i != toMergeWith.end() ; ++i)
-					spectra << (QwtPlotItem*) *i ;
-
-				// perform spectral adaptation
-				correctionCommand= specSpectrumPlot::generateCorrectionCommand(ranges, spectra, reference, view) ;
-				correctionCommand->redo();
+				foreach(specModelItem* other, toMergeWith)
+					*newItem += *((specDataItem*) other) ; // TODO check this cast
+				if (spectralAdaptation)
+					correctionCommand-> undo() ;
+				newItem->flatten();
 			}
-			foreach(specModelItem* other, toMergeWith)
-				*newItem += *((specDataItem*) other) ; // TODO check this cast
-			if (spectralAdaptation)
-				correctionCommand-> undo() ;
-			newItem->flatten();
-			if (! model->insertItems(QList<specModelItem*>() << newItem, model->index(item).parent(), model->index(item).row()))
-			{
-				delete newItem ;
-				continue ;
-			}
-			newlyInserted << newItem ;
+			toInsert << newItem ; // this creates overhead if  there are many items not to be merged...
 		}
-		else
-			delete newItem ;
+		if (model->insertItems(toInsert.toList(), model->index(parent), row))
+			newlyInserted += toInsert ; // TODO else...
 	}
 
 	specMultiCommand *command = new specMultiCommand ;
@@ -147,8 +150,6 @@ bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, doubl
 	dialogLayout->addWidget(new QLabel(tr("Criteria selected below will be used\n (possibly including some numerical tolerance, if given) to determine\n whether items match and need to be merged."),descriptorMatch)) ;
 	//TODO Label fuer tolerance ...
 	descriptorLayout->addWidget(new QLabel(tr("To merge, ... must match"),descriptorMatch),0,0) ;
-	QLabel *toleranceLabel = new QLabel("", descriptorMatch) ;
-	descriptorLayout->addWidget(toleranceLabel,0,1);
 	bool hasNumeric = false ;
 	for(QStringList::size_type i = 0 ; i < descriptors.size() ; i++)
 	{
@@ -162,7 +163,8 @@ bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, doubl
 			hasNumeric = true ;
 		}
 	}
-	if (hasNumeric) toleranceLabel->setText(tr("Numerical tolerance"));
+	if (hasNumeric)
+		descriptorLayout->addWidget(new QLabel("Numerical tolerance",descriptorMatch),0,1);
 	QScrollArea *scrollArea = new QScrollArea ;
 	QWidget *areaWidget = new QWidget ;
 	QCheckBox *spectralAdaptation = new QCheckBox(tr("Try to align merged data sets\n using offset/slope correction"),descriptorMatch) ;
