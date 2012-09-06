@@ -209,7 +209,7 @@ win32 {
 INCLUDEPATH += . \
     C:/Qwt-6.0.0/include \
     C:/Users/Hendrik/Downloads/muparser_v2_2_2/include
-LIBS += -LC:/Qwt-5.2.1/lib \
+LIBS += -LC:/Qwt-6.0.0/lib \
     -lqwt \
     C:/Users/Hendrik/Downloads/muparser_v2_2_2/lib/libmuparser.a
 DEFINES += WIN32BUILD \
