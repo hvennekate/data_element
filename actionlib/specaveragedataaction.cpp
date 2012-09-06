@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include "specmulticommand.h"
 #include "specexchangedatacommand.h"
+#include <cmath>
 
 specAverageDataAction::specAverageDataAction(QObject *parent) :
     specUndoAction(parent)
@@ -73,7 +74,8 @@ void specAverageDataAction::execute()
 		else
 		{
 //			newData.resize(oldData.size()/numAverages+1) ;
-			for (int i = 0 ; i < oldData.size()/numAverages+1 ; ++i)
+			int avs = std::ceil(double(oldData.size())/numAverages) ;
+			for (int i = 0 ; i < avs ; ++i)
 			{
 				specDataPoint dataPoint ; //= newData[i] ;
 				int limit = qMin(oldData.size(), (i+1)*numAverages) ;

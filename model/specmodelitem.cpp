@@ -98,10 +98,10 @@ void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 		x = sortedValues.keys().toVector() ;
 		y = sortedValues.values().toVector() ;
 	}
-	QVector<double> xt, yt ;
 
 	if (mergePlotData)
 	{
+		QVector<double> xt, yt ;
 		int i = 0 ;
 		while(i < x.size())
 		{

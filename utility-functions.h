@@ -42,12 +42,34 @@ inline T average(forwardIterator& begin,const forwardIterator& end,
 	return retVal /= (double) count ;
 }
 
+template<class T, class forwardIterator> // TODO mehr benutzen!
+inline T average(forwardIterator& begin,const forwardIterator& end)
+{
+	const T first = *begin++ ;
+	T retVal = first ;
+	int count = 1 ;
+	while (begin != end && *begin == first)
+	{
+		retVal += *begin++ ;
+		++ count ;
+	}
+	return retVal /= (double) count ;
+}
+
 template<class T, class forwardIterator, class outputIterator>
 inline void averageToNew(forwardIterator begin, forwardIterator end,
 		  bool (*equal)(const T&,const T&), outputIterator target)
 {
 	while (begin != end)
 		*target++ = average(begin, end, equal) ;
+} ;
+
+template<class T, class forwardIterator, class outputIterator>
+inline void averageToNew(forwardIterator begin, forwardIterator end,
+		  outputIterator target)
+{
+	while (begin != end)
+		*target++ = average(begin, end) ;
 } ;
 
 #endif
