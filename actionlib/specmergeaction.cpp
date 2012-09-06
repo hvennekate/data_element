@@ -79,38 +79,42 @@ void specMergeAction::execute()
 			// if there are others, do the merge
 			if (!toMergeWith.isEmpty())
 			{
-				specMultiCommand *correctionCommand = 0 ;
 				if (spectralAdaptation)
 				{
-					// generate reference spectrum
-					QMap<double,double> reference ;
-					newItem->revalidate();
-					const QwtSeriesData<QPointF>* spectrum = newItem->QwtPlotCurve::data() ;
-					for (size_t i = 0 ; i < spectrum->size() ; ++i)
+					foreach(specModelItem* other,toMergeWith)
 					{
-						const QPointF point = spectrum->sample(i) ;
-						reference[point.x()] = point.y() ;
+						// generate reference spectrum
+						QMap<double,double> reference ;
+						newItem->revalidate();
+						const QwtSeriesData<QPointF>* spectrum = newItem->QwtPlotCurve::data() ;
+						for (size_t i = 0 ; i < spectrum->size() ; ++i)
+						{
+							const QPointF point = spectrum->sample(i) ;
+							reference[point.x()] = point.y() ;
+						}
+
+						// define spectral ranges
+						QwtPlotItemList ranges ;
+						ranges << new specRange(reference.begin().key(), (reference.end() -1).key()) ; // DANGER
+						// TODO set up sensible ranges to account for "holes" in the spectrum
+
+						// generate list of spectra
+						// TODO generate this list directly above
+						QwtPlotItemList spectra ;
+						for (QList<specModelItem*>::iterator i = toMergeWith.begin() ; i != toMergeWith.end() ; ++i)
+							spectra << (QwtPlotItem*) *i ;
+
+						// perform spectral adaptation
+						specMultiCommand *correctionCommand= specSpectrumPlot::generateCorrectionCommand(ranges, QwtPlotItemList() << (QwtPlotItem*) other, reference, view) ;
+						correctionCommand->redo();
+						*newItem += *((specDataItem*) other) ;
+						correctionCommand->undo();
+						delete correctionCommand ;
 					}
-
-					// define spectral ranges
-					QwtPlotItemList ranges ;
-					ranges << new specRange(reference.begin().key(), (reference.end() -1).key()) ; // DANGER
-					// TODO set up sensible ranges to account for "holes" in the spectrum
-
-					// generate list of spectra
-					// TODO generate this list directly above
-					QwtPlotItemList spectra ;
-					for (QList<specModelItem*>::iterator i = toMergeWith.begin() ; i != toMergeWith.end() ; ++i)
-						spectra << (QwtPlotItem*) *i ;
-
-					// perform spectral adaptation
-					correctionCommand= specSpectrumPlot::generateCorrectionCommand(ranges, spectra, reference, view) ;
-					correctionCommand->redo();
 				}
-				foreach(specModelItem* other, toMergeWith)
-					*newItem += *((specDataItem*) other) ; // TODO check this cast
-				if (spectralAdaptation)
-					correctionCommand-> undo() ;
+				else
+					foreach(specModelItem* other, toMergeWith)
+						*newItem += *((specDataItem*) other) ; // TODO check this cast
 				newItem->flatten();
 			}
 			toInsert << newItem ; // this creates overhead if  there are many items not to be merged...
