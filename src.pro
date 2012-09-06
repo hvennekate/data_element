@@ -90,7 +90,8 @@ SOURCES += main.cpp \
     model/specsvgunitbutton.cpp \
     specsplitter.cpp \
     actionlib/specplotlabelcommand.cpp \
-    actionlib/speclabelaction.cpp
+    actionlib/speclabelaction.cpp \
+    specprofiler.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -182,7 +183,8 @@ HEADERS += cutbyintensitydialog.h \
     model/specsvgunitbutton.h \
     specsplitter.h \
     actionlib/specplotlabelcommand.h \
-    actionlib/speclabelaction.h
+    actionlib/speclabelaction.h \
+    specprofiler.h
 
 INCLUDEPATH += kinetic \
 	log \
