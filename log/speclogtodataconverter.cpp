@@ -86,7 +86,7 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
 			QFile file(fileName) ;
 			if (!file.exists())
 			{
-				QStringList directories(settings.value("importDirectory").toStringList()) ;
+				QStringList directories(settings.value("logConverter/importDirectory").toStringList()) ;
 				foreach(QString directory, directories)
 				{
 					currentDirectory.setPath(directory) ;
@@ -120,7 +120,7 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
 					}
 					currentDirectory = path.directory() ;
 					directories << currentDirectory.absolutePath() ;
-					settings.setValue("importDirectory",directories) ;
+					settings.setValue("logConverter/importDirectory",directories) ;
 					file.setFileName(path.selectedFiles().first()) ;
 				}
 			}
