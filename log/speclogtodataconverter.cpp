@@ -5,6 +5,7 @@
 #include <QMessageBox>
 #include <QMimeData>
 #include "speclogmodel.h"
+#include <QSettings>
 
 specLogToDataConverter::specLogToDataConverter(QObject *parent)
 	: specMimeConverter(parent)
@@ -55,6 +56,7 @@ void specLogToDataConverter::exportData(QList<specModelItem *> &items, QMimeData
 
 QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
 {
+	QSettings settings ;
 	QByteArray ba(data->data("application/spec.logged.files")) ;
 	QDataStream in(&ba,QIODevice::ReadOnly) ;
 	QPair<qint8, QString> entry ;
@@ -84,29 +86,43 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
 			QFile file(fileName) ;
 			if (!file.exists())
 			{
-				QFileDialog path ;
-				path.setWindowTitle("Datei zum Importieren angeben") ;
-				path.setDirectory(currentDirectory) ;
-				path.setFileMode(QFileDialog::ExistingFile);
-				path.selectFile(fileName) ;
-				path.setNameFilters(QStringList(QString("%1 (%1)").arg(fileName))) ;
-				if (path.exec() == QDialog::Rejected || path.selectedFiles().isEmpty())
+				QStringList directories(settings.value("importDirectory").toStringList()) ;
+				foreach(QString directory, directories)
 				{
-					if (QMessageBox::question(0,
-								  "Import abbrechen?",
-								  "Soll der Import von Datendateien abgebrochen werden?",
-								  QMessageBox::Yes | QMessageBox::No,
-								  QMessageBox::No) == QMessageBox::Yes)
-					{
-						foreach(specModelItem* item, items)
-							delete item ;
-						items.clear();
-						return items ;
-					}
-					continue ;
+					currentDirectory.setPath(directory) ;
+					QDir::setCurrent(currentDirectory.absolutePath()) ;
+					file.setFileName(currentDirectory.absoluteFilePath(fileName)) ;
+					if (file.exists()) break ;
 				}
-				currentDirectory = path.directory() ;
-				file.setFileName(path.selectedFiles().first()) ;
+
+				if (!file.exists())
+				{
+					QFileDialog path ;
+					path.setWindowTitle("Datei zum Importieren angeben") ;
+					path.setDirectory(currentDirectory) ;
+					path.setFileMode(QFileDialog::ExistingFile);
+					path.selectFile(fileName) ;
+					path.setNameFilters(QStringList(QString("%1 (%1)").arg(fileName))) ;
+					if (path.exec() == QDialog::Rejected || path.selectedFiles().isEmpty())
+					{
+						if (QMessageBox::question(0,
+									  "Import abbrechen?",
+									  "Soll der Import von Datendateien abgebrochen werden?",
+									  QMessageBox::Yes | QMessageBox::No,
+									  QMessageBox::No) == QMessageBox::Yes)
+						{
+							foreach(specModelItem* item, items)
+								delete item ;
+							items.clear();
+							return items ;
+						}
+						continue ;
+					}
+					currentDirectory = path.directory() ;
+					directories << currentDirectory.absolutePath() ;
+					settings.setValue("importDirectory",directories) ;
+					file.setFileName(path.selectedFiles().first()) ;
+				}
 			}
 			if (!file.open(QFile::ReadOnly | QFile::Text))
 			{
