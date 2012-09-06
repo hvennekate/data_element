@@ -49,5 +49,6 @@
         <file>xshift.png</file>
         <file>lineStyle.png</file>
         <file>resizeImage.png</file>
+        <file>undoView.png</file>
     </qresource>
 </RCC>

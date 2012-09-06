@@ -2,7 +2,7 @@
 #include <QFile>
 
 specAppWindow::specAppWindow()
- : QMainWindow(), settings()
+ : QMainWindow(), settings
 {
 	setAnimated(false) ;
 	setDockOptions(QMainWindow::AllowTabbedDocks) ;

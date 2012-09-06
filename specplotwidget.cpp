@@ -18,12 +18,14 @@
 #include "specspectrumplot.h"
 #include "speclogwidget.h"
 #include "canvaspicker.h"
+#include <QUndoView>
 
 specPlotWidget::specPlotWidget(QWidget *parent)
 	: QDockWidget(tr("untitled"),parent),
 	  items(new specDataView(this)),
 	  logWidget(new specLogWidget(parent)),
-	  kineticWidget(new specKineticWidget(QString(),parent)),
+	  undoViewWidget(new QDockWidget("History",parent)),
+	  kineticWidget(new specKineticWidget("Kinetics",parent)),
 	  content(new QWidget(this)),
 	  layout(new QVBoxLayout(content)),
 	  plot(new specSpectrumPlot(this)),
@@ -34,6 +36,7 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	  kineticsAction(kineticWidget->toggleViewAction()),
 	  saveAsAction(new QAction(QIcon::fromTheme("document-save-as"), tr("Save as..."), this)),
 	  logAction(logWidget->toggleViewAction()),
+	  undoViewAction(undoViewWidget->toggleViewAction()),
 	  actions(new specActionLibrary(this))
 {
 	setWhatsThis(tr("Data Dock Window - This is the main window for managing data.  Right-clicking on it will change the arrangement of its contents from vertical to horizontal and back.\nSince this is a dock window, you may remove it from the application's main window and move it around within the main window.  To do so, \"grab\" it by its title bar and drag it to where you need it to be.\nThere are also a dock window for managing logs and \"meta-data\" (i.e. data based on processing the primary data) associated with this data dock window.  To show these, click the log or meta buttons (to the right of the save as button).\nTo start working, check out the help of the data list at the bottom (or right) of this window or of the list in the log dock window."));
@@ -44,8 +47,13 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	redoAction = actions->redoAction(this) ;
 	undoAction->setToolTip(tr("Undo")) ;
 	redoAction->setToolTip(tr("Redo")) ;
-	undoAction->setToolTip(tr("Undo - By clicking this button you can revert changes.  To \"undo the undo\" click the redo button right next door.\nNote that all of your undo history will be saved along with your work and will be available again upon loading your file again."));
-	redoAction->setToolTip(tr("Redo - Redoes what has been undone by clicking the undo button.\nNote that all of your undo history (including possible redos) will be saved along with your work and will be available again upon loading your file again."));
+	undoAction->setWhatsThis(tr("Undo - By clicking this button you can revert changes.  To \"undo the undo\" click the redo button right next door.\nNote that all of your undo history will be saved along with your work and will be available again upon loading your file again."));
+	redoAction->setWhatsThis(tr("Redo - Redoes what has been undone by clicking the undo button.\nNote that all of your undo history (including possible redos) will be saved along with your work and will be available again upon loading your file again."));
+
+	undoViewWidget->setWhatsThis("Undo history.  Click on any command to forward/rewind to that particular state.");
+	undoViewWidget->setWidget(actions->undoView()) ;
+	undoViewWidget->setFloating(true) ;
+	undoViewAction->setIcon(QIcon(":/undoView.png")) ;
 
 	items->setModel(new specModel(items));
 
@@ -126,6 +134,7 @@ void specPlotWidget::modified()
 	setWindowTitle(currentTitle) ;
 	kineticWidget->setWindowTitle(QString("Kinetics of ").append(currentTitle)) ;
 	logWidget->setWindowTitle(QString("Logs of ").append(currentTitle)) ;
+	undoViewWidget->setWindowTitle(QString("History of ").append(currentTitle)) ;
 }
 
 void specPlotWidget::createToolbars()
@@ -141,6 +150,7 @@ void specPlotWidget::createToolbars()
 	toolbar-> addSeparator() ;
 	toolbar-> addAction(undoAction) ;
 	toolbar-> addAction(redoAction) ;
+	toolbar-> addAction(undoViewAction) ;
 
 	toolbar->addSeparator() ;
 	QAction *purgeUndoStack = new QAction(QIcon::fromTheme("user-trash"),tr("Clear undo"),this) ;
@@ -277,4 +287,5 @@ void specPlotWidget::changeFileName(const QString& name)
 	setWindowTitle(QFileInfo(name).fileName()) ;
 	kineticWidget->setWindowTitle(QString("Kinetics of ").append(QFileInfo(name).fileName())) ;
 	logWidget->setWindowTitle(QString("Logs of ").append(QFileInfo(name).fileName())) ;
+	undoViewWidget->setWindowTitle(QString("History of ").append(QFileInfo(name).fileName()));
 }

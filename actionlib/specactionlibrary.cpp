@@ -29,6 +29,12 @@
 #include "speceditdescriptorcommand.h"
 #include "specmetarangecommand.h"
 #include "specplotlabelcommand.h"
+#include <QUndoView>
+
+QUndoView* specActionLibrary::undoView()
+{
+	return new QUndoView(undoStack) ;
+}
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)

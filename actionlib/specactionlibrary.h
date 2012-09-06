@@ -19,6 +19,7 @@ class specActionLibrary ;
 class specView ;
 class specModel ;
 class specUndoAction ;
+class QUndoView ;
 
 class specActionLibrary : public QObject, public specStreamable
 {
@@ -38,6 +39,7 @@ public:
 	QAction* undoAction(QObject*) ;
 	QAction* redoAction(QObject*) ;
 	void purgeUndo() ;
+	QUndoView* undoView() ;
 public slots:
 	void push(specUndoCommand*) ;
 signals:
