@@ -30,6 +30,7 @@
 #include "specmetarangecommand.h"
 #include "specplotlabelcommand.h"
 #include <QUndoView>
+#include "utility-functions.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -82,7 +83,9 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 
 		addNewAction(bar, new specAddFolderAction(target)) ;
 		addNewAction(bar, new specAddSVGItemAction(target)) ;
-		addNewAction(bar, new specImportSpecAction(target)) ;
+		specImportSpecAction *importAction = new specImportSpecAction(target) ;
+		importAction->setAcceptableImportFunctions(QList<QList<specModelItem *> (*)(QFile &)>() << readHVFile << readPEFile << readJCAMPFile);
+		addNewAction(bar, importAction) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specCopyAction(target)) ;
 		addNewAction(bar, new specCutAction(target)) ;
@@ -120,7 +123,10 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		QToolBar *bar = new QToolBar(target) ;
 
 		addNewAction(bar, new specAddFolderAction(target)) ;
-		addNewAction(bar, new specImportSpecAction(target)) ;
+		specImportSpecAction *importAction = new specImportSpecAction(target) ;
+		importAction->setFilters(QStringList() << "Log-files (*.log)");
+		importAction->setAcceptableImportFunctions(QList<QList<specModelItem*> (*)(QFile&)>() << readLogFile);
+		addNewAction(bar, importAction) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specCopyAction(target)) ;
 		addNewAction(bar, new specCutAction(target)) ;

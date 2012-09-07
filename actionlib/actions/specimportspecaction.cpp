@@ -3,13 +3,14 @@
 #include "utility-functions.h"
 #include "specaddfoldercommand.h"
 #include "specview.h"
+#include <QMessageBox>
 
 specImportSpecAction::specImportSpecAction(QObject *parent) :
     specUndoAction(parent)
 {
 	setIcon(QIcon(":/fileimport.png"));
 	setToolTip(tr("Import files")) ;
-	setWhatsThis(tr("Import data files.  Use this button to get started by directly importing data."));
+	setWhatsThis(tr("Import files.  Use this button to get started."));
 }
 
 const std::type_info &specImportSpecAction::possibleParent()
@@ -36,7 +37,11 @@ void specImportSpecAction::execute()
 	for(int i = 0 ; i < fileNames.size() ; ++i)
 	{
 		QList<specModelItem*> (*importFunction)(QFile&) = fileFilter(fileNames[i]);
-		if (!importFunction) continue ;
+		if (!acceptableFunctions.contains(importFunction))
+		{
+			QMessageBox::critical(0,tr("Cannot import"),tr("Cannot import this type of data here:")+ fileNames[i],QMessageBox::Ok) ;
+			continue ;
+		}
 		QFile fileToImport(fileNames[i]) ;
 		fileToImport.open(QFile::ReadOnly | QFile::Text) ;
 		importedItems << importFunction(fileToImport) ;
@@ -55,4 +60,14 @@ void specImportSpecAction::execute()
 		library->push(command) ;
 	else
 		delete command ;
+}
+
+void specImportSpecAction::setFilters(const QStringList &f)
+{
+	filters = f ;
+}
+
+void specImportSpecAction::setAcceptableImportFunctions(const QList<QList<specModelItem *> (*)(QFile &)> &f)
+{
+	acceptableFunctions = f ;
 }
