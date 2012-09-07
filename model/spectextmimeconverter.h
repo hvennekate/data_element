@@ -13,6 +13,7 @@ public:
 	explicit specTextMimeConverter(QObject* parent = 0);
 	virtual QList<specModelItem*> importData(const QMimeData *data) ;
 	void exportData(QList<specModelItem *> &, QMimeData *) ;
+	bool canImport(const QStringList & types) ;
 };
 
 #endif // SPECTEXTMIMECONVERTER_H
