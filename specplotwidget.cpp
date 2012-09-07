@@ -233,6 +233,7 @@ specPlotWidget::~specPlotWidget()
 {
 	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(kineticWidget) ;
 	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(logWidget) ;
+	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(undoViewWidget) ;
 	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(this) ;
 	logWidget->deleteLater();
 	kineticWidget->deleteLater();

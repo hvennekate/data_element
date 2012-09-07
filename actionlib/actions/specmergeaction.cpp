@@ -14,6 +14,7 @@
 #include <QDoubleValidator>
 #include <QScrollArea>
 #include <QLabel>
+#include "specprofiler.h"
 
 specMergeAction::specMergeAction(QObject *parent)
 	: specUndoAction(parent)
@@ -25,6 +26,7 @@ specMergeAction::specMergeAction(QObject *parent)
 
 void specMergeAction::execute()
 {
+	specProfiler profiler("Prepare merge commands:") ;
 	specView *view = (specView*) parentWidget() ;
 	specModel *model = view->model() ;
 	QModelIndexList indexes = view->getSelection() ;
@@ -38,12 +40,14 @@ void specMergeAction::execute()
 	// let user define similarities
 	QList<QPair<QStringList::size_type, double> > criteria ;
 	bool spectralAdaptation ;
+	qDebug() << "gathered items:" << profiler.restart() ;
 	if (!getMergeCriteria(criteria, model->descriptors(), model->descriptorProperties(),spectralAdaptation)) return ;
 
 	QVector<specModelItem*> toBeDeleted ;
 	QVector<specModelItem*> newlyInserted ;
 
 	// Create and insert new merged items
+	qDebug() << "Beginning merge:" << profiler.restart() ;
 	while (!items.isEmpty())
 	{
 		// form chunk -> only merge if same parent! (new logic)
@@ -122,6 +126,7 @@ void specMergeAction::execute()
 		if (model->insertItems(toInsert.toList(), model->index(parent), row))
 			newlyInserted += toInsert ; // TODO else...
 	}
+	qDebug() << "arranged items:" << profiler.restart() ;
 
 	specMultiCommand *command = new specMultiCommand ;
 	command->setParentObject(view) ;

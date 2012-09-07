@@ -121,7 +121,11 @@ specUndoCommand* dataItemProperties::changeCommands(QObject* parent)
 		specExchangeDataCommand* dataCommand = new specExchangeDataCommand(parentMulti) ;
 		dataCommand->setParentObject(parent);
 		dataCommand->setItem(itemIndex,item.data) ;
-		if (correctionUnchanged) return dataCommand ;
+		if (correctionUnchanged)
+		{
+			dataCommand->setText(tr("Modify item data"));
+			return dataCommand ;
+		}
 	}
 
 	if (!correctionUnchanged)
@@ -136,7 +140,12 @@ specUndoCommand* dataItemProperties::changeCommands(QObject* parent)
 						  item.offset - originalItem->offset * newFactor,
 						  item.slope  - originalItem->slope  * newFactor,
 						  newFactor);
-		if (dataUnchanged) return correctionCommand ;
+		if (dataUnchanged)
+		{
+			correctionCommand->setText(tr("Modify item correction")) ;
+			return correctionCommand ;
+		}
 	}
+	parentMulti->setText(tr("Modify item data and correction")) ;
 	return parentMulti ;
 }

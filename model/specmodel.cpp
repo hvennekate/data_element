@@ -738,6 +738,7 @@ specModelItem* specModel::itemPointer(const QVector<int> &indexes) const
 	specModelItem* pointer = root ;
 	for (int i =  indexes.size() - 1 ; i >= 0 ; --i)
 	{
+		if (!pointer) return 0 ;
 		pointer = ((specFolderItem*) pointer)->child(indexes[i]) ;
 	}
 	return pointer ;

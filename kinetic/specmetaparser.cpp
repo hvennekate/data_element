@@ -1,7 +1,7 @@
 #include "specmetaparser.h"
 #include <QStringList>
 #include <QRegExp>
-#include <qwt/qwt_series_data.h>
+#include <qwt_series_data.h>
 #include <iostream>
 #include "specmetaitem.h"
 

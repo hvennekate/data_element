@@ -61,7 +61,7 @@ void specPlot::replot()
 	foreach(QwtPlotItem* item, allItems)
 	{
 		if (dynamic_cast<specMetaRange*>(item))
-			newMetaRanges += ((specCanvasItem*) item) ;
+			newMetaRanges << ((specCanvasItem*) item) ;
 		else if (dynamic_cast<specSVGItem*>(item))
 			svgitems << (specSVGItem*) item ;
 	}
