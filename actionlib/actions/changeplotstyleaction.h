@@ -1,8 +1,8 @@
 #ifndef CHANGEPLOTSTYLEACTION_H
 #define CHANGEPLOTSTYLEACTION_H
 
-#include "actionlib/specundoaction.h"
-#include "spectral/specdataview.h"
+#include "specundoaction.h"
+#include "specdataview.h"
 #include "specstylecommand.h"
 
 class specGenealogy ;

@@ -60,6 +60,7 @@ void specLabelAction::execute()
 	specPlotLabelCommand* command = generatePlotLabelCommand(commandId()) ;
 	command->setParentObject(parent()) ;
 	command->setLabelText(text) ;
+	command->setText(tr("Edited ") + labelText());
 	library->push(command) ;
 }
 
@@ -91,4 +92,19 @@ specStreamable::type specXLabelAction::commandId()
 specStreamable::type specYLabelAction::commandId()
 {
 	return specStreamable::plotYLabelCommandId ;
+}
+
+QString specTitleAction::labelText() const
+{
+	return tr("title") ;
+}
+
+QString specXLabelAction::labelText() const
+{
+	return tr("x axis label") ;
+}
+
+QString specYLabelAction::labelText() const
+{
+	return tr("y axis label") ;
 }

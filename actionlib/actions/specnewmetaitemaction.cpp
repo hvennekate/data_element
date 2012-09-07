@@ -42,6 +42,7 @@ void specNewMetaItemAction::execute()
 	command->setItems(QModelIndexList() << model->index(pointer)) ;
 	command->setParentObject(model) ;
 
+	command->setText(tr("Add meta item")) ;
 	if (command->ok())
 		library->push(command) ;
 	else

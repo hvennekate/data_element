@@ -74,6 +74,7 @@ void specTreeAction::execute()
 	insertion->setItems(QModelIndexList() << model->index(row,0,index)) ;
 	insertion->setParentObject(model) ;
 
+	command->setText(tr("Generate item tree")) ;
 	library->push(command);
 
 	for (int i = 0 ; i < moveTargets.size() ; ++i)

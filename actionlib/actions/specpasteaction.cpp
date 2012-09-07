@@ -39,7 +39,7 @@ void specPasteAction::execute()
 	for (int i = 0 ; i < count ; ++i)
 		list << model->index(i+row,0,index) ;
 	command->setItems(list) ;
-
+	command->setText(tr("Paste items")) ;
 	command->setParentObject(model) ;
 
 	if (command->ok())

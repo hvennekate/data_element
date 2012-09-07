@@ -2,7 +2,7 @@
 #define SPECMETAVIEW_H
 
 #include "specview.h"
-#include "actionlib/specactionlibrary.h"
+#include "specactionlibrary.h"
 
 class specMetaModel ;
 

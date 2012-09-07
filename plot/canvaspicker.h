@@ -52,6 +52,7 @@ public:
 	void highlightSelectable(bool) ;
 	QList<specCanvasItem*> items() const ;
 	inline void setOwning(bool Owning =true) { owning = Owning ; } // TODO do this more skilfully.
+	void purgeSelectable() ;
 
 signals:
 	void pointMoved(specCanvasItem*, int, double, double) ;

@@ -139,6 +139,7 @@ void specMergeAction::execute()
 	deletionCommand->setItems(deleteList) ;
 	deletionCommand->setParentObject(view->model()) ;
 
+	command->setText(tr("Merge items")) ;
 	library->push(command) ;
 }
 

@@ -15,7 +15,7 @@
 #include <QItemSelection>
 #include <QMap>
 #include <QHash>
-#include "actionlib/specactionlibrary.h"
+#include "specactionlibrary.h"
 #include "specmimeconverter.h"
 
 class specModel ;

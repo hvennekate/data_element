@@ -1,9 +1,9 @@
 #include "dataitemproperties.h"
 #include "ui_dataitemproperties.h"
 #include <qwt_series_data.h>
-#include "actionlib/specmulticommand.h"
-#include "actionlib/specexchangedatacommand.h"
-#include "actionlib/specplotmovecommand.h"
+#include "specmulticommand.h"
+#include "specexchangedatacommand.h"
+#include "specplotmovecommand.h"
 
 dataItemProperties::dataItemProperties(specDataItem *i, QWidget *parent) :
 	QDialog(parent),

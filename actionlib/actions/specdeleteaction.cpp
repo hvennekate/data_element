@@ -82,6 +82,8 @@ void specDeleteAction::execute()
 	parentCommand->setText("Delete");
 	parentCommand->setMergeable(false) ;
 	currentView->selectionModel()->clearSelection();
+
+	parentCommand->setText(tr("Delete item(s)")) ;
 	if (command->ok())
 		library->push(parentCommand) ;
 	else

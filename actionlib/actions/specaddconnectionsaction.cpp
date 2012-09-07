@@ -28,6 +28,7 @@ void specAddConnectionsAction::execute()
 	specAddConnectionsCommand *command = new specAddConnectionsCommand ;
 	command->setParentObject((QObject*) view->model()) ;
 	command->setItems(target,servers) ;
+	command->setText(tr("Connect to data items")) ;
 
 	if (command->ok())
 		library->push(command) ;

@@ -49,6 +49,7 @@ void specImportSpecAction::execute()
 		newIndexes << model->index(row+i,0,index) ;
 	command->setItems(newIndexes) ;
 	command->setParentObject(currentView->model()) ;
+	command->setText("Import data") ;
 
 	if (command->ok())
 		library->push(command) ;

@@ -12,6 +12,7 @@ private:
 	void execute() ;
 protected:
 	virtual QString textToEdit() = 0 ;
+	virtual QString labelText() const = 0 ;
 	virtual specStreamable::type commandId() = 0 ;
 public:
 	explicit specLabelAction(QObject *parent = 0) ;
@@ -26,6 +27,7 @@ public:
 private:
 	QString textToEdit() ;
 	specStreamable::type commandId() ;
+	QString labelText() const ;
 };
 
 class specXLabelAction : public specLabelAction
@@ -36,6 +38,7 @@ public:
 private:
 	QString textToEdit() ;
 	specStreamable::type commandId() ;
+	QString labelText() const ;
 };
 
 class specYLabelAction : public specLabelAction
@@ -46,6 +49,7 @@ public:
 private:
 	QString textToEdit() ;
 	specStreamable::type commandId() ;
+	QString labelText() const ;
 };
 
 #endif // SPECLABELACTION_H

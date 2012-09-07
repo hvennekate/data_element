@@ -166,6 +166,7 @@ void changePlotStyleAction::actionTriggered(QAction* action)
 	newCommand->obtainStyle(&item) ;
 	newCommand->setParentObject(view) ;
 	newCommand->setItems(view->getSelection()) ;
+	newCommand->setText(tr("Change plot style"));
 	library->push(newCommand) ;
 }
 

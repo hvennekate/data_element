@@ -90,5 +90,6 @@ void specAverageDataAction::execute()
 		command->setParentObject(view->model()) ;
 		command->setItem(index,newData);
 	}
+	groupCommand->setText(tr("Average data")) ;
 	library->push(groupCommand);
 }

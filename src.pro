@@ -193,7 +193,7 @@ INCLUDEPATH += kinetic \
 	spectral \
 	actionlib \
 	actionlib/actions \
-	actionlib/commands/commands
+	actionlib/commands
 
 
 TEMPLATE = app

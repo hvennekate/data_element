@@ -54,6 +54,7 @@ void specAddSVGItemAction::execute()
 	command->setItems(QModelIndexList() << model->index(row,0,index)) ;
 
 	command->setParentObject(model) ;
+	command->setText(tr("Add SVG item")) ;
 
 	if (command->ok())
 		library->push(command) ;

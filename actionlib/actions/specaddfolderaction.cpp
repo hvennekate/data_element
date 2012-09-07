@@ -34,6 +34,7 @@ void specAddFolderAction::execute()
 	specAddFolderCommand *command = new specAddFolderCommand ;
 	command->setItems(QModelIndexList() << model->index(row,0,index)) ;
 
+	command->setText(tr("Add folder")) ;
 	command->setParentObject(model) ;
 
 	if (command->ok())

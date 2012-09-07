@@ -300,6 +300,7 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 	command->setItem(view->model()->index( (specModelItem*) item)) ; // TODO do dynamic cast first!!
 	command->setCorrections(shift,offset,offline,scale) ;
 	command->setParentObject(view) ;
+	command->setText(tr("Modify data point(s)"));
 	undoPartner()->push(command) ;
 }
 
@@ -414,6 +415,7 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double n
 
 	specMultiCommand *zeroCommand = generateCorrectionCommand(zeroRanges, spectra, referenceSpectrum, view, noSlopeAction->isChecked()) ;
 	zeroCommand->setParentObject(view) ;
+	zeroCommand->setText(tr("Apply range correction"));
 	undoPartner()->push(zeroCommand) ;
 	replot() ;
 }
@@ -463,6 +465,7 @@ void specSpectrumPlot::multipleSubtraction()
 	}
 
 	subCommand->setParentObject(view->model()) ;
+	subCommand->setText(tr("Subtract reference"));
 	undoPartner()->push(subCommand) ;
 	replot() ;
 }

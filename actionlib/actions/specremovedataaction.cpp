@@ -39,6 +39,6 @@ void specRemoveDataAction::execute()
 
 	delete dialog ;
 
-
+	groupCommand->setText(tr("Delete data points")) ;
 	library->push(groupCommand);
 }

@@ -1,8 +1,8 @@
 #include "metaitemproperties.h"
 #include "ui_metaitemproperties.h"
-#include "actionlib/specaddconnectionscommand.h"
-#include "actionlib/specdeleteconnectionscommand.h"
-#include "actionlib/specmulticommand.h"
+#include "specaddconnectionscommand.h"
+#include "specdeleteconnectionscommand.h"
+#include "specmulticommand.h"
 
 metaItemProperties::metaItemProperties(specMetaItem* i,QWidget *parent) :
 	QDialog(parent),

@@ -18,10 +18,10 @@
 #include "specdataitem.h"
 #include "exportdialog.h"
 #include <QTime>
-#include "actionlib/specmovecommand.h"
-#include "actionlib/specaddfoldercommand.h"
-#include "actionlib/speceditdescriptorcommand.h"
-#include "actionlib/specresizesvgcommand.h"
+#include "specmovecommand.h"
+#include "specaddfoldercommand.h"
+#include "speceditdescriptorcommand.h"
+#include "specresizesvgcommand.h"
 // TODO replace isFolder() by addChildren(empty list,0)
 
 bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria)
@@ -536,6 +536,7 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 			else
 				command->setItem(index, desc, value.toString()) ;
 			// TODO unite in value-variant
+			command->setText(tr("Edit data")) ;
 			dropBuddy->push(command) ;
 		}
 		else if (role == Qt::ForegroundRole)
@@ -686,6 +687,7 @@ bool specModel::dropMimeData(const QMimeData *data,
 			specAddFolderCommand *command = new specAddFolderCommand ;
 			command->setParentObject(this) ;
 			command->setItems(newIndexes) ;
+			command->setText(tr("Insert items")) ;
 			dropBuddy->push(command);
 		}
 	}
@@ -821,6 +823,7 @@ void specModel::svgMoved(specCanvasItem *i, int point, double x, double y)
 	item->pointMoved(point,x,y) ;
 	command->setItem(index(item), item->getBounds()) ;
 	command->undo();
+	command->setText(tr("Resize/move SVG item"));
 	dropBuddy->push(command) ;
 }
 

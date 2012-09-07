@@ -15,10 +15,10 @@
 specModelItem::specModelItem(specFolderItem* par, QString desc)
 	: specCanvasItem(),
 	  iparent(0),
+	  dataValid(false),
 	  description(desc, spec::editable),
 	  mergePlotData(true),
-	  sortPlotData(true),
-	  dataValid(false)
+	  sortPlotData(true)
 {
 	setParent(par) ;
 }

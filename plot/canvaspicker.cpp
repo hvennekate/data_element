@@ -451,6 +451,8 @@ void CanvasPicker::removeSelectable()
 	removeSelectable(selectable) ;
 }
 
+
+
 CanvasPicker::~CanvasPicker()
 {
 	highlightSelectable(false) ;
@@ -460,4 +462,9 @@ CanvasPicker::~CanvasPicker()
 QList<specCanvasItem*> CanvasPicker::items() const
 {
 	return selectable.toList() ;
+}
+
+void CanvasPicker::purgeSelectable()
+{
+	selectable.clear() ;
 }
