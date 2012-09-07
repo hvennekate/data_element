@@ -9,7 +9,6 @@ specPrintPlotAction::specPrintPlotAction(QObject *parent) :
 	specUndoAction(parent),
 	printer(new QPrinter(QPrinter::HighResolution))
 {
-	this->setIcon(QIcon::fromTheme("document-print")) ;
 	specPlot *plot = (specPlot*) parentWidget() ;
 	QSize plotSize = plot->size() ;
 	double aspectRatio = (double) plotSize.width() / plotSize.height() ;

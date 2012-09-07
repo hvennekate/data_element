@@ -31,6 +31,7 @@
 #include "specplotlabelcommand.h"
 #include <QUndoView>
 #include "utility-functions.h"
+#include "genericexportaction.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -94,6 +95,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		bar->addSeparator() ;
 		addNewAction(bar, new specTreeAction(target)) ;
 		addNewAction(bar, new specMergeAction(target)) ;
+		addNewAction(bar,new genericExportAction(target)) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specRemoveDataAction(target)) ;
 		addNewAction(bar, new specAverageDataAction(target)) ;
@@ -115,6 +117,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		addNewAction(bar, new specDeleteAction(target)) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specAddConnectionsAction(target)) ;
+		addNewAction(bar,new genericExportAction(target)) ;
 
 		return bar ;
 	}

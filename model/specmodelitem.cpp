@@ -224,7 +224,7 @@ void specModelItem::exportData(const QList<QPair<bool,QString> >& headerFormat, 
 	out << endl ;
 	for (size_t j = 0 ; j < dataSize() ; j++)
 		for (int i = 0 ; i < dataFormat.size() ; i++)
-			out << dataFormat[i].first << dataFormat[i].second ;
+			out << (dataFormat[i].first ? sample(j).x() :sample(j).y()) << dataFormat[i].second ;
 	out << endl ;
 }
 

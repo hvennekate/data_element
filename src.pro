@@ -91,7 +91,8 @@ SOURCES += main.cpp \
     specsplitter.cpp \
     actionlib/commands/specplotlabelcommand.cpp \
     actionlib/actions/speclabelaction.cpp \
-    specprofiler.cpp
+    specprofiler.cpp \
+    actionlib/actions/genericexportaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -184,7 +185,8 @@ HEADERS += cutbyintensitydialog.h \
     specsplitter.h \
     actionlib/commands/specplotlabelcommand.h \
     actionlib/actions/speclabelaction.h \
-    specprofiler.h
+    specprofiler.h \
+    actionlib/actions/genericexportaction.h
 
 INCLUDEPATH += kinetic \
 	log \

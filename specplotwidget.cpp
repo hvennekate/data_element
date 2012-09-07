@@ -153,7 +153,7 @@ void specPlotWidget::createToolbars()
 	toolbar-> addAction(undoViewAction) ;
 
 	toolbar->addSeparator() ;
-	QAction *purgeUndoStack = new QAction(QIcon::fromTheme("user-trash"),tr("Clear undo"),this) ;
+	QAction *purgeUndoStack = new QAction(QIcon::fromTheme("user-trash"),tr("Clear history"),this) ;
 	toolbar-> addAction(purgeUndoStack) ;
 	connect(purgeUndoStack,SIGNAL(triggered()),this,SLOT(purgeUndo())) ;
 }
@@ -162,7 +162,7 @@ void specPlotWidget::purgeUndo()
 {
 	if (QMessageBox::Yes ==
 			QMessageBox::question(this,
-					      tr("Really Clear Undo?"),
+					      tr("Really Clear History?"),
 					      tr("Do you really want to delete all undo and redo actions?  WARNING:  This cannot be undone."),
 					      QMessageBox::Yes | QMessageBox::No,
 					      QMessageBox::No))
