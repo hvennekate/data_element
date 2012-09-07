@@ -12,8 +12,8 @@ private:
 	specGenealogy *items ; // TODO define type to hold reference to one single item.
 	void undoIt() ;
 	void doIt() ;
-	void writeToStream(QDataStream &out) const;
-	void readFromStream(QDataStream &in) ;
+	void writeCommand(QDataStream &out) const;
+	void readCommand(QDataStream &in) ;
 	type typeId() const { return specStreamable::movePlotCommandId ;}
 public:
 	specPlotMoveCommand(specUndoCommand *parent = 0);

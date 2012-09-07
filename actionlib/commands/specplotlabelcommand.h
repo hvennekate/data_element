@@ -7,8 +7,8 @@ class specPlotLabelCommand : public specUndoCommand
 {
 private:
 	void undoIt();
-	void writeToStream(QDataStream &out) const ;
-	void readFromStream(QDataStream &in) ;
+	void writeCommand(QDataStream &out) const ;
+	void readCommand(QDataStream &in) ;
 protected:
 	QString text ;
 public:

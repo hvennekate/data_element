@@ -53,12 +53,12 @@ void specMetaRangeCommand::setItem(QModelIndex index, int variableIndex, int ran
 	((specMetaItem*) (item->items().first()))->getRangePoint(variableNo, rangeNo, pointNo, oldX, oldY) ;
 }
 
-void specMetaRangeCommand::writeToStream(QDataStream &out) const
+void specMetaRangeCommand::writeCommand(QDataStream &out) const
 { // TODO careful when writing pointer to genealogy.  Make local variable
 	out << oldX << oldY << newX << newY << rangeNo << pointNo << variableNo << *item ;
 }
 
-void specMetaRangeCommand::readFromStream(QDataStream &in)
+void specMetaRangeCommand::readCommand(QDataStream &in)
 {
 	if (!item) item = new specGenealogy ;
 	in >> oldX >> oldY >> newX >> newY >> rangeNo >> pointNo >> variableNo >> *item ;

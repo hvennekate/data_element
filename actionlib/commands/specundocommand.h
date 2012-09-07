@@ -8,12 +8,14 @@ class specUndoCommand : public QUndoCommand, public specStreamable
 {
 private:
 	QObject *pO ;
+	virtual void writeToStream(QDataStream &out) const ;
+	virtual void readFromStream(QDataStream &in) ;
 protected:
 	virtual void doIt() = 0;
 	virtual void undoIt() = 0 ;
 	virtual void parentAssigned() {}
-	virtual void writeToStream(QDataStream &out) const ;
-	virtual void readFromStream(QDataStream &in) ;
+	virtual void writeCommand(QDataStream &out) const {}
+	virtual void readCommand(QDataStream &in) {}
 public:
 	explicit specUndoCommand(specUndoCommand *parent = 0);
 	void redo() ;

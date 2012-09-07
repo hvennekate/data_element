@@ -38,8 +38,8 @@ private:
 	void parentAssigned();
 	void doIt() ;
 	void undoIt() ;
-	void writeToStream(QDataStream &out) const;
-	void readFromStream(QDataStream &in);
+	void writeCommand(QDataStream &out) const;
+	void readCommand(QDataStream &in);
 
 	property newProperty ;
 	QVector<property> oldProperties ;

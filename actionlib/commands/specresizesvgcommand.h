@@ -15,8 +15,8 @@ private:
 	specSVGItem::SVGCornerPoint anchor ;
 	void doIt() ;
 	void undoIt() ;
-	void writeToStream(QDataStream &out) const;
-	void readFromStream(QDataStream &in) ;
+	void writeCommand(QDataStream &out) const;
+	void readCommand(QDataStream &in) ;
 	type typeId() const { return specStreamable::resizeSVGCommandId ; }
 	void parentAssigned();
 public:

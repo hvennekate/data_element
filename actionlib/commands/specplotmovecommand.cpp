@@ -61,12 +61,12 @@ void specPlotMoveCommand::setCorrections(double xShift, double yOffset, double y
 	scale = yScale ;
 }
 
-void specPlotMoveCommand::writeToStream(QDataStream &out) const
+void specPlotMoveCommand::writeCommand(QDataStream &out) const
 {
 	out << slope << offset << scale << shift << *items ;
 }
 
-void specPlotMoveCommand::readFromStream(QDataStream &in)
+void specPlotMoveCommand::readCommand(QDataStream &in)
 {
 	if (!items) items = new specGenealogy ;
 	in >> slope >> offset >> scale >> shift >> *items ;

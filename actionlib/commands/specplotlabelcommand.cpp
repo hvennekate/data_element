@@ -16,12 +16,12 @@ void specPlotLabelCommand::undoIt()
 	doIt() ;
 }
 
-void specPlotLabelCommand::writeToStream(QDataStream &out) const
+void specPlotLabelCommand::writeCommand(QDataStream &out) const
 {
 	out << text ;
 }
 
-void specPlotLabelCommand::readFromStream(QDataStream &in)
+void specPlotLabelCommand::readCommand(QDataStream &in)
 {
 	in >> text ;
 }

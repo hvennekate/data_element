@@ -19,8 +19,8 @@ protected:
 	void take() ;
 	void restore() ;
 private:
-	void writeToStream(QDataStream &out) const;
-	void readFromStream(QDataStream &in) ;
+	void writeCommand(QDataStream &out) const;
+	void readCommand(QDataStream &in) ;
 	QVector<specGenealogy*> items ;
 	bool inverse() ;
 	void clear() ;

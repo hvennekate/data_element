@@ -22,7 +22,7 @@ void specMultiCommand::undoIt()
 	QUndoCommand::undo() ;
 }
 
-void specMultiCommand::writeToStream(QDataStream &out) const
+void specMultiCommand::writeCommand(QDataStream &out) const
 // TODO make read/write part of specUndoCommand
 // +protected virtual worker functions
 {
@@ -31,7 +31,7 @@ void specMultiCommand::writeToStream(QDataStream &out) const
 		out << *((specUndoCommand*) child(i)) ;
 }
 
-void specMultiCommand::readFromStream(QDataStream &in)
+void specMultiCommand::readCommand(QDataStream &in)
 {
 	qint32 children, id ;
 	in >> mayMerge >> children ;

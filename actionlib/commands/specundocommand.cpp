@@ -30,6 +30,7 @@ void specUndoCommand::undo()
 void specUndoCommand::writeToStream(QDataStream &out) const
 {
 	out << text() ;
+	writeCommand(out) ;
 }
 
 void specUndoCommand::readFromStream(QDataStream &in)
@@ -37,4 +38,5 @@ void specUndoCommand::readFromStream(QDataStream &in)
 	QString d ;
 	in >> d ;
 	setText(d) ;
+	readCommand(in) ;
 }

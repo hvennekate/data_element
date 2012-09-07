@@ -47,18 +47,16 @@ void specEditDescriptorCommand::doIt()
 	}
 }
 
-void specEditDescriptorCommand::writeToStream(QDataStream &out) const
+void specEditDescriptorCommand::writeCommand(QDataStream &out) const
 {
-	specUndoCommand::writeToStream(out) ;
 	out << previousContent
 	    << descriptor
 	    << previousActiveLine
 	    << *item ;
 }
 
-void specEditDescriptorCommand::readFromStream(QDataStream &in)
+void specEditDescriptorCommand::readCommand(QDataStream &in)
 {
-	specUndoCommand::readFromStream(in) ;
 	if (!item) item = new specGenealogy ;
 	in >> previousContent
 	   >> descriptor

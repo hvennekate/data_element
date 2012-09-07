@@ -65,7 +65,7 @@ void specStyleCommandImplFuncTemplate::undoIt()
 }
 
 specStyleCommandImplTemplate
-void specStyleCommandImplFuncTemplate::writeToStream(QDataStream &out) const
+void specStyleCommandImplFuncTemplate::writeCommand(QDataStream &out) const
 {
 	out << quint32(Genealogies.size()) << newProperty << oldProperties ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
@@ -73,7 +73,7 @@ void specStyleCommandImplFuncTemplate::writeToStream(QDataStream &out) const
 }
 
 specStyleCommandImplTemplate
-void specStyleCommandImplFuncTemplate::readFromStream(QDataStream &in)
+void specStyleCommandImplFuncTemplate::readCommand(QDataStream &in)
 {
 //	clear() ;  TODO: where is this function?
 	quint32 size ;

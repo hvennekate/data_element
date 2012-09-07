@@ -13,8 +13,8 @@ private:
 	QVector<specModelItem*> itemPointers() const ;
 	specMetaItem* targetPointer() const ;
 	bool sameModel(specGenealogy*) const ;
-	void writeToStream(QDataStream &out) const;
-	void readFromStream(QDataStream &in) ;
+	void writeCommand(QDataStream &out) const;
+	void readCommand(QDataStream &in) ;
 	void parentAssigned();
 protected:
 	void take() ;

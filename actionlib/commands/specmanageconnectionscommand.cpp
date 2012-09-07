@@ -56,7 +56,7 @@ void specManageConnectionsCommand::take()
 		pointer->disconnectClient(client) ;
 }
 
-void specManageConnectionsCommand::writeToStream(QDataStream &out) const
+void specManageConnectionsCommand::writeCommand(QDataStream &out) const
 {
 	if (!ok()) return ; // TODO why check if ok?
 	out << qint32(items.size())
@@ -65,7 +65,7 @@ void specManageConnectionsCommand::writeToStream(QDataStream &out) const
 		out << *(items[i]) ;
 }
 
-void specManageConnectionsCommand::readFromStream(QDataStream &in)
+void specManageConnectionsCommand::readCommand(QDataStream &in)
 {
 	clear() ;
 	qint32 toRead ;

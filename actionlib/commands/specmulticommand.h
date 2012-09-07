@@ -11,8 +11,8 @@ private:
 	bool mayMerge ; // TODO consider subclassing
 	void doIt() ;
 	void undoIt() ;
-	void writeToStream(QDataStream &out) const;
-	void readFromStream(QDataStream &in) ;
+	void writeCommand(QDataStream &out) const;
+	void readCommand(QDataStream &in) ;
 	type typeId() const { return specStreamable::multiCommandId ; }
 //	void parentAssigned();
 public:

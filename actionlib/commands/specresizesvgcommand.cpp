@@ -24,12 +24,12 @@ bool specResizeSVGcommand::ok()
 	return item ; // maybe check validity of size
 }
 
-void specResizeSVGcommand::writeToStream(QDataStream &out) const
+void specResizeSVGcommand::writeCommand(QDataStream &out) const
 {
 	out << other << *item << (qint8) anchor ;
 }
 
-void specResizeSVGcommand::readFromStream(QDataStream &in)
+void specResizeSVGcommand::readCommand(QDataStream &in)
 {
 	qint8 newAnchor ;
 	if (!item) new specGenealogy ;

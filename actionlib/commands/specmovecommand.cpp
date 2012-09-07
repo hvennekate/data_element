@@ -119,12 +119,12 @@ void specMoveCommand::undoIt()
 	model->signalEndReset();
 }
 
-void specMoveCommand::writeToStream(QDataStream &out) const
+void specMoveCommand::writeCommand(QDataStream &out) const
 {
 	out << sourceIndexes << number << targetIndex << sourceIndex ;
 }
 
-void specMoveCommand::readFromStream(QDataStream &in)
+void specMoveCommand::readCommand(QDataStream &in)
 {
 	in >> sourceIndexes >> number >> targetIndex >> sourceIndex ;
 }

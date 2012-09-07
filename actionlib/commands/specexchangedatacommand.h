@@ -10,8 +10,8 @@ class specExchangeDataCommand : public specUndoCommand
 private:
 	specGenealogy *item ;
 	QVector<specDataPoint> data ;
-	void writeToStream(QDataStream &out) const ;
-	void readFromStream(QDataStream &in);
+	void writeCommand(QDataStream &out) const ;
+	void readCommand(QDataStream &in);
 	void doIt();
 	void undoIt() ;
 	void parentAssigned();

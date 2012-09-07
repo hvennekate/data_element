@@ -71,14 +71,14 @@ void specManageItemsCommand::restore()
 	finish() ;
 }
 
-void specManageItemsCommand::writeToStream(QDataStream &out) const
+void specManageItemsCommand::writeCommand(QDataStream &out) const
 {
 	out << qint32(items.size()) ;
 	foreach(specGenealogy* genealogy, items)
 		out << *genealogy ;
 }
 
-void specManageItemsCommand::readFromStream(QDataStream &in)
+void specManageItemsCommand::readCommand(QDataStream &in)
 {
 	qint32 toRead ;
 	in >> toRead ;

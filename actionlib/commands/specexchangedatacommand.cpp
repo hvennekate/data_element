@@ -43,12 +43,12 @@ void specExchangeDataCommand::doIt()
 		pointer->plot()->replot() ;
 }
 
-void specExchangeDataCommand::writeToStream(QDataStream &out) const
+void specExchangeDataCommand::writeCommand(QDataStream &out) const
 {
 	out << data << *item ;
 }
 
-void specExchangeDataCommand::readFromStream(QDataStream &in)
+void specExchangeDataCommand::readCommand(QDataStream &in)
 {
 	if (!item) item = new specGenealogy ;
 	in >> data >> *item ;

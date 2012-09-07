@@ -11,8 +11,8 @@ private:
 	specGenealogy *item ; // TODO single item type
 	void undoIt() ;
 	void doIt() ;
-	void writeToStream(QDataStream &out) const ;
-	void readFromStream(QDataStream &in) ;
+	void writeCommand(QDataStream &out) const ;
+	void readCommand(QDataStream &in) ;
 	type typeId() const { return specStreamable::metaRangeCommand ; }
 public:
 	specMetaRangeCommand(specUndoCommand* parent = 0);
