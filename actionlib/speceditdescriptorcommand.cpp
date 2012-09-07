@@ -49,6 +49,7 @@ void specEditDescriptorCommand::doIt()
 
 void specEditDescriptorCommand::writeToStream(QDataStream &out) const
 {
+	specUndoCommand::writeToStream(out) ;
 	out << previousContent
 	    << descriptor
 	    << previousActiveLine
@@ -57,6 +58,7 @@ void specEditDescriptorCommand::writeToStream(QDataStream &out) const
 
 void specEditDescriptorCommand::readFromStream(QDataStream &in)
 {
+	specUndoCommand::readFromStream(in) ;
 	if (!item) item = new specGenealogy ;
 	in >> previousContent
 	   >> descriptor

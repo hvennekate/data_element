@@ -79,6 +79,8 @@ void specDeleteAction::execute()
 	command->setItems(indexes) ;
 	command->setParentObject(currentView->model());
 
+	parentCommand->setText("Delete");
+	parentCommand->setMergeable(false) ;
 	currentView->selectionModel()->clearSelection();
 	if (command->ok())
 		library->push(parentCommand) ;

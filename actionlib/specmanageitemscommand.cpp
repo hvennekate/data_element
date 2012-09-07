@@ -54,6 +54,7 @@ void specManageItemsCommand::take()
 {
 	if (!ok()) return ;
 	prepare() ;
+	qDebug() << "command" << this << "taking items:" << items ;
 	for(int i = 0 ; i < items.size() ; ++i)
 		items[i]->takeItems();
 	finish() ;
@@ -64,6 +65,7 @@ void specManageItemsCommand::restore()
 	if (!ok()) return ;
 	if (!parentObject() || items.isEmpty()) return ;
 	prepare() ;
+	qDebug() << "command" << this << "restoring items:" << items ;
 	for(int i = 0 ; i < items.size() ; i++)
 		items[i]->returnItems();
 	finish() ;

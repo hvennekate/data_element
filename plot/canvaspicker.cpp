@@ -436,7 +436,7 @@ void CanvasPicker::removeSelectable(QSet<specCanvasItem *> &list)
 	foreach(specCanvasItem* item, list)
 		selectable.remove(item) ;
 
-	highlightSelectable(true) ;
+	highlightSelectable(highlighting) ;
 	plot()->replot() ;
 }
 

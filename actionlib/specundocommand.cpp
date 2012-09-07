@@ -26,3 +26,15 @@ void specUndoCommand::undo()
 {
 	if (pO) undoIt();
 }
+
+void specUndoCommand::writeToStream(QDataStream &out) const
+{
+	out << text() ;
+}
+
+void specUndoCommand::readFromStream(QDataStream &in)
+{
+	QString d ;
+	in >> d ;
+	setText(d) ;
+}

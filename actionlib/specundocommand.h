@@ -12,6 +12,8 @@ protected:
 	virtual void doIt() = 0;
 	virtual void undoIt() = 0 ;
 	virtual void parentAssigned() {}
+	virtual void writeToStream(QDataStream &out) const ;
+	virtual void readFromStream(QDataStream &in) ;
 public:
 	explicit specUndoCommand(specUndoCommand *parent = 0);
 	void redo() ;

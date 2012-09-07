@@ -3,6 +3,7 @@
 #include <QPrinter>
 #include <QPrintDialog>
 #include <qwt_plot_renderer.h>
+#include <QMessageBox>
 
 specPrintPlotAction::specPrintPlotAction(QObject *parent) :
 	specUndoAction(parent),
@@ -48,21 +49,30 @@ void specPrintPlotAction::execute()
 		double printRatio = pageSize.width()/pageSize.height() ;
 		qreal top,left,bottom,right ;
 		printer->getPageMargins(&left,&top,&right,&bottom,QPrinter::Millimeter);
-		if (printRatio > aspectRatio)
+		if (QMessageBox::question(0,"Keep Aspect", "Preserve aspect ratio?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
 		{
-			double frameAdd = (pageSize.width() - pageSize.height()*aspectRatio)/2.;
-			printer->setPageMargins(left+frameAdd,top,right+frameAdd,bottom,QPrinter::Millimeter);
+			plot->resize(printer->pageRect().size()) ;
+			plot->replot();
 		}
-		else if (printRatio < aspectRatio)
+		else
 		{
-			double frameAdd = (pageSize.height() - pageSize.width()/aspectRatio)/2. ;
-			printer->setPageMargins(left,top+frameAdd,right,bottom+frameAdd,QPrinter::Millimeter);
+			if (printRatio > aspectRatio)
+			{
+				double frameAdd = (pageSize.width() - pageSize.height()*aspectRatio)/2.;
+				printer->setPageMargins(left+frameAdd,top,right+frameAdd,bottom,QPrinter::Millimeter);
+			}
+			else if (printRatio < aspectRatio)
+			{
+				double frameAdd = (pageSize.height() - pageSize.width()/aspectRatio)/2. ;
+				printer->setPageMargins(left,top+frameAdd,right,bottom+frameAdd,QPrinter::Millimeter);
+			}
 		}
 
 		QwtPlotRenderer renderer ;
-		renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground,true) ;
+		renderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground,true) ;
 		renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames,true) ;
 		renderer.renderTo(plot,*printer) ;
 		printer->setPageMargins(left,top,right,bottom,QPrinter::Millimeter) ;
 	}
+	plot->resize(plotSize) ;
 }
