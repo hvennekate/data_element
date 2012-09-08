@@ -28,14 +28,15 @@ QModelIndexList specView::getSelection()
 	return list ;
 }
 
-/*QList<specModelItem*> specView::currentlySelected()
+void specView::columnsInserted(const QModelIndex &parent, int start, int end)
 {
-	QList<specModelItem*> list ;
-	QModelIndexList selection = getSelection() ;
-	foreach(QModelIndex index, selection)
-		list << (specModelItem*) index.internalPointer() ;
-	return list ;
-}*/
+	if (!model()) return ;
+	if (!start) return ;
+	if (end != model()->columnCount(parent)-1) return ;
+	int column = start -1 ;
+	resizeColumnToContents(column) ;
+	if (!column) setColumnWidth(column,qMax(columnWidth(column),50));
+}
 
 void specView::columnMoved(int i, int j, int k)
 {
@@ -191,15 +192,15 @@ specView::specView(QWidget* parent)
 void specView::createContextMenus()
 {
 	itemContextMenu = new QMenu(this) ;
-	itemContextMenu->addAction(deleteAction) ;
-	itemContextMenu->addAction(changePenAction) ;
+//	itemContextMenu->addAction(deleteAction) ;
+//	itemContextMenu->addAction(changePenAction) ;
 	itemContextMenu->addAction(propertiesAction) ;
 
 	folderContextMenu = new QMenu(this) ;
-	folderContextMenu->addAction(deleteAction) ;
-	folderContextMenu->addAction(treeAction) ;
-	folderContextMenu->addAction(changePenAction) ;
-	folderContextMenu->addAction(mergeFolderAction) ;
+//	folderContextMenu->addAction(deleteAction) ;
+//	folderContextMenu->addAction(treeAction) ;
+//	folderContextMenu->addAction(changePenAction) ;
+//	folderContextMenu->addAction(mergeFolderAction) ;
 }
 
 QList<QAction*> specView::actions()
@@ -229,6 +230,7 @@ void specView::setModel(specModel* model)
 	// TODO change this to plain old functions.
 	connect(model, SIGNAL(modelAboutToBeReset()), this, SLOT(prepareReset())) ;
 	connect(model, SIGNAL(modelReset()), this, SLOT(resetDone())) ;
+	connect(model,SIGNAL(columnsInserted(const QModelIndex&,int,int)), this, SLOT(columnsInserted(QModelIndex,int,int))) ;
 }
 
 void specView::itemProperties()

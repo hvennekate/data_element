@@ -30,6 +30,9 @@
 
 int main(int argc, char *argv[])
 {
+#ifdef WIN32BUILD
+	QIcon::setThemeName("oxygen") ;
+#endif
 	Q_INIT_RESOURCE(application);
 	QCoreApplication::setOrganizationName("MPIbpC") ;
 	QCoreApplication::setOrganizationDomain("mpibpc.mpg.de") ;

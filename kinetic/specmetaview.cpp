@@ -1,7 +1,7 @@
 #include "specmetaview.h"
 #include "specmetadelegate.h"
 #include "specmetarange.h"
-#include "actionlib/specmetarangecommand.h"
+#include "specmetarangecommand.h"
 #include "specmetamodel.h"
 #include "specmetaitem.h"
 #include <QQueue>
@@ -39,6 +39,8 @@ specMetaModel *specMetaView::model() const
 void specMetaView::assignDataView(specView *view)
 {
 	dataView = view ;
+	if (model())
+		((specMetaModel*) model())->setDataModel(dataView ? dataView->model() : 0) ;
 }
 
 specView *specMetaView::getDataView()
@@ -52,6 +54,7 @@ void specMetaView::rangeModified(specCanvasItem *r, int p, double x, double y)
 	specMetaRangeCommand* command = new specMetaRangeCommand ;
 	command->setItem(model()->index(address.item), address.variable,address.range, p, x, y) ;
 	command->setParentObject(this) ;
+	command->setText(tr("Modify range")) ;
 	if (!undoPartner)
 	{
 		command->redo();

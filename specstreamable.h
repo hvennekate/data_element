@@ -12,7 +12,7 @@ public:
 	friend QDataStream& operator>>(QDataStream& in, specStreamable&) ;
 	void readDirectly(QDataStream& in) { readFromStream(in) ; } // TODO improve; make factory available broadly
 	typedef quint16 type;
-	enum streamableType : type
+	enum streamableType
 	{
 		container = 32768,
 		none = 0,
@@ -33,11 +33,7 @@ public:
 		deleteCommandId = 15,
 		newFolderCommandId = 16,
 		moveItemsCommandId = 17,
-		modifyDataCommandId = 18,
 		movePlotCommandId = 19,
-		multiMoveCommandId = 20,
-		removeDataCommandId   = 21,
-		insertDataCommandId   = 22,
 		exchangeDataCommandId = 23,
 		resizeSVGCommandId    = 24,
 		newConnectionsCommandId = 31,
@@ -64,7 +60,10 @@ public:
 		range = 53,
 		metaRange = 54,
 		metaRangeCommand = 55,
-		lineWidthCommandId = 58
+		lineWidthCommandId = 58,
+		plotTitleCommandId = 59,
+		plotYLabelCommandId = 60,
+		plotXLabelCommandId = 61
 	};
 protected:
 	virtual void writeToStream(QDataStream& out) const = 0;

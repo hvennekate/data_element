@@ -26,6 +26,7 @@ class specPlotWidget : public QDockWidget
 private:
 	specDataView* items ;
 	specLogWidget *logWidget ;
+	QDockWidget *undoViewWidget ;
 	specKineticWidget *kineticWidget ;
 	QWidget* content ;
 	QVBoxLayout* layout ;
@@ -38,7 +39,8 @@ private:
 	*saveAsAction,
 	*logAction,
 	*undoAction,
-	*redoAction;
+	*redoAction,
+	*undoViewAction ;
 	specActionLibrary *actions ;
 	void createToolbars();
 	void setConnections() ;
@@ -46,6 +48,7 @@ private:
 private slots:
 	void modified() ;
 	void svgModification(bool) ;
+	void purgeUndo() ;
 protected :
 	void closeEvent(QCloseEvent*) ;
 public:

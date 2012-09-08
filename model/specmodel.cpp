@@ -18,10 +18,10 @@
 #include "specdataitem.h"
 #include "exportdialog.h"
 #include <QTime>
-#include "actionlib/specmovecommand.h"
-#include "actionlib/specaddfoldercommand.h"
-#include "actionlib/speceditdescriptorcommand.h"
-#include "actionlib/specresizesvgcommand.h"
+#include "specmovecommand.h"
+#include "specaddfoldercommand.h"
+#include "speceditdescriptorcommand.h"
+#include "specresizesvgcommand.h"
 // TODO replace isFolder() by addChildren(empty list,0)
 
 bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria)
@@ -352,7 +352,8 @@ specModel::specModel(QObject *par)
 	  internalDrop(false),
 	  dropSource(0),
 	  dropBuddy(0),
-	  dontDelete(false)
+	  dontDelete(false),
+	  metaModel(0)
 {
 	root = new specFolderItem ;
 	Descriptors += "" ;
@@ -411,8 +412,6 @@ bool specModel::removeColumns (int column,int count,const QModelIndex & parent)
 bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int row) // TODO
 {
 	// Check for possible new column headers
-	QTime timer ;
-	timer.start();
 	for (QList<specModelItem*>::size_type i = 0 ; i < list.size() ; i++)
 	{
 		for (QStringList::size_type j = 0 ; j < list[i]->descriptorKeys().size() ; j++)
@@ -537,6 +536,7 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 			else
 				command->setItem(index, desc, value.toString()) ;
 			// TODO unite in value-variant
+			command->setText(tr("Edit data")) ;
 			dropBuddy->push(command) ;
 		}
 		else if (role == Qt::ForegroundRole)
@@ -687,6 +687,7 @@ bool specModel::dropMimeData(const QMimeData *data,
 			specAddFolderCommand *command = new specAddFolderCommand ;
 			command->setParentObject(this) ;
 			command->setItems(newIndexes) ;
+			command->setText(tr("Insert items")) ;
 			dropBuddy->push(command);
 		}
 	}
@@ -737,6 +738,7 @@ specModelItem* specModel::itemPointer(const QVector<int> &indexes) const
 	specModelItem* pointer = root ;
 	for (int i =  indexes.size() - 1 ; i >= 0 ; --i)
 	{
+		if (!pointer) return 0 ;
 		pointer = ((specFolderItem*) pointer)->child(indexes[i]) ;
 	}
 	return pointer ;
@@ -822,6 +824,16 @@ void specModel::svgMoved(specCanvasItem *i, int point, double x, double y)
 	item->pointMoved(point,x,y) ;
 	command->setItem(index(item), item->getBounds()) ;
 	command->undo();
+	command->setText(tr("Resize/move SVG item"));
 	dropBuddy->push(command) ;
 }
 
+void specModel::setMetaModel(specMetaModel *m)
+{
+	metaModel = m ;
+}
+
+specMetaModel* specModel::getMetaModel() const
+{
+	return metaModel ;
+}

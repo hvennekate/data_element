@@ -124,6 +124,12 @@ void specMetaItem::attach(QwtPlot *plot)
 	refreshOtherPlots() ;
 }
 
+void specMetaItem::detach()
+{
+	attach(0) ;
+	specModelItem::detach() ; // TODO find out why this is necessary
+}
+
 void specMetaItem::refreshPlotData()
 {
 	// TODO do some more checks on valid items etc.

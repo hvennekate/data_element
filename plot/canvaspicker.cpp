@@ -121,13 +121,14 @@ bool CanvasPicker::eventFilter ( QObject *object, QEvent *e )
 				}
 				d_selectedCurve = NULL ;
 				d_selectedPoint = -1 ;
+				return true ;
 			}
-			return true;
+			return d_selectedCurve ;
 		}
 		case QEvent::MouseMove:
 		{
 			move ( ( ( QMouseEvent * ) e )->pos() );
-			return true;
+			return d_selectedCurve ;
 		}
 		case QEvent::MouseButtonRelease:
 		{
@@ -392,7 +393,7 @@ void CanvasPicker::highlightSelectable()
 {
 	// TODO enable highlighting on selectable items
 	foreach(specCanvasItem* item, selectable)
-		item->highlight(highlighting) ;
+		item->highlight(highlighting) ; // TODO crash when data + image have been imported
 	plot()->replot();
 }
 
@@ -435,7 +436,7 @@ void CanvasPicker::removeSelectable(QSet<specCanvasItem *> &list)
 	foreach(specCanvasItem* item, list)
 		selectable.remove(item) ;
 
-	highlightSelectable() ;
+	highlightSelectable(highlighting) ;
 	plot()->replot() ;
 }
 
@@ -450,12 +451,20 @@ void CanvasPicker::removeSelectable()
 	removeSelectable(selectable) ;
 }
 
+
+
 CanvasPicker::~CanvasPicker()
 {
-	removeSelectable(selectable);
+	highlightSelectable(false) ;
+	if (owning) removeSelectable(selectable);
 }
 
 QList<specCanvasItem*> CanvasPicker::items() const
 {
 	return selectable.toList() ;
+}
+
+void CanvasPicker::purgeSelectable()
+{
+	selectable.clear() ;
 }

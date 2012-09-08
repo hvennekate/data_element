@@ -10,7 +10,7 @@
 
 class specSimpleTextEdit : public QWidget
 {
-Q_OBJECT
+	Q_OBJECT
 private:
 	QTextEdit *content ;
 	QToolBar  *toolBar ;
@@ -26,9 +26,9 @@ private slots:
 	void newContent() ;
 
 public:
-    explicit specSimpleTextEdit(QWidget *parent = 0);
-    void setText(const QString&) ;
-    QString getText() const ;
+	explicit specSimpleTextEdit(QWidget *parent = 0);
+	void setText(const QString&) ;
+	QString getText() const ;
 
 signals:
 	void contentChanged(QString newContent) ;

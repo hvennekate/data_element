@@ -7,7 +7,7 @@
 #include <QContextMenuEvent>
 #include "specmodel.h"
 #include <QMap>
-#include "actionlib/specactionlibrary.h"
+#include "specactionlibrary.h"
 
 class specViewState ;
 class specModel ;
@@ -32,6 +32,7 @@ private:
 private slots:
 	void averageItems() ;
 	void itemProperties() ;
+	void columnsInserted(const QModelIndex& parent, int start, int end) ;
 protected:
 	void keyPressEvent(QKeyEvent*) ;
 	void dropEvent(QDropEvent *event) ;

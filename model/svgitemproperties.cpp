@@ -3,7 +3,7 @@
 #include "specsvgitem.h"
 #include "qwt_plot.h"
 #include <QSvgRenderer>
-#include "actionlib/specresizesvgcommand.h"
+#include "specresizesvgcommand.h"
 #include "specmodel.h"
 
 svgItemProperties::svgItemProperties(specSVGItem* i, QWidget *parent) :
@@ -15,6 +15,7 @@ svgItemProperties::svgItemProperties(specSVGItem* i, QWidget *parent) :
 
 	ui->itemPreview->load(i->data);
 	QSize svgSize = QSvgRenderer(item->data).defaultSize() ;
+	originalAspectRatio = (double) svgSize.width()/svgSize.height() ;
 	svgSize.scale(300,300,Qt::KeepAspectRatio);
 	ui->itemPreview->setFixedSize(svgSize) ;
 //	ui->itemPreview
@@ -79,4 +80,14 @@ specUndoCommand* svgItemProperties::generateCommand(QObject *parent)
 	item->setBounds(newBounds) ;
 	command->setItem(((specModel*) parent)->index(item),oldBounds,oldAnchor) ;
 	return command ;
+}
+
+void svgItemProperties::on_widthOriginalAspect_clicked()
+{
+	ui->widthValue->setValue(ui->heightValue->value()*originalAspectRatio) ;
+}
+
+void svgItemProperties::on_heightOriginalAspect_clicked()
+{
+	ui->heightValue->setValue(ui->widthValue->value()/originalAspectRatio);
 }

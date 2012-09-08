@@ -1,7 +1,7 @@
 #include "specmetaparser.h"
 #include <QStringList>
 #include <QRegExp>
-#include <qwt/qwt_series_data.h>
+#include <qwt_series_data.h>
 #include <iostream>
 #include "specmetaitem.h"
 
@@ -9,7 +9,6 @@ specMetaParser::specMetaParser(const QString &expressionList, const QString& xEx
 	: parent(par),
 	  changingRange(false)
 {
-	qDebug() << "creating parser" << this ;
 	setAssignments(expressionList, xExpression, yExpression) ;
 }
 
@@ -18,19 +17,18 @@ void specMetaParser::clear()
 	foreach(specMetaVariable* var, evaluators)
 		delete var ;
 	evaluators.clear();
-	symbols.remove_all() ;
+	symbols.clear();
+	valueVector.clear();
 	errors.clear();
 
 }
 
 void specMetaParser::setAssignments(const QString &expressionList, const QString& xExpression, const QString& yExpression)
 {
-	qDebug() << "setting assignments" ;
 	if (changingRange) return ;
 	valid = true ;
 	const QRegExp name("[a-zA-Z][a-zA-Z0-9]*") ;
 	clear() ;
-	qDebug() << "cleared old variables" ;
 	// Syntax:
 	//  [start:stop:incr]"string"
 	// oder:
@@ -78,13 +76,13 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 			valid = false ;
 			continue ;
 		}
-		symbols.append(GiNaC::symbol(symbol.toStdString())) ;
+		symbols << symbol ;
 		evaluators << specMetaVariable::factory(value,this) ;
 	}
+	valueVector.resize(symbols.size());
 	x = prepare(xExpression) ;
 	y = prepare(yExpression) ;
-//	x = prepare("x") ;
-//	y = prepare("y") ;
+
 	xExp = xExpression ;
 	yExp = yExpression ;
 }
@@ -101,6 +99,7 @@ QwtSeriesData<QPointF>* specMetaParser::evaluate(const QVector<specModelItem*>& 
 		QVector<specModelItem*> currentItems ;
 		QVector<double> xValues(1,NAN) ; // start value in case no arrays are among our variables
 
+		// TODO very fragile code...
 		// preparing a list of current items and overlapping xValues
 		if (indexes.isEmpty()) break ;
 		for(int i = 0 ; i < indexes.size() ; ++i)
@@ -128,16 +127,19 @@ QwtSeriesData<QPointF>* specMetaParser::evaluate(const QVector<specModelItem*>& 
 				data << QPointF(NAN, NAN) ;
 				continue ;
 			}
-			GiNaC::exmap substitution ;
-			for (int k = 0 ; k < substitutions[i].size() ; ++k)
-				substitution[symbols[k]] = substitutions[i][k] ;
 
-			GiNaC::ex xEx = GiNaC::evalf(x.subs(substitution, GiNaC::subs_options::no_pattern)),
-					yEx = GiNaC::evalf(y.subs(substitution, GiNaC::subs_options::no_pattern)) ;
-			if (GiNaC::is_a<GiNaC::numeric>(xEx) && GiNaC::is_a<GiNaC::numeric>(yEx))
+			// By all means avoid reallocation of the valueVector!!!
+			for (int k = 0 ; k < valueVector.size() ; ++k)
+				valueVector[k] = substitutions[i][k] ;
+
+			try
 			{
-				data << QPointF(GiNaC::ex_to<GiNaC::numeric>(xEx).to_double(),
-					GiNaC::ex_to<GiNaC::numeric>(yEx).to_double()) ;
+				data << QPointF(x.Eval(),y.Eval()) ;
+			}
+			catch(mu::Parser::exception_type &p)
+			{
+				errors << QString("Evaluation of muParser-Expression failed\nReason: %1").arg(p.GetMsg().c_str()) ;
+				valid = false ;
 			}
 		}
 		++j ;
@@ -155,25 +157,19 @@ bool specMetaParser::ok() const
 	return valid ;
 }
 
-GiNaC::ex specMetaParser::prepare(const QString &val)
+mu::Parser specMetaParser::prepare(const QString &val)
 {
-	GiNaC::ex retVal ;
+	mu::Parser retVal ;
 	try
 	{
-		GiNaC::symtab tab ;
-		foreach(GiNaC::ex expr, symbols)
-		{
-			GiNaC::symbol symbol = GiNaC::ex_to<GiNaC::symbol>(expr) ;
-			tab[symbol.get_name()] = symbol ;
-		}
-		GiNaC::parser parse(tab) ;
-		parse.strict = true ;
-		retVal = parse(val.toStdString()) ;
-//		retVal = GiNaC::ex(val.toStdString(),symbols) ;
+		int i = 0 ;
+		foreach(QString symbol, symbols)
+			retVal.DefineVar(symbol.toStdString(),&(valueVector[i++]));
+		retVal.SetExpr(val.toStdString()) ;
 	}
-	catch(std::exception &p)
+	catch(mu::Parser::exception_type &p)
 	{
-		errors << QString("Evaluation of GiNaC-Expression \"%1\" failed\nReason: %2").arg(val).arg(p.what()) ;
+		errors << QString("Evaluation of muParser-Expression \"%1\" failed\nReason: %2").arg(val).arg(p.GetMsg().c_str()) ;
 		valid = false ;
 	}
 	return  retVal ;
@@ -182,7 +178,7 @@ GiNaC::ex specMetaParser::prepare(const QString &val)
 bool specMetaParser::containsNan(const QVector<double> &vector)
 {
 	foreach(double zahl, vector)
-		if (isnan(zahl))
+		if (std::isnan(zahl))
 			return true ;
 	return false ;
 }
@@ -222,11 +218,10 @@ void specMetaParser::setRange(int variableNo, int rangeNo, int pointNo, double n
 	if (parent)
 	{
 		QStringList descriptor;
-		GiNaC::container<std::list>::const_iterator j = symbols.begin() ;
+		QStringList::const_iterator j = symbols.begin() ;
 		for (QList<specMetaVariable*>::const_iterator i = evaluators.begin() ;
 			 i < evaluators.end() && j != symbols.end() ; ++i, ++j)
-			descriptor += QString::fromStdString(GiNaC::ex_to<GiNaC::symbol>(*j).get_name())
-					+ " = " + (*i)->codeValue() ; // TODO this is a pain...
+			descriptor += *j + " = " + (*i)->codeValue() ; // TODO this is a pain...
 		parent->changeDescriptor("variables", descriptor.join("\n")) ;
 		parent->setActiveLine("variables",variableNo) ;
 	}

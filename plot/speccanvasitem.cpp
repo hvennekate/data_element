@@ -13,9 +13,7 @@ specCanvasItem::specCanvasItem( QString description)
 
 specCanvasItem::~specCanvasItem()
 {
-	specPlot *pointer = (specPlot*) plot() ;
 	detach() ;
-	if (pointer) pointer->replot() ;
 }
 
 void specCanvasItem::setLineWidth(const double& w)
@@ -87,7 +85,6 @@ QColor specCanvasItem::symbolPenColor()
 
 void specCanvasItem::setSymbolPenColor(const QColor& newColor)
 {
-	qDebug() << "setting symbol pen color" << newColor ;
 	QwtSymbol *newSymbol = symbol() ? (new QwtSymbol(*symbol())) : (new QwtSymbol()) ;
 	QPen newPen = newSymbol->pen() ;
 	newPen.setColor(newColor) ;

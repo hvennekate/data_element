@@ -6,6 +6,15 @@
 //	getItemPointers(Items) ;
 //}
 
+specGenealogy::specGenealogy(const QModelIndex &index)
+	: owning(false)
+{
+	Model = (specModel*) index.model() ;
+	Items << Model->itemPointer(index) ;
+	indexes = Model->hierarchy(index) ;
+	Parent = Items.first()->parent() ;
+}
+
 specGenealogy::specGenealogy(QModelIndexList &list)
 	: owning(false)
 {

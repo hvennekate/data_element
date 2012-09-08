@@ -17,6 +17,7 @@ specMetaRange::addressObject specMetaRange::address()
 
 void specMetaRange::attach(QwtPlot *newPlot)
 {
+	if (newPlot == plot()) return ;
 	specPlot *sp = qobject_cast<specPlot*>(newPlot) ;
 	specPlot *oldPlot = qobject_cast<specPlot*>(plot()) ;
 	if (oldPlot && oldPlot->metaPicker())
@@ -32,4 +33,9 @@ void specMetaRange::detach()
 	if (oldPlot && oldPlot->metaPicker())
 		oldPlot->metaPicker()->removeSelectable(this) ;
 	specRange::detach() ;
+}
+
+specMetaRange::~specMetaRange()
+{
+	detach() ;
 }

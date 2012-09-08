@@ -3,7 +3,7 @@
 
 #include <QString>
 #include <QMap>
-#include <ginac/ginac.h>
+#include <muParser.h>
 #include "specmodelitem.h"
 #include <QVector>
 #include "specmetavariable.h"
@@ -13,10 +13,11 @@ class specMetaParser
 private:
 	bool valid ;
 	QStringList errors ;
-	GiNaC::lst symbols ;
+	QStringList symbols ;
+	QVector<double> valueVector ;
 	QList<specMetaVariable*> evaluators ;
-	GiNaC::ex prepare(const QString&) ;
-	GiNaC::ex x, y ;
+	mu::Parser prepare(const QString&) ;
+	mu::Parser x, y ;
 	QString xExp, yExp ;
 	specMetaItem *parent ;
 	void clear() ;

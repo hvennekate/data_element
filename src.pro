@@ -26,45 +26,45 @@ SOURCES += main.cpp \
     spectral/specdatapoint.cpp \
     spectral/specdataview.cpp \
     actionlib/specactionlibrary.cpp \
-    actionlib/specundocommand.cpp \
-    actionlib/specundoaction.cpp \
-    actionlib/specdeleteaction.cpp \
-    actionlib/specdeletecommand.cpp \
-    actionlib/specaddfolderaction.cpp \
-    actionlib/specaddfoldercommand.cpp \
+    actionlib/commands/specundocommand.cpp \
+    actionlib/actions/specundoaction.cpp \
+    actionlib/actions/specdeleteaction.cpp \
+    actionlib/commands/specdeletecommand.cpp \
+    actionlib/actions/specaddfolderaction.cpp \
+    actionlib/commands/specaddfoldercommand.cpp \
     model/specgenealogy.cpp \
-    actionlib/specmanageitemscommand.cpp \
-    actionlib/specmovecommand.cpp \
-    actionlib/specimportspecaction.cpp \
+    actionlib/commands/specmanageitemscommand.cpp \
+    actionlib/commands/specmovecommand.cpp \
+    actionlib/actions/specimportspecaction.cpp \
     model/specviewstate.cpp \
     log/speclogmodel.cpp \
     log/speclogview.cpp \
-    actionlib/speccopyaction.cpp \
-    actionlib/specpasteaction.cpp \
-    actionlib/speccutaction.cpp \
+    actionlib/actions/speccopyaction.cpp \
+    actionlib/actions/specpasteaction.cpp \
+    actionlib/actions/speccutaction.cpp \
     plot/specspectrumplot.cpp \
-    actionlib/specplotmovecommand.cpp \
+    actionlib/commands/specplotmovecommand.cpp \
 	textEditor/specsimpletextedit.cpp \
-    actionlib/changeplotstyleaction.cpp \
-    actionlib/specstylecommand.cpp \
-    actionlib/spectreeaction.cpp \
-    actionlib/specmulticommand.cpp \
-    actionlib/specmergeaction.cpp \
-    actionlib/specremovedataaction.cpp \
-    actionlib/specaveragedataaction.cpp \
-    actionlib/specexchangedatacommand.cpp \
+    actionlib/actions/changeplotstyleaction.cpp \
+    actionlib/commands/specstylecommand.cpp \
+    actionlib/actions/spectreeaction.cpp \
+    actionlib/commands/specmulticommand.cpp \
+    actionlib/actions/specmergeaction.cpp \
+    actionlib/actions/specremovedataaction.cpp \
+    actionlib/actions/specaveragedataaction.cpp \
+    actionlib/commands/specexchangedatacommand.cpp \
     model/specsvgitem.cpp \
-    actionlib/specaddsvgitem.cpp \
-    actionlib/specprintplotaction.cpp \
-    actionlib/specresizesvgcommand.cpp \
+    actionlib/actions/specaddsvgitem.cpp \
+    actionlib/actions/specprintplotaction.cpp \
+    actionlib/commands/specresizesvgcommand.cpp \
     kinetic/specmetaitem.cpp \
     kinetic/specmetamodel.cpp \
     kinetic/specmetaview.cpp \
-    actionlib/specnewmetaitemaction.cpp \
-    actionlib/specmanageconnectionscommand.cpp \
-    actionlib/specaddconnectionscommand.cpp \
-    actionlib/specdeleteconnectionscommand.cpp \
-    actionlib/specaddconnectionsaction.cpp \
+    actionlib/actions/specnewmetaitemaction.cpp \
+    actionlib/commands/specmanageconnectionscommand.cpp \
+    actionlib/commands/specaddconnectionscommand.cpp \
+    actionlib/commands/specdeleteconnectionscommand.cpp \
+    actionlib/actions/specaddconnectionsaction.cpp \
     model/specmimeconverter.cpp \
     log/speclogtodataconverter.cpp \
     kinetic/specmetaparser.cpp \
@@ -78,17 +78,21 @@ SOURCES += main.cpp \
     kinetic/specmetadelegate.cpp \
     kinetic/specmetarange.cpp \
     log/speclogwidget.cpp \
-    actionlib/speceditdescriptorcommand.cpp \
+    actionlib/commands/speceditdescriptorcommand.cpp \
     plot/specplotstyle.cpp \
     specstreamable.cpp \
-    actionlib/specmetarangecommand.cpp \
+    actionlib/commands/specmetarangecommand.cpp \
     model/specgenericmimeconverter.cpp \
     model/spectextmimeconverter.cpp \
     spectral/dataitemproperties.cpp \
     kinetic/metaitemproperties.cpp \
     model/svgitemproperties.cpp \
     model/specsvgunitbutton.cpp \
-    specsplitter.cpp
+    specsplitter.cpp \
+    actionlib/commands/specplotlabelcommand.cpp \
+    actionlib/actions/speclabelaction.cpp \
+    specprofiler.cpp \
+    actionlib/actions/genericexportaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -116,45 +120,45 @@ HEADERS += cutbyintensitydialog.h \
     spectral/specdatapoint.h \
     spectral/specdataview.h \
     actionlib/specactionlibrary.h \
-    actionlib/specundocommand.h \
-    actionlib/specundoaction.h \
-    actionlib/specdeleteaction.h \
-    actionlib/specdeletecommand.h \
-    actionlib/specaddfolderaction.h \
-    actionlib/specaddfoldercommand.h \
+    actionlib/commands/specundocommand.h \
+    actionlib/actions/specundoaction.h \
+    actionlib/actions/specdeleteaction.h \
+    actionlib/commands/specdeletecommand.h \
+    actionlib/actions/specaddfolderaction.h \
+    actionlib/commands/specaddfoldercommand.h \
     model/specgenealogy.h \
-    actionlib/specmanageitemscommand.h \
-    actionlib/specmovecommand.h \
-    actionlib/specimportspecaction.h \
+    actionlib/commands/specmanageitemscommand.h \
+    actionlib/commands/specmovecommand.h \
+    actionlib/actions/specimportspecaction.h \
     model/specviewstate.h \
     log/speclogmodel.h \
     log/speclogview.h \
-    actionlib/speccopyaction.h \
-    actionlib/specpasteaction.h \
-    actionlib/speccutaction.h \
+    actionlib/actions/speccopyaction.h \
+    actionlib/actions/specpasteaction.h \
+    actionlib/actions/speccutaction.h \
     plot/specspectrumplot.h \
-    actionlib/specplotmovecommand.h \
+    actionlib/commands/specplotmovecommand.h \
 	textEditor/specsimpletextedit.h \
-    actionlib/changeplotstyleaction.h \
-    actionlib/specstylecommand.h \
-    actionlib/spectreeaction.h \
-    actionlib/specmulticommand.h \
-    actionlib/specmergeaction.h \
-    actionlib/specremovedataaction.h \
-    actionlib/specaveragedataaction.h \
-    actionlib/specexchangedatacommand.h \
+    actionlib/actions/changeplotstyleaction.h \
+    actionlib/commands/specstylecommand.h \
+    actionlib/actions/spectreeaction.h \
+    actionlib/commands/specmulticommand.h \
+    actionlib/actions/specmergeaction.h \
+    actionlib/actions/specremovedataaction.h \
+    actionlib/actions/specaveragedataaction.h \
+    actionlib/commands/specexchangedatacommand.h \
     model/specsvgitem.h \
-    actionlib/specaddsvgitem.h \
-    actionlib/specprintplotaction.h \
-    actionlib/specresizesvgcommand.h \
+    actionlib/actions/specaddsvgitem.h \
+    actionlib/actions/specprintplotaction.h \
+    actionlib/commands/specresizesvgcommand.h \
     kinetic/specmetaitem.h \
     kinetic/specmetamodel.h \
     kinetic/specmetaview.h \
-    actionlib/specnewmetaitemaction.h \
-    actionlib/specmanageconnectionscommand.h \
-    actionlib/specaddconnectionscommand.h \
-    actionlib/specdeleteconnectionscommand.h \
-    actionlib/specaddconnectionsaction.h \
+    actionlib/actions/specnewmetaitemaction.h \
+    actionlib/commands/specmanageconnectionscommand.h \
+    actionlib/commands/specaddconnectionscommand.h \
+    actionlib/commands/specdeleteconnectionscommand.h \
+    actionlib/actions/specaddconnectionsaction.h \
     model/specmimeconverter.h \
     log/speclogtodataconverter.h \
     kinetic/specmetaparser.h \
@@ -168,24 +172,30 @@ HEADERS += cutbyintensitydialog.h \
     kinetic/specmetadelegate.h \
     kinetic/specmetarange.h \
     log/speclogwidget.h \
-    actionlib/speceditdescriptorcommand.h \
+    actionlib/commands/speceditdescriptorcommand.h \
     plot/specplotstyle.h \
     specstreamable.h \
-    actionlib/specmetarangecommand.h \
+    actionlib/commands/specmetarangecommand.h \
     model/specgenericmimeconverter.h \
     model/spectextmimeconverter.h \
     spectral/dataitemproperties.h \
     kinetic/metaitemproperties.h \
     model/svgitemproperties.h \
     model/specsvgunitbutton.h \
-    specsplitter.h
+    specsplitter.h \
+    actionlib/commands/specplotlabelcommand.h \
+    actionlib/actions/speclabelaction.h \
+    specprofiler.h \
+    actionlib/actions/genericexportaction.h
 
 INCLUDEPATH += kinetic \
 	log \
 	model \
 	plot \
 	spectral \
-	actionlib
+	actionlib \
+	actionlib/actions \
+	actionlib/commands
 
 
 TEMPLATE = app
@@ -197,15 +207,21 @@ unix {
 INCLUDEPATH += . \
     /usr/include/qwt
 LIBS += -lqwt \
-    -lcln \
-    -lginac
+	-lmuparser
 }
-#win32 {
-#INCLUDEPATH += . \
-#    C:/Qwt-5.2.1/include
-#LIBS += -LC:/Qwt-5.2.1/lib \
-#    -lqwt
-#}
+win32 {
+INCLUDEPATH += . \
+    C:/Qwt-6.0.0/include \
+    C:/Users/Hendrik/Downloads/muparser_v2_2_2/include
+LIBS += -LC:/Qwt-5.2.1/lib \
+    -lqwt \
+    C:/Users/Hendrik/Downloads/muparser_v2_2_2/lib/libmuparser.a
+DEFINES += WIN32BUILD \
+    QT_DLL \
+    QWT_DLL
+DEPENDPATH += C:/Users/Hendrik/Downloads/muparser_v2_2_2/lib
+RESOURCES += oxygen.qrc
+}
 CONFIG += qwt
 
 TARGET = data_element
@@ -214,9 +230,12 @@ RESOURCES += icons/application.qrc
 
 QT += svg
 
-QMAKE_CXXFLAGS += -std=c++0x
+#QMAKE_CXXFLAGS += -std=c++0x
 
 FORMS += \
     spectral/dataitemproperties.ui \
     kinetic/metaitemproperties.ui \
     model/svgitemproperties.ui
+
+OTHER_FILES += icons/oxygen/index.theme \
+    icons/oxygen/geticons.py

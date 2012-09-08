@@ -210,14 +210,16 @@ specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 	return (*this) ;
 }
 
+bool compareDataPoints(const specDataPoint& a, const specDataPoint& b)
+{
+	return a.nu == b.nu ;
+}
 
 void specDataItem::flatten(bool oneTime)
 {
 	qSort(data) ;
 	QVector<specDataPoint> newData ;
-	bool (*comparison)(const specDataPoint&, const specDataPoint&) =
-			[](const specDataPoint& a, const specDataPoint& b) { return a.nu == b.nu ;} ;
-	averageToNew(data.begin(), data.end(), comparison, std::back_inserter(newData)) ;
+	averageToNew(data.begin(), data.end(), compareDataPoints, std::back_inserter(newData)) ;
 
 	data = newData ; // TODO swap
 	// average Time
@@ -266,8 +268,9 @@ void specDataItem::moveXBy(const double & value)
 	invalidate();
 }
 
-void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out) const
+void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out) // TODO split into two
 {
+	revalidate();
 	QVector<double> t = times(), w = wnums(), s = ints(), m = intensityData() ;
 	
 	for (int i = 0 ; i < headerFormat.size() ; i++)

@@ -41,6 +41,8 @@ public:
 	virtual bool disconnectServer(specModelItem*) ;
 	bool connectClient(specMetaItem* clnt) ;
 	bool disconnectClient(specMetaItem* clnt) ;
+	virtual QList<specModelItem*> serverList() const { return QList<specModelItem*>() ; }
+	QSet<specMetaItem*> clientList() const { return clients ; }
 	/*! Merge/sort plot data when rebuilding it.  Mainly applies to both specFolderItem and specDataItem.  Both are enabled by default. */
 	bool mergePlotData, sortPlotData ;
 	

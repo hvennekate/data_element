@@ -21,6 +21,22 @@
 #include "log/speclogview.h"
 #include "specimportspecaction.h"
 #include "names.h"
+#include "speclabelaction.h"
+#include "specexchangedatacommand.h"
+#include "specresizesvgcommand.h"
+#include "specaddconnectionscommand.h"
+#include "specdeleteconnectionscommand.h"
+#include "speceditdescriptorcommand.h"
+#include "specmetarangecommand.h"
+#include "specplotlabelcommand.h"
+#include <QUndoView>
+#include "utility-functions.h"
+#include "genericexportaction.h"
+
+QUndoView* specActionLibrary::undoView()
+{
+	return new QUndoView(undoStack) ;
+}
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
@@ -68,7 +84,9 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 
 		addNewAction(bar, new specAddFolderAction(target)) ;
 		addNewAction(bar, new specAddSVGItemAction(target)) ;
-		addNewAction(bar, new specImportSpecAction(target)) ;
+		specImportSpecAction *importAction = new specImportSpecAction(target) ;
+		importAction->setAcceptableImportFunctions(QList<QList<specModelItem *> (*)(QFile &)>() << readHVFile << readPEFile << readJCAMPFile);
+		addNewAction(bar, importAction) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specCopyAction(target)) ;
 		addNewAction(bar, new specCutAction(target)) ;
@@ -77,6 +95,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		bar->addSeparator() ;
 		addNewAction(bar, new specTreeAction(target)) ;
 		addNewAction(bar, new specMergeAction(target)) ;
+		addNewAction(bar,new genericExportAction(target)) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specRemoveDataAction(target)) ;
 		addNewAction(bar, new specAverageDataAction(target)) ;
@@ -98,6 +117,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		addNewAction(bar, new specDeleteAction(target)) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specAddConnectionsAction(target)) ;
+		addNewAction(bar,new genericExportAction(target)) ;
 
 		return bar ;
 	}
@@ -106,12 +126,25 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		QToolBar *bar = new QToolBar(target) ;
 
 		addNewAction(bar, new specAddFolderAction(target)) ;
-		addNewAction(bar, new specImportSpecAction(target)) ;
+		specImportSpecAction *importAction = new specImportSpecAction(target) ;
+		importAction->setFilters(QStringList() << "Log-files (*.log)");
+		importAction->setAcceptableImportFunctions(QList<QList<specModelItem*> (*)(QFile&)>() << readLogFile);
+		addNewAction(bar, importAction) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specCopyAction(target)) ;
 		addNewAction(bar, new specCutAction(target)) ;
 		addNewAction(bar, new specPasteAction(target)) ;
 		addNewAction(bar, new specDeleteAction(target)) ;
+
+		return bar ;
+	}
+	else if (dynamic_cast<specPlot*>(target))
+	{
+		QToolBar *bar = new QToolBar(target) ;
+
+		addNewAction(bar, new specTitleAction(target)) ;
+		addNewAction(bar, new specXLabelAction(target)) ;
+		addNewAction(bar, new specYLabelAction(target)) ;
 
 		return bar ;
 	}
@@ -163,6 +196,29 @@ specUndoCommand *specActionLibrary::commandById(int id, specUndoCommand* parent)
 		return new specPlotMoveCommand(parent) ;
 	case specStreamable::multiCommandId :
 		return new specMultiCommand(parent) ;
+	case specStreamable::exchangeDataCommandId:
+		return new specExchangeDataCommand(parent) ;
+	case specStreamable::resizeSVGCommandId :
+		return new specResizeSVGcommand(parent) ;
+	case specStreamable::newConnectionsCommandId :
+		return new specAddConnectionsCommand(parent) ;
+	case specStreamable::deleteConnectionsCommandId :
+		return new specDeleteConnectionsCommand(parent) ;
+	case specStreamable::editDescriptorCommandId :
+		return new specEditDescriptorCommand(parent) ;
+	case specStreamable::penColorCommandId:
+	case specStreamable::lineWidthCommandId:
+	case specStreamable::symbolStyleCommandId:
+	case specStreamable::symbolPenColorCommandId:
+	case specStreamable::symbolSizeCommandId:
+	case specStreamable::symbolBrushColorCommandId:
+		return generateStyleCommand(id,parent) ;
+	case specStreamable::metaRangeCommand :
+		return new specMetaRangeCommand(parent) ;
+	case specStreamable::plotTitleCommandId:
+	case specStreamable::plotYLabelCommandId:
+	case specStreamable::plotXLabelCommandId:
+		generatePlotLabelCommand(id,parent) ;
 	default:
 		return 0 ;
 	}
@@ -205,4 +261,9 @@ void specActionLibrary::moveInternally(const QModelIndex &parent, int row, specV
 void specActionLibrary::addPlot(specPlot *plot)
 {
 	connect(this,SIGNAL(stackChanged()),plot,SLOT(replot())) ;
+}
+
+void specActionLibrary::purgeUndo()
+{
+	undoStack->clear();
 }

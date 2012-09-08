@@ -19,6 +19,7 @@ class specActionLibrary ;
 class specView ;
 class specModel ;
 class specUndoAction ;
+class QUndoView ;
 
 class specActionLibrary : public QObject, public specStreamable
 {
@@ -37,9 +38,10 @@ public:
 	static specUndoCommand* commandById(int id, specUndoCommand* parent = 0) ;
 	QAction* undoAction(QObject*) ;
 	QAction* redoAction(QObject*) ;
+	void purgeUndo() ;
+	QUndoView* undoView() ;
 public slots:
 	void push(specUndoCommand*) ;
-
 signals:
 	void stackChanged() ;
 private:
@@ -52,6 +54,7 @@ private:
 	QModelIndexList lastRequested ;
 	void addParent(QObject*) ;
 	void addNewAction(QToolBar*, specUndoAction*) ;
+
 };
 
 #endif // SPECACTIONLIBRARY_H

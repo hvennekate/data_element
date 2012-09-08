@@ -56,7 +56,6 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 	}
 
 	// setup the interval
-	qDebug() << "Processing variable" << init << xlower.isEmpty() << xupper.isEmpty() ;
 	if (!xlower.isEmpty() || !xupper.isEmpty())
 	{
 		product->setMinValue( xlower.isEmpty() ? -INFINITY : xlower.toDouble()) ;
@@ -78,7 +77,6 @@ specMetaVariable::specMetaVariable(specMetaParser *p)
 	  parent(p),
 	  descriptor("")
 {
-	qDebug() << "creating meta variable" << this ;
 }
 
 bool specMetaVariable::setIndexRange(int &start, int &finish, int &step, int max) const
@@ -110,7 +108,7 @@ QVector<double> specMetaVariable::values(specModelItem *item, const QVector<doub
 bool specMetaVariable::extractXs(specModelItem *item, QVector<double> &xvals) const
 {
 	item->revalidate() ;
-	if (xvals.size() == 1 && isnan(xvals[0]))
+	if (xvals.size() == 1 && std::isnan(xvals[0]))
 	{
 		double value ;
 		xvals.clear();
@@ -175,15 +173,20 @@ void specMetaVariable::detachRanges()
 
 QString specMetaVariable::codeValue() const
 {
-	qDebug() << "code:" << code << QwtInterval::isValid() ;
 	if (!QwtInterval::isValid()) return code ;
 	return code + QString::number(minValue()) + ":" + QString::number(maxValue()) ;
 }
 
 specMetaRange::addressObject specMetaVariable::address(specMetaRange* r)
 {
-	if (!parent) return specMetaRange::addressObject{0,-1,-1} ;
-	qDebug() << "querying address from" << parent << "Queried by" << this ;
+	if (!parent)
+	{
+		specMetaRange::addressObject ao ;
+		ao.item = 0 ;
+		ao.range = -1 ;
+		ao.variable = -1 ;
+		return ao ;
+	}
 	specMetaRange::addressObject a = parent->addressOf(this) ;
 	a.range = ranges.indexOf(r) ;
 	return a;
@@ -194,7 +197,7 @@ void specMetaVariable::getRangePoint(int range, int point, double &x, double &y)
 	if (range <0 || range >= ranges.size()) return ;
 	if (point != 0 && point != 1) return ;
 	x = point == 0 ? minValue() : maxValue() ;
-	y = ranges[range]->sample(0).x() ; // TODO this is uggahh...
+	y = ranges[range]->sample(0).y() ; // TODO this is uggahh...
 }
 
 void specMetaVariable::setRange(int rangeNo, int pointNo, double newX, double newY)

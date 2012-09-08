@@ -25,7 +25,6 @@ void specSVGItem::detach()
 
 void specSVGItem::highlight(bool highlight)
 {
-	qDebug() << "highlighting" << highlight << this;
 	highlighting = highlight ;
 	QVector<QPointF> points(specSVGItem::size) ;
 	QRectF br = boundRect() ;

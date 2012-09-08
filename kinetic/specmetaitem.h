@@ -26,9 +26,11 @@ public:
 	void setModels(specModel* meta, specModel* data) ;
 	bool disconnectServer(specModelItem*) ;
 	bool connectServer(specModelItem*) ;
+	QList<specModelItem*> serverList() const { return items ; }
 	explicit specMetaItem(specFolderItem* par=0, QString description="");
 	QList<specModelItem*> purgeConnections() ;
 	void attach(QwtPlot *plot) ;
+	void detach();
 	void refreshPointers(const QHash<specModelItem*,specModelItem*>& mapping) ; // TODO restore connections, maybe by hierarchy...
 	void refreshPlotData();
 	QStringList descriptorKeys() const ;

@@ -34,6 +34,7 @@ void specSpectrumPlot::toggleAligning(bool on)
 void specSpectrumPlot::invalidateReference()
 {
 	if (reference) delete reference ;
+	reference = 0 ;
 	setReferenceAction->setToolTip(QString("Momentan keine Referenz."));
 }
 
@@ -125,7 +126,7 @@ QList<specDataItem*> specSpectrumPlot::folderContent(specModelItem *folder)
 
 void specSpectrumPlot::setReference()
 {
-	if (reference) delete reference ;
+	invalidateReference();
 	QModelIndexList referenceItems = view->getSelection() ;
 
 	// convert indexes to pointers
@@ -133,10 +134,7 @@ void specSpectrumPlot::setReference()
 	for(int i = 0 ; i < referenceItems.size() ; ++i)
 		referenceDataItems << folderContent(view->model()->itemPointer(referenceItems[i])) ;
 	if (referenceDataItems.isEmpty())
-	{
-		invalidateReference();
 		return ;
-	}
 	reference = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
 	for (int i = 0 ; i < referenceDataItems.size() ; ++i)
 		reference->operator +=(*(referenceDataItems[i])) ;
@@ -302,6 +300,7 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 	command->setItem(view->model()->index( (specModelItem*) item)) ; // TODO do dynamic cast first!!
 	command->setCorrections(shift,offset,offline,scale) ;
 	command->setParentObject(view) ;
+	command->setText(tr("Modify data point(s)"));
 	undoPartner()->push(command) ;
 }
 
@@ -416,6 +415,7 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double n
 
 	specMultiCommand *zeroCommand = generateCorrectionCommand(zeroRanges, spectra, referenceSpectrum, view, noSlopeAction->isChecked()) ;
 	zeroCommand->setParentObject(view) ;
+	zeroCommand->setText(tr("Apply range correction"));
 	undoPartner()->push(zeroCommand) ;
 	replot() ;
 }
@@ -465,6 +465,7 @@ void specSpectrumPlot::multipleSubtraction()
 	}
 
 	subCommand->setParentObject(view->model()) ;
+	subCommand->setText(tr("Subtract reference"));
 	undoPartner()->push(subCommand) ;
 	replot() ;
 }

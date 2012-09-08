@@ -15,6 +15,7 @@
 specModelItem::specModelItem(specFolderItem* par, QString desc)
 	: specCanvasItem(),
 	  iparent(0),
+	  dataValid(false),
 	  description(desc, spec::editable),
 	  mergePlotData(true),
 	  sortPlotData(true)
@@ -88,8 +89,7 @@ void specModelItem::refreshPlotData()
 
 void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 {
-	QTime timer ;
-	timer.start() ;
+	// TODO accelerate
 	if (sortPlotData)
 	{
 		QMultiMap<double,double> sortedValues;
@@ -98,10 +98,10 @@ void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 		x = sortedValues.keys().toVector() ;
 		y = sortedValues.values().toVector() ;
 	}
-	QVector<double> xt, yt ;
 
 	if (mergePlotData)
 	{
+		QVector<double> xt, yt ;
 		int i = 0 ;
 		while(i < x.size())
 		{
@@ -224,7 +224,7 @@ void specModelItem::exportData(const QList<QPair<bool,QString> >& headerFormat, 
 	out << endl ;
 	for (size_t j = 0 ; j < dataSize() ; j++)
 		for (int i = 0 ; i < dataFormat.size() ; i++)
-			out << dataFormat[i].first << dataFormat[i].second ;
+			out << (dataFormat[i].first ? sample(j).x() :sample(j).y()) << dataFormat[i].second ;
 	out << endl ;
 }
 

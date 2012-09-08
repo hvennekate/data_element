@@ -83,6 +83,8 @@ void specKineticWidget::addToolbar(specActionLibrary* actions)
 	actions->addPlot(plot) ;
 	QToolBar *toolbar = actions->toolBar(items) ;
 	toolbar->addSeparator() ;
-	toolbar->addActions(plot->actions());
+	QToolBar *plotBar = actions->toolBar(plot) ;
+	plotBar->addActions(plot->actions()) ;
 	layout->insertWidget(0,toolbar) ;
+	layout->insertWidget(1,plotBar);
 }
