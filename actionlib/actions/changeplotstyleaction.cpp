@@ -10,7 +10,8 @@
 #include <QInputDialog>
 
 changePlotStyleAction::changePlotStyleAction(QObject *parent) :
-    specUndoAction(parent)
+	specRequiresItemAction(parent),
+	currentTrigger(0)
 {
 	setIcon(QIcon(":/lineStyle.png"));
 	setToolTip(tr("Plot Style")) ;
@@ -90,15 +91,6 @@ changePlotStyleAction::changePlotStyleAction(QObject *parent) :
 	connect(symbolSizeMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionTriggered(QAction*))) ;
 }
 
-void changePlotStyleAction::execute()
-{
-	specView *view = (specView*) parent() ;
-	QModelIndexList items = view->getSelection() ;
-
-	if (items.isEmpty()) return ;
-
-}
-
 QColor changePlotStyleAction::getColor(int index)
 {
 	if(!index) return QColorDialog::getColor() ;
@@ -113,60 +105,66 @@ double changePlotStyleAction::getSize(int index, bool &ok)
 
 void changePlotStyleAction::actionTriggered(QAction* action)
 {
-	specView *view = (specView*) parent() ;
-	specStyleCommand *newCommand = 0 ;
-	QObject *source = sender() ;
-	specDataItem item ;
+	currentTrigger = sender() ;
+	currentAction = action ;
+	execute() ;
+}
 
-	if (source == lineColorMenu)
+specUndoCommand* changePlotStyleAction::generateUndoCommand()
+{
+	specStyleCommand *newCommand = 0 ;
+	if (!currentTrigger || !currentAction) return 0 ;
+
+	specDataItem item ;
+	if (currentTrigger == lineColorMenu)
 	{
-		QColor color = getColor(lineColorActions.indexOf(action)) ;
-		if (!color.isValid()) return ;
+		QColor color = getColor(lineColorActions.indexOf(currentAction)) ;
+		if (!color.isValid()) return 0;
 		newCommand = generateStyleCommand(specStreamable::penColorCommandId) ;
 		item.setPenColor(color) ;
 	}
-	if (source == symbolInnerColorMenu)
+	if (currentTrigger == symbolInnerColorMenu)
 	{
-		QColor color = getColor(symbolInnerColorActions.indexOf(action)) ;
-		if (!color.isValid()) return ;
+		QColor color = getColor(symbolInnerColorActions.indexOf(currentAction)) ;
+		if (!color.isValid()) return 0;
 		newCommand = generateStyleCommand(specStreamable::symbolBrushColorCommandId) ;
 		item.setSymbolBrushColor(color) ;
 	}
-	if (source == symbolOuterColorMenu)
+	if (currentTrigger == symbolOuterColorMenu)
 	{
-		QColor color = getColor(symbolOuterColorActions.indexOf(action)) ;
-		if (!color.isValid()) return ;
+		QColor color = getColor(symbolOuterColorActions.indexOf(currentAction)) ;
+		if (!color.isValid()) return 0;
 		newCommand = generateStyleCommand(specStreamable::symbolPenColorCommandId) ;
 		item.setSymbolPenColor(color) ;
 	}
 
 	bool ok = true;
-	if (source == lineWidthMenu)
+	if (currentTrigger == lineWidthMenu)
 	{
-		double value = getSize(lineWidthActions.indexOf(action), ok) ;
-		if (!ok) return ;
+		double value = getSize(lineWidthActions.indexOf(currentAction), ok) ;
+		if (!ok) return 0;
 		newCommand = generateStyleCommand(specStreamable::lineWidthCommandId) ;
 		item.setLineWidth(value) ;
 	}
-	if (source == symbolSizeMenu)
+	if (currentTrigger == symbolSizeMenu)
 	{
-		double value = getSize(symbolSizeActions.indexOf(action), ok) ;
-		if (!ok) return ;
+		double value = getSize(symbolSizeActions.indexOf(currentAction), ok) ;
+		if (!ok) return 0;
 		newCommand = generateStyleCommand(specStreamable::symbolSizeCommandId) ;
 		item.setSymbolSize(value) ;
 	}
 
-	if (source == symbolMenu)
+	if (currentTrigger == symbolMenu)
 	{
 		newCommand = generateStyleCommand(specStreamable::symbolStyleCommandId) ;
-		item.setSymbolStyle(symbolActions.indexOf(action));
+		item.setSymbolStyle(symbolActions.indexOf(currentAction));
 	}
 
-	if (!newCommand) return ;
+	if (!newCommand) return 0;
 	newCommand->obtainStyle(&item) ;
 	newCommand->setParentObject(view) ;
 	newCommand->setItems(view->getSelection()) ;
 	newCommand->setText(tr("Change plot style"));
-	library->push(newCommand) ;
+	return newCommand ;
 }
 

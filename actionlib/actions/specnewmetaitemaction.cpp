@@ -5,7 +5,7 @@
 #include "specmetaitem.h"
 
 specNewMetaItemAction::specNewMetaItemAction(QObject *parent) :
-    specUndoAction(parent)
+    specItemAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("document-new")) ;
 	setToolTip(tr("New item"));
@@ -17,34 +17,27 @@ const std::type_info &specNewMetaItemAction::possibleParent()
 	return typeid(specMetaView) ;
 }
 
-void specNewMetaItemAction::execute()
+specUndoCommand * specNewMetaItemAction::generateUndoCommand()
 {
-	if (!parent()) return ;
-	specMetaView *view = (specMetaView*) parent() ;
-	specMetaModel *model = view->model() ;
-	QModelIndex index = view->currentIndex() ;
-	specModelItem *item = model->itemPointer(index) ;
+	specMetaView *view = qobject_cast<specMetaView*>(specItemAction::view) ;
+	if (!view) return 0 ;
 	int row = 0 ;
-	if (!item->isFolder())
+	if (!currentItem->isFolder())
 	{
-		row = index.row()+1 ;
-		index = index.parent() ;
+		row = currentIndex.row()+1 ;
+		currentIndex = currentIndex.parent() ;
 	}
 
 	specMetaItem *pointer = new specMetaItem ;
 	pointer->setModels(model,view->getDataView()->model());
-	if (! model->insertItems(QList<specModelItem*>() << pointer, index,row))
+	if (! model->insertItems(QList<specModelItem*>() << pointer, currentIndex,row))
 	{
 		delete pointer ;
-		return ;
+		return 0;
 	}
 	specAddFolderCommand *command = new specAddFolderCommand ;
 	command->setItems(QModelIndexList() << model->index(pointer)) ;
 	command->setParentObject(model) ;
-
 	command->setText(tr("Add meta item")) ;
-	if (command->ok())
-		library->push(command) ;
-	else
-		delete command ;
+	return command ;
 }

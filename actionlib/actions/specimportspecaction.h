@@ -1,23 +1,21 @@
 #ifndef SPECIMPORTSPECACTION_H
 #define SPECIMPORTSPECACTION_H
-#include "specundoaction.h"
+#include "specitemaction.h"
 
 class QFile ;
 class specModelItem ;
 
-class specImportSpecAction : public specUndoAction
+class specImportSpecAction : public specItemAction
 {
 	Q_OBJECT
 	QStringList filters ;
 	QList<QList<specModelItem*> (*)(QFile&)> acceptableFunctions ;
 public:
 	explicit specImportSpecAction(QObject *parent = 0);
-	const std::type_info& possibleParent() ;
 	void setFilters(const QStringList& f) ;
 	void setAcceptableImportFunctions(const QList<QList<specModelItem*> (*)(QFile&)>& f) ;
-private:
-	void execute() ;
-
+protected:
+	specUndoCommand* generateUndoCommand() ;
 };
 
 #endif // SPECIMPORTSPECACTION_H

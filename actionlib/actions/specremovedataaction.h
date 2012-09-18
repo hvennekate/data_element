@@ -1,17 +1,17 @@
 #ifndef SPECREMOVEDATAACTION_H
 #define SPECREMOVEDATAACTION_H
 
-#include "spectral/specdataview.h"
-#include "specundoaction.h"
+#include "specdataview.h"
+#include "specrequiresitemaction.h"
 
-class specRemoveDataAction : public specUndoAction
+class specRemoveDataAction : public specRequiresItemAction
 {
 	Q_OBJECT
 public:
 	explicit specRemoveDataAction(QObject *parent = 0);
-	const std::type_info& possibleParent() { return typeid(specDataView) ; }
+	const std::type_info& possibleParent() ;
 protected:
-	void execute() ;
+	specUndoCommand* generateUndoCommand() ;
 };
 
 #endif // SPECREMOVEDATAACTION_H

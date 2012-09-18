@@ -1,6 +1,7 @@
 #include "speccutaction.h"
 #include <QApplication>
 #include <QClipboard>
+#include "speccopyaction.h"
 
 specCutAction::specCutAction(QObject *parent) :
     specDeleteAction(parent)
@@ -10,10 +11,8 @@ specCutAction::specCutAction(QObject *parent) :
 	setWhatsThis(tr("Cut items to clipboard.  Removes orginal items from this file.  May be pasted in this program or in any other that understands plain text.")) ;
 }
 
-void specCutAction::execute()
+specUndoCommand* specCutAction::generateUndoCommand()
 {
-	specView *currentView = (specView*) parent() ;
-	QApplication::clipboard()->setMimeData(
-	currentView->model()->mimeData(currentView->selectionModel()->selectedIndexes()) );
-	specDeleteAction::execute() ;
+	specCopyAction::copyToClipboard(model,selection) ;
+	return specDeleteAction::generateUndoCommand() ;
 }

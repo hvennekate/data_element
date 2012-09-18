@@ -1,21 +1,15 @@
 #ifndef SPECDELETEACTION_H
 #define SPECDELETEACTION_H
 
-#include "specundoaction.h"
-#include "specdataview.h"
+#include "specrequiresitemaction.h"
 
-class specDeleteAction : public specUndoAction
+class specDeleteAction : public specRequiresItemAction
 {
     Q_OBJECT
 public:
 	explicit specDeleteAction(QObject *parent = 0);
-	const std::type_info &possibleParent() ;
-
-signals:
-
-public slots:
 protected:
-	void execute() ;
+	specUndoCommand* generateUndoCommand() ;
 
 };
 

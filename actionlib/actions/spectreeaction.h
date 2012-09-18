@@ -2,7 +2,7 @@
 #define SPECTREEACTION_H
 
 #include "specundoaction.h"
-#include "model/specview.h"
+#include "specview.h"
 
 class specTreeAction : public specUndoAction
 {

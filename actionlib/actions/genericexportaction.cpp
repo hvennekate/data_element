@@ -1,25 +1,15 @@
 #include "genericexportaction.h"
 
 genericExportAction::genericExportAction(QObject *parent) :
-    specUndoAction(parent)
+    specRequiresItemAction(parent)
 {
 	setIcon(QIcon(":/export.png")) ;
 	setToolTip(tr("Export to ASCII")) ;
 	setWhatsThis(tr("Export selected items to ASCII file.")) ;
 }
 
-const std::type_info &genericExportAction::possibleParent()
+specUndoCommand* genericExportAction::generateUndoCommand()
 {
-	return typeid(specView) ;
-}
-
-void genericExportAction::execute()
-{
-	specView* view = qobject_cast<specView*>(parentWidget()) ;
-	if (!view) return ;
-	specModel* model = view->model() ;
-	if (!model) return ;
-
-	QModelIndexList indexes(view->getSelection()) ;
-	model->exportData(indexes) ;
+	model->exportData(selection) ;
+	return 0 ;
 }

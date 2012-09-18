@@ -4,21 +4,20 @@
 #include <QClipboard>
 
 specCopyAction::specCopyAction(QObject *parent) :
-    specUndoAction(parent)
+    specRequiresItemAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("edit-copy")) ;
 	setToolTip(tr("Copy selected items")) ;
 	setWhatsThis(tr("Copy items to clipboard.  May be pasted in this program or in any other that understands plain text.")) ;
 }
 
-const std::type_info &specCopyAction::possibleParent()
+specUndoCommand* specCopyAction::generateUndoCommand()
 {
-	return typeid(specView) ;
+	copyToClipboard(model,selection) ;
+	return 0 ;
 }
 
-void specCopyAction::execute()
+void specCopyAction::copyToClipboard(specModel *model, const QModelIndexList& selection)
 {
-	specView *currentView = (specView*) parent() ;
-	QApplication::clipboard()->setMimeData(
-	currentView->model()->mimeData(currentView->selectionModel()->selectedIndexes()) );
+	QApplication::clipboard()->setMimeData(model->mimeData(selection));
 }

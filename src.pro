@@ -92,7 +92,10 @@ SOURCES += main.cpp \
     actionlib/commands/specplotlabelcommand.cpp \
     actionlib/actions/speclabelaction.cpp \
     specprofiler.cpp \
-    actionlib/actions/genericexportaction.cpp
+    actionlib/actions/genericexportaction.cpp \
+    actionlib/actions/specplotaction.cpp \
+    actionlib/actions/specitemaction.cpp \
+    actionlib/actions/specrequiresitemaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -186,7 +189,10 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/commands/specplotlabelcommand.h \
     actionlib/actions/speclabelaction.h \
     specprofiler.h \
-    actionlib/actions/genericexportaction.h
+    actionlib/actions/genericexportaction.h \
+    actionlib/actions/specplotaction.h \
+    actionlib/actions/specitemaction.h \
+    actionlib/actions/specrequiresitemaction.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -211,11 +217,11 @@ LIBS += -lqwt \
 }
 win32 {
 INCLUDEPATH += . \
-    C:/Qwt-6.0.0/include \
-    C:/Users/Hendrik/Downloads/muparser_v2_2_2/include
-LIBS += -LC:/Qwt-5.2.1/lib \
+    C:/builds/Qwt-6.0.1/qwt \
+    C:/builds/muparser_v2_2_2/include
+LIBS += -LC:/builds/Qwt-6.0.1/lib \
     -lqwt \
-    C:/Users/Hendrik/Downloads/muparser_v2_2_2/lib/libmuparser.a
+    C:/builds/muparser_v2_2_2/lib/libmuparser.a
 DEFINES += WIN32BUILD \
     QT_DLL \
     QWT_DLL

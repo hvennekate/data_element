@@ -6,33 +6,23 @@
 #include <QMessageBox>
 
 specImportSpecAction::specImportSpecAction(QObject *parent) :
-    specUndoAction(parent)
+    specItemAction(parent)
 {
 	setIcon(QIcon(":/fileimport.png"));
 	setToolTip(tr("Import files")) ;
 	setWhatsThis(tr("Import files.  Use this button to get started."));
 }
 
-const std::type_info &specImportSpecAction::possibleParent()
+specUndoCommand *specImportSpecAction::generateUndoCommand()
 {
-	return typeid(specView) ;
-}
-
-void specImportSpecAction::execute()
-{
-	specView *currentView = (specView*) parent() ; // TODO: outsource this code (shared with insert folder action)
-	specModel *model = currentView->model() ;
-	QModelIndex index = currentView->currentIndex() ;
-	specModelItem *item = model->itemPointer(index) ;
 	int row = 0 ;
-	if (!item->isFolder())
+	if (!currentItem->isFolder())
 	{
-		row = index.row()+1 ;
-		index = index.parent() ;
-
+		row = currentIndex.row()+1 ;
+		currentIndex = currentIndex.parent() ;
 	}
 
-	QStringList fileNames = QFileDialog::getOpenFileNames(currentView,tr("Files to import")) ; // TODO get proper file type from model
+	QStringList fileNames = QFileDialog::getOpenFileNames(view,tr("Files to import")) ; // TODO get proper file type from model
 	QList<specModelItem*> importedItems ;
 	for(int i = 0 ; i < fileNames.size() ; ++i)
 	{
@@ -47,19 +37,15 @@ void specImportSpecAction::execute()
 		importedItems << importFunction(fileToImport) ;
 	}
 
-	if (! model->insertItems(importedItems, index, row)) return ;
+	if (! model->insertItems(importedItems, currentIndex, row)) return 0 ;
 	specAddFolderCommand *command = new specAddFolderCommand ;
 	QModelIndexList newIndexes ;
 	for (int i = 0 ; i < importedItems.size() ; ++i)
-		newIndexes << model->index(row+i,0,index) ;
+		newIndexes << model->index(row+i,0,currentIndex) ;
 	command->setItems(newIndexes) ;
-	command->setParentObject(currentView->model()) ;
+	command->setParentObject(view->model()) ;
 	command->setText("Import data") ;
-
-	if (command->ok())
-		library->push(command) ;
-	else
-		delete command ;
+	return command ;
 }
 
 void specImportSpecAction::setFilters(const QStringList &f)

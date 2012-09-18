@@ -2,7 +2,7 @@
 #define SPECMERGEACTION_H
 
 #include "specundoaction.h"
-#include "specview.h"
+#include "specdataview.h"
 
 class specMergeAction : public specUndoAction
 {
@@ -13,7 +13,7 @@ private:
 	QModelIndexList allChildren(const QModelIndex& parent) const ;
 public:
 	explicit specMergeAction(QObject *parent = 0);
-	const std::type_info& possibleParent() { return typeid(specView) ; }
+	const std::type_info& possibleParent() { return typeid(specDataView) ; }
 protected:
 	void execute() ;
 

@@ -9,16 +9,17 @@
 #include "specmulticommand.h"
 #include "specexchangedatacommand.h"
 #include <cmath>
+#include "specdataview.h"
 
 specAverageDataAction::specAverageDataAction(QObject *parent) :
-    specUndoAction(parent)
+    specRequiresItemAction(parent)
 {
 	setIcon(QIcon(":/ave.png")) ;
 	setToolTip(tr("Average Data")) ;
 	setWhatsThis(tr("Smooth data by averaging.  You can choose between plainly averaging any number of data points or calculating a moving average."));
 }
 
-void specAverageDataAction::execute()
+specUndoCommand* specAverageDataAction::generateUndoCommand()
 {
 	// TODO subclass QDialog, make one instance persistent in memory
 	// also:  minimale Anzahl Punkte, wenn nicht laufend: 2, sonst 1
@@ -43,7 +44,7 @@ void specAverageDataAction::execute()
 	connect(buttonBox,SIGNAL(rejected()),&dialog,SLOT(reject())) ;
 
 	if (!dialog.exec())
-		return ;
+		return 0 ;
 
 	specDataView *view = (specDataView*) parentWidget() ;
 	QModelIndexList indexes = view->getSelection() ;

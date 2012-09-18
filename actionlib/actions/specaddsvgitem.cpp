@@ -9,55 +9,43 @@
 #include <QtSvg>
 
 specAddSVGItemAction::specAddSVGItemAction(QObject *parent) :
-    specUndoAction(parent)
+    specItemAction(parent)
 {
 	setIcon(QIcon::fromTheme("insert-image")) ;
 	setToolTip(tr("Add SVG image")) ;
 	setWhatsThis(tr("Insert an image to be displayed as an annotation to the plot canvas.  Currently, SVG images are supported.")) ;
 }
 
-const std::type_info &specAddSVGItemAction::possibleParent()
-{
-	return typeid(specView) ;
-}
-
-void specAddSVGItemAction::execute()
+specUndoCommand* specAddSVGItemAction::generateUndoCommand()
 {
 	QFile input(QFileDialog::getOpenFileName(parentWidget(),
 						 "Select SVG file",
 						 "",
 						 "SVG images (*.svg)")) ;
 	if (!(input.exists() && input.open(QIODevice::ReadOnly)))
-		return ;
+		return 0;
 	QByteArray fileContent(input.readAll()) ;
 	specSVGItem *newItem = new specSVGItem() ;
 	newItem->setImage(fileContent) ; // TODO remove
 
-	specView *currentView = (specView*) parent() ; // TODO consolidate with addfolderaction
-	specModel *model = currentView->model() ;
-	QModelIndex index = currentView->currentIndex() ;
-	specModelItem *item = model->itemPointer(index) ;
 	int row = 0 ;
-	if (!item->isFolder())
+	if (!currentItem->isFolder())
 	{
-		row = index.row()+1 ;
-		index = index.parent() ;
+		row = currentIndex.row()+1 ;
+		currentIndex = currentIndex.parent() ;
 
 	}
-	if (! model->insertItems(QList<specModelItem*>() << newItem, index, row))
+	if (! model->insertItems(QList<specModelItem*>() << newItem, currentIndex, row))
 	{
 		delete newItem ;
-		return ;
+		return 0;
 	}
 
 	specAddFolderCommand *command = new specAddFolderCommand ;
-	command->setItems(QModelIndexList() << model->index(row,0,index)) ;
+	command->setItems(QModelIndexList() << model->index(row,0,currentIndex)) ;
 
 	command->setParentObject(model) ;
 	command->setText(tr("Add SVG item")) ;
 
-	if (command->ok())
-		library->push(command) ;
-	else
-		delete command ;
+	return command ;
 }

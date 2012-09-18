@@ -1,19 +1,16 @@
 #ifndef SPECCOPYACTION_H
 #define SPECCOPYACTION_H
 
-#include "specundoaction.h"
+#include "specrequiresitemaction.h"
 
-class specCopyAction : public specUndoAction
+class specCopyAction : public specRequiresItemAction
 {
     Q_OBJECT
 public:
 	explicit specCopyAction(QObject *parent = 0);
-	const std::type_info &possibleParent() ;
-
+	static void copyToClipboard(specModel*, const QModelIndexList& selection) ;
 private:
-	void execute() ;
-
-
+	specUndoCommand *generateUndoCommand() ;
 };
 
 #endif // SPECCOPYACTION_H

@@ -116,6 +116,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		addNewAction(bar, new specPasteAction(target)) ;
 		addNewAction(bar, new specDeleteAction(target)) ;
 		bar->addSeparator() ;
+		addNewAction(bar, new changePlotStyleAction(target)) ;
 		addNewAction(bar, new specAddConnectionsAction(target)) ;
 		addNewAction(bar,new genericExportAction(target)) ;
 
@@ -255,6 +256,7 @@ void specActionLibrary::moveInternally(const QModelIndex &parent, int row, specV
 	specMoveCommand *command = new specMoveCommand ;
 	command->setParentObject(target);
 	command->setItems(lastRequested,parent,row) ;
+	command->setText(tr("Move items"));
 	push(command) ;
 }
 

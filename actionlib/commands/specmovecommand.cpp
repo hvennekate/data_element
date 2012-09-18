@@ -61,7 +61,7 @@ void specMoveCommand::doIt()
 	QList<specModelItem*> items ;
 	for (int i = 0 ; i < sourceIndexes.size() ; ++i)
 	{
-		QVector<int> indexes = sourceIndexes[i].first ;
+		QVector<int> indexes = sourceIndexes[i].first ; // TODO Haeh?
 		for (int j = 0 ; j < sourceIndexes[i].second ; ++j)
 		{
 			items << model->itemPointer(indexes) ;

@@ -7,32 +7,23 @@
 #include <QMap>
 
 specDeleteAction::specDeleteAction(QObject *parent) :
-    specUndoAction(parent)
+    specRequiresItemAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("edit-delete"));
 	setToolTip(tr("Delete")) ;
 	setWhatsThis(tr("Deletes selected items.")) ;
 }
 
-const std::type_info &specDeleteAction::possibleParent()
+specUndoCommand* specDeleteAction::generateUndoCommand()
 {
-	return typeid(specDataView) ;
-}
-
-void specDeleteAction::execute()
-{
-	specView *currentView = (specView*) parent() ;
-	QModelIndexList indexes = currentView->selectionModel()->selectedIndexes() ;
-	if (indexes.isEmpty()) return ; // 1. Bug von Daniel
-	// TODO change this if there are no connections
 	specMultiCommand *parentCommand = new specMultiCommand ;
-	parentCommand->setParentObject(currentView->model()) ;
+	parentCommand->setParentObject(model) ;
 
-	specMetaModel *metaModel = currentView->model()->getMetaModel() ;
+	specMetaModel *metaModel = model->getMetaModel() ;
 	specModel *dataModel = metaModel->getDataModel() ;
 
 	// collect all indexes and remove connections
-	QModelIndexList queue = indexes ;
+	QModelIndexList queue = selection ;
 	QMap<specModelItem*, QModelIndex> allItems ;
 
 	while (!queue.isEmpty())
@@ -75,17 +66,14 @@ void specDeleteAction::execute()
 	}
 
 	specDeleteCommand *command = new specDeleteCommand(parentCommand) ;
-	command->setParentObject(currentView->model());
-	command->setItems(indexes) ;
-	command->setParentObject(currentView->model());
+	command->setParentObject(model);
+	command->setItems(selection) ;
+	command->setParentObject(model);
 
 	parentCommand->setText("Delete");
 	parentCommand->setMergeable(false) ;
-	currentView->selectionModel()->clearSelection();
+	view->selectionModel()->clearSelection();
 
 	parentCommand->setText(tr("Delete item(s)")) ;
-	if (command->ok())
-		library->push(parentCommand) ;
-	else
-		delete parentCommand ;
+	return parentCommand ;
 }

@@ -1,24 +1,20 @@
 #ifndef CHANGEPLOTSTYLEACTION_H
 #define CHANGEPLOTSTYLEACTION_H
 
-#include "specundoaction.h"
+#include "specrequiresitemaction.h"
 #include "specdataview.h"
 #include "specstylecommand.h"
 
 class specGenealogy ;
 
-class changePlotStyleAction : public specUndoAction
+class changePlotStyleAction : public specRequiresItemAction
 {
 	Q_OBJECT
 public:
 	explicit changePlotStyleAction(QObject *parent = 0);
 	const std::type_info& possibleParent() { return typeid(specView) ; }
-
-protected:
-
-	void execute() ;
-
 private:
+	specUndoCommand* generateUndoCommand() ;
 	QMenu *lineColorMenu,
 		*symbolMenu,
 		*symbolInnerColorMenu,
@@ -35,9 +31,10 @@ private:
 		symbolSizeActions ;
 	QColor getColor(int index) ;
 	double getSize(int index, bool& ok) ;
+	QObject *currentTrigger ;
+	QAction *currentAction ;
 private slots:
 	void actionTriggered(QAction*) ;
-
 };
 
 #endif // CHANGEPLOTSTYLEACTION_H

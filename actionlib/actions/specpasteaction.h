@@ -1,21 +1,15 @@
 #ifndef SPECPASTEACTION_H
 #define SPECPASTEACTION_H
 
-#include "specundoaction.h"
+#include "specitemaction.h"
 
-class specPasteAction : public specUndoAction
+class specPasteAction : public specItemAction
 {
 	Q_OBJECT
 public:
 	explicit specPasteAction(QObject *parent = 0);
-	const std::type_info &possibleParent() ;
-
-signals:
-
-public slots:
-
-private:
-	void execute() ;
+protected:
+	specUndoCommand* generateUndoCommand() ;
 };
 
 #endif // SPECPASTEACTION_H
