@@ -64,7 +64,7 @@ inline void averageToNew(forwardIterator begin, forwardIterator end,
 		*target++ = average(begin, end, equal) ;
 } ;
 
-template<class T, class forwardIterator, class outputIterator>
+template<class forwardIterator, class outputIterator>
 inline void averageToNew(forwardIterator begin, forwardIterator end,
 		  outputIterator target)
 {

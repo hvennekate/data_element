@@ -7,9 +7,10 @@
 class specMergeAction : public specUndoAction
 {
     Q_OBJECT
+	typedef QPair<QString,double>  stringDoublePair ;
 private:
-	bool getMergeCriteria(QList<QPair<QStringList::size_type, double> >& toCompare, const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties, bool &spectralAdaptation) ;
-	bool itemsAreEqual(specModelItem* first, specModelItem* second, const QList<QPair<QStringList::size_type, double> >& criteria, const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties) ;
+	bool getMergeCriteria(QList<stringDoublePair>& toCompare, const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties, bool &spectralAdaptation) ;
+	bool itemsAreEqual(specModelItem* first, specModelItem* second, const QList<stringDoublePair>& criteria) ;
 	QModelIndexList allChildren(const QModelIndex& parent) const ;
 public:
 	explicit specMergeAction(QObject *parent = 0);

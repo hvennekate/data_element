@@ -66,6 +66,19 @@ public:
 	static QVector<int> hierarchy(const QModelIndex&) ;
 	QList<specModelItem*> pointerList(const QModelIndexList&) const ;
 	QModelIndexList indexList(const QList<specModelItem*>&) const ;
+	template<class T>
+	QModelIndexList indexList(const QList<T*>& pointers) const
+	{
+		QModelIndexList returnList ;
+		foreach(T* tpointer, pointers)
+		{
+			specModelItem *pointer = dynamic_cast<specModelItem*>(tpointer) ;
+			if (pointer)
+				returnList << index(pointer) ;
+		}
+		return returnList ;
+	}
+
 	bool isFolder(const QModelIndex&) const ;
 	void eliminateChildren(QModelIndexList&) const ;
 	virtual bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row=0) ;

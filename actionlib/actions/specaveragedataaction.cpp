@@ -92,5 +92,5 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 		command->setItem(index,newData);
 	}
 	groupCommand->setText(tr("Average data")) ;
-	library->push(groupCommand);
+	return groupCommand ;
 }
