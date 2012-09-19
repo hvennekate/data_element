@@ -21,12 +21,12 @@ public:
 		specFolderItem *parent ;
 		int count ;
 		int row ;
+		void pointersToIndexes(specModel*) ;
+		void IndexesToPointers(specModel*) ;
 	public:
 		moveUnit(QModelIndexList&, const QModelIndex& target, int r, specModel*) ;
 		moveUnit() ;
 		void moveIt(specModel*) ;
-		void pointersToIndexes(specModel*) ;
-		void IndexesToPointers(specModel*) ;
 		friend QDataStream& operator<<(QDataStream&, const moveUnit&) ;
 		friend QDataStream& operator>>(QDataStream&, moveUnit&) ;
 	};

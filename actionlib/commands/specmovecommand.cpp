@@ -40,7 +40,7 @@ void specMoveCommand::moveUnit::IndexesToPointers(specModel *model)
 
 void specMoveCommand::moveUnit::moveIt(specModel* model)
 {
-//	IndexesToPointers(model);
+	IndexesToPointers(model);
 	specFolderItem *oldParent = items.first()->parent() ;
 	int oldRow = oldParent->childNo(items.first()) ;
 	foreach (specModelItem* item, items)
@@ -48,7 +48,7 @@ void specMoveCommand::moveUnit::moveIt(specModel* model)
 	parent->addChildren(items.toList(),row) ;
 	row = oldRow ;
 	parent = oldParent ;
-//	pointersToIndexes(model);
+	pointersToIndexes(model);
 }
 
 QDataStream& operator<<(QDataStream& out, const specMoveCommand::moveUnit& unit)
@@ -62,15 +62,15 @@ QDataStream& operator>>(QDataStream& in, specMoveCommand::moveUnit& unit)
 }
 
 specMoveCommand::moveUnit::moveUnit(QModelIndexList &list, const QModelIndex& target, int r, specModel *model)
-	: count(0),
-	  parent(0)
+	: parent(0),
+	  count(0),
+	  row(r)
 {
 	if (list.isEmpty() || !model) return ;
 	int nextRow = list.first().row() ;
 	firstItemIndex = model->hierarchy(list.first()) ;
 	if (firstItemIndex.isEmpty()) return ;
 	parentIndex = model->hierarchy(target) ;
-	row = r ;
 	const QModelIndex parentModelIndex(list.first().parent()) ;
 	while (!list.isEmpty() &&
 			list.first().row() == nextRow++ &&
@@ -82,8 +82,8 @@ specMoveCommand::moveUnit::moveUnit(QModelIndexList &list, const QModelIndex& ta
 }
 
 specMoveCommand::moveUnit::moveUnit()
-	: count(0),
-	  parent(0),
+	: parent(0),
+	  count(0),
 	  row(0)
 {
 }
@@ -114,18 +114,18 @@ void specMoveCommand::doIt()
 {
 	if (!refresh()) return ;
 	model->signalBeginReset();
-	for (QVector<moveUnit>::iterator unit = moveUnits.begin() ; unit != moveUnits.end() ; ++unit)
-		unit->IndexesToPointers(model) ;
-	for (QVector<moveUnit>::iterator unit = moveUnits.begin() ; unit != moveUnits.end() ; ++unit)
-		unit->moveIt(model) ;
-	for (QVector<moveUnit>::iterator unit = moveUnits.begin() ; unit != moveUnits.end() ; ++unit)
-		unit->pointersToIndexes(model) ;
+	for (int i = 0 ; i < moveUnits.size() ; ++i)
+		moveUnits[i].moveIt(model) ;
 	model->signalEndReset();
 }
 
 void specMoveCommand::undoIt()
 {
-	doIt() ;
+	if (!refresh()) return ;
+	model->signalBeginReset();
+	for (int i = moveUnits.size() ; i > 0 ; --i)
+		moveUnits[i-1].moveIt(model) ;
+	model->signalEndReset();
 }
 
 void specMoveCommand::writeCommand(QDataStream &out) const

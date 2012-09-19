@@ -14,7 +14,7 @@ specAddFolderAction::specAddFolderAction(QObject *parent)
 specUndoCommand* specAddFolderAction::generateUndoCommand()
 {
 	int row = 0 ;
-	if (!currentItem->isFolder())
+	if (currentItem && !currentItem->isFolder())
 	{
 		row = currentIndex.row()+1 ;
 		currentIndex = currentIndex.parent() ;
