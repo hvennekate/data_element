@@ -3,21 +3,17 @@
 
 specStreamable::type specStreamable::effectiveId() const
 {
-	return type(typeId() | type(isContainer() ? type(specStreamable::container) : type(0))) ;
+	return type(typeId()) ;
 }
 
 QDataStream& operator<<(QDataStream& out, const specStreamable& item)
 {
 	QByteArray ba ;
 	QDataStream stream(&ba,QIODevice::WriteOnly) ;
-	stream << item.effectiveId() ;
+	stream << (quint32) item.effectiveId() ;
 	item.writeToStream(stream) ;
-	out << ba ;
-	if (item.isContainer())
-	{
-		item.writeContents(out);
-		out << QByteArray() ;
-	}
+	out <<  ba ;
+	qDebug() << "Writing item id:" << specStreamable::streamableType(item.effectiveId()) << "Size:" << ba.size() ;
 	return out ;
 }
 
@@ -26,37 +22,16 @@ QDataStream& operator>>(QDataStream& in, specStreamable& item)
 	QByteArray ba ;
 	in >> ba ;
 	QDataStream stream(ba) ;
-	specStreamable::type t ;
-	stream >> t ;
+	quint32 ta ;
+	stream >> ta ;
+	specStreamable::type t(ta) ;
 	if (t != item.effectiveId())
 	{
-		if (specStreamable::isContainer(t))
-			specStreamable::skipContainer(in) ;
 		return in ;
 	}
 	item.readFromStream(stream) ;
-	if (item.isContainer())
-	{
-		item.readContents(in) ;
-		specStreamable::skipContainer(in) ;
-	}
+	qDebug() << "Reading item id:" << specStreamable::streamableType(ta) << "Size:" << ba.size() ;
 	return in ;
-}
-
-void specStreamable::skipContainer(QDataStream& in)
-{ // invariant:  we have entered the container and are expecting the container termination (empty QByteArray)
-	int containerCount = 1 ;
-	while (containerCount)
-	{
-		if (in.status()) return ; // too bad, no more input.
-		QByteArray ba ;
-		in >> ba ;
-		if (ba.isEmpty()) --containerCount ; // Yesss, we've reached the end of a container
-		QDataStream stream(ba) ;
-		type t = 0 ;
-		stream >> t ;
-		if (isContainer(t)) ++containerCount; // Ooops, stumbled over another (nested) container to skip
-	}
 }
 
 specStreamable *specStreamable::produceItem(QDataStream& in) const
@@ -64,9 +39,10 @@ specStreamable *specStreamable::produceItem(QDataStream& in) const
 	QByteArray ba ;
 	in >> ba ;
 	QDataStream stream(ba) ;
-	type t ;
+	quint32 t ;
 	stream >> t ;
 	specStreamable *item = factory(t) ;
+	qDebug() << "Produced item id:" << t << "Size:" << ba.size() ;
 	if (item) item->readFromStream(stream);
 	return item ;
 }

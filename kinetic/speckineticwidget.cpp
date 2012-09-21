@@ -81,6 +81,7 @@ void specKineticWidget::addToolbar(specActionLibrary* actions)
 {
 	actions->addDragDropPartner(items->model());
 	actions->addPlot(plot) ;
+	plot->setUndoPartner(actions);
 	QToolBar *toolbar = actions->toolBar(items) ;
 	toolbar->addSeparator() ;
 	QToolBar *plotBar = actions->toolBar(plot) ;

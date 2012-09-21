@@ -33,11 +33,10 @@ void specMultiCommand::writeCommand(QDataStream &out) const
 
 void specMultiCommand::readCommand(QDataStream &in)
 {
-	qint32 children, id ;
+	qint32 children, id ; // TODO typedef for type-id in file!!!
 	in >> mayMerge >> children ;
 	for (int i = 0 ; i < children ; ++i)
 	{
-
 		in >> id ; // TODO throw if id does not match
 		specUndoCommand *command = specActionLibrary::commandById(id,this) ;
 		in >> *command ;

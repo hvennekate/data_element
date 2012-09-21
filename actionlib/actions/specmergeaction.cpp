@@ -145,6 +145,7 @@ bool specMergeAction::getMergeCriteria(QList<stringDoublePair>& toCompare, const
 	typedef QPair<QCheckBox*,QLineEdit*>  checkBoxEditPair ;
 	QList<checkBoxEditPair> input ;
 	QDialog *descriptorMatch = new QDialog() ;
+	descriptorMatch->setWindowTitle(tr("Merge items")) ;
 	QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel) ;
 	connect(buttons,SIGNAL(accepted()), descriptorMatch, SLOT(accept()));
 	connect(buttons,SIGNAL(rejected()), descriptorMatch, SLOT(reject()));

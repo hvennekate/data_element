@@ -334,7 +334,8 @@ QList<specModelItem*> readHVFile(QFile& file)
 			{
 				bool polarisation = (i/32)%2 ;
 				headerItems["polarisation"] = specDescriptor(polarisation) ;
-				(polarisation ? otherPolarisation : specData) << new specDataItem(dataPoints.mid(i,32),headerItems) ;
+//				(polarisation ? otherPolarisation : specData) << new specDataItem(dataPoints.mid(i,32),headerItems) ;
+				specData << new specDataItem(dataPoints.mid(i,32),headerItems) ;
 			}
 			specData.last()->mergePlotData = false ;
 			specData.last()->invalidate(); ;

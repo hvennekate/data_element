@@ -53,6 +53,7 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 		product->end   = qMax(product->begin, indexes.size()==1 ? product->begin + 1
 								:(indexes[1] == "" ? int(INFINITY) : indexes[1].toInt())) ;
 		product->inc   = qBound(1, indexes.size() > 2 && indexes[2] != "" ? indexes[2].toInt() : 1, product->end - product->begin) ;
+		range = "[" + range + "]" ;
 	}
 
 	// setup the interval

@@ -7,7 +7,6 @@
 #include "specrange.h"
 #include "specdataitem.h"
 #include "canvaspicker.h"
-#include "specprintplotaction.h"
 #include "specfolderitem.h"
 #include "specview.h"
 #include "qwt_plot_renderer.h"
