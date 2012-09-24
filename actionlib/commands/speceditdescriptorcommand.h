@@ -10,12 +10,13 @@ private:
 	QString previousContent ;
 	QString descriptor ;
 	int previousActiveLine ;
-	specGenealogy *item ;
+	specGenealogy item ;
 	void doIt() ;
 	void undoIt() ;
 	void writeCommand(QDataStream &out) const ;
 	void readCommand(QDataStream &in) ;
 	type typeId() const {return specStreamable::editDescriptorCommandId ;}
+	void parentAssigned();
 public:
 	explicit specEditDescriptorCommand(specUndoCommand* parent = 0) ;
 	void setItem(const QModelIndex &index, QString descriptor,

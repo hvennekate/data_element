@@ -35,16 +35,12 @@ void specMetaItem::writeToStream(QDataStream &out) const
 	out << variables ;
 	if (!metaModel || !dataModel) return ;
 	QVector<QPair<specGenealogy,qint8> > currentConnections ;
+	QModelIndexList indexes ;
 	foreach(specModelItem* item, items)
-	{
-		QModelIndex index = metaModel->index(item) ;
-		if (index.isValid())
-			currentConnections << qMakePair<specGenealogy,qint8>(
-						specGenealogy(QModelIndexList() << index), true) ;
-		else currentConnections << qMakePair<specGenealogy,qint8>(
-					specGenealogy(QModelIndexList() <<
-						      dataModel->index(item)), false) ;
-	}
+		indexes << (metaModel->contains(item) ? metaModel->index(item) : dataModel->index(item)) ;
+
+	while (!indexes.isEmpty())
+		currentConnections << qMakePair<specGenealogy,qint8>(specGenealogy(indexes), indexes.first().model() == metaModel) ;
 	out << currentConnections ;
 }
 

@@ -2,8 +2,7 @@
 #include "specmodelitem.h"
 
 specEditDescriptorCommand::specEditDescriptorCommand(specUndoCommand *parent)
-	: specUndoCommand(parent),
-	  item(0)
+	: specUndoCommand(parent)
 {
 }
 
@@ -13,11 +12,10 @@ void specEditDescriptorCommand::setItem(const QModelIndex &index, QString desc,
 	previousContent= newContent ;
 	previousActiveLine = activeLine ;
 	specModelItem *pointer = ((specModel*) (index.model()))->itemPointer(index) ;
-	if (item) delete item ;
-	item = 0 ;
+	item.setModel(0); // TODO invalidate item
 	if (!pointer) return ;
 	descriptor = desc ;
-	item = new specGenealogy(QModelIndexList() << index) ;
+	item = specGenealogy(index) ;
 }
 
 void specEditDescriptorCommand::undoIt()
@@ -25,10 +23,14 @@ void specEditDescriptorCommand::undoIt()
 	doIt() ;
 }
 
+void specEditDescriptorCommand::parentAssigned()
+{
+	item.setModel(qobject_cast<specModel*>(parentObject()));
+}
+
 void specEditDescriptorCommand::doIt()
 {
-	if (!item) return ;
-	specModelItem *pointer = item->firstItem() ;
+	specModelItem *pointer = item.firstItem() ;
 	if (!pointer) return ;
 	QString currentContent = pointer->descriptor(descriptor,true) ;
 	int currentLine = pointer->activeLine(descriptor) ;
@@ -39,7 +41,7 @@ void specEditDescriptorCommand::doIt()
 	previousContent = currentContent ;
 	previousActiveLine = currentLine ;
 
-	specModel *model = item->model() ;
+	specModel *model = item.model() ;
 	if (model)
 	{ // TODO: maybe implement specModel::index(specModelItem*, QString descriptor)
 		QModelIndex index = model->index(pointer, model->descriptors().indexOf(descriptor)) ;
@@ -52,16 +54,15 @@ void specEditDescriptorCommand::writeCommand(QDataStream &out) const
 	out << previousContent
 	    << descriptor
 	    << previousActiveLine
-	    << *item ;
+	    << item ;
 }
 
 void specEditDescriptorCommand::readCommand(QDataStream &in)
 {
-	if (!item) item = new specGenealogy ;
 	in >> previousContent
 	   >> descriptor
 	   >> previousActiveLine
-	   >> *item ;
+	   >> item ;
 }
 
 //bool specEditDescriptorCommand::mergeable(const specUndoCommand *other)

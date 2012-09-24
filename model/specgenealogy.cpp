@@ -47,11 +47,6 @@ specGenealogy::specGenealogy(QModelIndexList &list)
 
 bool specGenealogy::valid()
 {
-	qDebug() << "validity of genealogy:" ;
-	qDebug() << Model ;
-	qDebug() << Parent ;
-	qDebug() << indexes.isEmpty() ;
-	qDebug() << Items.isEmpty() ;
 	return Model && Parent && !indexes.isEmpty() && !Items.isEmpty() ;
 }
 
@@ -59,9 +54,9 @@ bool specGenealogy::valid()
 void specGenealogy::takeItems()
 {
 	if (owning) return ;
-	if (!valid()) return ;
 	if (!Parent) // TODO: Haeh?  wird doch schon bei valid() geprueft?
 		seekParent() ;
+	if (!valid()) return ;
 	foreach(specModelItem* item, Items)
 		item->setParent(0) ;
 	owning = true ;
@@ -70,9 +65,9 @@ void specGenealogy::takeItems()
 void specGenealogy::returnItems()
 {
 	if (!owning) return ;
-	if (!valid()) return ;
 	if (!Parent)
 		seekParent() ;
+	if (!valid()) return ;
 	Parent->addChildren(Items.toList(),indexes.first()) ;
 	owning = false ;
 }
@@ -165,17 +160,16 @@ specGenealogy::~specGenealogy()
 
 QVector<specModelItem*> specGenealogy::items()
 {
+	if (!Parent) seekParent() ;
 	if (!valid()) return QVector<specModelItem*>() ;
-	if (!Parent)
-		seekParent() ;
 	return Items ;
 }
 
 specModelItem* specGenealogy::firstItem()
 {
-	if (!valid()) return 0 ;
 	if (!Parent)
 		seekParent() ;
+	if (!valid()) return 0 ;
 	if (Items.isEmpty()) return 0 ;
 	return Items.first() ;
 }

@@ -781,13 +781,17 @@ QModelIndex specModel::index(const QVector<int> &ancestry,int column) const
 	return returnIndex ;
 }
 
+bool specModel::contains(specModelItem* parent) const
+{
+	while (parent->parent()) parent = parent->parent() ;
+	return parent == root ;
+}
+
 QModelIndex specModel::index(specModelItem *pointer, int column) const
 {
 	if (!pointer) return QModelIndex() ;
-	specModelItem* parent = pointer ;
 	// Test if item is indeed part of THIS model
-	while (parent->parent()) parent = parent->parent() ;
-	if (parent != root) return QModelIndex() ;
+	if (!contains(pointer)) return QModelIndex() ;
 
 	// Generate genealogy to find parent
 	return index(hierarchy(pointer), column) ;
@@ -836,4 +840,11 @@ void specModel::setMetaModel(specMetaModel *m)
 specMetaModel* specModel::getMetaModel() const
 {
 	return metaModel ;
+}
+
+void specModel::signalChanged(const QModelIndex &i)
+{
+	QModelIndex begin = index(i.row(),0,i.parent()),
+			end = index(i.row(),columnCount(i)-1,i.parent()) ;
+	emit dataChanged(begin,end) ;
 }

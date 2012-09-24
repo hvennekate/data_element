@@ -84,4 +84,7 @@ void specMetaView::readFromStream(QDataStream &in)
 		if (mitem)
 			mitem->setModels(model(),dataView->model()) ;
 	}
+	// update selected items
+	foreach(specModelItem* item, model()->pointerList(getSelection()))
+		item->revalidate();
 }
