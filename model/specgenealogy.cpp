@@ -47,6 +47,11 @@ specGenealogy::specGenealogy(QModelIndexList &list)
 
 bool specGenealogy::valid()
 {
+	qDebug() << "validity of genealogy:" ;
+	qDebug() << Model ;
+	qDebug() << Parent ;
+	qDebug() << indexes.isEmpty() ;
+	qDebug() << Items.isEmpty() ;
 	return Model && Parent && !indexes.isEmpty() && !Items.isEmpty() ;
 }
 
@@ -140,7 +145,7 @@ bool specGenealogy::seekParent()
 void specGenealogy::setModel(specModel *model)
 {
 	Model = model ;
-	seekParent() ;
+//	seekParent() ;
 }
 
 void specGenealogy::getItemPointers()
@@ -158,13 +163,19 @@ specGenealogy::~specGenealogy()
 			delete item ;
 }
 
-const QVector<specModelItem*>& specGenealogy::items() const
+QVector<specModelItem*> specGenealogy::items()
 {
+	if (!valid()) return QVector<specModelItem*>() ;
+	if (!Parent)
+		seekParent() ;
 	return Items ;
 }
 
-specModelItem* specGenealogy::firstItem() const
+specModelItem* specGenealogy::firstItem()
 {
+	if (!valid()) return 0 ;
+	if (!Parent)
+		seekParent() ;
 	if (Items.isEmpty()) return 0 ;
 	return Items.first() ;
 }

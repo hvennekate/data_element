@@ -95,7 +95,7 @@ void specStyleCommandImplFuncTemplate::parentAssigned()
 }
 
 specStyleCommandImplTemplate
-void specStyleCommandImplFuncTemplate::applyStyle(const specGenealogy &genealogy, int propertyIndex)
+void specStyleCommandImplFuncTemplate::applyStyle(specGenealogy &genealogy, int propertyIndex)
 {
 	property prop = (propertyIndex < 0 || !(propertyIndex < oldProperties.size())) ? newProperty : oldProperties[propertyIndex] ;
 	QVector<specModelItem*> items = genealogy.items() ;
@@ -113,7 +113,7 @@ int specStyleCommandImplFuncTemplate::styleNo(specCanvasItem *item)
 }
 
 specStyleCommandImplTemplate
-void specStyleCommandImplFuncTemplate::saveStyles(const QList<specGenealogy> & list)
+void specStyleCommandImplFuncTemplate::saveStyles(QList<specGenealogy> & list)
 {
 	oldProperties.clear();
 

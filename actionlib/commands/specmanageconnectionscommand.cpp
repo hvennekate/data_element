@@ -102,6 +102,7 @@ QVector<specModelItem*> specManageConnectionsCommand::itemPointers() const
 
 specMetaItem *specManageConnectionsCommand::targetPointer() const
 {
+
 	return (specMetaItem*) (target->firstItem()) ;
 }
 

@@ -21,7 +21,8 @@ void specMetaItem::setModels(specModel *m, specModel *d)
 	for (int i = 0 ; i < oldConnections.size() ; ++i)
 	{
 		oldConnections[i].first.setModel(oldConnections[i].second ? m : d) ;
-		foreach(specModelItem* item, oldConnections[i].first.items())
+		QVector<specModelItem*> oldItems = oldConnections[i].first.items() ;
+		foreach(specModelItem* item, oldItems)
 			connectServer(item) ;
 	}
 	oldConnections.clear();
