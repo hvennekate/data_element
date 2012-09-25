@@ -48,6 +48,7 @@ void specMetaItem::readFromStream(QDataStream &in)
 {
 	specModelItem::readFromStream(in) ;
 	in >> variables >> oldConnections;
+	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
 	invalidate() ; // TODO maybe insert in data item or just model item.
 }
 
@@ -155,7 +156,7 @@ bool specMetaItem::changeDescriptor(QString key, QString value)
 	if (key == "") return specModelItem::changeDescriptor(key,value) ;
 	if (!descriptorKeys().contains(key)) return false ;
 	variables[key] = value ;
-	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
+	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ; // TODO put in function (see above)
 	invalidate();
 	return true ;
 }

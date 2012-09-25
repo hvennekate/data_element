@@ -31,7 +31,6 @@ public:
 	QList<specModelItem*> purgeConnections() ;
 	void attach(QwtPlot *plot) ;
 	void detach();
-	void refreshPointers(const QHash<specModelItem*,specModelItem*>& mapping) ; // TODO restore connections, maybe by hierarchy...
 	void refreshPlotData();
 	QStringList descriptorKeys() const ;
 	QString descriptor(const QString &key, bool full=false) const ;
