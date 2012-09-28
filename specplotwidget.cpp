@@ -54,6 +54,7 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	undoViewWidget->setWidget(actions->undoView()) ;
 	undoViewWidget->setFloating(true) ;
 	undoViewAction->setIcon(QIcon(":/undoView.png")) ;
+	undoViewAction->setWhatsThis(tr("Shows and hides the undo history."));
 
 	items->setModel(new specModel(items));
 
@@ -72,9 +73,11 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	kineticWidget->view()->setUndoPartner(actions) ;
 	kineticWidget->addToolbar(actions) ;
 	kineticsAction->setIcon(QIcon(":/kineticwindow.png"));
+	kineticsAction->setWhatsThis(tr("Shows and hides the meta widget."));
 
 	logWidget->addToolbar(actions) ;
 	logAction->setIcon(QIcon(":/logs.png"));
+	logAction->setWhatsThis(tr("Shows and hides the log widget."));
 
 	createToolbars();
 	setConnections() ;
@@ -154,6 +157,7 @@ void specPlotWidget::createToolbars()
 
 	toolbar->addSeparator() ;
 	QAction *purgeUndoStack = new QAction(QIcon::fromTheme("user-trash"),tr("Clear history"),this) ;
+	purgeUndoStack->setWhatsThis(tr("Deletes the complete undo history -- use with care and don't point this at humans."));
 	toolbar-> addAction(purgeUndoStack) ;
 	connect(purgeUndoStack,SIGNAL(triggered()),this,SLOT(purgeUndo())) ;
 }

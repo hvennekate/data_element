@@ -304,3 +304,21 @@ specModelItem* specModelItem::factory(const type &t) const
 {
 	return itemFactory(t) ;
 }
+
+specModelItem::descriptorComparison::descriptorComparison(const QStringList *d)
+	: description(d)
+{
+}
+
+bool specModelItem::descriptorComparison::operator ()(specModelItem *& a, specModelItem *& b)
+{
+	if (!description) return false ;
+	foreach(QString criterion, *description)
+	{
+		QString aDescriptor = a->descriptor(criterion,true),
+				bDescriptor = b->descriptor(criterion, true) ;
+		if (aDescriptor != bDescriptor)
+			return aDescriptor < bDescriptor ;
+	}
+	return false ;
+}

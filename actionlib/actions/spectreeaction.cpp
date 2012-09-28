@@ -11,11 +11,13 @@ specTreeAction::specTreeAction(QObject *parent) :
 	setWhatsThis(tr("Generates a tree of directories and moves the selected items into those directories.  The columns in this dock window's list will be used from left to right to establish the level of folders within the tree."));
 }
 
+
 void specTreeAction::execute()
 {
 	specView *view = (specView*) parentWidget() ;
 	if (view->getSelection().isEmpty()) return ; // Teil von 2. Bug von Daniel
 	specModel *model = view->model() ;
+	if (!model) return ;
 	QVector<QPair<specFolderItem*,QList<specModelItem*> > > moveTargets ;
 
 	// getting header strings
@@ -29,7 +31,7 @@ void specTreeAction::execute()
 
 	for (int i = 0 ; i < headers.size() ; ++i)
 	{
-		QString sortBy = headers[i] ; // always tree all folders except the ones produce by the current treeing step
+		QString sortBy = headers[i] ; // always tree all folders except the ones produced by the current treeing step
 		int end = moveTargets.size() ;
 		for (int j = 0 ; j != end ; ++j)
 		{
@@ -89,3 +91,36 @@ void specTreeAction::execute()
 		moveCommand->redo();
 	}
 }
+
+/*void specTreeAction::execute()
+{
+	specView *view = (specView*) parentWidget() ;
+	if (view->getSelection().isEmpty()) return ; // Teil von 2. Bug von Daniel
+	specModel *model = view->model() ;
+	if (!model) return ;
+
+	// eliminate folders
+	QList<specModelItem*> items = model->pointerList(view->getSelection()) ;
+	for (int i = 0 ; i < items.size() ; ++i)
+	{
+		if (items[i]->isFolder())
+		{
+			for (int j = 0 ; j < items[i]->children() ; ++j)
+				items << ((specFolderItem*) (items[i]))->child(i) ;
+			items.takeAt(i) ;
+		}
+	}
+
+	// getting header strings
+	int columnCount = model->columnCount(QModelIndex()) ;
+	QStringList headers ;
+	for (int i = 0 ; i < columnCount ; ++i)
+		headers << model->headerData(i,Qt::Horizontal).toString() ;
+
+	specModelItem::descriptorComparison comparison(&headers) ;
+	qSort(items.begin(), items.end(), comparison) ;
+
+
+}
+
+*/

@@ -35,6 +35,7 @@ void specSpectrumPlot::invalidateReference()
 	if (reference) delete reference ;
 	reference = 0 ;
 	setReferenceAction->setToolTip(QString("Momentan keine Referenz."));
+	subInterpolatedAction->setDisabled(true);
 }
 
 specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
@@ -180,6 +181,7 @@ void specSpectrumPlot::setReference()
 	plotImage.save(&buffer,"PNG") ;
 
 	setReferenceAction->setToolTip(QString("Momentane Referenz:<br><img src=\"data:image/png;base64,%1\"></img>").arg(QString(buffer.data().toBase64())));
+	subInterpolatedAction->setEnabled(true) ;
 }
 
 void specSpectrumPlot::alignmentChanged(QAction *action)
@@ -421,6 +423,7 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double n
 
 void specSpectrumPlot::multipleSubtraction()
 {
+	if (!reference) return ;
 	QwtPlotItemList spectra = itemList(spec::spectrum) ;
 	// prepare map of x and y values
 	QMap<double,double> referenceSpectrum ; // TODO convert reference spectrum to map!

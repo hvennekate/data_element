@@ -9,6 +9,7 @@ specLogWidget::specLogWidget(QWidget *parent)
 	  view(new specLogView(this)),
 	  layout(new QVBoxLayout)
 {
+	setWhatsThis(tr("Log widget -- This widget contains log data.  Individual log items may be dragged to the data widget in order to import the corresponding data sets."));
 	setFloating(true) ;
 	QWidget* content = new QWidget(this) ;
 	view->setModel(new specLogModel(view));
