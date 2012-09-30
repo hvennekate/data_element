@@ -1,8 +1,8 @@
 #include "metaitemproperties.h"
 #include "ui_metaitemproperties.h"
-#include "actionlib/specaddconnectionscommand.h"
-#include "actionlib/specdeleteconnectionscommand.h"
-#include "actionlib/specmulticommand.h"
+#include "specaddconnectionscommand.h"
+#include "specdeleteconnectionscommand.h"
+#include "specmulticommand.h"
 
 metaItemProperties::metaItemProperties(specMetaItem* i,QWidget *parent) :
 	QDialog(parent),
@@ -118,6 +118,7 @@ specUndoCommand* metaItemProperties::changedConnections(QObject *parent)
 	addCommand->setParentObject(parent) ;
 	indexList = generateConnectionList(newConnections) ;
 	addCommand->setItems(model->index(originalItem), indexList) ;
+	parentCommand->setText(tr("Modify item connections"));
 	return parentCommand ;
 }
 

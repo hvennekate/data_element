@@ -68,7 +68,7 @@ public:
 	void detach() ;
 
 	/* not reviewed */
-	void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) const ;
+	void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
 
 	/* Functions to be deleted soon: */
 	void subMap(const QMap<double, double>&) ;

@@ -54,6 +54,7 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	undoViewWidget->setWidget(actions->undoView()) ;
 	undoViewWidget->setFloating(true) ;
 	undoViewAction->setIcon(QIcon(":/undoView.png")) ;
+	undoViewAction->setWhatsThis(tr("Shows and hides the undo history."));
 
 	items->setModel(new specModel(items));
 
@@ -72,9 +73,11 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	kineticWidget->view()->setUndoPartner(actions) ;
 	kineticWidget->addToolbar(actions) ;
 	kineticsAction->setIcon(QIcon(":/kineticwindow.png"));
+	kineticsAction->setWhatsThis(tr("Shows and hides the meta widget."));
 
 	logWidget->addToolbar(actions) ;
 	logAction->setIcon(QIcon(":/logs.png"));
+	logAction->setWhatsThis(tr("Shows and hides the log widget."));
 
 	createToolbars();
 	setConnections() ;
@@ -153,7 +156,8 @@ void specPlotWidget::createToolbars()
 	toolbar-> addAction(undoViewAction) ;
 
 	toolbar->addSeparator() ;
-	QAction *purgeUndoStack = new QAction(QIcon::fromTheme("user-trash"),tr("Clear undo"),this) ;
+	QAction *purgeUndoStack = new QAction(QIcon::fromTheme("user-trash"),tr("Clear history"),this) ;
+	purgeUndoStack->setWhatsThis(tr("Deletes the complete undo history -- use with care and don't point this at humans."));
 	toolbar-> addAction(purgeUndoStack) ;
 	connect(purgeUndoStack,SIGNAL(triggered()),this,SLOT(purgeUndo())) ;
 }
@@ -162,7 +166,7 @@ void specPlotWidget::purgeUndo()
 {
 	if (QMessageBox::Yes ==
 			QMessageBox::question(this,
-					      tr("Really Clear Undo?"),
+					      tr("Really Clear History?"),
 					      tr("Do you really want to delete all undo and redo actions?  WARNING:  This cannot be undone."),
 					      QMessageBox::Yes | QMessageBox::No,
 					      QMessageBox::No))
@@ -233,6 +237,7 @@ specPlotWidget::~specPlotWidget()
 {
 	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(kineticWidget) ;
 	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(logWidget) ;
+	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(undoViewWidget) ;
 	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(this) ;
 	logWidget->deleteLater();
 	kineticWidget->deleteLater();

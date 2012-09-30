@@ -7,7 +7,7 @@
 #include <QContextMenuEvent>
 #include "specmodel.h"
 #include <QMap>
-#include "actionlib/specactionlibrary.h"
+#include "specactionlibrary.h"
 
 class specViewState ;
 class specModel ;

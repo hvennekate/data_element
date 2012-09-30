@@ -11,6 +11,8 @@
 #include <QtDebug>
 #include <QPointF>
 #include "specdatapoint.h"
+#include <QMessageBox>
+#include <QObject>
 using std::max ;
 using std::min ;
 
@@ -332,7 +334,8 @@ QList<specModelItem*> readHVFile(QFile& file)
 			{
 				bool polarisation = (i/32)%2 ;
 				headerItems["polarisation"] = specDescriptor(polarisation) ;
-				(polarisation ? otherPolarisation : specData) << new specDataItem(dataPoints.mid(i,32),headerItems) ;
+//				(polarisation ? otherPolarisation : specData) << new specDataItem(dataPoints.mid(i,32),headerItems) ;
+				specData << new specDataItem(dataPoints.mid(i,32),headerItems) ;
 			}
 			specData.last()->mergePlotData = false ;
 			specData.last()->invalidate(); ;
@@ -393,6 +396,21 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 	{
 		QHash<QString,specDescriptor> descriptors ;
 		QString firstLine = in.readLine(), secondLine ;
+		for (QString::iterator i = firstLine.begin() ; i != firstLine.end() ; ++i)
+		{
+			if (!(QChar(*i).isPrint()))
+			{
+				QMessageBox::critical(0,QObject::tr("Binary File"),
+						      QObject::tr("File ") +
+						      file.fileName() +
+						      QObject::tr("seems to be binary.  Aborting Import (found non-printable character at position ") +
+						      QString::number(in.pos()) +
+						      QObject::tr(").")) ;
+				for (QList<specModelItem*>::iterator i = logData.begin() ; i != logData.end() ; ++i)
+					delete *i ;
+				return QList<specModelItem*>() ;
+			}
+		}
 		if (!in.atEnd()) secondLine = in.readLine() ;
 		descriptors["Tag"] = specDescriptor(takeDateOrTime(secondLine)) ;
 		descriptors["Uhrzeit"] = specDescriptor(takeDateOrTime(secondLine)) ;

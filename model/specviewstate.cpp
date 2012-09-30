@@ -103,7 +103,9 @@ void specViewState::restoreState()
 	QItemSelection selectedIndexes ;
 	for (int i = 0 ; i < selectedItems.size() ; ++i)
 	{
-		selectedIndexes << QItemSelectionRange(model()->index(selectedItems[i])) ;
+		QModelIndex begin = model()->index(selectedItems[i]);
+		QModelIndex end = model()->index(begin.row(),model()->columnCount(begin)-1,begin.parent()) ;
+		selectedIndexes << QItemSelectionRange(begin,end) ;
 	}
 
 	parent->selectionModel()->select(selectedIndexes,QItemSelectionModel::Select) ;

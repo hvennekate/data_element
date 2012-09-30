@@ -54,9 +54,9 @@ bool specGenealogy::valid()
 void specGenealogy::takeItems()
 {
 	if (owning) return ;
-	if (!valid()) return ;
 	if (!Parent) // TODO: Haeh?  wird doch schon bei valid() geprueft?
 		seekParent() ;
+	if (!valid()) return ;
 	foreach(specModelItem* item, Items)
 		item->setParent(0) ;
 	owning = true ;
@@ -65,9 +65,9 @@ void specGenealogy::takeItems()
 void specGenealogy::returnItems()
 {
 	if (!owning) return ;
-	if (!valid()) return ;
 	if (!Parent)
 		seekParent() ;
+	if (!valid()) return ;
 	Parent->addChildren(Items.toList(),indexes.first()) ;
 	owning = false ;
 }
@@ -140,7 +140,7 @@ bool specGenealogy::seekParent()
 void specGenealogy::setModel(specModel *model)
 {
 	Model = model ;
-	seekParent() ;
+//	seekParent() ;
 }
 
 void specGenealogy::getItemPointers()
@@ -158,13 +158,18 @@ specGenealogy::~specGenealogy()
 			delete item ;
 }
 
-const QVector<specModelItem*>& specGenealogy::items() const
+QVector<specModelItem*> specGenealogy::items()
 {
+	if (!Parent) seekParent() ;
+	if (!valid()) return QVector<specModelItem*>() ;
 	return Items ;
 }
 
-specModelItem* specGenealogy::firstItem() const
+specModelItem* specGenealogy::firstItem()
 {
+	if (!Parent)
+		seekParent() ;
+	if (!valid()) return 0 ;
 	if (Items.isEmpty()) return 0 ;
 	return Items.first() ;
 }

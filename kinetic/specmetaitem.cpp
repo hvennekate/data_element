@@ -21,7 +21,8 @@ void specMetaItem::setModels(specModel *m, specModel *d)
 	for (int i = 0 ; i < oldConnections.size() ; ++i)
 	{
 		oldConnections[i].first.setModel(oldConnections[i].second ? m : d) ;
-		foreach(specModelItem* item, oldConnections[i].first.items())
+		QVector<specModelItem*> oldItems = oldConnections[i].first.items() ;
+		foreach(specModelItem* item, oldItems)
 			connectServer(item) ;
 	}
 	oldConnections.clear();
@@ -34,16 +35,12 @@ void specMetaItem::writeToStream(QDataStream &out) const
 	out << variables ;
 	if (!metaModel || !dataModel) return ;
 	QVector<QPair<specGenealogy,qint8> > currentConnections ;
+	QModelIndexList indexes ;
 	foreach(specModelItem* item, items)
-	{
-		QModelIndex index = metaModel->index(item) ;
-		if (index.isValid())
-			currentConnections << qMakePair<specGenealogy,qint8>(
-						specGenealogy(QModelIndexList() << index), true) ;
-		else currentConnections << qMakePair<specGenealogy,qint8>(
-					specGenealogy(QModelIndexList() <<
-						      dataModel->index(item)), false) ;
-	}
+		indexes << (metaModel->contains(item) ? metaModel->index(item) : dataModel->index(item)) ;
+
+	while (!indexes.isEmpty())
+		currentConnections << qMakePair<specGenealogy,qint8>(specGenealogy(indexes), indexes.first().model() == metaModel) ;
 	out << currentConnections ;
 }
 
@@ -51,6 +48,7 @@ void specMetaItem::readFromStream(QDataStream &in)
 {
 	specModelItem::readFromStream(in) ;
 	in >> variables >> oldConnections;
+	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
 	invalidate() ; // TODO maybe insert in data item or just model item.
 }
 
@@ -158,7 +156,7 @@ bool specMetaItem::changeDescriptor(QString key, QString value)
 	if (key == "") return specModelItem::changeDescriptor(key,value) ;
 	if (!descriptorKeys().contains(key)) return false ;
 	variables[key] = value ;
-	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
+	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ; // TODO put in function (see above)
 	invalidate();
 	return true ;
 }

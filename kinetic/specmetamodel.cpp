@@ -1,4 +1,6 @@
 #include "specmetamodel.h"
+#include "specfolderitem.h"
+#include "specmetaitem.h"
 
 specMetaModel::specMetaModel(QObject *parent) :
 	specModel(parent),
@@ -20,4 +22,20 @@ void specMetaModel::setDataModel(specModel *m)
 specModel* specMetaModel::getDataModel() const
 {
 	return dataModel ;
+}
+
+bool specMetaModel::insertItems(QList<specModelItem *> list, QModelIndex parent, int row)
+{
+	foreach(specModelItem* item, list)
+		setModels(item) ;
+	return specModel::insertItems(list, parent, row) ;
+}
+
+void specMetaModel::setModels(specModelItem *item)
+{
+	for (int i = 0 ; i < item->children() ; ++i)
+		setModels(((specFolderItem*) item)->child(i)) ;
+	specMetaItem *mitem = dynamic_cast<specMetaItem*>(item) ;
+	if (mitem)
+		mitem->setModels(this, dataModel) ;
 }

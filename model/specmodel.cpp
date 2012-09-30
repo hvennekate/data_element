@@ -18,10 +18,10 @@
 #include "specdataitem.h"
 #include "exportdialog.h"
 #include <QTime>
-#include "actionlib/specmovecommand.h"
-#include "actionlib/specaddfoldercommand.h"
-#include "actionlib/speceditdescriptorcommand.h"
-#include "actionlib/specresizesvgcommand.h"
+#include "specmovecommand.h"
+#include "specaddfoldercommand.h"
+#include "speceditdescriptorcommand.h"
+#include "specresizesvgcommand.h"
 // TODO replace isFolder() by addChildren(empty list,0)
 
 bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria)
@@ -536,6 +536,7 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 			else
 				command->setItem(index, desc, value.toString()) ;
 			// TODO unite in value-variant
+			command->setText(tr("Edit data")) ;
 			dropBuddy->push(command) ;
 		}
 		else if (role == Qt::ForegroundRole)
@@ -686,6 +687,7 @@ bool specModel::dropMimeData(const QMimeData *data,
 			specAddFolderCommand *command = new specAddFolderCommand ;
 			command->setParentObject(this) ;
 			command->setItems(newIndexes) ;
+			command->setText(tr("Insert items")) ;
 			dropBuddy->push(command);
 		}
 	}
@@ -736,6 +738,7 @@ specModelItem* specModel::itemPointer(const QVector<int> &indexes) const
 	specModelItem* pointer = root ;
 	for (int i =  indexes.size() - 1 ; i >= 0 ; --i)
 	{
+		if (!pointer) return 0 ;
 		pointer = ((specFolderItem*) pointer)->child(indexes[i]) ;
 	}
 	return pointer ;
@@ -778,13 +781,17 @@ QModelIndex specModel::index(const QVector<int> &ancestry,int column) const
 	return returnIndex ;
 }
 
+bool specModel::contains(specModelItem* parent) const
+{
+	while (parent->parent()) parent = parent->parent() ;
+	return parent == root ;
+}
+
 QModelIndex specModel::index(specModelItem *pointer, int column) const
 {
 	if (!pointer) return QModelIndex() ;
-	specModelItem* parent = pointer ;
 	// Test if item is indeed part of THIS model
-	while (parent->parent()) parent = parent->parent() ;
-	if (parent != root) return QModelIndex() ;
+	if (!contains(pointer)) return QModelIndex() ;
 
 	// Generate genealogy to find parent
 	return index(hierarchy(pointer), column) ;
@@ -821,6 +828,7 @@ void specModel::svgMoved(specCanvasItem *i, int point, double x, double y)
 	item->pointMoved(point,x,y) ;
 	command->setItem(index(item), item->getBounds()) ;
 	command->undo();
+	command->setText(tr("Resize/move SVG item"));
 	dropBuddy->push(command) ;
 }
 
@@ -832,4 +840,11 @@ void specModel::setMetaModel(specMetaModel *m)
 specMetaModel* specModel::getMetaModel() const
 {
 	return metaModel ;
+}
+
+void specModel::signalChanged(const QModelIndex &i)
+{
+	QModelIndex begin = index(i.row(),0,i.parent()),
+			end = index(i.row(),columnCount(i)-1,i.parent()) ;
+	emit dataChanged(begin,end) ;
 }

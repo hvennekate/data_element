@@ -30,6 +30,8 @@
 #include "specmetarangecommand.h"
 #include "specplotlabelcommand.h"
 #include <QUndoView>
+#include "utility-functions.h"
+#include "genericexportaction.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -82,7 +84,9 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 
 		addNewAction(bar, new specAddFolderAction(target)) ;
 		addNewAction(bar, new specAddSVGItemAction(target)) ;
-		addNewAction(bar, new specImportSpecAction(target)) ;
+		specImportSpecAction *importAction = new specImportSpecAction(target) ;
+		importAction->setAcceptableImportFunctions(QList<QList<specModelItem *> (*)(QFile &)>() << readHVFile << readPEFile << readJCAMPFile);
+		addNewAction(bar, importAction) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specCopyAction(target)) ;
 		addNewAction(bar, new specCutAction(target)) ;
@@ -91,6 +95,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		bar->addSeparator() ;
 		addNewAction(bar, new specTreeAction(target)) ;
 		addNewAction(bar, new specMergeAction(target)) ;
+		addNewAction(bar,new genericExportAction(target)) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specRemoveDataAction(target)) ;
 		addNewAction(bar, new specAverageDataAction(target)) ;
@@ -111,7 +116,9 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		addNewAction(bar, new specPasteAction(target)) ;
 		addNewAction(bar, new specDeleteAction(target)) ;
 		bar->addSeparator() ;
+		addNewAction(bar, new changePlotStyleAction(target)) ;
 		addNewAction(bar, new specAddConnectionsAction(target)) ;
+		addNewAction(bar,new genericExportAction(target)) ;
 
 		return bar ;
 	}
@@ -120,7 +127,10 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		QToolBar *bar = new QToolBar(target) ;
 
 		addNewAction(bar, new specAddFolderAction(target)) ;
-		addNewAction(bar, new specImportSpecAction(target)) ;
+		specImportSpecAction *importAction = new specImportSpecAction(target) ;
+		importAction->setFilters(QStringList() << "Log-files (*.log)");
+		importAction->setAcceptableImportFunctions(QList<QList<specModelItem*> (*)(QFile&)>() << readLogFile);
+		addNewAction(bar, importAction) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specCopyAction(target)) ;
 		addNewAction(bar, new specCutAction(target)) ;
@@ -246,6 +256,7 @@ void specActionLibrary::moveInternally(const QModelIndex &parent, int row, specV
 	specMoveCommand *command = new specMoveCommand ;
 	command->setParentObject(target);
 	command->setItems(lastRequested,parent,row) ;
+	command->setText(tr("Move items"));
 	push(command) ;
 }
 

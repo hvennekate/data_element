@@ -1,7 +1,7 @@
 #include "specmetaparser.h"
 #include <QStringList>
 #include <QRegExp>
-#include <qwt/qwt_series_data.h>
+#include <qwt_series_data.h>
 #include <iostream>
 #include "specmetaitem.h"
 
@@ -44,7 +44,7 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 	//  x-Werte pruefen, matchen.
 	//
 	//  Dann x, y auswerten.
-	const QRegExp acceptable(//"(\\[[0-9]*(:[0-9]*(:[0-9]*)?)?\\])?"
+	const QRegExp acceptable("(\\[[0-9]*(:[0-9]*(:[0-9]*)?)?\\])?"
 				 "(\"[^\"]*\"|"
 				 "((x|y|i|u|l)"
 				 "("

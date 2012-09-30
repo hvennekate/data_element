@@ -88,6 +88,15 @@ public:
 	
 	static specModelItem* itemFactory(specStreamable::type) ;
 	virtual specUndoCommand* itemPropertiesAction(QObject *parentObject) { Q_UNUSED(parentObject) ; return 0 ; }
+
+	class descriptorComparison
+	{
+	private:
+		const QStringList* description ;
+	public:
+		descriptorComparison(const QStringList* description) ;
+		bool operator() (specModelItem *&, specModelItem *&) ;
+	};
 };
 
 #endif

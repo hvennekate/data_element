@@ -15,7 +15,7 @@
 #include <QItemSelection>
 #include <QMap>
 #include <QHash>
-#include "actionlib/specactionlibrary.h"
+#include "specactionlibrary.h"
 #include "specmimeconverter.h"
 
 class specModel ;
@@ -66,6 +66,20 @@ public:
 	static QVector<int> hierarchy(const QModelIndex&) ;
 	QList<specModelItem*> pointerList(const QModelIndexList&) const ;
 	QModelIndexList indexList(const QList<specModelItem*>&) const ;
+	bool contains(specModelItem*) const ;
+	template<class T>
+	QModelIndexList indexList(const QList<T*>& pointers) const
+	{
+		QModelIndexList returnList ;
+		foreach(T* tpointer, pointers)
+		{
+			specModelItem *pointer = dynamic_cast<specModelItem*>(tpointer) ;
+			if (pointer)
+				returnList << index(pointer) ;
+		}
+		return returnList ;
+	}
+
 	bool isFolder(const QModelIndex&) const ;
 	void eliminateChildren(QModelIndexList&) const ;
 	virtual bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row=0) ;
@@ -111,7 +125,7 @@ public:
 
 	void signalBeginReset() { beginResetModel() ; } // TODO just emit from whereever this function is called
 	void signalEndReset() { endResetModel() ; } // TODO just emit from whereever this function is called
-	void signalChanged(const QModelIndex& index)  { emit dataChanged(index,index) ; }
+	void signalChanged(const QModelIndex& index) ;
 	
 	
 // //TODO	bool QAbstractItemModel::setHeaderData ( int section, Qt::Orientation orientation, const QVariant & value, int role = Qt::EditRole )

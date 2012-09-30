@@ -15,10 +15,10 @@
 specModelItem::specModelItem(specFolderItem* par, QString desc)
 	: specCanvasItem(),
 	  iparent(0),
+	  dataValid(false),
 	  description(desc, spec::editable),
 	  mergePlotData(true),
-	  sortPlotData(true),
-	  dataValid(false)
+	  sortPlotData(true)
 {
 	setParent(par) ;
 }
@@ -224,7 +224,7 @@ void specModelItem::exportData(const QList<QPair<bool,QString> >& headerFormat, 
 	out << endl ;
 	for (size_t j = 0 ; j < dataSize() ; j++)
 		for (int i = 0 ; i < dataFormat.size() ; i++)
-			out << dataFormat[i].first << dataFormat[i].second ;
+			out << (dataFormat[i].first ? sample(j).x() :sample(j).y()) << dataFormat[i].second ;
 	out << endl ;
 }
 
@@ -303,4 +303,22 @@ specModelItem* specModelItem::itemFactory(specStreamable::type t)
 specModelItem* specModelItem::factory(const type &t) const
 {
 	return itemFactory(t) ;
+}
+
+specModelItem::descriptorComparison::descriptorComparison(const QStringList *d)
+	: description(d)
+{
+}
+
+bool specModelItem::descriptorComparison::operator ()(specModelItem *& a, specModelItem *& b)
+{
+	if (!description) return false ;
+	foreach(QString criterion, *description)
+	{
+		QString aDescriptor = a->descriptor(criterion,true),
+				bDescriptor = b->descriptor(criterion, true) ;
+		if (aDescriptor != bDescriptor)
+			return aDescriptor < bDescriptor ;
+	}
+	return false ;
 }

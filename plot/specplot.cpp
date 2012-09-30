@@ -3,9 +3,9 @@
 #include "speczoomer.h"
 #include <QAction>
 #include "canvaspicker.h"
-#include "actionlib/specactionlibrary.h"
+#include "specactionlibrary.h"
 #include "specview.h"
-#include "actionlib/specprintplotaction.h"
+#include "specprintplotaction.h"
 #include "specsvgitem.h"
 #include "specmetaitem.h"
 
@@ -61,7 +61,7 @@ void specPlot::replot()
 	foreach(QwtPlotItem* item, allItems)
 	{
 		if (dynamic_cast<specMetaRange*>(item))
-			newMetaRanges += ((specCanvasItem*) item) ;
+			newMetaRanges << ((specCanvasItem*) item) ;
 		else if (dynamic_cast<specSVGItem*>(item))
 			svgitems << (specSVGItem*) item ;
 	}
@@ -114,6 +114,8 @@ void specPlot::replot()
 
 specPlot::~specPlot()
 {
+	MetaPicker->purgeSelectable();
+	SVGpicker->purgeSelectable();
 }
 
 QList<QAction*> specPlot::actions()

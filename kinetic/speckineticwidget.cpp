@@ -22,6 +22,7 @@ void specKineticWidget::contextMenuEvent(QContextMenuEvent* event)
 specKineticWidget::specKineticWidget(QString title, QWidget *parent)
 	: QDockWidget(title, parent)
 {
+	setWhatsThis(tr("Meta dock widget - In this widget, further processing of the primary data can be done (integration, max, min, etc.)"));
 	setFloating(true) ;
 	content = new QWidget ;
 	layout = new QVBoxLayout ;
@@ -81,6 +82,7 @@ void specKineticWidget::addToolbar(specActionLibrary* actions)
 {
 	actions->addDragDropPartner(items->model());
 	actions->addPlot(plot) ;
+	plot->setUndoPartner(actions);
 	QToolBar *toolbar = actions->toolBar(items) ;
 	toolbar->addSeparator() ;
 	QToolBar *plotBar = actions->toolBar(plot) ;

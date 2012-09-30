@@ -30,8 +30,8 @@ public:
 	bool seekParent() ;
 	specModel* model() ;
 	specFolderItem* parent() ;
-	const QVector<specModelItem*>& items() const ;
-	specModelItem* firstItem() const ;
+	QVector<specModelItem*> items() ;
+	specModelItem* firstItem() ;
 
 	bool operator==(const specGenealogy& other) ;
 	bool operator!=(const specGenealogy& other) ;
