@@ -3,6 +3,7 @@
 #include "speclogtodataconverter.h"
 #include "specgenericmimeconverter.h"
 #include "speclogtodataconverter.h"
+#include "specmimetextexporter.h"
 
 specLogWidget::specLogWidget(QWidget *parent)
 	: QDockWidget("Logs", parent),
@@ -15,6 +16,7 @@ specLogWidget::specLogWidget(QWidget *parent)
 	view->setModel(new specLogModel(view));
 	new specGenericMimeConverter(view->model()) ;
 	new specLogToDataConverter(view->model()) ;
+	new specMimeTextExporter(view->model()) ;
 	layout->addWidget(view) ;
 	content->setLayout(layout);
 	setWidget(content);

@@ -346,6 +346,7 @@ QList<specModelItem*> readHVFile(QFile& file)
 
 QPair<QString,QString> interpretString(QString& string)
 {
+	qDebug() << "interpreting string:" << string ;
 	if(string.left(1) == "\"")
 	{
 		string.remove(0,1) ;
@@ -366,7 +367,7 @@ QPair<QString,QString> interpretString(QString& string)
 	if(string.left(1) == "\"")
 	{
 		content = string.mid(0,string.remove(0,1).indexOf("\"")) ;
-		string.remove(0,max(content.size(),string.indexOf(QRegExp("[^,.\\s\\\"]"),content.size()))) ;
+		string.remove(0,max(content.size()+1,string.indexOf(QRegExp("[^,.\\s\\\"]"),content.size()))) ;
 	}
 	else
 	{
@@ -403,11 +404,11 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 				QMessageBox::critical(0,QObject::tr("Binary File"),
 						      QObject::tr("File ") +
 						      file.fileName() +
-						      QObject::tr("seems to be binary.  Aborting Import (found non-printable character at position ") +
+						      QObject::tr("seems to be binary.  Aborting import (found non-printable character at position ") +
 						      QString::number(in.pos()) +
-						      QObject::tr(").")) ;
-				for (QList<specModelItem*>::iterator i = logData.begin() ; i != logData.end() ; ++i)
-					delete *i ;
+						      QObject::tr(").  Context:\n")+ firstLine) ;
+				for (QList<specModelItem*>::iterator j = logData.begin() ; j != logData.end() ; ++j)
+					delete *j ;
 				return QList<specModelItem*>() ;
 			}
 		}
@@ -416,9 +417,19 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 		descriptors["Uhrzeit"] = specDescriptor(takeDateOrTime(secondLine)) ;
 		if (firstLine == "")
 		{
+			while(secondLine.count("\"")%2)
+				secondLine += "\n" + in.readLine() ;
 			QPair<QString,QString> newDescriptor = interpretString(secondLine) ;
 			descriptors["Wert"] = newDescriptor.second ;
-			logData += new specLogMessage(descriptors,0, newDescriptor.first) ;
+			QString mainDescriptor = newDescriptor.first ;
+			while(!secondLine.isEmpty())
+			{
+				qDebug() << "first" << newDescriptor.first << "second" << newDescriptor.second << "rest:" << secondLine ;
+				newDescriptor = interpretString(secondLine) ;
+				descriptors[newDescriptor.first] = newDescriptor.second ;
+			}
+			logData += new specLogMessage(descriptors,0, mainDescriptor) ;
+			qDebug() << "first" << newDescriptor.first << "second" << newDescriptor.second << "rest:" << secondLine ;
 		}
 		else
 		{

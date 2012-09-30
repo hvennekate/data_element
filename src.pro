@@ -95,7 +95,8 @@ SOURCES += main.cpp \
     actionlib/actions/genericexportaction.cpp \
     actionlib/actions/specplotaction.cpp \
     actionlib/actions/specitemaction.cpp \
-    actionlib/actions/specrequiresitemaction.cpp
+    actionlib/actions/specrequiresitemaction.cpp \
+    model/specmimetextexporter.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -192,7 +193,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/genericexportaction.h \
     actionlib/actions/specplotaction.h \
     actionlib/actions/specitemaction.h \
-    actionlib/actions/specrequiresitemaction.h
+    actionlib/actions/specrequiresitemaction.h \
+    model/specmimetextexporter.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -211,6 +213,7 @@ CONFIG += warn_on \
 
 unix {
 INCLUDEPATH += . \
+    /usr/include/qwt6 \
     /usr/include/qwt
 LIBS += -lqwt \
 	-lmuparser

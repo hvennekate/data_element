@@ -41,12 +41,12 @@ void specStyleCommandImplFuncTemplate::setItems(QModelIndexList items)
 specStyleCommandImplTemplate
 void specStyleCommandImplFuncTemplate::doIt()
 {
-	specPlot *plot = 0 ;
+//	specPlot *plot = 0 ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
 	{
-		for (int j = 0 ; j < Genealogies[i].items().size() ; ++ j)
-			if (Genealogies[i].items()[j]->plot())
-				plot = (specPlot*) Genealogies[i].items()[j]->plot() ;
+//		for (int j = 0 ; j < Genealogies[i].items().size() ; ++ j)
+//			if (Genealogies[i].items()[j]->plot())
+//				plot = (specPlot*) Genealogies[i].items()[j]->plot() ;
 		applyStyle(Genealogies[i],-1) ;
 	}
 }
@@ -54,12 +54,12 @@ void specStyleCommandImplFuncTemplate::doIt()
 specStyleCommandImplTemplate
 void specStyleCommandImplFuncTemplate::undoIt()
 {
-	specPlot *plot = 0 ;
+//	specPlot *plot = 0 ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
 	{
-		for (int j = 0 ; j < Genealogies[i].items().size() ; ++ j)
-			if (Genealogies[i].items()[j]->plot())
-				plot = (specPlot*) Genealogies[i].items()[j]->plot() ;
+//		for (int j = 0 ; j < Genealogies[i].items().size() ; ++ j)
+//			if (Genealogies[i].items()[j]->plot())
+//				plot = (specPlot*) Genealogies[i].items()[j]->plot() ;
 		applyStyle(Genealogies[i],i) ;
 	}
 }
