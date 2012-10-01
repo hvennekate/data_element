@@ -15,6 +15,8 @@ private:
 	void writeCommand(QDataStream &out) const;
 	void readCommand(QDataStream &in) ;
 	type typeId() const { return specStreamable::movePlotCommandId ;}
+	void generateDescription() ;
+	QString description() const ;
 public:
 	specPlotMoveCommand(specUndoCommand *parent = 0);
 	bool mergeWith(const QUndoCommand* other) ;

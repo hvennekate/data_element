@@ -301,7 +301,6 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 	command->setItem(view->model()->index( (specModelItem*) item)) ; // TODO do dynamic cast first!!
 	command->setCorrections(shift,offset,offline,scale) ;
 	command->setParentObject(view) ;
-	command->setText(tr("Modify data point(s)"));
 	undoPartner()->push(command) ;
 }
 
