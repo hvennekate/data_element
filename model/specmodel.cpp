@@ -471,7 +471,7 @@ Qt::ItemFlags specModel::flags(const QModelIndex &index) const
 	Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index) | ( itemPointer(index)->isFolder() ? Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled : Qt::ItemIsDragEnabled);
 	if (itemPointer(index)->isEditable(Descriptors[index.column()]))
 		return  defaultFlags | Qt::ItemIsEditable ;
-	return QAbstractItemModel::flags(index) ;
+	return defaultFlags ;
 }
 
 
