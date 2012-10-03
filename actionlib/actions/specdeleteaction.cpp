@@ -75,7 +75,7 @@ specUndoCommand* specDeleteAction::generateUndoCommand()
 	specDeleteCommand *command = new specDeleteCommand(parentCommand) ;
 	command->setParentObject(model);
 	command->setItems(selection) ;
-	command->setParentObject(model);
+	command->setParentObject(model); // TODO: Again???
 	view->selectionModel()->clearSelection();
 
 	if (!parentCommand)

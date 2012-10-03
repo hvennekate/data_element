@@ -46,7 +46,7 @@ private:
 	bool internalDrop ;
 	specView* dropSource ;
 	specActionLibrary* dropBuddy ;
-	bool dontDelete ;
+	int dontDelete ;
 	void writeToStream(QDataStream &out) const ;
 	void readFromStream(QDataStream &in) ;
 	type typeId() const { return specStreamable::model ; }

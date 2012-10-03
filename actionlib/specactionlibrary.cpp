@@ -251,13 +251,15 @@ void specActionLibrary::setLastRequested(const QModelIndexList &list)
 	lastRequested = list ;
 }
 
-void specActionLibrary::moveInternally(const QModelIndex &parent, int row, specView* target)
+int specActionLibrary::moveInternally(const QModelIndex &parent, int row, specView* target)
 {
+	int count = lastRequested.size() ;
 	specMoveCommand *command = new specMoveCommand ;
-	command->setParentObject(target);
+	command->setParentObject(target->model());
 	command->setItems(lastRequested,parent,row) ;
 	command->setText(tr("Move items"));
 	push(command) ;
+	return count ;
 }
 
 void specActionLibrary::addPlot(specPlot *plot)

@@ -352,7 +352,7 @@ specModel::specModel(QObject *par)
 	  internalDrop(false),
 	  dropSource(0),
 	  dropBuddy(0),
-	  dontDelete(false),
+	  dontDelete(0),
 	  metaModel(0)
 {
 	root = new specFolderItem ;
@@ -583,10 +583,10 @@ bool specModel::removeRows(int position, int rows, const QModelIndex &parent)
 	if (position < 0 || rows < 1) return false ;
 	if (dontDelete)
 	{
-		dontDelete = false ;
+		dontDelete -- ;
 		return true ;
 	}
-	beginRemoveRows(parent, position, position+rows-1);
+	beginRemoveRows(parent, position, position+rows-1); // TODO this is actually not to be permitted!!
 // 	QList<specModelItem*> list = itemPointer(index)->takeChildren(position,rows) ;
 	QList<specModelItem*> list ;
 	specFolderItem *parentPointer = (specFolderItem*) itemPointer(parent) ;
@@ -660,9 +660,8 @@ bool specModel::dropMimeData(const QMimeData *data,
 	row = (row != -1 ? row : rowCount(parent) );
 	if (internalDrop && dropBuddy && dropSource)
 	{
-		dropBuddy->moveInternally(parent,row,dropSource) ;
+		dontDelete = dropBuddy->moveInternally(parent,row,dropSource) ;
 		internalDrop = false ;
-		dontDelete = true ;
 		dropSource = 0 ;
 		return true ;
 	}

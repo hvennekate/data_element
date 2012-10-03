@@ -83,7 +83,7 @@ void specFolderItem::refreshPlotData()
 }
 
 void specFolderItem::removeChild(specModelItem* child)
-{
+{// TODO this is terrible!
 	QVector<specModelItem*> newChildren ;
 	foreach (specModelItem* childPointer, childrenList)
 		if (childPointer != child)

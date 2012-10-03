@@ -68,6 +68,7 @@ specMoveCommand::moveUnit::moveUnit(QModelIndexList &list, const QModelIndex& ta
 {
 	if (list.isEmpty() || !model) return ;
 	int nextRow = list.first().row() ;
+	int firstRow = nextRow ;
 	firstItemIndex = model->hierarchy(list.first()) ;
 	if (firstItemIndex.isEmpty()) return ;
 	parentIndex = model->hierarchy(target) ;
@@ -79,6 +80,9 @@ specMoveCommand::moveUnit::moveUnit(QModelIndexList &list, const QModelIndex& ta
 		count ++ ;
 		list.takeFirst() ;
 	}
+	if (parentModelIndex == target && row > firstRow) // moving within same parent
+		row = qMax(row - count, firstRow) ;
+	;
 }
 
 specMoveCommand::moveUnit::moveUnit()
@@ -96,16 +100,13 @@ specMoveCommand::specMoveCommand(specUndoCommand *parent)
 void specMoveCommand::setItems(QModelIndexList &sources, const QModelIndex &target, int row)
 {
 	if (!refresh()) return ;
-	int oldSize = sources.size() ;
 	while (!sources.isEmpty())
-		moveUnits << moveUnit(sources,target,row+(oldSize - sources.size()),model) ;
+		moveUnits << moveUnit(sources,target,row,model) ;
 }
 
 bool specMoveCommand::refresh()
 {
-	view = qobject_cast<specView*>(parentObject()) ;
-	if (!view) return false;
-	model = view->model() ; // TODO put into function
+	model = qobject_cast<specModel*>(parentObject()) ; // TODO put into function
 	if (!model) return false;
 	return true ;
 }
@@ -116,6 +117,7 @@ void specMoveCommand::doIt()
 	model->signalBeginReset();
 	for (int i = 0 ; i < moveUnits.size() ; ++i)
 		moveUnits[i].moveIt(model) ;
+
 	model->signalEndReset();
 }
 
