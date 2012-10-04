@@ -373,10 +373,10 @@ specUndoCommand *specDataItem::itemPropertiesAction(QObject *parentObject)
 
 void specDataItem::attach(QwtPlot *pl)
 {
-	specModelItem::attach(pl) ;
 	specPlot *p = qobject_cast<specPlot*>(plot()) ;
 	if (p)
 		p->attachToPicker(this) ;
+	specModelItem::attach(pl) ;
 }
 
 void specDataItem::detach()

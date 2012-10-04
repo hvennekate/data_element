@@ -21,12 +21,12 @@ public:
 		specFolderItem *parent ;
 		int count ;
 		int row ;
-		void pointersToIndexes(specModel*) ;
-		void IndexesToPointers(specModel*) ;
 	public:
-		moveUnit(QModelIndexList&, const QModelIndex& target, int r, specModel*) ;
+		void pointersToIndexes(specModel*) ;
+		void indexesToPointers(specModel*) ;
+		moveUnit(QModelIndexList&, const QModelIndex& target, int &r, specModel*) ;
 		moveUnit() ;
-		void moveIt(specModel*) ;
+		void moveIt() ;
 		friend QDataStream& operator<<(QDataStream&, const moveUnit&) ;
 		friend QDataStream& operator>>(QDataStream&, moveUnit&) ;
 	};
@@ -35,6 +35,8 @@ private:
 	void undoIt() ;
 	void writeCommand(QDataStream &out) const;
 	void readCommand(QDataStream &in) ;
+	void finish() ;
+	bool prepare() ;
 	type typeId() const { return specStreamable::moveItemsCommandId ; }
 
 	QVector<moveUnit> moveUnits ;

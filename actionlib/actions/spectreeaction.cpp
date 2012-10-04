@@ -83,7 +83,8 @@ specUndoCommand *specTreeAction::generateUndoCommand()
 			}
 		}
 		// get set for the next round
-		folderQueue.swap(nextQueue) ;
+		folderQueue = nextQueue ;
+		// TODO: folderQueue.swap(nextQueue) ;
 	}
 	// append final round's outcome to move list
 	finalPositions << folderQueue ;
@@ -95,12 +96,7 @@ specUndoCommand *specTreeAction::generateUndoCommand()
 
 	// add the new tree:
 	int row = 0 ;
-	if (!currentItem->isFolder())
-	{
-		row = currentItem->parent()->childNo(currentItem) ;
-		currentItem = currentItem->parent() ;
-	}
-	while (toBeDeletedFolders.contains(currentItem)) // make sure tree won't be removed accidentally
+	while (toBeDeletedFolders.contains(currentItem) || !currentItem->isFolder()) // make sure tree won't be removed accidentally
 	{
 		row = currentItem->parent()->childNo(currentItem) ;
 		currentItem = currentItem->parent() ;
@@ -115,6 +111,7 @@ specUndoCommand *specTreeAction::generateUndoCommand()
 	insertTree->setParentObject(model) ;
 
 	// move items into the new tree:
+	QVector<specMoveCommand*> moveCommands ;
 	foreach(destination d, finalPositions)
 	{
 		if (d.second.isEmpty()) continue ;
@@ -122,7 +119,11 @@ specUndoCommand *specTreeAction::generateUndoCommand()
 		moveItems->setParentObject(model) ;
 		QModelIndexList indexes = model->indexList(d.second) ;
 		moveItems->setItems(indexes, model->index(d.first), d.first->children());
+		moveItems->redo(); // TODO optimieren!  Problem:  Die move-commands finden ihre Objekte nicht richtig, wenn man alle am Anfang zuordnet...
+		moveCommands << moveItems ;
 	}
+	for (int i = moveCommands.size()-1 ; i >= 0 ; --i) // TODO siehe oben!
+		moveCommands[i]->undo();
 
 	// delete superfluous folders:  TODO: connections???
 	specDeleteCommand *deleteOldFolders = new specDeleteCommand(command) ;

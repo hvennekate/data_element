@@ -17,7 +17,7 @@ void specMoveCommand::moveUnit::pointersToIndexes(specModel *model)
 	parent = 0 ;
 }
 
-void specMoveCommand::moveUnit::IndexesToPointers(specModel *model)
+void specMoveCommand::moveUnit::indexesToPointers(specModel *model)
 {
 	if (!model || firstItemIndex.isEmpty())
 	{
@@ -31,16 +31,15 @@ void specMoveCommand::moveUnit::IndexesToPointers(specModel *model)
 	for (int i = 0 ; i < count ; ++i)
 	{
 		items << model->itemPointer(prefix) ;
-		prefix.last() ++ ;
+		prefix.first() ++ ; // address vectors are little endian
 	}
 	firstItemIndex.clear();
 	parentIndex.clear();
 	qDebug() << "IndexesToPointers" << count ;
 }
 
-void specMoveCommand::moveUnit::moveIt(specModel* model)
+void specMoveCommand::moveUnit::moveIt()
 {
-	IndexesToPointers(model);
 	specFolderItem *oldParent = items.first()->parent() ;
 	int oldRow = oldParent->childNo(items.first()) ;
 	foreach (specModelItem* item, items)
@@ -48,7 +47,6 @@ void specMoveCommand::moveUnit::moveIt(specModel* model)
 	parent->addChildren(items.toList(),row) ;
 	row = oldRow ;
 	parent = oldParent ;
-	pointersToIndexes(model);
 }
 
 QDataStream& operator<<(QDataStream& out, const specMoveCommand::moveUnit& unit)
@@ -61,7 +59,7 @@ QDataStream& operator>>(QDataStream& in, specMoveCommand::moveUnit& unit)
 	return in >> unit.firstItemIndex >> unit.parentIndex >> unit.count >> unit.row ;
 }
 
-specMoveCommand::moveUnit::moveUnit(QModelIndexList &list, const QModelIndex& target, int r, specModel *model)
+specMoveCommand::moveUnit::moveUnit(QModelIndexList &list, const QModelIndex& target, int &r, specModel *model)
 	: parent(0),
 	  count(0),
 	  row(r)
@@ -82,7 +80,7 @@ specMoveCommand::moveUnit::moveUnit(QModelIndexList &list, const QModelIndex& ta
 	}
 	if (parentModelIndex == target && row > firstRow) // moving within same parent
 		row = qMax(row - count, firstRow) ;
-	;
+	r = row + count ; // set next insert position
 }
 
 specMoveCommand::moveUnit::moveUnit()
@@ -106,28 +104,39 @@ void specMoveCommand::setItems(QModelIndexList &sources, const QModelIndex &targ
 
 bool specMoveCommand::refresh()
 {
-	model = qobject_cast<specModel*>(parentObject()) ; // TODO put into function
-	if (!model) return false;
+	return (model = qobject_cast<specModel*>(parentObject())) ; // TODO put into function
+}
+
+bool specMoveCommand::prepare()
+{
+	if (!refresh()) return false ;
+	for (QVector<moveUnit>::iterator i = moveUnits.begin() ; i != moveUnits.end() ; ++i)
+		i->indexesToPointers(model) ;
+	model->signalBeginReset();
 	return true ;
+}
+
+void specMoveCommand::finish()
+{
+	model->signalEndReset();
+	for (QVector<moveUnit>::iterator i = moveUnits.begin() ; i != moveUnits.end() ; ++i)
+		i->pointersToIndexes(model) ;
 }
 
 void specMoveCommand::doIt()
 {
-	if (!refresh()) return ;
-	model->signalBeginReset();
+	if (!prepare()) return ;
 	for (int i = 0 ; i < moveUnits.size() ; ++i)
-		moveUnits[i].moveIt(model) ;
-
-	model->signalEndReset();
+		moveUnits[i].moveIt() ;
+	finish() ;
 }
 
 void specMoveCommand::undoIt()
 {
-	if (!refresh()) return ;
-	model->signalBeginReset();
+	if (!prepare()) return ;
 	for (int i = moveUnits.size() ; i > 0 ; --i)
-		moveUnits[i-1].moveIt(model) ;
-	model->signalEndReset();
+		moveUnits[i-1].moveIt() ;
+	finish() ;
 }
 
 void specMoveCommand::writeCommand(QDataStream &out) const
