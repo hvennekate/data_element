@@ -478,3 +478,9 @@ QList<QAction*> specSpectrumPlot::actions()
 				   << alignmentActions->actions()
 				   << subInterpolatedAction ;
 }
+
+specSpectrumPlot::~specSpectrumPlot()
+{
+	if (correctionPicker) correctionPicker->purgeSelectable();
+	if (alignmentPicker) alignmentPicker->purgeSelectable();
+}

@@ -391,10 +391,15 @@ void CanvasPicker::highlightSelectable(bool highlight)
 
 void CanvasPicker::highlightSelectable()
 {
-	// TODO enable highlighting on selectable items
+	switchHighlighting(highlighting);
+}
+
+void CanvasPicker::switchHighlighting(bool on)
+{
 	foreach(specCanvasItem* item, selectable)
-		item->highlight(highlighting) ; // TODO crash when data + image have been imported
+		item->highlight(on) ;
 	plot()->replot();
+
 }
 
 void CanvasPicker::addSelectable(specCanvasItem *item)
@@ -419,7 +424,7 @@ void CanvasPicker::addSelectable(const QSet<specCanvasItem *> &list)
 
 void CanvasPicker::removeSelectable(QSet<specCanvasItem *> &list)
 {
-	highlightSelectable(false) ;
+	if (highlighting) switchHighlighting(false) ;
 	if (list.contains(d_selectedCurve))
 	{
 		d_selectedCurve = 0 ;
@@ -436,7 +441,7 @@ void CanvasPicker::removeSelectable(QSet<specCanvasItem *> &list)
 	foreach(specCanvasItem* item, list)
 		selectable.remove(item) ;
 
-	highlightSelectable(highlighting) ;
+	if (highlighting) highlightSelectable() ;
 	plot()->replot() ;
 }
 

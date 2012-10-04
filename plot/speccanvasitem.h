@@ -14,6 +14,13 @@ class specCanvasItem : public QwtPlotCurve, public specStreamable
 {
 private:
 	QList<int> selectedPoints ;
+	QwtSymbol* oldSymbol ;
+	class moveIndicator : public QwtSymbol
+	{
+	private:
+		QSize boundingSize() const ;
+		void drawSymbols(QPainter *, const QPointF *, int numPoints) const ;
+	};
 protected:
 	void writeToStream(QDataStream &out) const;
 	void readFromStream(QDataStream &in) ;
@@ -28,22 +35,22 @@ public:
 	virtual void attach(QwtPlot *plot) { QwtPlotCurve::attach(plot) ; }
 	virtual void detach() { QwtPlotCurve::detach() ; }
 	virtual QMenu* contextMenu() ;
-	void setLineWidth(const double&) ;
-	double lineWidth() ;
 	~specCanvasItem();
 
 	int rtti() const { return spec::canvasItem ; }
 	virtual void highlight(bool highlight) ;
 
-	QColor penColor() ;
+	void setLineWidth(const double&) ;
+	double lineWidth() const;
+	QColor penColor() const;
 	void setPenColor(const QColor&) ;
-	int symbolStyle() ;
+	int symbolStyle() const ;
 	void setSymbolStyle(const int&) ;
-	QColor symbolPenColor() ;
+	QColor symbolPenColor() const ;
 	void setSymbolPenColor(const QColor&) ;
 	void setSymbolBrushColor(const QColor&) ;
-	QColor symbolBrushColor() ;
-	QSize symbolSize() ;
+	QColor symbolBrushColor() const ;
+	QSize symbolSize() const;
 	void setSymbolSize(int w, int h = -1) ;
 	void setSymbolSize(const QSize&) ;
 };

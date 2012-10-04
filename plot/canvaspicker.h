@@ -32,6 +32,7 @@ private:
 	specPlot *plot() { return (specPlot *)parent(); }
 	QSet<specCanvasItem*> selectable ;
 	void highlightSelectable() ;
+	void switchHighlighting(bool) ;
 
 	specCanvasItem *d_selectedCurve, *lastSelected;
 	int d_selectedPoint;

@@ -50,5 +50,6 @@
         <file>lineStyle.png</file>
         <file>resizeImage.png</file>
         <file>undoView.png</file>
+        <file>moveIndicator.png</file>
     </qresource>
 </RCC>
