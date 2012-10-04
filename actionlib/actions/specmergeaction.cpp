@@ -31,6 +31,7 @@ void specMergeAction::execute()
 	specModel *model = view->model() ;
 	QModelIndexList indexes = view->getSelection() ;
 	qSort(indexes) ;
+	if (indexes.size() < 2) return ;
 	QList<specDataItem*> items ;
 	foreach(QModelIndex index, indexes)
 		 items << dynamic_cast<specDataItem*>(model->itemPointer(index)) ;

@@ -322,3 +322,17 @@ bool specModelItem::descriptorComparison::operator ()(specModelItem *& a, specMo
 	}
 	return false ;
 }
+
+void specModelItem::attach(QwtPlot *plot)
+{
+	specCanvasItem::attach(plot) ;
+	foreach(specMetaItem* client, clients)
+		client->refreshOtherPlots();
+}
+
+void specModelItem::detach()
+{
+	specCanvasItem::detach() ;
+	foreach(specMetaItem* client, clients)
+		client->refreshOtherPlots();
+}

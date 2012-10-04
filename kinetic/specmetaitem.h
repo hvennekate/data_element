@@ -16,13 +16,13 @@ private:
 	specMetaParser *filter ;
 	QHash<QString,specDescriptor> variables ;
 	specModelItem *currentlyConnectingServer ;
-	void refreshOtherPlots() ;
 	type typeId() const { return specStreamable::metaItem ; }
 	void readFromStream(QDataStream & in) ;
 	void writeToStream(QDataStream & out) const ;
 	specModel* metaModel, *dataModel ;
 	QVector<QPair<specGenealogy,qint8> > oldConnections ;
 public:
+	void refreshOtherPlots() ;
 	void setModels(specModel* meta, specModel* data) ;
 	bool disconnectServer(specModelItem*) ;
 	bool connectServer(specModelItem*) ;

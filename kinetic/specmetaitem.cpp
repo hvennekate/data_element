@@ -106,18 +106,16 @@ void specMetaItem::refreshOtherPlots()
 	foreach(specModelItem* item, items)
 		otherPlots << ((specPlot*) item->plot()) ;
 	otherPlots.remove(0) ;
-	filter->attachRanges(otherPlots)  ;
+	if (plot())
+		filter->attachRanges(otherPlots)  ;
+	else
+		filter->detachRanges();
 	foreach(QwtPlot *otherPlot, otherPlots)
 		otherPlot->replot();
 }
 
 void specMetaItem::attach(QwtPlot *plot)
 {
-	if (!plot)
-	{
-		filter->detachRanges();
-		return ;
-	}
 	specModelItem::attach(plot) ;
 	refreshOtherPlots() ;
 }
