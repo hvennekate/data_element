@@ -53,7 +53,8 @@ private:
 	QVector<specModel*> partners;
 	QModelIndexList lastRequested ;
 	void addParent(QObject*) ;
-	void addNewAction(QToolBar*, specUndoAction*) ;
+	template<class toolMenu>
+	void addNewAction(toolMenu*, specUndoAction*) ;
 
 };
 

@@ -35,6 +35,8 @@
 #include "specitempropertiesaction.h"
 #include <QClipboard>
 #include <QApplication>
+#include "specexchangefitcurvecommand.h"
+#include "specaddfitaction.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -54,7 +56,8 @@ void specActionLibrary::push(specUndoCommand * cmd)
 	undoStack->push(cmd) ;
 }
 
-void specActionLibrary::addNewAction<toolMenu>(toolMenu *bar, specUndoAction *action)
+template<class toolMenu>
+void specActionLibrary::addNewAction(toolMenu *bar, specUndoAction *action)
 {
 	action->setLibrary(this) ;
 	bar->addAction(action) ;
@@ -280,13 +283,18 @@ void specActionLibrary::purgeUndo()
 QMenu *specActionLibrary::contextMenu(QWidget *w)
 {
 	QMenu *cMenu = new QMenu(w) ;
-	if (specMetaView* view = dynamic_cast<specMetaView*>(w) && view->model())
+	specMetaView* metaView = dynamic_cast<specMetaView*>(w) ;
+	specView *view = dynamic_cast<specView*>(w) ;
+	if (metaView && metaView->model())
 	{
-		specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;
+		specModelItem *currentItem = view->model()->itemPointer(metaView->currentIndex()) ;
 		if (dynamic_cast<specMetaItem*>(currentItem))
+		{
+			addNewAction(cMenu, new specAddConnectionsAction(w)) ;
 			addNewAction(cMenu, new specAddFitAction(w)) ;
+		}
 	}
-	if (specView *view = dynamic_cast<specView*>(w) && view->model())
+	if (view && view->model())
 	{
 		addNewAction(cMenu, new specAddFolderAction(w)) ;
 		specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;

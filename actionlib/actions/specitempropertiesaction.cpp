@@ -10,6 +10,6 @@ specItemPropertiesAction::specItemPropertiesAction(QObject *parent) :
 
 specUndoCommand* specItemPropertiesAction::generateUndoCommand()
 {
-	if (!currentItem) return ;
+	if (!currentItem) return 0 ;
 	return currentItem->itemPropertiesAction(model) ;
 }
