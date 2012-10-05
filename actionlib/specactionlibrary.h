@@ -28,7 +28,7 @@ public:
 	explicit specActionLibrary(QObject *parent = 0);
 //	QMenuBar *menuBar(QObject*) ;
 	QToolBar *toolBar(QWidget*) ;
-//	QMenu *contextMenu(const QItemSelection&, specModel*) ; // actionLibrary bekommt Clients in fester Reihenfolge; speichert diese mit den Commands und restauriert so deren Referenz.
+	QMenu *contextMenu(QWidget*) ; // actionLibrary bekommt Clients in fester Reihenfolge; speichert diese mit den Commands und restauriert so deren Referenz.
 	QObject* parentId(int) ;
 	void addDragDropPartner(specModel*) ;
 	void setLastRequested(const QModelIndexList&) ;

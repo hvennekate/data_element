@@ -170,7 +170,8 @@ void specView::keyPressEvent(QKeyEvent* event)
 }
 
 specView::specView(QWidget* parent)
- : QTreeView(parent)
+ : QTreeView(parent),
+   actionLibrary(0)
 {
 	setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
 	createActions() ;
@@ -215,12 +216,12 @@ void specView::contextMenuEvent(QContextMenuEvent* event)
 		clearSelection() ;
 		setCurrentIndex(QModelIndex()) ;
 	}
-	bool containsOnlyFolders = true ;
-	QModelIndexList list = getSelection() ;
-	foreach(QModelIndex index, list)
-		containsOnlyFolders = containsOnlyFolders && model()->isFolder(index) ;
-	
-	(containsOnlyFolders ? folderContextMenu : itemContextMenu )->exec(event->globalPos()) ;
+	if (!actionLibrary) return ;
+	QMenu *cMenu = actionLibrary->contextMenu(this) ;
+	cMenu->exec(event->globalPos()) ;
+	foreach (QAction* action, cMenu->actions())
+		delete action ; // TODO check!
+	delete cMenu ;
 	event->accept() ;
 }
 
@@ -399,4 +400,9 @@ bool specView::acceptData(const QMimeData *data)
 {
 	if (!model()) return false ;
 	return model()->mimeAcceptable(data) ;
+}
+
+void specView::setActionLibrary(specActionLibrary *a)
+{
+	actionLibrary = a ;
 }

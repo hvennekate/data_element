@@ -19,7 +19,6 @@ class QItemSelection ;
 
 
 
-
 class specPlotWidget : public QDockWidget
 {
 	Q_OBJECT

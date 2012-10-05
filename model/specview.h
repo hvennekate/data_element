@@ -7,10 +7,10 @@
 #include <QContextMenuEvent>
 #include "specmodel.h"
 #include <QMap>
-#include "specactionlibrary.h"
 
 class specViewState ;
 class specModel ;
+class specActionLibrary ;
 
 class specView : public QTreeView, public specStreamable
 { // TODO turn into abstract class (add purely virtual function)

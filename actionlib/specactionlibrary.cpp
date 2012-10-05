@@ -32,7 +32,9 @@
 #include <QUndoView>
 #include "utility-functions.h"
 #include "genericexportaction.h"
-#include "specexchangefitcurvecommand.h"
+#include "specitempropertiesaction.h"
+#include <QClipboard>
+#include <QApplication>
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -52,7 +54,7 @@ void specActionLibrary::push(specUndoCommand * cmd)
 	undoStack->push(cmd) ;
 }
 
-void specActionLibrary::addNewAction(QToolBar *bar, specUndoAction *action)
+void specActionLibrary::addNewAction<toolMenu>(toolMenu *bar, specUndoAction *action)
 {
 	action->setLibrary(this) ;
 	bar->addAction(action) ;
@@ -273,4 +275,32 @@ void specActionLibrary::addPlot(specPlot *plot)
 void specActionLibrary::purgeUndo()
 {
 	undoStack->clear();
+}
+
+QMenu *specActionLibrary::contextMenu(QWidget *w)
+{
+	QMenu *cMenu = new QMenu(w) ;
+	if (specMetaView* view = dynamic_cast<specMetaView*>(w) && view->model())
+	{
+		specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;
+		if (dynamic_cast<specMetaItem*>(currentItem))
+			addNewAction(cMenu, new specAddFitAction(w)) ;
+	}
+	if (specView *view = dynamic_cast<specView*>(w) && view->model())
+	{
+		addNewAction(cMenu, new specAddFolderAction(w)) ;
+		specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;
+		if (dynamic_cast<specDataItem*>(currentItem)
+				|| dynamic_cast<specMetaItem*>(currentItem))
+			addNewAction(cMenu, new specItemPropertiesAction(w)) ;
+		if (QApplication::clipboard()->mimeData())
+			addNewAction(cMenu, new specPasteAction(w)) ;
+		if (!view->getSelection().isEmpty())
+		{
+			addNewAction(cMenu, new specCopyAction(w)) ;
+			addNewAction(cMenu, new specCutAction(w)) ;
+			addNewAction(cMenu, new specDeleteAction(w)) ;
+		}
+	}
+	return cMenu ;
 }

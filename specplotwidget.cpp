@@ -56,7 +56,8 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	undoViewAction->setIcon(QIcon(":/undoView.png")) ;
 	undoViewAction->setWhatsThis(tr("Shows and hides the undo history."));
 
-	items->setModel(new specModel(items));
+	items->setModel(new specModel(items)); // TODO redundant!  durchschleifen!
+	items->setActionLibrary(actions) ;
 
 	plot->setMinimumSize(100,100) ;
 	plot->setView(items) ;
@@ -70,7 +71,7 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	actions->addPlot(plot) ;
 
 	kineticWidget->view()->assignDataView(items) ;
-	kineticWidget->view()->setUndoPartner(actions) ;
+	kineticWidget->view()->setActionLibrary(actions) ; // TODO redundant!  durchschleifen!
 	kineticWidget->addToolbar(actions) ;
 	kineticsAction->setIcon(QIcon(":/kineticwindow.png"));
 	kineticsAction->setWhatsThis(tr("Shows and hides the meta widget."));
@@ -78,6 +79,7 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	logWidget->addToolbar(actions) ;
 	logAction->setIcon(QIcon(":/logs.png"));
 	logAction->setWhatsThis(tr("Shows and hides the log widget."));
+	logWidget->view()->setActionLibrary(actions) ;
 
 	createToolbars();
 	setConnections() ;
@@ -255,8 +257,6 @@ void specPlotWidget::setConnections()
 	connect(kineticWidget->internalPlot(), SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(), SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
 	connect(plot, SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(),SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
 
-	connect(items,SIGNAL(newUndoCommand(specUndoCommand*)), actions, SLOT(push(specUndoCommand*))) ;
-	connect(kineticWidget->view(),SIGNAL(newUndoCommand(specUndoCommand*)), actions, SLOT(push(specUndoCommand*))) ;
 	connect(plot->svgAction(),SIGNAL(toggled(bool)),this,SLOT(svgModification(bool))) ;
 }
 
