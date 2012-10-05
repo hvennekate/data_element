@@ -32,6 +32,7 @@
 #include <QUndoView>
 #include "utility-functions.h"
 #include "genericexportaction.h"
+#include "specexchangefitcurvecommand.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -187,6 +188,8 @@ specUndoCommand *specActionLibrary::commandById(int id, specUndoCommand* parent)
 {
 	switch(id)
 	{
+	case specStreamable::exchangeFitCommand:
+		return new specExchangeFitCurveCommand(parent) ;
 	case specStreamable::deleteCommandId :
 		return new specDeleteCommand(parent) ;
 	case specStreamable::newFolderCommandId :

@@ -63,7 +63,9 @@ public:
 		lineWidthCommandId = 58,
 		plotTitleCommandId = 59,
 		plotYLabelCommandId = 60,
-		plotXLabelCommandId = 61
+		plotXLabelCommandId = 61,
+		fitCurve = 62,
+		exchangeFitCommand = 63
 	};
 protected:
 	virtual void writeToStream(QDataStream& out) const = 0;

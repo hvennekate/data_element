@@ -7,6 +7,7 @@
 #include "specgenealogy.h"
 
 class specPlot ;
+class specFitCurve ;
 
 class specMetaItem : public specModelItem
 {
@@ -21,6 +22,8 @@ private:
 	void writeToStream(QDataStream & out) const ;
 	specModel* metaModel, *dataModel ;
 	QVector<QPair<specGenealogy,qint8> > oldConnections ;
+	specFitCurve *fitCurve ;
+	bool fitCurveDescriptor(const QString&) const ;
 public:
 	void refreshOtherPlots() ;
 	void setModels(specModel* meta, specModel* data) ;
@@ -28,6 +31,7 @@ public:
 	bool connectServer(specModelItem*) ;
 	QList<specModelItem*> serverList() const { return items ; }
 	explicit specMetaItem(specFolderItem* par=0, QString description="");
+	~specMetaItem() ;
 	QList<specModelItem*> purgeConnections() ;
 	void attach(QwtPlot *plot) ;
 	void detach();
@@ -40,8 +44,14 @@ public:
 	void getRangePoint(int variable, int range, int point, double& x, double& y) const ;
 	void setRange(int variableNo, int rangeNo, int pointNo, double newX, double newY) ;
 	bool setActiveLine(const QString &, int) ;
+	int activeLine(const QString &key) const ;
 	int rtti() { return spec::metaItem ; }
 	specUndoCommand* itemPropertiesAction(QObject *parentObject) ;
+
+	// for fitting:
+	specFitCurve *setFitCurve(specFitCurve*) ;
+	specFitCurve *getFitCurve() const ;
+	void conductFit() ;
 };
 
 /* TODO in other classes

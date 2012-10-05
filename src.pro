@@ -99,7 +99,8 @@ SOURCES += main.cpp \
     model/specmimetextexporter.cpp \
     lmfit/lmmin.c \
     lmfit/lmcurve.c \
-    kinetic/specfitcurve.cpp
+    kinetic/specfitcurve.cpp \
+    actionlib/commands/specexchangefitcurvecommand.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -200,7 +201,8 @@ HEADERS += cutbyintensitydialog.h \
     model/specmimetextexporter.h \
     lmfit/lmmin.h \
     lmfit/lmcurve.h \
-    kinetic/specfitcurve.h
+    kinetic/specfitcurve.h \
+    actionlib/commands/specexchangefitcurvecommand.h
 
 INCLUDEPATH += kinetic \
 	log \

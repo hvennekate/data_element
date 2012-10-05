@@ -35,6 +35,8 @@ public:
 
 	bool operator==(const specGenealogy& other) ;
 	bool operator!=(const specGenealogy& other) ;
+	specGenealogy& operator=(specGenealogy& other) ;
+	specGenealogy& operator=(const specGenealogy& other) ;
 };
 
 #endif // SPECGENEALOGY_H

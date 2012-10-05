@@ -187,3 +187,21 @@ bool specGenealogy::operator !=(const specGenealogy& other)
 {
 	return !(*this == other) ;
 }
+
+specGenealogy& specGenealogy::operator =(const specGenealogy& other)
+{
+	Model = other.Model ;
+	indexes = other.indexes ;
+	Parent = other.Parent ;
+	Items = other.Items ;
+	owning  = false;
+	return *this ;
+}
+
+specGenealogy& specGenealogy::operator =(specGenealogy& other)
+{
+	*this = *(const_cast<const specGenealogy*>(&other)) ; // call the const-version first
+	owning  = other.owning ; // then strip it of possible ownership
+	other.owning = false ; // taking possession of the items
+	return *this ;
+}

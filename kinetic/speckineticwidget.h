@@ -24,8 +24,6 @@ private:
 	type typeId() const { return specStreamable::metaWidget ;}
 private slots:
 	void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) ;
-protected:
-	void contextMenuEvent(QContextMenuEvent*) ;
 public:
 	specKineticWidget ( QString, QWidget *parent = 0 );
 	~specKineticWidget();

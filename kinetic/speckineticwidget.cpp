@@ -3,22 +3,10 @@
 #include "speccanvasitem.h"
 #include "specgenericmimeconverter.h"
 #include "specmimetextexporter.h"
+#include "specsplitter.h"
 
 specMetaView* specKineticWidget::view()
 { return items ; }
-
-void specKineticWidget::contextMenuEvent(QContextMenuEvent* event)
-{
-	int a,b,c,d ;
-	splitter->geometry().getCoords(&a,&b,&c,&d) ;
-	if(splitter->geometry().contains(event->x(),event->y()))
-	{
-		if (splitter->orientation() == Qt::Horizontal)
-			splitter->setOrientation(Qt::Vertical) ;
-		else
-			splitter->setOrientation(Qt::Horizontal) ;
-	}
-}
 
 specKineticWidget::specKineticWidget(QString title, QWidget *parent)
 	: QDockWidget(title, parent)
@@ -28,7 +16,7 @@ specKineticWidget::specKineticWidget(QString title, QWidget *parent)
 	content = new QWidget ;
 	layout = new QVBoxLayout ;
 	plot = new specPlot ;
-	splitter = new QSplitter ;
+	splitter = new specSplitter(Qt::Vertical,this) ;
 	items = new specMetaView(this) ;
 	
 	plot->setMinimumHeight(100) ;
