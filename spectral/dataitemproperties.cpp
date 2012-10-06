@@ -12,6 +12,9 @@ dataItemProperties::dataItemProperties(specDataItem *i, QWidget *parent) :
 	originalItem(i),
 	setupComplete(false)
 {
+	if (!i) return ;
+	item.sortPlotData = false ;
+	item.mergePlotData = false ;
 	ui->setupUi(this);
 	ui->slopeValue->setRange(-INFINITY,INFINITY);
 	ui->xShiftValue->setRange(-INFINITY,INFINITY);

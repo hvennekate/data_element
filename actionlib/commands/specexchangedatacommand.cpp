@@ -39,7 +39,7 @@ void specExchangeDataCommand::doIt()
 	QVector<specDataPoint> currentData(pointer->allData()) ; // TODO introduce swap here via function of the data item
 	pointer->setData(data);
 	data = currentData ;
-	if (pointer->plot())
+	if (pointer->plot()) // TODO is this really necessary?
 		pointer->plot()->replot() ;
 }
 

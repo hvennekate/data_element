@@ -352,7 +352,7 @@ specModel::specModel(QObject *par)
 	  internalDrop(false),
 	  dropSource(0),
 	  dropBuddy(0),
-	  dontDelete(false),
+	  dontDelete(0),
 	  metaModel(0)
 {
 	root = new specFolderItem ;
@@ -471,7 +471,7 @@ Qt::ItemFlags specModel::flags(const QModelIndex &index) const
 	Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index) | ( itemPointer(index)->isFolder() ? Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled : Qt::ItemIsDragEnabled);
 	if (itemPointer(index)->isEditable(Descriptors[index.column()]))
 		return  defaultFlags | Qt::ItemIsEditable ;
-	return QAbstractItemModel::flags(index) ;
+	return defaultFlags ;
 }
 
 
@@ -583,10 +583,10 @@ bool specModel::removeRows(int position, int rows, const QModelIndex &parent)
 	if (position < 0 || rows < 1) return false ;
 	if (dontDelete)
 	{
-		dontDelete = false ;
+		dontDelete -- ;
 		return true ;
 	}
-	beginRemoveRows(parent, position, position+rows-1);
+	beginRemoveRows(parent, position, position+rows-1); // TODO this is actually not to be permitted!!
 // 	QList<specModelItem*> list = itemPointer(index)->takeChildren(position,rows) ;
 	QList<specModelItem*> list ;
 	specFolderItem *parentPointer = (specFolderItem*) itemPointer(parent) ;
@@ -660,9 +660,8 @@ bool specModel::dropMimeData(const QMimeData *data,
 	row = (row != -1 ? row : rowCount(parent) );
 	if (internalDrop && dropBuddy && dropSource)
 	{
-		dropBuddy->moveInternally(parent,row,dropSource) ;
+		dontDelete = dropBuddy->moveInternally(parent,row,dropSource) ;
 		internalDrop = false ;
-		dontDelete = true ;
 		dropSource = 0 ;
 		return true ;
 	}
@@ -736,7 +735,7 @@ void specModel::applySubMap(const QModelIndexList & indexList)
 specModelItem* specModel::itemPointer(const QVector<int> &indexes) const
 {
 	specModelItem* pointer = root ;
-	for (int i =  indexes.size() - 1 ; i >= 0 ; --i)
+	for (int i =  indexes.size() - 1 ; i >= 0 && pointer->isFolder() ; --i)
 	{
 		if (!pointer) return 0 ;
 		pointer = ((specFolderItem*) pointer)->child(indexes[i]) ;
@@ -781,13 +780,17 @@ QModelIndex specModel::index(const QVector<int> &ancestry,int column) const
 	return returnIndex ;
 }
 
+bool specModel::contains(specModelItem* parent) const
+{
+	while (parent->parent()) parent = parent->parent() ;
+	return parent == root ;
+}
+
 QModelIndex specModel::index(specModelItem *pointer, int column) const
 {
 	if (!pointer) return QModelIndex() ;
-	specModelItem* parent = pointer ;
 	// Test if item is indeed part of THIS model
-	while (parent->parent()) parent = parent->parent() ;
-	if (parent != root) return QModelIndex() ;
+	if (!contains(pointer)) return QModelIndex() ;
 
 	// Generate genealogy to find parent
 	return index(hierarchy(pointer), column) ;
@@ -836,4 +839,11 @@ void specModel::setMetaModel(specMetaModel *m)
 specMetaModel* specModel::getMetaModel() const
 {
 	return metaModel ;
+}
+
+void specModel::signalChanged(const QModelIndex &i)
+{
+	QModelIndex begin = index(i.row(),0,i.parent()),
+			end = index(i.row(),columnCount(i)-1,i.parent()) ;
+	emit dataChanged(begin,end) ;
 }

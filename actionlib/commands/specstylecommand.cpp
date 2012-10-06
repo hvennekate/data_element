@@ -41,12 +41,12 @@ void specStyleCommandImplFuncTemplate::setItems(QModelIndexList items)
 specStyleCommandImplTemplate
 void specStyleCommandImplFuncTemplate::doIt()
 {
-	specPlot *plot = 0 ;
+//	specPlot *plot = 0 ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
 	{
-		for (int j = 0 ; j < Genealogies[i].items().size() ; ++ j)
-			if (Genealogies[i].items()[j]->plot())
-				plot = (specPlot*) Genealogies[i].items()[j]->plot() ;
+//		for (int j = 0 ; j < Genealogies[i].items().size() ; ++ j)
+//			if (Genealogies[i].items()[j]->plot())
+//				plot = (specPlot*) Genealogies[i].items()[j]->plot() ;
 		applyStyle(Genealogies[i],-1) ;
 	}
 }
@@ -54,12 +54,12 @@ void specStyleCommandImplFuncTemplate::doIt()
 specStyleCommandImplTemplate
 void specStyleCommandImplFuncTemplate::undoIt()
 {
-	specPlot *plot = 0 ;
+//	specPlot *plot = 0 ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
 	{
-		for (int j = 0 ; j < Genealogies[i].items().size() ; ++ j)
-			if (Genealogies[i].items()[j]->plot())
-				plot = (specPlot*) Genealogies[i].items()[j]->plot() ;
+//		for (int j = 0 ; j < Genealogies[i].items().size() ; ++ j)
+//			if (Genealogies[i].items()[j]->plot())
+//				plot = (specPlot*) Genealogies[i].items()[j]->plot() ;
 		applyStyle(Genealogies[i],i) ;
 	}
 }
@@ -95,7 +95,7 @@ void specStyleCommandImplFuncTemplate::parentAssigned()
 }
 
 specStyleCommandImplTemplate
-void specStyleCommandImplFuncTemplate::applyStyle(const specGenealogy &genealogy, int propertyIndex)
+void specStyleCommandImplFuncTemplate::applyStyle(specGenealogy &genealogy, int propertyIndex)
 {
 	property prop = (propertyIndex < 0 || !(propertyIndex < oldProperties.size())) ? newProperty : oldProperties[propertyIndex] ;
 	QVector<specModelItem*> items = genealogy.items() ;
@@ -113,7 +113,7 @@ int specStyleCommandImplFuncTemplate::styleNo(specCanvasItem *item)
 }
 
 specStyleCommandImplTemplate
-void specStyleCommandImplFuncTemplate::saveStyles(const QList<specGenealogy> & list)
+void specStyleCommandImplFuncTemplate::saveStyles(QList<specGenealogy> & list)
 {
 	oldProperties.clear();
 

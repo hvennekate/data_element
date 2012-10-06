@@ -16,7 +16,7 @@ public:
 specStyleCommand *generateStyleCommand(specStreamable::type id, specUndoCommand *parent = 0) ;
 
 #define specStyleCommandImplTemplate template<class property, \
-					      property (specCanvasItem::*getProperty)(), \
+					      property (specCanvasItem::*getProperty)() const, \
 					      void     (specCanvasItem::*setProperty)(const property&), \
 					      int ID>
 #define specStyleCommandImplFuncTemplate specStyleCommandImplementation<property, getProperty, setProperty, ID>
@@ -30,9 +30,9 @@ public:
 	void setItems(QModelIndexList) ;
 	void obtainStyle(specCanvasItem*) ;
 private:
-	void applyStyle(const specGenealogy&, int) ; // if int == -1: revert to old style
+	void applyStyle(specGenealogy&, int) ; // if int == -1: revert to old style
 	int styleNo(specCanvasItem*) ;
-	void saveStyles(const QList<specGenealogy>&) ;
+	void saveStyles(QList<specGenealogy>&) ;
 	type typeId() const { return ID ; }
 
 	void parentAssigned();

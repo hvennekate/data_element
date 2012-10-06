@@ -1,17 +1,15 @@
 #ifndef SPECTREEACTION_H
 #define SPECTREEACTION_H
 
-#include "specundoaction.h"
-#include "model/specview.h"
+#include "specitemaction.h"
 
-class specTreeAction : public specUndoAction
+class specTreeAction : public specItemAction
 {
 	Q_OBJECT
 public:
 	explicit specTreeAction(QObject *parent = 0);
-	const std::type_info& possibleParent() { return typeid(specView) ; }
 protected:
-	void execute() ;
+	specUndoCommand* generateUndoCommand() ;
 };
 
 #endif // SPECTREEACTION_H

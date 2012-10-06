@@ -5,6 +5,7 @@
 cutByIntensityDialog::cutByIntensityDialog(QWidget *parent) :
     QDialog(parent), huevalue(0)
 {
+	setWindowTitle(tr("Delete data by range")) ;
 	layout = new QVBoxLayout(this) ;
 	plot = new specPlot(this) ;
 	newRange = new QPushButton("new range",this) ;

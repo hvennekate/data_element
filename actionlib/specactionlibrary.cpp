@@ -32,6 +32,11 @@
 #include <QUndoView>
 #include "utility-functions.h"
 #include "genericexportaction.h"
+#include "specitempropertiesaction.h"
+#include <QClipboard>
+#include <QApplication>
+#include "specexchangefitcurvecommand.h"
+#include "specaddfitaction.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -51,7 +56,8 @@ void specActionLibrary::push(specUndoCommand * cmd)
 	undoStack->push(cmd) ;
 }
 
-void specActionLibrary::addNewAction(QToolBar *bar, specUndoAction *action)
+template<class toolMenu>
+void specActionLibrary::addNewAction(toolMenu *bar, specUndoAction *action)
 {
 	action->setLibrary(this) ;
 	bar->addAction(action) ;
@@ -116,6 +122,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		addNewAction(bar, new specPasteAction(target)) ;
 		addNewAction(bar, new specDeleteAction(target)) ;
 		bar->addSeparator() ;
+		addNewAction(bar, new changePlotStyleAction(target)) ;
 		addNewAction(bar, new specAddConnectionsAction(target)) ;
 		addNewAction(bar,new genericExportAction(target)) ;
 
@@ -186,6 +193,8 @@ specUndoCommand *specActionLibrary::commandById(int id, specUndoCommand* parent)
 {
 	switch(id)
 	{
+	case specStreamable::exchangeFitCommand:
+		return new specExchangeFitCurveCommand(parent) ;
 	case specStreamable::deleteCommandId :
 		return new specDeleteCommand(parent) ;
 	case specStreamable::newFolderCommandId :
@@ -250,12 +259,15 @@ void specActionLibrary::setLastRequested(const QModelIndexList &list)
 	lastRequested = list ;
 }
 
-void specActionLibrary::moveInternally(const QModelIndex &parent, int row, specView* target)
+int specActionLibrary::moveInternally(const QModelIndex &parent, int row, specView* target)
 {
+	int count = lastRequested.size() ;
 	specMoveCommand *command = new specMoveCommand ;
-	command->setParentObject(target);
+	command->setParentObject(target->model());
 	command->setItems(lastRequested,parent,row) ;
+	command->setText(tr("Move items"));
 	push(command) ;
+	return count ;
 }
 
 void specActionLibrary::addPlot(specPlot *plot)
@@ -266,4 +278,37 @@ void specActionLibrary::addPlot(specPlot *plot)
 void specActionLibrary::purgeUndo()
 {
 	undoStack->clear();
+}
+
+QMenu *specActionLibrary::contextMenu(QWidget *w)
+{
+	QMenu *cMenu = new QMenu(w) ;
+	specMetaView* metaView = dynamic_cast<specMetaView*>(w) ;
+	specView *view = dynamic_cast<specView*>(w) ;
+	if (metaView && metaView->model())
+	{
+		specModelItem *currentItem = view->model()->itemPointer(metaView->currentIndex()) ;
+		if (dynamic_cast<specMetaItem*>(currentItem))
+		{
+			addNewAction(cMenu, new specAddConnectionsAction(w)) ;
+			addNewAction(cMenu, new specAddFitAction(w)) ;
+		}
+	}
+	if (view && view->model())
+	{
+		addNewAction(cMenu, new specAddFolderAction(w)) ;
+		specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;
+		if (dynamic_cast<specDataItem*>(currentItem)
+				|| dynamic_cast<specMetaItem*>(currentItem))
+			addNewAction(cMenu, new specItemPropertiesAction(w)) ;
+		if (QApplication::clipboard()->mimeData())
+			addNewAction(cMenu, new specPasteAction(w)) ;
+		if (!view->getSelection().isEmpty())
+		{
+			addNewAction(cMenu, new specCopyAction(w)) ;
+			addNewAction(cMenu, new specCutAction(w)) ;
+			addNewAction(cMenu, new specDeleteAction(w)) ;
+		}
+	}
+	return cMenu ;
 }

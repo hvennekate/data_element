@@ -2,31 +2,21 @@
 #include <QTextStream>
 #include "speccanvasitem.h"
 #include "specgenericmimeconverter.h"
+#include "specmimetextexporter.h"
+#include "specsplitter.h"
 
 specMetaView* specKineticWidget::view()
 { return items ; }
 
-void specKineticWidget::contextMenuEvent(QContextMenuEvent* event)
-{
-	int a,b,c,d ;
-	splitter->geometry().getCoords(&a,&b,&c,&d) ;
-	if(splitter->geometry().contains(event->x(),event->y()))
-	{
-		if (splitter->orientation() == Qt::Horizontal)
-			splitter->setOrientation(Qt::Vertical) ;
-		else
-			splitter->setOrientation(Qt::Horizontal) ;
-	}
-}
-
 specKineticWidget::specKineticWidget(QString title, QWidget *parent)
 	: QDockWidget(title, parent)
 {
+	setWhatsThis(tr("Meta dock widget - In this widget, further processing of the primary data can be done (integration, max, min, etc.)"));
 	setFloating(true) ;
 	content = new QWidget ;
 	layout = new QVBoxLayout ;
 	plot = new specPlot ;
-	splitter = new QSplitter ;
+	splitter = new specSplitter(Qt::Vertical,this) ;
 	items = new specMetaView(this) ;
 	
 	plot->setMinimumHeight(100) ;
@@ -35,6 +25,8 @@ specKineticWidget::specKineticWidget(QString title, QWidget *parent)
 	
 	items->setModel(new specMetaModel(items)) ;
 	new specGenericMimeConverter(items->model());
+	new specMimeTextExporter(items->model()) ;
+
 	
 	splitter->setOrientation(Qt::Vertical) ;
 	splitter->addWidget(plot) ;
@@ -81,6 +73,7 @@ void specKineticWidget::addToolbar(specActionLibrary* actions)
 {
 	actions->addDragDropPartner(items->model());
 	actions->addPlot(plot) ;
+	plot->setUndoPartner(actions);
 	QToolBar *toolbar = actions->toolBar(items) ;
 	toolbar->addSeparator() ;
 	QToolBar *plotBar = actions->toolBar(plot) ;

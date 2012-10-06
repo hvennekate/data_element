@@ -1,55 +1,76 @@
 #include "specplotstyle.h"
 #include "names.h"
 
+#define PLOTSTYLEINITIALIZER lineWidth(0),\
+	penColor(Qt::black),\
+	symbolPenColor(Qt::black),\
+	symbolBrushColor(Qt::transparent),\
+	symbolStyle(QwtSymbol::NoSymbol)
+
 specPlotStyle::specPlotStyle()
-	: symbolType(-1)
+	: PLOTSTYLEINITIALIZER
 {
 }
 
 specPlotStyle::specPlotStyle(QDataStream& in)
-	: symbolType(-1)
+	: PLOTSTYLEINITIALIZER
+
 {
 	readFromStream(in) ;
 }
 
-specPlotStyle::specPlotStyle(const QwtPlotCurve *c)
-	: symbolType(-1)
+specPlotStyle::specPlotStyle(const specCanvasItem *c)
+	: PLOTSTYLEINITIALIZER
 {
 	initialize(c) ;
 }
 
-void specPlotStyle::initialize(const QwtPlotCurve *curve)
+void specPlotStyle::initialize(const specCanvasItem *curve)
 {
-	pen = curve->pen();
-	if (curve->symbol())
+	lineWidth = curve->lineWidth() ;
+	penColor = curve->penColor() ;
+	symbolStyle = curve->symbolStyle() ;
+	if (symbolStyle != noSymbol)
 	{
-		symbolType = curve->symbol()->style() ;
-		symbolPen  = curve->symbol()->pen() ;
-		symbolBrush= curve->symbol()->brush() ;
-		symbolSize = curve->symbol()->size() ;
+		symbolSize = curve->symbolSize() ;
+		symbolPenColor = curve->symbolPenColor() ;
+		symbolBrushColor = curve->symbolBrushColor() ;
 	}
 }
 
 void specPlotStyle::writeToStream(QDataStream &out) const
 {
-	out << pen << symbolPen << symbolType << symbolBrush << symbolSize ;
+	out << lineWidth
+	    << penColor
+	    << symbolStyle ;
+	if (symbolStyle != noSymbol)
+		out << symbolSize
+		    << symbolPenColor
+		    << symbolBrushColor ;
 }
 
 void specPlotStyle::readFromStream(QDataStream &in)
 {
-	in >> pen >> symbolPen >> symbolType >> symbolBrush >> symbolSize ;
+	in >> lineWidth
+	   >> penColor
+	   >> symbolStyle ;
+	if (symbolStyle != noSymbol)
+		in >> symbolSize
+		    >> symbolPenColor
+		    >> symbolBrushColor ;
 }
 
-void specPlotStyle::apply(QwtPlotCurve *c) const
+void specPlotStyle::apply(specCanvasItem *c) const
 {
-	c->setPen(pen) ;
-	if (symbolType == -1)
-		c->setSymbol(0) ;
-	else
-		c->setSymbol(new QwtSymbol((QwtSymbol::Style) symbolType, symbolBrush, symbolPen, symbolSize));
+	c->setLineWidth(lineWidth) ;
+	c->setPenColor(penColor) ;
+	c->setSymbolStyle(symbolStyle) ;
+	c->setSymbolPenColor(symbolPenColor) ;
+	c->setSymbolBrushColor(symbolBrushColor) ;
+	c->setSymbolSize(symbolSize) ;
 }
 
-void specPlotStyle::retrieve(QwtPlotCurve *c)
+void specPlotStyle::retrieve(specCanvasItem *c)
 {
 	initialize(c) ;
 }

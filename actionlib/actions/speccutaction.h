@@ -8,13 +8,8 @@ class specCutAction : public specDeleteAction
     Q_OBJECT
 public:
     explicit specCutAction(QObject *parent = 0);
-
-signals:
-
-public slots:
-
 protected:
-	void execute();
+	specUndoCommand* generateUndoCommand() ;
 
 };
 

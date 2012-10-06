@@ -7,10 +7,10 @@
 #include <QContextMenuEvent>
 #include "specmodel.h"
 #include <QMap>
-#include "specactionlibrary.h"
 
 class specViewState ;
 class specModel ;
+class specActionLibrary ;
 
 class specView : public QTreeView, public specStreamable
 { // TODO turn into abstract class (add purely virtual function)
@@ -38,6 +38,7 @@ protected:
 	void dropEvent(QDropEvent *event) ;
 	void readFromStream(QDataStream &in) ;
 	void writeToStream(QDataStream &out) const ;
+	specActionLibrary *actionLibrary ;
 protected slots:
 	void columnMoved(int,int,int) ;
 public:
@@ -49,6 +50,7 @@ public:
 //	QList<specModelItem*> currentlySelected() ;
 	virtual QList<QAction*> actions() ;
 	QModelIndexList getSelection() ;
+	void setActionLibrary(specActionLibrary*) ;
 
 signals:
 	void changed() ;

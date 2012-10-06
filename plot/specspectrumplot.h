@@ -40,6 +40,7 @@ private:
 
 public:
 	explicit specSpectrumPlot(QWidget *parent = 0);
+	~specSpectrumPlot() ;
 	QList<QAction*> actions() ;
 	static specMultiCommand* generateCorrectionCommand(const QwtPlotItemList& zeroRanges, const QwtPlotItemList& spectra, const QMap<double, double>& referenceSpectrum, specView*, bool noSlope = false) ;
 

@@ -44,7 +44,7 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 	//  x-Werte pruefen, matchen.
 	//
 	//  Dann x, y auswerten.
-	const QRegExp acceptable(//"(\\[[0-9]*(:[0-9]*(:[0-9]*)?)?\\])?"
+	const QRegExp acceptable("(\\[[0-9]*(:[0-9]*(:[0-9]*)?)?\\])?"
 				 "(\"[^\"]*\"|"
 				 "((x|y|i|u|l)"
 				 "("

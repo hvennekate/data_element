@@ -44,6 +44,7 @@ bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
 	offset+= other->offset * scale - other->slope * scale * shift ;
 	scale *= other->scale ;
 	shift += other->shift ;
+	generateDescription();
 	return true ;
 }
 
@@ -59,6 +60,7 @@ void specPlotMoveCommand::setCorrections(double xShift, double yOffset, double y
 	offset = yOffset ;
 	shift = xShift ;
 	scale = yScale ;
+	generateDescription();
 }
 
 void specPlotMoveCommand::writeCommand(QDataStream &out) const
@@ -70,9 +72,27 @@ void specPlotMoveCommand::readCommand(QDataStream &in)
 {
 	if (!items) items = new specGenealogy ;
 	in >> slope >> offset >> scale >> shift >> *items ;
+	generateDescription();
 }
 
 bool specPlotMoveCommand::mergeable(const specUndoCommand *other)
 {
 	return *(((specPlotMoveCommand*) other)->items) == *items ;
+}
+
+void specPlotMoveCommand::generateDescription()
+{
+	QStringList modificationDescriptions ;
+	if (scale != 1.0) modificationDescriptions << QObject::tr("scaling by ") + QString::number(scale) ;
+	if (offset) modificationDescriptions << QObject::tr("offset by ") + QString::number(offset) ;
+	if (slope) modificationDescriptions << QObject::tr("slope by ") + QString::number(slope) ;
+	if (shift) modificationDescriptions << QObject::tr("shifted x by ") + QString::number(shift) ;
+	if (modificationDescriptions.size() > 1) modificationDescriptions.last().prepend(QObject::tr("and "));
+	setText(QObject::tr("Modify data: ") +
+			 modificationDescriptions.join(modificationDescriptions.size() > 2 ? ", " : " "));
+}
+
+QString specPlotMoveCommand::description() const
+{
+	return QString() ;
 }

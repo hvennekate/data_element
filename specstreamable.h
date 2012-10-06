@@ -14,7 +14,6 @@ public:
 	typedef quint16 type;
 	enum streamableType
 	{
-		container = 32768,
 		none = 0,
 		folder = 1,
 		logEntry = 2,
@@ -46,6 +45,7 @@ public:
 		symbolBrushColorCommandId = 38,
 		manageConnectionsCommandId = 39,
 		manageItemsCommandId = 40,
+		dataView = 41,
 		multiCommandId = 42,
 		genealogyId = 43,
 		model = 44,
@@ -63,7 +63,9 @@ public:
 		lineWidthCommandId = 58,
 		plotTitleCommandId = 59,
 		plotYLabelCommandId = 60,
-		plotXLabelCommandId = 61
+		plotXLabelCommandId = 61,
+		fitCurve = 62,
+		exchangeFitCommand = 63
 	};
 protected:
 	virtual void writeToStream(QDataStream& out) const = 0;
@@ -71,19 +73,10 @@ protected:
 	virtual void writeContents(QDataStream& out) const {Q_UNUSED(out)} ; // write container contents
 	virtual void readContents(QDataStream& in) {Q_UNUSED(in)} ; // read container contents
 	virtual type typeId() const = 0;
-	virtual bool isContainer() const { return false ; }
 	virtual specStreamable* factory(const type& t) const {Q_UNUSED(t) ; return 0; } // to be implemented in parent!
 	specStreamable* produceItem(QDataStream& in) const;
 private:
 	type effectiveId() const ;
-	static bool isContainer(const type& t) { return t & container ; }
-	static void skipContainer(QDataStream& in) ;
-};
-
-class specStreamContainer : public specStreamable
-{
-protected:
-	bool isContainer() const { return true ; }
 };
 
 QDataStream& operator<<(QDataStream& out, const specStreamable&) ;

@@ -7,7 +7,6 @@
 #include "specrange.h"
 #include "specdataitem.h"
 #include "canvaspicker.h"
-#include "specprintplotaction.h"
 #include "specfolderitem.h"
 #include "specview.h"
 #include "qwt_plot_renderer.h"
@@ -36,6 +35,7 @@ void specSpectrumPlot::invalidateReference()
 	if (reference) delete reference ;
 	reference = 0 ;
 	setReferenceAction->setToolTip(QString("Momentan keine Referenz."));
+	subInterpolatedAction->setDisabled(true);
 }
 
 specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
@@ -181,6 +181,7 @@ void specSpectrumPlot::setReference()
 	plotImage.save(&buffer,"PNG") ;
 
 	setReferenceAction->setToolTip(QString("Momentane Referenz:<br><img src=\"data:image/png;base64,%1\"></img>").arg(QString(buffer.data().toBase64())));
+	subInterpolatedAction->setEnabled(true) ;
 }
 
 void specSpectrumPlot::alignmentChanged(QAction *action)
@@ -300,7 +301,6 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 	command->setItem(view->model()->index( (specModelItem*) item)) ; // TODO do dynamic cast first!!
 	command->setCorrections(shift,offset,offline,scale) ;
 	command->setParentObject(view) ;
-	command->setText(tr("Modify data point(s)"));
 	undoPartner()->push(command) ;
 }
 
@@ -422,6 +422,7 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double n
 
 void specSpectrumPlot::multipleSubtraction()
 {
+	if (!reference) return ;
 	QwtPlotItemList spectra = itemList(spec::spectrum) ;
 	// prepare map of x and y values
 	QMap<double,double> referenceSpectrum ; // TODO convert reference spectrum to map!
@@ -476,4 +477,10 @@ QList<QAction*> specSpectrumPlot::actions()
 				   << setReferenceAction
 				   << alignmentActions->actions()
 				   << subInterpolatedAction ;
+}
+
+specSpectrumPlot::~specSpectrumPlot()
+{
+	if (correctionPicker) correctionPicker->purgeSelectable();
+	if (alignmentPicker) alignmentPicker->purgeSelectable();
 }

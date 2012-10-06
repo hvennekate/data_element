@@ -22,6 +22,7 @@ private:
 	specDataItem *originalItem ;
 	QwtPlotCurve highlightSelected, highlightCurrent ;
 	bool setupComplete ;
+	bool merge, sort ;
 private slots:
 	void refreshPlot() ;
 };

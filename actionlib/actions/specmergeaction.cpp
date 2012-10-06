@@ -31,6 +31,7 @@ void specMergeAction::execute()
 	specModel *model = view->model() ;
 	QModelIndexList indexes = view->getSelection() ;
 	qSort(indexes) ;
+	if (indexes.size() < 2) return ;
 	QList<specDataItem*> items ;
 	foreach(QModelIndex index, indexes)
 		 items << dynamic_cast<specDataItem*>(model->itemPointer(index)) ;
@@ -38,12 +39,12 @@ void specMergeAction::execute()
 	if (items.isEmpty()) return ;
 
 	// let user define similarities
-	QList<QPair<QStringList::size_type, double> > criteria ;
+	QList<stringDoublePair > criteria ;
 	bool spectralAdaptation ;
 	qDebug() << "gathered items:" << profiler.restart() ;
 	if (!getMergeCriteria(criteria, model->descriptors(), model->descriptorProperties(),spectralAdaptation)) return ;
 
-	QVector<specModelItem*> toBeDeleted ;
+	QVector<specDataItem*> toBeDeleted ;
 	QVector<specModelItem*> newlyInserted ;
 
 	// Create and insert new merged items
@@ -64,22 +65,12 @@ void specMergeAction::execute()
 			specDataItem *newItem = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
 			*newItem += *item ; // TODO ueberarbeiten
 			toBeDeleted << item ; // TODO check possibility of immediate deletion
-			QList<specModelItem*> toMergeWith ;
+			QList<specDataItem*> toMergeWith ;
 			// look for items to merge with
 			for (int i = 0 ; i < chunk.size() ; ++i)
-			{
-				if (itemsAreEqual(newItem,chunk[i],criteria, model->descriptors(), model->descriptorProperties()))
-				{
-					specDataItem *other = dynamic_cast<specDataItem*>(chunk[i]) ;
-					if (!other)
-					{
-						chunk.takeAt(i--) ;
-						continue ;
-					}
-					toMergeWith << other ;
-					toBeDeleted << chunk.takeAt(i--) ;
-				}
-			}
+				if (itemsAreEqual(newItem,chunk[i],criteria))
+					toMergeWith << chunk.takeAt(i--) ;
+			toBeDeleted << toMergeWith.toVector() ;
 			// if there are others, do the merge
 			if (!toMergeWith.isEmpty())
 			{
@@ -105,7 +96,7 @@ void specMergeAction::execute()
 						// generate list of spectra
 						// TODO generate this list directly above
 						QwtPlotItemList spectra ;
-						for (QList<specModelItem*>::iterator i = toMergeWith.begin() ; i != toMergeWith.end() ; ++i)
+						for (QList<specDataItem*>::iterator i = toMergeWith.begin() ; i != toMergeWith.end() ; ++i)
 							spectra << (QwtPlotItem*) *i ;
 
 						// perform spectral adaptation
@@ -125,6 +116,7 @@ void specMergeAction::execute()
 		}
 		if (model->insertItems(toInsert.toList(), model->index(parent), row))
 			newlyInserted += toInsert ; // TODO else...
+		qDebug() << "processing chunk:" << profiler.restart() ;
 	}
 	qDebug() << "arranged items:" << profiler.restart() ;
 
@@ -149,9 +141,12 @@ void specMergeAction::execute()
 }
 
 
-bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, double> >& toCompare, const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties, bool& doSpectralAdaptation)
+bool specMergeAction::getMergeCriteria(QList<stringDoublePair>& toCompare, const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties, bool& doSpectralAdaptation)
 { // TODO separate class
+	typedef QPair<QCheckBox*,QLineEdit*>  checkBoxEditPair ;
+	QList<checkBoxEditPair> input ;
 	QDialog *descriptorMatch = new QDialog() ;
+	descriptorMatch->setWindowTitle(tr("Merge items")) ;
 	QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel) ;
 	connect(buttons,SIGNAL(accepted()), descriptorMatch, SLOT(accept()));
 	connect(buttons,SIGNAL(rejected()), descriptorMatch, SLOT(reject()));
@@ -163,15 +158,18 @@ bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, doubl
 	bool hasNumeric = false ;
 	for(QStringList::size_type i = 0 ; i < descriptors.size() ; i++)
 	{
-		descriptorLayout->addWidget(new QCheckBox(descriptors[i]),i+1,0) ;
+		QCheckBox *mustMatchBox(new QCheckBox(descriptors[i])) ;
+		QLineEdit *tolerance = 0 ;
+		descriptorLayout->addWidget(mustMatchBox,i+1,0) ;
 		if(descriptorProperties[i] & spec::numeric)
 		{
-			QLineEdit *validatorLine = new QLineEdit("0") ;
-			validatorLine->setValidator(new QDoubleValidator(validatorLine)) ;
-			((QDoubleValidator*) validatorLine->validator())->setBottom(0) ;
-			descriptorLayout->addWidget(validatorLine,i+1,1) ;
+			tolerance = new QLineEdit("0") ;
+			tolerance->setValidator(new QDoubleValidator(tolerance)) ;
+			((QDoubleValidator*) tolerance->validator())->setBottom(0) ;
+			descriptorLayout->addWidget(tolerance,i+1,1) ;
 			hasNumeric = true ;
 		}
+		input << qMakePair(mustMatchBox, tolerance) ;
 	}
 	if (hasNumeric)
 		descriptorLayout->addWidget(new QLabel("Numerical tolerance",descriptorMatch),0,1);
@@ -186,16 +184,9 @@ bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, doubl
 	descriptorMatch->setLayout(dialogLayout) ;
 	bool retval = descriptorMatch->exec() ;
 
-// 	QList<QPair<QStringList::size_type, double> > toCompare ;
-	for (int i = 1 ; i < descriptorLayout->count() ; i++)
-	{
-		int row, column, rowspan, columnspan ;
-		descriptorLayout->getItemPosition(i, &row, &column, &rowspan, &columnspan) ;
-		if (column == 0 && ((QCheckBox*) descriptorLayout->itemAt(i)->widget())->checkState() == Qt::Checked)
-			toCompare << qMakePair(row-1,
-				descriptorProperties[row] & spec::numeric ?
-						((QLineEdit*) descriptorLayout->itemAt(i+1)->widget())->text().toDouble() : 0.) ;
-	}
+	foreach(checkBoxEditPair item, input)
+		if (item.first->isChecked())
+			toCompare << qMakePair(item.first->text(),item.second ? item.second->text().toDouble() : -1) ; // -1 encodes non-numerical
 
 	doSpectralAdaptation = spectralAdaptation->checkState() ;
 	delete descriptorMatch ;
@@ -203,25 +194,23 @@ bool specMergeAction::getMergeCriteria(QList<QPair<QStringList::size_type, doubl
 }
 
 
-bool specMergeAction::itemsAreEqual(specModelItem* first, specModelItem* second, const QList<QPair<QStringList::size_type, double> >& criteria, const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties) // TODO insert actual strings into merge criteria
+bool specMergeAction::itemsAreEqual(specModelItem* first, specModelItem* second, const QList<stringDoublePair>& criteria) // TODO insert actual strings into merge criteria
 {
 	if (!first || !second)
 		return false ;
 	// TODO may need to be revised if descriptor contains actual numeric value, not QString
-	bool equal = true ;
-	for(QList<QPair<QStringList::size_type, double> >::size_type i = 0 ; i < criteria.size() ; i++)
+	foreach(stringDoublePair criterion, criteria)
 	{
-		QStringList::size_type descriptor = criteria[i].first ;
-		double tolerance = criteria[i].second ;
-		if (descriptorProperties[descriptor] & spec::numeric)
+		double tolerance = criterion.second ;
+		if (tolerance != -1)
 		{
-			double a = first->descriptor(descriptors[descriptor]).toDouble(),
-				b = second->descriptor(descriptors[descriptor]).toDouble() ;
-			equal = equal && b-tolerance <= a && a <= b+tolerance ;
+			double a = first->descriptor(criterion.first).toDouble(),
+				b = second->descriptor(criterion.first).toDouble() ;
+//			qDebug() <<"items equal?" << a << b << tolerance << (b-tolerance <= a && a <= b+tolerance) ;
+			if (!(b-tolerance <= a && a <= b+tolerance)) return false ;
 		}
-		else
-			equal = equal && first->descriptor(descriptors[descriptor]) ==
-				second->descriptor(descriptors[descriptor]) ;
+		else if (first->descriptor(criterion.first,true) != second->descriptor(criterion.first,true))
+			return false ;
 	}
-	return equal ;
+	return true ;
 }

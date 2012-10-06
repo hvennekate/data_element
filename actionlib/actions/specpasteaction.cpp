@@ -7,43 +7,30 @@
 #include <QClipboard>
 
 specPasteAction::specPasteAction(QObject *parent) :
-    specUndoAction(parent)
+    specItemAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("edit-paste")) ;
 	setToolTip(tr("Paste")) ;
 	setWhatsThis(tr("Paste data from clipboard, if possible")) ;
 }
 
-const std::type_info &specPasteAction::possibleParent()
+specUndoCommand* specPasteAction::generateUndoCommand()
 {
-	return typeid(specView) ; // TODO change in other actions to more generic partners (i.e. specView instead of specDataView)
-}
-
-void specPasteAction::execute()
-{
-	specView *currentView = (specView*) parent() ; // TODO change in other actions to more generic partners (i.e. specView instead of specDataView)
-	specModel *model = currentView->model() ;
-	QModelIndex index = currentView->currentIndex() ;
-	specModelItem *item = model->itemPointer(index) ;
 	int row = 0 ;
-	if (!item->isFolder())
+	if (!currentItem->isFolder())
 	{
-		row = index.row()+1 ;
-		index = index.parent() ;
+		row = currentIndex.row()+1 ;
+		currentIndex = currentIndex.parent() ;
 	}
-	int count = model->itemPointer(index)->children() ;
-	if (! model->dropMimeData(QApplication::clipboard()->mimeData(),Qt::CopyAction,row,0,index)) return ;
-	count = model->itemPointer(index)->children() - count ; // now we know, how many were inserted...
+	int count = model->itemPointer(currentIndex)->children() ;
+	if (! model->dropMimeData(QApplication::clipboard()->mimeData(),Qt::CopyAction,row,0,currentIndex)) return 0 ;
+	count = model->itemPointer(currentIndex)->children() - count ; // now we know, how many were inserted...
 	specAddFolderCommand *command = new specAddFolderCommand ;
 	QModelIndexList list ;
 	for (int i = 0 ; i < count ; ++i)
-		list << model->index(i+row,0,index) ;
+		list << model->index(i+row,0,currentIndex) ;
 	command->setItems(list) ;
 	command->setText(tr("Paste items")) ;
 	command->setParentObject(model) ;
-
-	if (command->ok())
-		library->push(command) ;
-	else
-		delete command ;
+	return command ;
 }

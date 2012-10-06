@@ -9,29 +9,30 @@
 #include "specmulticommand.h"
 #include "specexchangedatacommand.h"
 #include <cmath>
+#include "specdataview.h"
 
 specAverageDataAction::specAverageDataAction(QObject *parent) :
-    specUndoAction(parent)
+    specRequiresItemAction(parent)
 {
 	setIcon(QIcon(":/ave.png")) ;
 	setToolTip(tr("Average Data")) ;
 	setWhatsThis(tr("Smooth data by averaging.  You can choose between plainly averaging any number of data points or calculating a moving average."));
 }
 
-void specAverageDataAction::execute()
+specUndoCommand* specAverageDataAction::generateUndoCommand()
 {
 	// TODO subclass QDialog, make one instance persistent in memory
 	// also:  minimale Anzahl Punkte, wenn nicht laufend: 2, sonst 1
 	QDialog dialog(parentWidget()) ;
-	dialog.setWindowTitle("Mitteln") ;
+	dialog.setWindowTitle(tr("Average")) ;
 	dialog.setLayout(new QVBoxLayout(&dialog)) ;
 	QSpinBox *number = new QSpinBox(&dialog) ;
 	number->setMinimum(1) ;
-	number->setSuffix(" Punkte") ;
-	number->setSpecialValueText("1 Punkt") ;
+	number->setSuffix(tr(" points")) ;
+	number->setSpecialValueText(tr("1 point")) ;
 	dialog.layout()->addWidget(number) ;
-	QCheckBox *running = new QCheckBox("Laufend mitteln",&dialog) ;
-	QLabel *runningLabel = new QLabel("Punkte symmetrisch zu beiden Seiten\n(wenn vorhanden)",&dialog) ;
+	QCheckBox *running = new QCheckBox(tr("running average"),&dialog) ;
+	QLabel *runningLabel = new QLabel("Points will be taken symmetrically\nfrom both sides\n(if available)",&dialog) ;
 	runningLabel->setVisible(running->isChecked()) ;
 	dialog.layout()->addWidget(runningLabel);
 	dialog.layout()->addWidget(running) ;
@@ -43,7 +44,7 @@ void specAverageDataAction::execute()
 	connect(buttonBox,SIGNAL(rejected()),&dialog,SLOT(reject())) ;
 
 	if (!dialog.exec())
-		return ;
+		return 0 ;
 
 	specDataView *view = (specDataView*) parentWidget() ;
 	QModelIndexList indexes = view->getSelection() ;
@@ -91,5 +92,5 @@ void specAverageDataAction::execute()
 		command->setItem(index,newData);
 	}
 	groupCommand->setText(tr("Average data")) ;
-	library->push(groupCommand);
+	return groupCommand ;
 }

@@ -6,6 +6,7 @@
 #include <QMimeData>
 #include "speclogmodel.h"
 #include <QSettings>
+#include "speclogmessage.h"
 
 specLogToDataConverter::specLogToDataConverter(QObject *parent)
 	: specMimeConverter(parent)
@@ -37,11 +38,12 @@ void specLogToDataConverter::toStream(specModelItem *item, QDataStream & out)
 		for (int i = 0 ; i < folder->children() ; ++i)
 			toStream(folder->child(i),out) ;
 	}
-	else
+	else if (!dynamic_cast<specLogMessage*>(item))
 	{
 		entry.first = 0 ;
 		entry.second = item->descriptor("Datei") ;
 	}
+	else return ;
 	out << entry ;
 }
 
@@ -51,7 +53,8 @@ void specLogToDataConverter::exportData(QList<specModelItem *> &items, QMimeData
 	QDataStream out(&ba, QIODevice::WriteOnly) ;
 	foreach (specModelItem* item, items)
 		toStream(item, out) ;
-	data->setData("application/spec.logged.files",ba) ;
+	if (!ba.isEmpty())
+		data->setData("application/spec.logged.files",ba) ;
 }
 
 QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)

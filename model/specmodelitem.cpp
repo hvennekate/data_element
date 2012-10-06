@@ -304,3 +304,35 @@ specModelItem* specModelItem::factory(const type &t) const
 {
 	return itemFactory(t) ;
 }
+
+specModelItem::descriptorComparison::descriptorComparison(const QStringList *d)
+	: description(d)
+{
+}
+
+bool specModelItem::descriptorComparison::operator ()(specModelItem *& a, specModelItem *& b)
+{
+	if (!description) return false ;
+	foreach(QString criterion, *description)
+	{
+		QString aDescriptor = a->descriptor(criterion,true),
+				bDescriptor = b->descriptor(criterion, true) ;
+		if (aDescriptor != bDescriptor)
+			return aDescriptor < bDescriptor ;
+	}
+	return false ;
+}
+
+void specModelItem::attach(QwtPlot *plot)
+{
+	specCanvasItem::attach(plot) ;
+	foreach(specMetaItem* client, clients)
+		client->refreshOtherPlots();
+}
+
+void specModelItem::detach()
+{
+	specCanvasItem::detach() ;
+	foreach(specMetaItem* client, clients)
+		client->refreshOtherPlots();
+}

@@ -83,7 +83,7 @@ void specFolderItem::refreshPlotData()
 }
 
 void specFolderItem::removeChild(specModelItem* child)
-{
+{// TODO this is terrible!
 	QVector<specModelItem*> newChildren ;
 	foreach (specModelItem* childPointer, childrenList)
 		if (childPointer != child)
@@ -102,6 +102,7 @@ void specFolderItem::readFromStream(QDataStream& in)
 	QList<specModelItem*> newChildren ;
 	for (quint64 i = 0 ; i < numChildren ; ++i)
 		newChildren << (specModelItem*) produceItem(in) ; // TODO remove all zeros
+	newChildren.removeAll(0) ;
 	addChildren(newChildren) ;
 }
 

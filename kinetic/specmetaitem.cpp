@@ -1,16 +1,29 @@
 #include "specmetaitem.h"
 #include "specplot.h"
 #include "metaitemproperties.h"
+#include "specfitcurve.h"
+
+bool specMetaItem::fitCurveDescriptor(const QString &s) const
+{
+	return fitCurve && fitCurve->descriptorKeys().contains(s) ;
+}
 
 specMetaItem::specMetaItem(specFolderItem *par, QString description)
 	: specModelItem(par,description),
 	  filter(0),
 	  currentlyConnectingServer(0),
 	  metaModel(0),
-	  dataModel(0)
+	  dataModel(0),
+	  fitCurve(0)
 {
 	filter = new specMetaParser("","","",this) ;
 	invalidate() ;
+}
+
+specMetaItem::~specMetaItem()
+{
+	delete filter ;
+	delete fitCurve ;
 }
 
 void specMetaItem::setModels(specModel *m, specModel *d)
@@ -21,7 +34,8 @@ void specMetaItem::setModels(specModel *m, specModel *d)
 	for (int i = 0 ; i < oldConnections.size() ; ++i)
 	{
 		oldConnections[i].first.setModel(oldConnections[i].second ? m : d) ;
-		foreach(specModelItem* item, oldConnections[i].first.items())
+		QVector<specModelItem*> oldItems = oldConnections[i].first.items() ;
+		foreach(specModelItem* item, oldItems)
 			connectServer(item) ;
 	}
 	oldConnections.clear();
@@ -34,16 +48,12 @@ void specMetaItem::writeToStream(QDataStream &out) const
 	out << variables ;
 	if (!metaModel || !dataModel) return ;
 	QVector<QPair<specGenealogy,qint8> > currentConnections ;
+	QModelIndexList indexes ;
 	foreach(specModelItem* item, items)
-	{
-		QModelIndex index = metaModel->index(item) ;
-		if (index.isValid())
-			currentConnections << qMakePair<specGenealogy,qint8>(
-						specGenealogy(QModelIndexList() << index), true) ;
-		else currentConnections << qMakePair<specGenealogy,qint8>(
-					specGenealogy(QModelIndexList() <<
-						      dataModel->index(item)), false) ;
-	}
+		indexes << (metaModel->contains(item) ? metaModel->index(item) : dataModel->index(item)) ;
+
+	while (!indexes.isEmpty())
+		currentConnections << qMakePair<specGenealogy,qint8>(specGenealogy(indexes), indexes.first().model() == metaModel) ;
 	out << currentConnections ;
 }
 
@@ -51,6 +61,7 @@ void specMetaItem::readFromStream(QDataStream &in)
 {
 	specModelItem::readFromStream(in) ;
 	in >> variables >> oldConnections;
+	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
 	invalidate() ; // TODO maybe insert in data item or just model item.
 }
 
@@ -108,18 +119,16 @@ void specMetaItem::refreshOtherPlots()
 	foreach(specModelItem* item, items)
 		otherPlots << ((specPlot*) item->plot()) ;
 	otherPlots.remove(0) ;
-	filter->attachRanges(otherPlots)  ;
+	if (plot())
+		filter->attachRanges(otherPlots)  ;
+	else
+		filter->detachRanges();
 	foreach(QwtPlot *otherPlot, otherPlots)
 		otherPlot->replot();
 }
 
 void specMetaItem::attach(QwtPlot *plot)
 {
-	if (!plot)
-	{
-		filter->detachRanges();
-		return ;
-	}
 	specModelItem::attach(plot) ;
 	refreshOtherPlots() ;
 }
@@ -144,21 +153,26 @@ QStringList specMetaItem::descriptorKeys() const
 {
 	QStringList keys = specModelItem::descriptorKeys() ;
 	keys << "variables" << "x" << "y" << "errors" ;
+	if (fitCurve) keys << fitCurve->descriptorKeys() ;
 	return keys ;
 }
 
 QString specMetaItem::descriptor(const QString &key, bool full) const
 {
 	if (key == "") return specModelItem::descriptor(key,full) ;
+	if (fitCurve && fitCurve->descriptorKeys().contains(key))
+		return fitCurve->descriptor(key,full) ;
 	return variables[key].content(full) ;
 }
 
 bool specMetaItem::changeDescriptor(QString key, QString value)
 {
 	if (key == "") return specModelItem::changeDescriptor(key,value) ;
+	if (fitCurveDescriptor(key))
+		return fitCurve->changeDescriptor(key,value) ;
 	if (!descriptorKeys().contains(key)) return false ;
 	variables[key] = value ;
-	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
+	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ; // TODO put in function (see above)
 	invalidate();
 	return true ;
 }
@@ -166,6 +180,7 @@ bool specMetaItem::changeDescriptor(QString key, QString value)
 spec::descriptorFlags specMetaItem::descriptorProperties(const QString &key) const
 {
 	if (key == "") return specModelItem::descriptorProperties(key) ;
+	if (fitCurveDescriptor(key)) return spec::editable ;
 	return (key == "errors" ? spec::def : spec::editable) ;
 }
 
@@ -189,6 +204,8 @@ void specMetaItem::setRange(int variableNo, int rangeNo, int pointNo, double new
 
 bool specMetaItem::setActiveLine(const QString &s, int i)
 {
+	if (fitCurveDescriptor(s))
+		return fitCurve->setActiveLine(s,i) ;
 	if (variables.contains(s))
 	{
 		variables[s].setActiveLine(i) ;
@@ -197,10 +214,37 @@ bool specMetaItem::setActiveLine(const QString &s, int i)
 	return specModelItem::setActiveLine(s,i) ;
 }
 
+int specMetaItem::activeLine(const QString &key) const
+{
+	if (fitCurveDescriptor(key)) return fitCurve->activeLine(key) ;
+	if (variables.contains(key)) return variables[key].activeLine() ;
+	return specModelItem::activeLine(key) ;
+}
+
 specUndoCommand* specMetaItem::itemPropertiesAction(QObject *parentObject)
 {
 	metaItemProperties propertiesDialog(this) ;
 	propertiesDialog.exec() ;
 	if (propertiesDialog.result() != QDialog::Accepted) return 0 ;
 	return propertiesDialog.changedConnections(parentObject) ;
+}
+
+specFitCurve* specMetaItem::setFitCurve(specFitCurve *fc)
+{
+	specFitCurve *old = fitCurve ;
+	fitCurve = fc ;
+	if (fitCurve && plot()) fitCurve->attach(plot()) ;
+	return old ;
+}
+
+specFitCurve* specMetaItem::getFitCurve() const
+{
+	return fitCurve ;
+}
+
+void specMetaItem::conductFit()
+{
+	if (!fitCurve) return ;
+	revalidate() ;
+	fitCurve->refit(data()) ;
 }

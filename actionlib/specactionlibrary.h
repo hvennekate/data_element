@@ -28,11 +28,11 @@ public:
 	explicit specActionLibrary(QObject *parent = 0);
 //	QMenuBar *menuBar(QObject*) ;
 	QToolBar *toolBar(QWidget*) ;
-//	QMenu *contextMenu(const QItemSelection&, specModel*) ; // actionLibrary bekommt Clients in fester Reihenfolge; speichert diese mit den Commands und restauriert so deren Referenz.
+	QMenu *contextMenu(QWidget*) ; // actionLibrary bekommt Clients in fester Reihenfolge; speichert diese mit den Commands und restauriert so deren Referenz.
 	QObject* parentId(int) ;
 	void addDragDropPartner(specModel*) ;
 	void setLastRequested(const QModelIndexList&) ;
-	void moveInternally(const QModelIndex&, int row, specView*) ;
+	int moveInternally(const QModelIndex&, int row, specView*) ;
 	void addPlot(specPlot*) ;
 
 	static specUndoCommand* commandById(int id, specUndoCommand* parent = 0) ;
@@ -53,7 +53,8 @@ private:
 	QVector<specModel*> partners;
 	QModelIndexList lastRequested ;
 	void addParent(QObject*) ;
-	void addNewAction(QToolBar*, specUndoAction*) ;
+	template<class toolMenu>
+	void addNewAction(toolMenu*, specUndoAction*) ;
 
 };
 

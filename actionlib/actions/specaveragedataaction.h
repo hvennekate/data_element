@@ -1,17 +1,15 @@
 #ifndef SPECAVERAGEDATAACTION_H
 #define SPECAVERAGEDATAACTION_H
 
-#include "specundoaction.h"
-#include "specdataview.h"
+#include "specrequiresitemaction.h"
 
-class specAverageDataAction : public specUndoAction
+class specAverageDataAction : public specRequiresItemAction
 {
     Q_OBJECT
 public:
-    explicit specAverageDataAction(QObject *parent = 0);
-	const std::type_info& possibleParent() { return typeid(specDataView) ; }
+	explicit specAverageDataAction(QObject *parent = 0);
 protected:
-	void execute() ;
+	specUndoCommand* generateUndoCommand() ;
 };
 
 #endif // SPECAVERAGEDATAACTION_H

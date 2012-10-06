@@ -11,6 +11,7 @@ private:
 	virtual void writeToStream(QDataStream &out) const ;
 	virtual void readFromStream(QDataStream &in) ;
 protected:
+	virtual QString description() const ;
 	virtual void doIt() = 0;
 	virtual void undoIt() = 0 ;
 	virtual void parentAssigned() {}

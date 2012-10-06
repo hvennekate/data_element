@@ -1,16 +1,15 @@
 #ifndef SPECADDSVGITEMACTION_H
 #define SPECADDSVGITEMACTION_H
 
-#include "specundoaction.h"
+#include "specitemaction.h"
 
-class specAddSVGItemAction : public specUndoAction
+class specAddSVGItemAction : public specItemAction
 {
 	Q_OBJECT
 public:
 	explicit specAddSVGItemAction(QObject *parent = 0);
-	const std::type_info &possibleParent() ;
 private:
-	void execute() ;
+	specUndoCommand *generateUndoCommand() ;
 };
 
 #endif // SPECADDSVGITEMACTION_H
