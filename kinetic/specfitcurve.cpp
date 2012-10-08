@@ -149,7 +149,7 @@ bool specFitCurve::changeDescriptor(QString key, QString value)
 	generateParser();
 	setParserConstants();
 	qDebug() << "Data size:" << dataSize() ;
-	for (int i  = 0 ; i < qMin((size_t) 10,dataSize()) ; ++i)
+	for (size_t i  = 0 ; i < qMin((size_t) 10,dataSize()) ; ++i)
 		qDebug() << sample(i) ;
 	refreshPlotData();
 	return true ;
@@ -158,7 +158,7 @@ bool specFitCurve::changeDescriptor(QString key, QString value)
 void specFitCurve::attach(QwtPlot *plot)
 {
 	qDebug() << "Data size:" << dataSize() ;
-	for (int i  = 0 ; i < qMin((size_t) 10,dataSize()) ; ++i)
+	for (size_t i  = 0 ; i < qMin((size_t) 10,dataSize()) ; ++i)
 		qDebug() << sample(i) ;
 //	if (plot)
 //		if (fitData *d = dynamic_cast<fitData*>(data()))
@@ -199,6 +199,7 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 {
 	generateParser();
 	if (!parser) return ;
+	QList<std::string> variableNames ;
 
 	double x[data->size()], y[data->size()], parameters[fitParameters.size()] ;
 	// Set the fit data up
@@ -214,7 +215,8 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 		{
 			int index = fitParameters.indexOf(var.first) ;
 			parameters[index] = var.second ;
-			parser->DefineVar(var.first.toStdString(), &(parameters[index]));
+			parser->DefineConst(var.first.toStdString(), parameters[index]);
+			variableNames << var.first.toStdString() ;
 		}
 		else
 			parser->DefineConst(var.first.toStdString(), var.second);
@@ -227,7 +229,7 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	control.maxcall = maxSteps ;
 	control.printflags = 11 ;
 	double currentX ;
-	lmcurve_data_struct fitParams = { x, y, parser} ;
+	lmcurve_data_struct fitParams = { x, y, parser, &variableNames} ;
 	parser->DefineVar("x",&currentX);
 	lmmin(fitParameters.size(),
 	      parameters,
@@ -251,15 +253,16 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 
 void evaluateParser(const double *parameters, int count, const void *data, double *fitResults, int *info)
 {
-	Q_UNUSED(parameters) ;
 	Q_UNUSED(info) ;
 	lmcurve_data_struct *fitData = (lmcurve_data_struct *) data ;
 	fitData->parser->DefineVar("x", ((lmcurve_data_struct*)data)->x);
 	fitData->parser->Eval(fitResults, count) ;
 
-	qDebug() << "evaluate parser:" << parameters << count << data << fitResults << info << fitData->x << fitData->y ;
-	for (int i = 0 ; i < 3 ; ++i)
-		Q_ASSERT(!isnan(parameters[i])) ;
+	// prepare parser variables
+	int j = 0 ;
+	foreach(const std::string& variableName, *(fitData->variableNames))
+		fitData->parser->DefineConst(variableName, parameters[j++]);
+
 	for (int i = 0 ; i < count ; ++i)
 		fitResults[i] = fitData->y[i] - fitResults[i] ;
 }

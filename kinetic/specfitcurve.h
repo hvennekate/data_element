@@ -64,6 +64,7 @@ typedef struct {
     double *x;
     const double *y;
     mu::Parser *parser ;
+    QList<std::string>* variableNames ;
 } lmcurve_data_struct;
 
 void evaluateParser(const double *parameters, int count, const void *data, double *fitResults, int *info) ;
