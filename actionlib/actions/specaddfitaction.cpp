@@ -9,6 +9,7 @@ specAddFitAction::specAddFitAction(QObject *parent) :
 	setIcon(QIcon(":/addFit.png")) ;
 	setToolTip(tr("Add fit")) ;
 	setWhatsThis(tr("Adds a fit to the currently selected item.")) ;
+	setText(tr("Add fit")) ;
 }
 
 specUndoCommand* specAddFitAction::generateUndoCommand()

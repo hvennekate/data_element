@@ -56,6 +56,7 @@ public:
 	void refit(QwtSeriesData<QPointF>* data) ;
 	QString errors() ;
 	int rtti() const { return specStreamable::fitCurve ; }
+	void attach(QwtPlot *plot) ;
 };
 
 // from lmcurve.c:

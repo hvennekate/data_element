@@ -15,6 +15,7 @@ changePlotStyleAction::changePlotStyleAction(QObject *parent) :
 {
 	setIcon(QIcon(":/lineStyle.png"));
 	setToolTip(tr("Plot Style")) ;
+	setText(tr("Set plot style")) ;
 	setWhatsThis(tr("Plot Style -- In this menu you will find commands for modifying the appearance of plots (colors, line widths, symbols).\nClick the \"triple circle\" icon at the top of a list for defining a color/size/width yourself."));
 	QWidget *p = qobject_cast<QWidget*>(parent) ;
 	setMenu(new QMenu(p)) ;

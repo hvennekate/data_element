@@ -12,6 +12,7 @@ specPasteAction::specPasteAction(QObject *parent) :
 	this->setIcon(QIcon::fromTheme("edit-paste")) ;
 	setToolTip(tr("Paste")) ;
 	setWhatsThis(tr("Paste data from clipboard, if possible")) ;
+	setText(tr("Paste")) ;
 }
 
 specUndoCommand* specPasteAction::generateUndoCommand()

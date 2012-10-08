@@ -37,6 +37,7 @@
 #include <QApplication>
 #include "specexchangefitcurvecommand.h"
 #include "specaddfitaction.h"
+#include "specconductfitaction.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -292,6 +293,7 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
 		{
 			addNewAction(cMenu, new specAddConnectionsAction(w)) ;
 			addNewAction(cMenu, new specAddFitAction(w)) ;
+			addNewAction(cMenu, new specConductFitAction(w)) ;
 		}
 	}
 	if (view && view->model())

@@ -409,21 +409,27 @@ bool specModel::removeColumns (int column,int count,const QModelIndex & parent)
 	return true ;
 }
 
-bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int row) // TODO
+void specModel::checkForNewDescriptors(const QList<specModelItem*>& list, const QModelIndex& parent)
 {
+	// TODO: check if descriptors were removed... hm...
 	// Check for possible new column headers
-	for (QList<specModelItem*>::size_type i = 0 ; i < list.size() ; i++)
+	for (QList<specModelItem*>::const_iterator i = list.begin() ; i != list.end() ; ++i)
 	{
-		for (QStringList::size_type j = 0 ; j < list[i]->descriptorKeys().size() ; j++)
+		foreach (const QString& descriptor, (*i)->descriptorKeys())
 		{
-			if (!Descriptors.contains(list[i]->descriptorKeys()[j]))
+			if (!Descriptors.contains(descriptor))
 			{
 				insertColumns(columnCount(parent),1,parent) ;
-				setHeaderData(columnCount(parent)-1,Qt::Horizontal,list[i]->descriptorKeys()[j]) ;
-				setHeaderData(columnCount(parent)-1,Qt::Horizontal,(int) list[i]->descriptorProperties(list[i]->descriptorKeys()[j]), 34) ;
+				setHeaderData(columnCount(parent)-1,Qt::Horizontal,descriptor) ;
+				setHeaderData(columnCount(parent)-1,Qt::Horizontal,(int) (*i)->descriptorProperties(descriptor), 34) ;
 			}
 		}
 	}
+}
+
+bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int row) // TODO
+{
+	checkForNewDescriptors(list,parent) ;
 	row = row < rowCount(parent) ? row : rowCount(parent) ;
 	
 	emit layoutAboutToBeChanged() ;
@@ -843,7 +849,10 @@ specMetaModel* specModel::getMetaModel() const
 
 void specModel::signalChanged(const QModelIndex &i)
 {
+
 	QModelIndex begin = index(i.row(),0,i.parent()),
 			end = index(i.row(),columnCount(i)-1,i.parent()) ;
+	specModelItem *item = itemPointer(i) ;
+	checkForNewDescriptors(QList<specModelItem*>() << item, i.parent());
 	emit dataChanged(begin,end) ;
 }

@@ -22,6 +22,7 @@ specMergeAction::specMergeAction(QObject *parent)
 	setIcon(QIcon(":/merge.png")) ;
 	setToolTip(tr("Merge items")) ;
 	setWhatsThis(tr("Merge selected data items.  You may define criteria and processing options for merging."));
+	setText(tr("Merge items...")) ;
 }
 
 void specMergeAction::execute()

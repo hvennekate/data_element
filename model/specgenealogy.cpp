@@ -174,6 +174,11 @@ specModelItem* specGenealogy::firstItem()
 	return Items.first() ;
 }
 
+QModelIndex specGenealogy::firstIndex()
+{
+	return model()->index(firstItem()) ;
+}
+
 bool specGenealogy::operator ==(const specGenealogy& other)
 {
 	bool returnValue = true ;

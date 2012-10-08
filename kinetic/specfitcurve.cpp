@@ -24,6 +24,7 @@ QRectF specFitCurve::fitData::boundingRect() const
 void specFitCurve::fitData::setRectOfInterest(const QRectF &r)
 {
 	d_boundingRect = r ;
+	reevaluate() ;
 }
 
 size_t specFitCurve::fitData::size() const
@@ -47,15 +48,18 @@ void specFitCurve::fitData::reevaluate()
 		y[i] = NAN ;
 		xc += step ;
 	}
-	if (!parser) return ;
-	try
+	if (parser)
 	{
-		parser->Eval(y, samples.size()) ;
+		try
+		{
+				parser->Eval(y, samples.size()) ;
+		}
+		catch(...)
+		{}
 	}
-	catch(...)
-	{}
 	for (int i = 0 ; i < samples.size() ; ++i)
 		samples[i] = QPointF(x[i],y[i]) ;
+	delete[] y ;
 }
 
 specFitCurve::specFitCurve()
@@ -68,7 +72,7 @@ specFitCurve::specFitCurve()
 
 QStringList specFitCurve::descriptorKeys()
 {
-	return QStringList() << QObject::tr("Variables") <<
+	return QStringList() << QObject::tr("Fit variables") <<
 				QObject::tr("Fit parameters") <<
 				QObject::tr("Fit expression") <<
 				QObject::tr("Max fit steps") <<
@@ -80,12 +84,12 @@ void specFitCurve::refreshPlotData()
 	fitData* fit = dynamic_cast<fitData*>(data()) ;
 	if (!fit) return ;
 	//////  Set variables!
-	fit->reevaluate();
+//	fit->reevaluate();
 }
 
 QString specFitCurve::descriptor(const QString &key, bool full)
 {
-	if (QObject::tr("Variables") == key)
+	if (QObject::tr("Fit variables") == key)
 	{
 		QStringList variableDescriptors ;
 		foreach(variablePair variable, variables)
@@ -114,7 +118,7 @@ double specFitCurve::coerce(double val, double min, double max)
 
 bool specFitCurve::changeDescriptor(QString key, QString value)
 {
-	if (QObject::tr("Variables") == key)
+	if (QObject::tr("Fit variables") == key)
 	{
 		variables.clear();
 		foreach(QString line, value.split("\n"))
@@ -141,7 +145,25 @@ bool specFitCurve::changeDescriptor(QString key, QString value)
 		maxSteps = qAbs(value.toInt()) ;
 	if (QObject::tr("Fit threshold") == key)
 		threshold = qFabs(value.toDouble()) ;
+
+	generateParser();
+	setParserConstants();
+	qDebug() << "Data size:" << dataSize() ;
+	for (int i  = 0 ; i < qMin((size_t) 10,dataSize()) ; ++i)
+		qDebug() << sample(i) ;
+	refreshPlotData();
 	return true ;
+}
+
+void specFitCurve::attach(QwtPlot *plot)
+{
+	qDebug() << "Data size:" << dataSize() ;
+	for (int i  = 0 ; i < qMin((size_t) 10,dataSize()) ; ++i)
+		qDebug() << sample(i) ;
+//	if (plot)
+//		if (fitData *d = dynamic_cast<fitData*>(data()))
+//			d->setRectOfInterest(plot->);
+	specCanvasItem::attach(plot) ;
 }
 
 QString specFitCurve::errors()
@@ -153,7 +175,7 @@ bool specFitCurve::setActiveLine(const QString &key, int n)
 {
 	if (key == QObject::tr("Fit expression"))
 		return expression.setActiveLine(n) ;
-	if (key == QObject::tr("Variables"))
+	if (key == QObject::tr("Fit variables"))
 		activeVar = n ;
 	return false ;
 }
@@ -162,7 +184,7 @@ int specFitCurve::activeLine(const QString& key) const
 {
 	if (key == QObject::tr("Fit expression"))
 		return expression.activeLine() ;
-	if (key == QObject::tr("Variables"))
+	if (key == QObject::tr("Fit variables"))
 		return activeVar ;
 	return 0 ;
 }
@@ -203,7 +225,7 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	lm_control_struct control ;
 	control.ftol = threshold ;
 	control.maxcall = maxSteps ;
-	control.printflags = 0 ;
+	control.printflags = 11 ;
 	double currentX ;
 	lmcurve_data_struct fitParams = { x, y, parser} ;
 	parser->DefineVar("x",&currentX);
@@ -214,7 +236,7 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	      evaluateParser,
 	      &control,
 	      &status,
-	      0) ;
+	      lm_printout_std) ;
 
 	// get the fit parameters back out:
 	for (QList<variablePair>::iterator i = variables.begin() ; i != variables.end() ; ++i)
@@ -235,6 +257,9 @@ void evaluateParser(const double *parameters, int count, const void *data, doubl
 	fitData->parser->DefineVar("x", ((lmcurve_data_struct*)data)->x);
 	fitData->parser->Eval(fitResults, count) ;
 
+	qDebug() << "evaluate parser:" << parameters << count << data << fitResults << info << fitData->x << fitData->y ;
+	for (int i = 0 ; i < 3 ; ++i)
+		Q_ASSERT(!isnan(parameters[i])) ;
 	for (int i = 0 ; i < count ; ++i)
 		fitResults[i] = fitData->y[i] - fitResults[i] ;
 }
@@ -279,6 +304,7 @@ void specFitCurve::clearParser()
 void specFitCurve::generateParser()
 {
 	clearParser();
+	parser = new mu::Parser ;
 	try // this is sort of paranoid
 	{
 		parser->SetExpr(expression.content(true).toStdString()) ;

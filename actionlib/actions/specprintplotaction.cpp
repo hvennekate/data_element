@@ -16,6 +16,7 @@ specPrintPlotAction::specPrintPlotAction(QObject *parent) :
 	setIcon(QIcon::fromTheme("document-print"));
 	setToolTip(tr("Print plot")) ;
 	setWhatsThis(tr("Print this dock window's plot as currently displayed.")) ;
+	setText(tr("Print plot...")) ;
 }
 
 const std::type_info &specPrintPlotAction::possibleParent()

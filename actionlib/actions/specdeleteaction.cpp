@@ -13,6 +13,7 @@ specDeleteAction::specDeleteAction(QObject *parent) :
 	this->setIcon(QIcon::fromTheme("edit-delete"));
 	setToolTip(tr("Delete")) ;
 	setWhatsThis(tr("Deletes selected items.")) ;
+	setText(tr("Delete")) ;
 }
 
 specUndoCommand* specDeleteAction::generateUndoCommand()

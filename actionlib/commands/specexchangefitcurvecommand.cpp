@@ -33,6 +33,7 @@ void specExchangeFitCurveCommand::doIt()
 	specMetaItem *pointer = dynamic_cast<specMetaItem*>(item.firstItem()) ;
 	if (!pointer) return ;
 	curve = pointer->setFitCurve(curve);
+	item.model()->signalChanged(item.firstIndex());
 }
 
 void specExchangeFitCurveCommand::writeCommand(QDataStream &out) const

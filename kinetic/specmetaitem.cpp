@@ -124,12 +124,13 @@ void specMetaItem::refreshOtherPlots()
 	else
 		filter->detachRanges();
 	foreach(QwtPlot *otherPlot, otherPlots)
-		otherPlot->replot();
+		otherPlot->replot(); // TODO leads to crashes
 }
 
 void specMetaItem::attach(QwtPlot *plot)
 {
 	specModelItem::attach(plot) ;
+	if (fitCurve) fitCurve->attach(plot) ;
 	refreshOtherPlots() ;
 }
 
