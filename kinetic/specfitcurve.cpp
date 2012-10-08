@@ -224,13 +224,11 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 
 	//// Perform the fit
 	lm_status_struct status ;
-	lm_control_struct control ;
-	control.ftol = threshold ;
-	control.maxcall = maxSteps ;
-	control.printflags = 11 ;
-	double currentX ;
+	lm_control_struct control = lm_control_double ;
+
+//	control.maxcall = maxSteps ;
+//	control.printflags = 11 ;
 	lmcurve_data_struct fitParams = { x, y, parser, &variableNames} ;
-	parser->DefineVar("x",&currentX);
 	lmmin(fitParameters.size(),
 	      parameters,
 	      data->size(),
@@ -238,7 +236,7 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	      evaluateParser,
 	      &control,
 	      &status,
-	      lm_printout_std) ;
+	      0) ;
 
 	// get the fit parameters back out:
 	for (QList<variablePair>::iterator i = variables.begin() ; i != variables.end() ; ++i)
@@ -256,13 +254,14 @@ void evaluateParser(const double *parameters, int count, const void *data, doubl
 	Q_UNUSED(info) ;
 	lmcurve_data_struct *fitData = (lmcurve_data_struct *) data ;
 	fitData->parser->DefineVar("x", ((lmcurve_data_struct*)data)->x);
-	fitData->parser->Eval(fitResults, count) ;
 
 	// prepare parser variables
 	int j = 0 ;
 	foreach(const std::string& variableName, *(fitData->variableNames))
 		fitData->parser->DefineConst(variableName, parameters[j++]);
 
+	// Evaluate and prepare for lm algorithm
+	fitData->parser->Eval(fitResults, count) ;
 	for (int i = 0 ; i < count ; ++i)
 		fitResults[i] = fitData->y[i] - fitResults[i] ;
 }
