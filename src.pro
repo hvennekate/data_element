@@ -103,7 +103,8 @@ SOURCES += main.cpp \
     actionlib/commands/specexchangefitcurvecommand.cpp \
     actionlib/actions/specitempropertiesaction.cpp \
     actionlib/actions/specaddfitaction.cpp \
-    actionlib/actions/specconductfitaction.cpp
+    actionlib/actions/specconductfitaction.cpp \
+    actionlib/actions/specremovefitaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -208,7 +209,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/commands/specexchangefitcurvecommand.h \
     actionlib/actions/specitempropertiesaction.h \
     actionlib/actions/specaddfitaction.h \
-    actionlib/actions/specconductfitaction.h
+    actionlib/actions/specconductfitaction.h \
+    actionlib/actions/specremovefitaction.h
 
 INCLUDEPATH += kinetic \
 	log \

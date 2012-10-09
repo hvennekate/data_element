@@ -38,6 +38,7 @@
 #include "specexchangefitcurvecommand.h"
 #include "specaddfitaction.h"
 #include "specconductfitaction.h"
+#include "specremovefitaction.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -289,11 +290,16 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
 	if (metaView && metaView->model())
 	{
 		specModelItem *currentItem = view->model()->itemPointer(metaView->currentIndex()) ;
-		if (dynamic_cast<specMetaItem*>(currentItem))
+		if (specMetaItem* mi = dynamic_cast<specMetaItem*>(currentItem))
 		{
 			addNewAction(cMenu, new specAddConnectionsAction(w)) ;
-			addNewAction(cMenu, new specAddFitAction(w)) ;
-			addNewAction(cMenu, new specConductFitAction(w)) ;
+			if (mi->getFitCurve())
+			{
+				addNewAction(cMenu, new specRemoveFitAction(w)) ;
+				addNewAction(cMenu, new specConductFitAction(w)) ;
+			}
+			else
+				addNewAction(cMenu, new specAddFitAction(w)) ;
 		}
 	}
 	if (view && view->model())

@@ -64,9 +64,7 @@ void specFitCurve::fitData::reevaluate()
 
 specFitCurve::specFitCurve()
 	: expression(specDescriptor("",spec::editable)),
-	  parser(0),
-	  maxSteps(0),
-	  threshold(1e-2)
+	  parser(0)
 {
 }
 
@@ -75,8 +73,7 @@ QStringList specFitCurve::descriptorKeys()
 	return QStringList() << QObject::tr("Fit variables") <<
 				QObject::tr("Fit parameters") <<
 				QObject::tr("Fit expression") <<
-				QObject::tr("Max fit steps") <<
-				QObject::tr("Fit threshold") ;
+				QObject::tr("Fit errors") ;
 }
 
 void specFitCurve::refreshPlotData()
@@ -96,7 +93,7 @@ QString specFitCurve::descriptor(const QString &key, bool full)
 			variableDescriptors << variable.first + " = " + QString::number(variable.second) ;
 		if (full)
 			return variableDescriptors.join("\n") ;
-		if (activeVar > 0 && activeVar < variableDescriptors.size())
+		if (activeVar >= 0 && activeVar < variableDescriptors.size())
 			return variableDescriptors[activeVar] ;
 		return QString() ;
 	}
@@ -104,10 +101,8 @@ QString specFitCurve::descriptor(const QString &key, bool full)
 		return fitParameters.join(", ") ;
 	if (QObject::tr("Fit expression") == key)
 		return expression.content(full) ;
-	if (QObject::tr("Max fit steps") == key)
-		return QString::number(maxSteps) ;
-	if (QObject::tr("Fit threshold") == key)
-		return QString::number(threshold) ;
+	if (QObject::tr("Fit errors") == key)
+		return errorString ;
 	return QString() ;
 }
 
@@ -139,12 +134,8 @@ bool specFitCurve::changeDescriptor(QString key, QString value)
 	}
 	if (QObject::tr("Fit expression") == key)
 	{
-		expression.setContent(value) ;
+		expression.setContent(value.replace("**","^")) ;
 	}
-	if (QObject::tr("Max fit steps") == key)
-		maxSteps = qAbs(value.toInt()) ;
-	if (QObject::tr("Fit threshold") == key)
-		threshold = qFabs(value.toDouble()) ;
 
 	generateParser();
 	setParserConstants();
@@ -164,11 +155,6 @@ void specFitCurve::attach(QwtPlot *plot)
 //		if (fitData *d = dynamic_cast<fitData*>(data()))
 //			d->setRectOfInterest(plot->);
 	specCanvasItem::attach(plot) ;
-}
-
-QString specFitCurve::errors()
-{
-	return errorString ;
 }
 
 bool specFitCurve::setActiveLine(const QString &key, int n)
@@ -261,7 +247,16 @@ void evaluateParser(const double *parameters, int count, const void *data, doubl
 		fitData->parser->DefineConst(variableName, parameters[j++]);
 
 	// Evaluate and prepare for lm algorithm
-	fitData->parser->Eval(fitResults, count) ;
+	try
+	{
+		fitData->parser->Eval(fitResults, count) ;
+	}
+	catch(...)
+	{
+		for (int i = 0 ; i < count ; ++i)
+			fitResults[i] = NAN ;
+		return ;
+	}
 	for (int i = 0 ; i < count ; ++i)
 		fitResults[i] = fitData->y[i] - fitResults[i] ;
 }
@@ -278,8 +273,6 @@ void specFitCurve::writeToStream(QDataStream &out) const
 	       activeVar <<
 	       fitParameters <<
 	       expression <<
-	       maxSteps <<
-	       threshold <<
 	       errorString ;
 }
 
@@ -289,8 +282,6 @@ void specFitCurve::readFromStream(QDataStream &in)
 	      activeVar >>
 	      fitParameters >>
 	      expression >>
-	      maxSteps >>
-	      threshold >>
 	      errorString ;
 	generateParser();
 	setParserConstants();

@@ -22,6 +22,8 @@ specMetaItem::specMetaItem(specFolderItem *par, QString description)
 
 specMetaItem::~specMetaItem()
 {
+	foreach(specModelItem* item, items)
+		disconnectServer(item) ;
 	delete filter ;
 	delete fitCurve ;
 }
@@ -181,8 +183,10 @@ bool specMetaItem::changeDescriptor(QString key, QString value)
 spec::descriptorFlags specMetaItem::descriptorProperties(const QString &key) const
 {
 	if (key == "") return specModelItem::descriptorProperties(key) ;
+	if (variables.contains(key))
+		return (key == "errors" ? spec::def : spec::editable) ;
 	if (fitCurveDescriptor(key)) return spec::editable ;
-	return (key == "errors" ? spec::def : spec::editable) ;
+	return spec::def ;
 }
 
 QIcon specMetaItem::decoration() const

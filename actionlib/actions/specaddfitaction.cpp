@@ -8,7 +8,7 @@ specAddFitAction::specAddFitAction(QObject *parent) :
 {
 	setIcon(QIcon(":/addFit.png")) ;
 	setToolTip(tr("Add fit")) ;
-	setWhatsThis(tr("Adds a fit to the currently selected item.")) ;
+	setWhatsThis(tr("Adds a fit to the current item.")) ;
 	setText(tr("Add fit")) ;
 }
 

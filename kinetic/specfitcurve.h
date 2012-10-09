@@ -32,8 +32,6 @@ private:
 	QStringList fitParameters ;
 	specDescriptor expression ;
 	mu::Parser *parser ;
-	qint16 maxSteps ;
-	qreal threshold ;
 	QString errorString ;
 	double coerce(double val, double min, double max) ;
 	static bool acceptableVariable(const QString&) ;
@@ -54,7 +52,6 @@ public:
 	int activeLine(const QString& key) const ;
 	void refreshPlotData();
 	void refit(QwtSeriesData<QPointF>* data) ;
-	QString errors() ;
 	int rtti() const { return specStreamable::fitCurve ; }
 	void attach(QwtPlot *plot) ;
 };
