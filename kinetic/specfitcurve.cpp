@@ -54,8 +54,14 @@ void specFitCurve::fitData::reevaluate()
 		{
 				parser->Eval(y, samples.size()) ;
 		}
-		catch(...)
-		{}
+		catch(mu::Parser::exception_type &p)
+		{
+			errorString = QString("Evaluation of fit expression \"%1\" failed\nReason: %2").arg(parser->GetExpr().c_str()).arg(p.GetMsg().c_str()) ;
+			for (int i = 0 ; i < samples.size() ; ++i)
+				samples[i] = QPointF(NAN,NAN) ;
+			delete[] y ;
+			return ;
+		}
 	}
 	for (int i = 0 ; i < samples.size() ; ++i)
 		samples[i] = QPointF(x[i],y[i]) ;
@@ -81,7 +87,7 @@ void specFitCurve::refreshPlotData()
 	fitData* fit = dynamic_cast<fitData*>(data()) ;
 	if (!fit) return ;
 	//////  Set variables!
-//	fit->reevaluate();
+	fit->reevaluate();
 }
 
 QString specFitCurve::descriptor(const QString &key, bool full)
@@ -102,7 +108,20 @@ QString specFitCurve::descriptor(const QString &key, bool full)
 	if (QObject::tr("Fit expression") == key)
 		return expression.content(full) ;
 	if (QObject::tr("Fit errors") == key)
-		return errorString ;
+	{
+		if (!errorString.isEmpty())
+		{
+			if (full)
+				return errorString ;
+			return errorString.section("\n",0,0) ;
+		}
+		if (fitData* fit = dynamic_cast<fitData*>(data()))
+		{
+			if (full)
+				return fit->errorString ;
+			return fit->errorString.section("\n",0,0) ;
+		}
+	}
 	return QString() ;
 }
 

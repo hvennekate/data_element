@@ -17,6 +17,7 @@ private:
 		double *x ;
 		QVector<QPointF> samples ;
 	public:
+		QString errorString ;
 		fitData(mu::Parser* p = 0) ;
 		~fitData() ;
 		QRectF boundingRect() const ;
