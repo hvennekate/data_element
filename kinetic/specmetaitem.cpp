@@ -14,7 +14,8 @@ specMetaItem::specMetaItem(specFolderItem *par, QString description)
 	  currentlyConnectingServer(0),
 	  metaModel(0),
 	  dataModel(0),
-	  fitCurve(0)
+	  fitCurve(0),
+	  styleFitCurve(false)
 {
 	filter = new specMetaParser("","","",this) ;
 	invalidate() ;
@@ -252,4 +253,99 @@ void specMetaItem::conductFit()
 	if (!fitCurve) return ;
 	revalidate() ;
 	fitCurve->refit(data()) ;
+}
+
+bool specMetaItem::getFitStyleState() const
+{
+	return styleFitCurve ;
+}
+
+void specMetaItem::toggleFitStyle()
+{
+	styleFitCurve = !styleFitCurve ;
+}
+
+template<typename styleType, styleType (specCanvasItem::*getProperty)() const>
+styleType specMetaItem::getStyleFunction() const
+{
+	if (styleFitCurve && fitCurve)
+		return (fitCurve->*getProperty)() ;
+	return (this->*getProperty)() ;
+}
+
+template<typename styleType, void (specCanvasItem::*setProperty)(const styleType&)> // TODO geht der typ auch implizit?
+void specMetaItem::setStyleFunction(const styleType& st)
+{
+	if (styleFitCurve && fitCurve)
+		(fitCurve->*setProperty)(st) ;
+	else
+		(this->*setProperty)(st) ;
+}
+
+void specMetaItem::setLineWidth(const double& v)
+{
+	setStyleFunction<double, &specCanvasItem::setLineWidth>(v) ;
+}
+
+double specMetaItem::lineWidth() const
+{
+	return getStyleFunction<double, &specCanvasItem::lineWidth>() ;
+}
+
+QColor specMetaItem::penColor() const
+{
+	return getStyleFunction<QColor, &specCanvasItem::penColor>() ;
+}
+
+void specMetaItem::setPenColor(const QColor& c)
+{
+	setStyleFunction<QColor, &specCanvasItem::setPenColor>(c) ;
+}
+
+int specMetaItem::symbolStyle() const
+{
+	return getStyleFunction<int, &specCanvasItem::symbolStyle>() ;
+}
+
+void specMetaItem::setSymbolStyle(const int& s)
+{
+	setStyleFunction<int, &specCanvasItem::setSymbolStyle>(s) ;
+}
+
+QColor specMetaItem::symbolPenColor() const
+{
+	return getStyleFunction<QColor, &specCanvasItem::symbolPenColor>() ;
+}
+
+void specMetaItem::setSymbolPenColor(const QColor& c)
+{
+	setStyleFunction<QColor, &specCanvasItem::setSymbolPenColor>(c) ;
+}
+
+void specMetaItem::setSymbolBrushColor(const QColor& c)
+{
+	setStyleFunction<QColor, &specCanvasItem::setSymbolBrushColor>(c) ;
+}
+
+QColor specMetaItem::symbolBrushColor() const
+{
+	return getStyleFunction<QColor, &specCanvasItem::symbolBrushColor>() ;
+}
+
+QSize specMetaItem::symbolSize() const
+{
+	return getStyleFunction<QSize, &specCanvasItem::symbolSize>() ;
+}
+
+void specMetaItem::setSymbolSize(int w, int h)
+{
+	if (styleFitCurve && fitCurve)
+		fitCurve->setSymbolSize(w,h) ;
+	else
+		specCanvasItem::setSymbolSize(w,h) ;
+}
+
+void specMetaItem::setSymbolSize(const QSize& s)
+{
+	setStyleFunction<QSize, &specCanvasItem::setSymbolSize>(s) ;
 }

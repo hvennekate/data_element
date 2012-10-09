@@ -39,6 +39,8 @@
 #include "specaddfitaction.h"
 #include "specconductfitaction.h"
 #include "specremovefitaction.h"
+#include "spectogglefitstyleaction.h"
+#include "spectogglefitstylecommand.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -195,6 +197,8 @@ specUndoCommand *specActionLibrary::commandById(int id, specUndoCommand* parent)
 {
 	switch(id)
 	{
+	case specStreamable::toggleFitStyleCommand:
+		return new specToggleFitStyleCommand(parent) ;
 	case specStreamable::exchangeFitCommand:
 		return new specExchangeFitCurveCommand(parent) ;
 	case specStreamable::deleteCommandId :
@@ -297,6 +301,7 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
 			{
 				addNewAction(cMenu, new specRemoveFitAction(w)) ;
 				addNewAction(cMenu, new specConductFitAction(w)) ;
+				addNewAction(cMenu, new specToggleFitStyleAction(w)) ;
 			}
 			else
 				addNewAction(cMenu, new specAddFitAction(w)) ;
