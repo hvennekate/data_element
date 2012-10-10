@@ -3,6 +3,7 @@
 #include "specaddconnectionscommand.h"
 #include "specdeleteconnectionscommand.h"
 #include "specmulticommand.h"
+#include "spectogglefitstylecommand.h"
 
 metaItemProperties::metaItemProperties(specMetaItem* i,QWidget *parent) :
 	QDialog(parent),
@@ -27,6 +28,9 @@ metaItemProperties::metaItemProperties(specMetaItem* i,QWidget *parent) :
 			samples << item->sample(i) ;
 		connectedData.last().second->setSamples(samples);
 	}
+
+	ui->styleFit->setDisabled(!i->getFitCurve()) ;
+	ui->styleFit->setCheckState(i->styleFitCurve ? Qt::Checked : Qt::Unchecked) ;
 }
 
 // TODO include variable view
@@ -104,8 +108,6 @@ specUndoCommand* metaItemProperties::changedConnections(QObject *parent)
 		if (ui->connectedItemsList->item(i)->checkState() == Qt::Checked)
 			newConnections << originalItem->items[connectedData[i].first] ;
 
-	if (newConnections == originalItem->items) return 0 ;
-
 	specMultiCommand *parentCommand = new specMultiCommand ;
 	parentCommand->setParentObject(parent) ;
 
@@ -118,7 +120,20 @@ specUndoCommand* metaItemProperties::changedConnections(QObject *parent)
 	addCommand->setParentObject(parent) ;
 	indexList = generateConnectionList(newConnections) ;
 	addCommand->setItems(model->index(originalItem), indexList) ;
-	parentCommand->setText(tr("Modify item connections"));
+	parentCommand->setText(tr("Modify meta item propertis"));
+
+	if (ui->styleFit->checkState() != originalItem->styleFitCurve)
+	{
+		specToggleFitStyleCommand* fitStyleCommand = new specToggleFitStyleCommand(parentCommand) ;
+		fitStyleCommand->setParentObject(parent) ;
+		fitStyleCommand->setup(model->index(originalItem));
+	}
+
+	if (!parentCommand->childCount())
+	{
+		delete parentCommand ;
+		parentCommand = 0 ;
+	}
 	return parentCommand ;
 }
 

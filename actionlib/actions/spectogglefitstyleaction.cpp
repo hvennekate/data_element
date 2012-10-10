@@ -6,9 +6,9 @@ specToggleFitStyleAction::specToggleFitStyleAction(QObject *parent) :
     specItemAction(parent)
 {
 	setIcon(QIcon(":/toggleFit.png")) ;
-	setToolTip(tr("Switch styling to fit")) ;
-	setWhatsThis(tr("Switches the styling options to affect the fit connected with this meta item.")) ;
-	setText(tr("Switch styling to fit")) ;
+	setToolTip(tr("Switch styling to/from fit")) ;
+	setWhatsThis(tr("Switches the styling options to affect the fit connected with this meta item or the meta item itself.")) ;
+	setText(tr("Switch styling to/from fit")) ;
 }
 
 specUndoCommand* specToggleFitStyleAction::generateUndoCommand()

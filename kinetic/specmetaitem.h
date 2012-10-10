@@ -25,8 +25,6 @@ private:
 	specFitCurve *fitCurve ;
 	bool styleFitCurve ;
 	bool fitCurveDescriptor(const QString&) const ;
-	template<typename styleType, styleType (specCanvasItem::*getProperty)() const> styleType getStyleFunction() const ;
-	template<typename styleType, void (specCanvasItem::*setProperty)(const styleType&) > void setStyleFunction(const styleType&) ;
 public:
 	void refreshOtherPlots() ;
 	void setModels(specModel* meta, specModel* data) ;

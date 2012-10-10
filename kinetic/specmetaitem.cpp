@@ -19,6 +19,10 @@ specMetaItem::specMetaItem(specFolderItem *par, QString description)
 {
 	filter = new specMetaParser("","","",this) ;
 	invalidate() ;
+	variables["x"] = specDescriptor("", spec::editable) ;
+	variables["y"] = specDescriptor("", spec::editable) ;
+	variables["variables"] = specDescriptor("", spec::editable) ;
+	variables["errors"] = specDescriptor("No data") ;
 }
 
 specMetaItem::~specMetaItem()
@@ -155,8 +159,7 @@ void specMetaItem::refreshPlotData()
 
 QStringList specMetaItem::descriptorKeys() const
 {
-	QStringList keys = specModelItem::descriptorKeys() ;
-	keys << "variables" << "x" << "y" << "errors" ;
+	QStringList keys = specModelItem::descriptorKeys() << "variables" << "x" << "y" << "errors" ; // TODO change to get from variables
 	if (fitCurve) keys << fitCurve->descriptorKeys() ;
 	return keys ;
 }
@@ -174,7 +177,7 @@ bool specMetaItem::changeDescriptor(QString key, QString value)
 	if (key == "") return specModelItem::changeDescriptor(key,value) ;
 	if (fitCurveDescriptor(key))
 		return fitCurve->changeDescriptor(key,value) ;
-	if (!descriptorKeys().contains(key)) return false ;
+	if (!variables.contains(key)) return false ;
 	variables[key] = value ;
 	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ; // TODO put in function (see above)
 	invalidate();
@@ -183,16 +186,17 @@ bool specMetaItem::changeDescriptor(QString key, QString value)
 
 spec::descriptorFlags specMetaItem::descriptorProperties(const QString &key) const
 {
+	qDebug() << "requesting descriptor properties:" << key ;
 	if (key == "") return specModelItem::descriptorProperties(key) ;
 	if (variables.contains(key))
-		return (key == "errors" ? spec::def : spec::editable) ;
+		return variables[key].flags() ;
 	if (fitCurveDescriptor(key)) return spec::editable ;
 	return spec::def ;
 }
 
 QIcon specMetaItem::decoration() const
 {
-	if (!filter->ok())
+	if (!variables["errors"].content(true).isEmpty())
 		return QIcon::fromTheme("dialog-warning") ;
 
 	return QIcon(":/kinetic.png") ;
@@ -265,77 +269,21 @@ void specMetaItem::toggleFitStyle()
 	styleFitCurve = !styleFitCurve ;
 }
 
-template<typename styleType, styleType (specCanvasItem::*getProperty)() const>
-styleType specMetaItem::getStyleFunction() const
-{
-	if (styleFitCurve && fitCurve)
-		return (fitCurve->*getProperty)() ;
-	return (this->*getProperty)() ;
-}
+#define STYLEROUTINGFUNCTION(TYPE,GETNAME,SETNAME) \
+	void specMetaItem::SETNAME(const TYPE& arg) { \
+		if (styleFitCurve && fitCurve) fitCurve->SETNAME(arg) ; \
+		else specModelItem::SETNAME(arg) ; } \
+	\
+	TYPE specMetaItem::GETNAME() const { \
+		if (styleFitCurve && fitCurve) return fitCurve->GETNAME() ; \
+		else return specModelItem::GETNAME() ; }
 
-template<typename styleType, void (specCanvasItem::*setProperty)(const styleType&)> // TODO geht der typ auch implizit?
-void specMetaItem::setStyleFunction(const styleType& st)
-{
-	if (styleFitCurve && fitCurve)
-		(fitCurve->*setProperty)(st) ;
-	else
-		(this->*setProperty)(st) ;
-}
-
-void specMetaItem::setLineWidth(const double& v)
-{
-	setStyleFunction<double, &specCanvasItem::setLineWidth>(v) ;
-}
-
-double specMetaItem::lineWidth() const
-{
-	return getStyleFunction<double, &specCanvasItem::lineWidth>() ;
-}
-
-QColor specMetaItem::penColor() const
-{
-	return getStyleFunction<QColor, &specCanvasItem::penColor>() ;
-}
-
-void specMetaItem::setPenColor(const QColor& c)
-{
-	setStyleFunction<QColor, &specCanvasItem::setPenColor>(c) ;
-}
-
-int specMetaItem::symbolStyle() const
-{
-	return getStyleFunction<int, &specCanvasItem::symbolStyle>() ;
-}
-
-void specMetaItem::setSymbolStyle(const int& s)
-{
-	setStyleFunction<int, &specCanvasItem::setSymbolStyle>(s) ;
-}
-
-QColor specMetaItem::symbolPenColor() const
-{
-	return getStyleFunction<QColor, &specCanvasItem::symbolPenColor>() ;
-}
-
-void specMetaItem::setSymbolPenColor(const QColor& c)
-{
-	setStyleFunction<QColor, &specCanvasItem::setSymbolPenColor>(c) ;
-}
-
-void specMetaItem::setSymbolBrushColor(const QColor& c)
-{
-	setStyleFunction<QColor, &specCanvasItem::setSymbolBrushColor>(c) ;
-}
-
-QColor specMetaItem::symbolBrushColor() const
-{
-	return getStyleFunction<QColor, &specCanvasItem::symbolBrushColor>() ;
-}
-
-QSize specMetaItem::symbolSize() const
-{
-	return getStyleFunction<QSize, &specCanvasItem::symbolSize>() ;
-}
+STYLEROUTINGFUNCTION(double, lineWidth,   setLineWidth)
+STYLEROUTINGFUNCTION(QColor, penColor,    setPenColor)
+STYLEROUTINGFUNCTION(int,    symbolStyle, setSymbolStyle)
+STYLEROUTINGFUNCTION(QColor, symbolPenColor, setSymbolPenColor)
+STYLEROUTINGFUNCTION(QColor, symbolBrushColor, setSymbolBrushColor)
+STYLEROUTINGFUNCTION(QSize, symbolSize, setSymbolSize)
 
 void specMetaItem::setSymbolSize(int w, int h)
 {
@@ -343,9 +291,4 @@ void specMetaItem::setSymbolSize(int w, int h)
 		fitCurve->setSymbolSize(w,h) ;
 	else
 		specCanvasItem::setSymbolSize(w,h) ;
-}
-
-void specMetaItem::setSymbolSize(const QSize& s)
-{
-	setStyleFunction<QSize, &specCanvasItem::setSymbolSize>(s) ;
 }

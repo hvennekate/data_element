@@ -288,6 +288,7 @@ void specFitCurve::setParserConstants()
 
 void specFitCurve::writeToStream(QDataStream &out) const
 {
+	specCanvasItem::writeToStream(out);
 	out << variables <<
 	       activeVar <<
 	       fitParameters <<
@@ -297,6 +298,7 @@ void specFitCurve::writeToStream(QDataStream &out) const
 
 void specFitCurve::readFromStream(QDataStream &in)
 {
+	specCanvasItem::readFromStream(in) ;
 	in >> variables >>
 	      activeVar >>
 	      fitParameters >>
