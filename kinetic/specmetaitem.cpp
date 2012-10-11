@@ -62,13 +62,25 @@ void specMetaItem::writeToStream(QDataStream &out) const
 	while (!indexes.isEmpty())
 		currentConnections << qMakePair<specGenealogy,qint8>(specGenealogy(indexes), indexes.first().model() == metaModel) ;
 	out << currentConnections ;
+	out << (quint8 ((bool) fitCurve)) ;
+	if (fitCurve) out << *fitCurve ;
 }
 
 void specMetaItem::readFromStream(QDataStream &in)
 {
+	delete fitCurve ;
 	specModelItem::readFromStream(in) ;
 	in >> variables >> oldConnections;
 	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
+	quint8 hasFitCurve ;
+	in >> hasFitCurve ;
+	if (hasFitCurve)
+	{
+		fitCurve = new specFitCurve ;
+		in >> *fitCurve ;
+	}
+	else
+		fitCurve = 0 ;
 	invalidate() ; // TODO maybe insert in data item or just model item.
 }
 
@@ -186,7 +198,6 @@ bool specMetaItem::changeDescriptor(QString key, QString value)
 
 spec::descriptorFlags specMetaItem::descriptorProperties(const QString &key) const
 {
-	qDebug() << "requesting descriptor properties:" << key ;
 	if (key == "") return specModelItem::descriptorProperties(key) ;
 	if (variables.contains(key))
 		return variables[key].flags() ;

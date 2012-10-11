@@ -306,6 +306,7 @@ void specFitCurve::readFromStream(QDataStream &in)
 	      errorString ;
 	generateParser();
 	setParserConstants();
+	setData(new fitData(parser)) ;
 }
 
 void specFitCurve::clearParser()
