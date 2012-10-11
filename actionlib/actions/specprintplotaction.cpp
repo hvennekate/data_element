@@ -7,7 +7,7 @@
 
 specPrintPlotAction::specPrintPlotAction(QObject *parent) :
 	specUndoAction(parent),
-	printer(new QPrinter(QPrinter::HighResolution))
+	printer(new QPrinter)
 {
 	specPlot *plot = (specPlot*) parentWidget() ;
 	QSize plotSize = plot->size() ;
@@ -49,7 +49,7 @@ void specPrintPlotAction::execute()
 		double printRatio = pageSize.width()/pageSize.height() ;
 		qreal top,left,bottom,right ;
 		printer->getPageMargins(&left,&top,&right,&bottom,QPrinter::Millimeter);
-		if (QMessageBox::question(0,"Keep Aspect", "Preserve aspect ratio?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) == QMessageBox::Yes)
+		if (QMessageBox::question(0,"Keep Aspect", "Preserve aspect ratio?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) != QMessageBox::Yes)
 		{
 			plot->resize(printer->pageRect().size()) ;
 			plot->replot();
