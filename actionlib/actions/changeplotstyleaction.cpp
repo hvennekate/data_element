@@ -163,7 +163,7 @@ specUndoCommand* changePlotStyleAction::generateUndoCommand()
 
 	if (!newCommand) return 0;
 	newCommand->obtainStyle(&item) ;
-	newCommand->setParentObject(view) ;
+	newCommand->setParentObject(view->model()) ;
 	newCommand->setItems(view->getSelection()) ;
 	newCommand->setText(tr("Change plot style"));
 	return newCommand ;

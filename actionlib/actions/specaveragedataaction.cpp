@@ -51,7 +51,7 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 	QModelIndexList indexes = view->getSelection() ;
 	int numAverages = number->value() ;
 	specMultiCommand *groupCommand = new specMultiCommand ;
-	groupCommand->setParentObject(view) ;
+	groupCommand->setParentObject(view->model()) ;
 	groupCommand->setMergeable(false) ; // TODO consider dataExchange command (also to avoid frequent replots)
 //	library->push(groupCommand);
 	foreach(QModelIndex index, indexes)

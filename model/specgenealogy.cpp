@@ -145,7 +145,7 @@ void specGenealogy::setModel(specModel *model)
 
 void specGenealogy::getItemPointers()
 {
-	for (int i = 0 ; i < Items.size() ; ++i)
+	for (int i = 0 ; i < Items.size() ; ++i) // TODO maybe precautions...
 		Items[i] = Parent->child(i+indexes.first()) ;
 }
 

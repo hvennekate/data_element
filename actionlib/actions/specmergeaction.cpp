@@ -122,7 +122,7 @@ void specMergeAction::execute()
 	qDebug() << "arranged items:" << profiler.restart() ;
 
 	specMultiCommand *command = new specMultiCommand ;
-	command->setParentObject(view) ;
+	command->setParentObject(view->model()) ;
 	command->setMergeable(false) ;
 
 	// preparing insertion command

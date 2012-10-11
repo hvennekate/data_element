@@ -66,7 +66,7 @@ specUndoCommand* specDeleteAction::generateUndoCommand()
 		for(QMap<QModelIndex,QModelIndexList>::iterator i = toDisconnect.begin() ; i != toDisconnect.end() ; ++i)
 		{
 			specDeleteConnectionsCommand *connectionsCommand = new specDeleteConnectionsCommand(parentCommand) ;
-			connectionsCommand->setParentObject(metaModel) ;
+			connectionsCommand->setParentObject(metaModel) ; // TODO model statt metaModel (and let the command pick the right one)
 			connectionsCommand->setItems(i.key(),i.value());
 		}
 		parentCommand->setText(tr("Delete")) ;

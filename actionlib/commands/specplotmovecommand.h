@@ -17,6 +17,7 @@ private:
 	type typeId() const { return specStreamable::movePlotCommandId ;}
 	void generateDescription() ;
 	QString description() const ;
+	void parentAssigned();
 public:
 	specPlotMoveCommand(specUndoCommand *parent = 0);
 	bool mergeWith(const QUndoCommand* other) ;

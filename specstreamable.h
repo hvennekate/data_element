@@ -71,8 +71,8 @@ public:
 protected:
 	virtual void writeToStream(QDataStream& out) const = 0;
 	virtual void readFromStream(QDataStream& in) = 0;
-	virtual void writeContents(QDataStream& out) const {Q_UNUSED(out)} ; // write container contents
-	virtual void readContents(QDataStream& in) {Q_UNUSED(in)} ; // read container contents
+	virtual void writeContents(QDataStream& out) const {Q_UNUSED(out)} // write container contents
+	virtual void readContents(QDataStream& in) {Q_UNUSED(in)} // read container contents
 	virtual type typeId() const = 0;
 	virtual specStreamable* factory(const type& t) const {Q_UNUSED(t) ; return 0; } // to be implemented in parent!
 	specStreamable* produceItem(QDataStream& in) const;
