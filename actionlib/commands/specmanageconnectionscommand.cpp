@@ -85,7 +85,13 @@ void specManageConnectionsCommand::parentAssigned()
 	if (!parentObject()) return ;
 	if (!target) return ;
 
-	specModel *thisModel = (specModel*) parentObject() ;
+	specModel *thisModel = qobject_cast<specMetaModel*>(parentObject()) ;
+	if (!thisModel) // Necessary for specMultiCommand
+	{
+		thisModel = qobject_cast<specModel*>(parentObject()) ;
+		if (!thisModel) return ;
+		thisModel = thisModel->getMetaModel() ;
+	}
 	specModel *otherModel = ((specMetaModel*) thisModel)->getDataModel() ;
 	foreach(specGenealogy* genealogy, items)
 		genealogy->setModel(sameModel(genealogy) ? thisModel : otherModel) ;

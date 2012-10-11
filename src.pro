@@ -106,7 +106,8 @@ SOURCES += main.cpp \
     actionlib/actions/specconductfitaction.cpp \
     actionlib/actions/specremovefitaction.cpp \
     actionlib/commands/spectogglefitstylecommand.cpp \
-    actionlib/actions/spectogglefitstyleaction.cpp
+    actionlib/actions/spectogglefitstyleaction.cpp \
+    actionlib/speccommandgenerator.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -214,7 +215,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/specconductfitaction.h \
     actionlib/actions/specremovefitaction.h \
     actionlib/commands/spectogglefitstylecommand.h \
-    actionlib/actions/spectogglefitstyleaction.h
+    actionlib/actions/spectogglefitstyleaction.h \
+    actionlib/speccommandgenerator.h
 
 INCLUDEPATH += kinetic \
 	log \
