@@ -3,6 +3,7 @@
 
 #include "specundocommand.h"
 #include "names.h"
+#include "speccommandgenerator.h"
 
 
 class specMultiCommand : public specUndoCommand
@@ -14,7 +15,9 @@ private:
 	void writeCommand(QDataStream &out) const;
 	void readCommand(QDataStream &in) ;
 	type typeId() const { return specStreamable::multiCommandId ; }
-//	void parentAssigned();
+	void parentAssigned();
+	specStreamable* factory(const type& t) const ;
+	specCommandGenerator commandGenerator ;
 public:
 	explicit specMultiCommand(specUndoCommand* parent = 0);
 	void setMergeable(bool mergeable = true) ;

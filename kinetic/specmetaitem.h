@@ -23,6 +23,7 @@ private:
 	specModel* metaModel, *dataModel ;
 	QVector<QPair<specGenealogy,qint8> > oldConnections ;
 	specFitCurve *fitCurve ;
+	bool styleFitCurve ;
 	bool fitCurveDescriptor(const QString&) const ;
 public:
 	void refreshOtherPlots() ;
@@ -52,6 +53,22 @@ public:
 	specFitCurve *setFitCurve(specFitCurve*) ;
 	specFitCurve *getFitCurve() const ;
 	void conductFit() ;
+	void toggleFitStyle() ;
+	bool getFitStyleState() const ;
+
+	void setLineWidth(const double&) ;
+	double lineWidth() const;
+	QColor penColor() const;
+	void setPenColor(const QColor&) ;
+	int symbolStyle() const ;
+	void setSymbolStyle(const int&) ;
+	QColor symbolPenColor() const ;
+	void setSymbolPenColor(const QColor&) ;
+	void setSymbolBrushColor(const QColor&) ;
+	QColor symbolBrushColor() const ;
+	QSize symbolSize() const;
+	void setSymbolSize(int w, int h = -1) ;
+	void setSymbolSize(const QSize&) ;
 };
 
 /* TODO in other classes

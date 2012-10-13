@@ -52,6 +52,7 @@ private:
 	type typeId() const { return specStreamable::model ; }
 	QList<specMimeConverter*> mimeConverters() const ;
 	specMetaModel* metaModel ;
+	void checkForNewDescriptors(const QList<specModelItem*>& list, const QModelIndex& parent) ;
 public:
 	specModel(QObject *par = 0) ;
 	~specModel() ;

@@ -15,6 +15,7 @@ class specActionLibrary ;
 #include "specview.h"
 #include <typeinfo>
 #include "specplot.h"
+#include "speccommandgenerator.h"
 
 class specView ;
 class specModel ;
@@ -35,11 +36,11 @@ public:
 	int moveInternally(const QModelIndex&, int row, specView*) ;
 	void addPlot(specPlot*) ;
 
-	static specUndoCommand* commandById(int id, specUndoCommand* parent = 0) ;
 	QAction* undoAction(QObject*) ;
 	QAction* redoAction(QObject*) ;
 	void purgeUndo() ;
 	QUndoView* undoView() ;
+	specCommandGenerator commandGenerator ;
 public slots:
 	void push(specUndoCommand*) ;
 signals:

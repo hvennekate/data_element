@@ -6,14 +6,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>623</width>
-    <height>331</height>
+    <width>487</width>
+    <height>284</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Connected Items</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_3">
    <item>
     <widget class="QLabel" name="label">
      <property name="text">
@@ -22,9 +22,9 @@
     </widget>
    </item>
    <item>
-    <widget class="specSplitter" name="splitter">
+    <widget class="QSplitter" name="splitter">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+      <sizepolicy hsizetype="Expanding" vsizetype="MinimumExpanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -33,11 +33,33 @@
       <enum>Qt::Horizontal</enum>
      </property>
      <widget class="QListWidget" name="connectedItemsList">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="MinimumExpanding" vsizetype="MinimumExpanding">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
       <property name="selectionMode">
        <enum>QAbstractItemView::ContiguousSelection</enum>
       </property>
      </widget>
-     <widget class="QwtPlot" name="itemPreview"/>
+     <widget class="QWidget" name="layoutWidget">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QwtPlot" name="itemPreview"/>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="styleFit">
+         <property name="enabled">
+          <bool>true</bool>
+         </property>
+         <property name="text">
+          <string>Styling operations apply to fit</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
     </widget>
    </item>
    <item>
@@ -85,12 +107,6 @@
    <class>QwtPlot</class>
    <extends>QFrame</extends>
    <header>qwt_plot.h</header>
-  </customwidget>
-  <customwidget>
-   <class>specSplitter</class>
-   <extends>QSplitter</extends>
-   <header>specsplitter.h</header>
-   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>

@@ -40,19 +40,19 @@ public:
 	int rtti() const { return spec::canvasItem ; }
 	virtual void highlight(bool highlight) ;
 
-	void setLineWidth(const double&) ;
-	double lineWidth() const;
-	QColor penColor() const;
-	void setPenColor(const QColor&) ;
-	int symbolStyle() const ;
-	void setSymbolStyle(const int&) ;
-	QColor symbolPenColor() const ;
-	void setSymbolPenColor(const QColor&) ;
-	void setSymbolBrushColor(const QColor&) ;
-	QColor symbolBrushColor() const ;
-	QSize symbolSize() const;
-	void setSymbolSize(int w, int h = -1) ;
-	void setSymbolSize(const QSize&) ;
+	virtual void setLineWidth(const double&) ;
+	virtual double lineWidth() const;
+	virtual QColor penColor() const;
+	virtual void setPenColor(const QColor&) ;
+	virtual int symbolStyle() const ;
+	virtual void setSymbolStyle(const int&) ;
+	virtual QColor symbolPenColor() const ;
+	virtual void setSymbolPenColor(const QColor&) ;
+	virtual void setSymbolBrushColor(const QColor&) ;
+	virtual QColor symbolBrushColor() const ;
+	virtual QSize symbolSize() const;
+	virtual void setSymbolSize(int w, int h = -1) ;
+	virtual void setSymbolSize(const QSize&) ;
 };
 
 #endif

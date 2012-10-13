@@ -32,6 +32,7 @@ public:
 	specFolderItem* parent() ;
 	QVector<specModelItem*> items() ;
 	specModelItem* firstItem() ;
+	QModelIndex firstIndex() ;
 
 	bool operator==(const specGenealogy& other) ;
 	bool operator!=(const specGenealogy& other) ;

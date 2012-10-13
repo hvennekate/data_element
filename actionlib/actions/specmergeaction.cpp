@@ -22,6 +22,7 @@ specMergeAction::specMergeAction(QObject *parent)
 	setIcon(QIcon(":/merge.png")) ;
 	setToolTip(tr("Merge items")) ;
 	setWhatsThis(tr("Merge selected data items.  You may define criteria and processing options for merging."));
+	setText(tr("Merge items...")) ;
 }
 
 void specMergeAction::execute()
@@ -121,7 +122,7 @@ void specMergeAction::execute()
 	qDebug() << "arranged items:" << profiler.restart() ;
 
 	specMultiCommand *command = new specMultiCommand ;
-	command->setParentObject(view) ;
+	command->setParentObject(view->model()) ;
 	command->setMergeable(false) ;
 
 	// preparing insertion command

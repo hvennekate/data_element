@@ -68,3 +68,8 @@ bool specMetaRangeCommand::mergeable(const specUndoCommand *other)
 {
 	return *(((specMetaRangeCommand*) other)->item) == *item ;
 }
+
+void specMetaRangeCommand::parentAssigned()
+{
+	if (item) item->setModel(qobject_cast<specModel*>(parentObject()));
+}

@@ -17,6 +17,7 @@ specAverageDataAction::specAverageDataAction(QObject *parent) :
 	setIcon(QIcon(":/ave.png")) ;
 	setToolTip(tr("Average Data")) ;
 	setWhatsThis(tr("Smooth data by averaging.  You can choose between plainly averaging any number of data points or calculating a moving average."));
+	setText(tr("Average data...")) ;
 }
 
 specUndoCommand* specAverageDataAction::generateUndoCommand()
@@ -50,7 +51,7 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 	QModelIndexList indexes = view->getSelection() ;
 	int numAverages = number->value() ;
 	specMultiCommand *groupCommand = new specMultiCommand ;
-	groupCommand->setParentObject(view) ;
+	groupCommand->setParentObject(view->model()) ;
 	groupCommand->setMergeable(false) ; // TODO consider dataExchange command (also to avoid frequent replots)
 //	library->push(groupCommand);
 	foreach(QModelIndex index, indexes)

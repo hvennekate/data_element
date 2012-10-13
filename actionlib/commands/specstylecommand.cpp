@@ -12,12 +12,7 @@ specStyleCommandImplTemplate
 void specStyleCommandImplFuncTemplate::setItems(QModelIndexList items)
 {
 
-	//	for (int i = 0 ; i < items.size() ; ++i)
-	//		if (!dynamic_cast<specCanvasItem*>(model->itemPointer(items[i])))
-	//			items.takeAt(i--) ;
-
-	specView *view = (specView*) parentObject() ;
-	specModel *model = view->model() ;
+	specModel *model = qobject_cast<specModel*>(parentObject()) ;
 
 	QMap<int, QModelIndexList > groups ;
 	for (int i = 0 ; i < items.size() ; ++i)
@@ -41,27 +36,15 @@ void specStyleCommandImplFuncTemplate::setItems(QModelIndexList items)
 specStyleCommandImplTemplate
 void specStyleCommandImplFuncTemplate::doIt()
 {
-//	specPlot *plot = 0 ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
-	{
-//		for (int j = 0 ; j < Genealogies[i].items().size() ; ++ j)
-//			if (Genealogies[i].items()[j]->plot())
-//				plot = (specPlot*) Genealogies[i].items()[j]->plot() ;
 		applyStyle(Genealogies[i],-1) ;
-	}
 }
 
 specStyleCommandImplTemplate
 void specStyleCommandImplFuncTemplate::undoIt()
 {
-//	specPlot *plot = 0 ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
-	{
-//		for (int j = 0 ; j < Genealogies[i].items().size() ; ++ j)
-//			if (Genealogies[i].items()[j]->plot())
-//				plot = (specPlot*) Genealogies[i].items()[j]->plot() ;
 		applyStyle(Genealogies[i],i) ;
-	}
 }
 
 specStyleCommandImplTemplate
@@ -75,7 +58,6 @@ void specStyleCommandImplFuncTemplate::writeCommand(QDataStream &out) const
 specStyleCommandImplTemplate
 void specStyleCommandImplFuncTemplate::readCommand(QDataStream &in)
 {
-//	clear() ;  TODO: where is this function?
 	quint32 size ;
 	in >> size >> newProperty >> oldProperties ;
 	for (quint32 i = 0 ; i < size ; ++i)
@@ -88,16 +70,18 @@ void specStyleCommandImplFuncTemplate::readCommand(QDataStream &in)
 specStyleCommandImplTemplate
 void specStyleCommandImplFuncTemplate::parentAssigned()
 {
-	if (!parentObject()) return ;
-	specModel *model = (specModel*) (((QAbstractItemView*) parentObject())->model()) ;
-	foreach(specGenealogy genealogy, Genealogies)
-		genealogy.setModel(model) ;
+	specModel *model = qobject_cast<specModel*>(parentObject()) ;
+	qDebug() << "assigning parent to style genealogy" << model ;
+	for (QList<specGenealogy>::iterator i = Genealogies.begin() ; i != Genealogies.end() ; ++i)
+		i->setModel(model) ;
 }
 
 specStyleCommandImplTemplate
 void specStyleCommandImplFuncTemplate::applyStyle(specGenealogy &genealogy, int propertyIndex)
 {
 	property prop = (propertyIndex < 0 || !(propertyIndex < oldProperties.size())) ? newProperty : oldProperties[propertyIndex] ;
+	genealogy.seekParent() ;
+	if (!genealogy.valid()) return ;
 	QVector<specModelItem*> items = genealogy.items() ;
 	for (int j = 0 ; j < items.size() ; ++j)
 		(items[j]->*setProperty)(prop) ;

@@ -14,14 +14,21 @@ specMetaItem::specMetaItem(specFolderItem *par, QString description)
 	  currentlyConnectingServer(0),
 	  metaModel(0),
 	  dataModel(0),
-	  fitCurve(0)
+	  fitCurve(0),
+	  styleFitCurve(false)
 {
 	filter = new specMetaParser("","","",this) ;
 	invalidate() ;
+	variables["x"] = specDescriptor("", spec::editable) ;
+	variables["y"] = specDescriptor("", spec::editable) ;
+	variables["variables"] = specDescriptor("", spec::editable) ;
+	variables["errors"] = specDescriptor("No data") ;
 }
 
 specMetaItem::~specMetaItem()
 {
+	foreach(specModelItem* item, items)
+		disconnectServer(item) ;
 	delete filter ;
 	delete fitCurve ;
 }
@@ -44,8 +51,11 @@ void specMetaItem::setModels(specModel *m, specModel *d)
 
 void specMetaItem::writeToStream(QDataStream &out) const
 {
+	bool stylingWasToFit = styleFitCurve ;
+	const_cast<bool&>(styleFitCurve) = false ; // TODO this is ugly
 	specModelItem::writeToStream(out) ;
-	out << variables ;
+	const_cast<bool&>(styleFitCurve) = stylingWasToFit ;
+	out << ((quint8) styleFitCurve) << variables ;
 	if (!metaModel || !dataModel) return ;
 	QVector<QPair<specGenealogy,qint8> > currentConnections ;
 	QModelIndexList indexes ;
@@ -55,13 +65,28 @@ void specMetaItem::writeToStream(QDataStream &out) const
 	while (!indexes.isEmpty())
 		currentConnections << qMakePair<specGenealogy,qint8>(specGenealogy(indexes), indexes.first().model() == metaModel) ;
 	out << currentConnections ;
+	out << (quint8 ((bool) fitCurve)) ;
+	if (fitCurve) out << *fitCurve ;
 }
 
 void specMetaItem::readFromStream(QDataStream &in)
 {
+	delete fitCurve ;
+	styleFitCurve = false ;
 	specModelItem::readFromStream(in) ;
-	in >> variables >> oldConnections;
+	quint8 stylingWasToFit ;
+	in >> stylingWasToFit >> variables >> oldConnections;
+	styleFitCurve = stylingWasToFit ;
 	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
+	quint8 hasFitCurve ;
+	in >> hasFitCurve ;
+	if (hasFitCurve)
+	{
+		fitCurve = new specFitCurve ;
+		in >> *fitCurve ;
+	}
+	else
+		fitCurve = 0 ;
 	invalidate() ; // TODO maybe insert in data item or just model item.
 }
 
@@ -124,12 +149,13 @@ void specMetaItem::refreshOtherPlots()
 	else
 		filter->detachRanges();
 	foreach(QwtPlot *otherPlot, otherPlots)
-		otherPlot->replot();
+		otherPlot->replot(); // TODO leads to crashes
 }
 
 void specMetaItem::attach(QwtPlot *plot)
 {
 	specModelItem::attach(plot) ;
+	if (fitCurve) fitCurve->attach(plot) ;
 	refreshOtherPlots() ;
 }
 
@@ -151,8 +177,7 @@ void specMetaItem::refreshPlotData()
 
 QStringList specMetaItem::descriptorKeys() const
 {
-	QStringList keys = specModelItem::descriptorKeys() ;
-	keys << "variables" << "x" << "y" << "errors" ;
+	QStringList keys = specModelItem::descriptorKeys() << "variables" << "x" << "y" << "errors" ; // TODO change to get from variables
 	if (fitCurve) keys << fitCurve->descriptorKeys() ;
 	return keys ;
 }
@@ -170,7 +195,7 @@ bool specMetaItem::changeDescriptor(QString key, QString value)
 	if (key == "") return specModelItem::changeDescriptor(key,value) ;
 	if (fitCurveDescriptor(key))
 		return fitCurve->changeDescriptor(key,value) ;
-	if (!descriptorKeys().contains(key)) return false ;
+	if (!variables.contains(key)) return false ;
 	variables[key] = value ;
 	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ; // TODO put in function (see above)
 	invalidate();
@@ -180,13 +205,15 @@ bool specMetaItem::changeDescriptor(QString key, QString value)
 spec::descriptorFlags specMetaItem::descriptorProperties(const QString &key) const
 {
 	if (key == "") return specModelItem::descriptorProperties(key) ;
+	if (variables.contains(key))
+		return variables[key].flags() ;
 	if (fitCurveDescriptor(key)) return spec::editable ;
-	return (key == "errors" ? spec::def : spec::editable) ;
+	return spec::def ;
 }
 
 QIcon specMetaItem::decoration() const
 {
-	if (!filter->ok())
+	if (!variables["errors"].content(true).isEmpty())
 		return QIcon::fromTheme("dialog-warning") ;
 
 	return QIcon(":/kinetic.png") ;
@@ -247,4 +274,38 @@ void specMetaItem::conductFit()
 	if (!fitCurve) return ;
 	revalidate() ;
 	fitCurve->refit(data()) ;
+}
+
+bool specMetaItem::getFitStyleState() const
+{
+	return styleFitCurve ;
+}
+
+void specMetaItem::toggleFitStyle()
+{
+	styleFitCurve = !styleFitCurve ;
+}
+
+#define STYLEROUTINGFUNCTION(TYPE,GETNAME,SETNAME) \
+	void specMetaItem::SETNAME(const TYPE& arg) { \
+		if (styleFitCurve && fitCurve) fitCurve->SETNAME(arg) ; \
+		else specModelItem::SETNAME(arg) ; } \
+	\
+	TYPE specMetaItem::GETNAME() const { \
+		if (styleFitCurve && fitCurve) return fitCurve->GETNAME() ; \
+		else return specModelItem::GETNAME() ; }
+
+STYLEROUTINGFUNCTION(double, lineWidth,   setLineWidth)
+STYLEROUTINGFUNCTION(QColor, penColor,    setPenColor)
+STYLEROUTINGFUNCTION(int,    symbolStyle, setSymbolStyle)
+STYLEROUTINGFUNCTION(QColor, symbolPenColor, setSymbolPenColor)
+STYLEROUTINGFUNCTION(QColor, symbolBrushColor, setSymbolBrushColor)
+STYLEROUTINGFUNCTION(QSize, symbolSize, setSymbolSize)
+
+void specMetaItem::setSymbolSize(int w, int h)
+{
+	if (styleFitCurve && fitCurve)
+		fitCurve->setSymbolSize(w,h) ;
+	else
+		specCanvasItem::setSymbolSize(w,h) ;
 }

@@ -6,6 +6,7 @@ specItemPropertiesAction::specItemPropertiesAction(QObject *parent) :
 	setIcon(QIcon::fromTheme("document-properties")) ;
 	setToolTip(tr("Edit item properties")) ;
 	setWhatsThis(tr("Displays an item-specific dialog to let you edit the current item's properties")) ;
+	setText(tr("Item properties...")) ;
 }
 
 specUndoCommand* specItemPropertiesAction::generateUndoCommand()

@@ -10,6 +10,7 @@ specNewMetaItemAction::specNewMetaItemAction(QObject *parent) :
 	this->setIcon(QIcon::fromTheme("document-new")) ;
 	setToolTip(tr("New item"));
 	setWhatsThis(tr("Create a new item in this dock window's list."));
+	setText(tr("New meta item")) ;
 }
 
 const std::type_info &specNewMetaItemAction::possibleParent()

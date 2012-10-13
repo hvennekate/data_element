@@ -96,3 +96,8 @@ QString specPlotMoveCommand::description() const
 {
 	return QString() ;
 }
+
+void specPlotMoveCommand::parentAssigned()
+{
+	if (items) items->setModel(qobject_cast<specModel*>(parentObject()));
+}

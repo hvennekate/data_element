@@ -11,6 +11,7 @@ specImportSpecAction::specImportSpecAction(QObject *parent) :
 	setIcon(QIcon(":/fileimport.png"));
 	setToolTip(tr("Import files")) ;
 	setWhatsThis(tr("Import files.  Use this button to get started."));
+	setText(tr("Import file...")) ;
 }
 
 specUndoCommand *specImportSpecAction::generateUndoCommand()

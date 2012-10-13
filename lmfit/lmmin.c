@@ -22,7 +22,6 @@
  * free to do whatever you want with this stuff. If we meet some day,
  * and you think this work is worth it, you can buy me a beer in return.
  */
- 
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -103,7 +102,7 @@ const char *lm_shortmsg[] = {
 
 void lm_printout_std( int n_par, const double *par, int m_dat,
                       const void *data, const double *fvec,
-                      int printflags, int iflag, int iter, int nfev)
+		      int printflags, int iflag, int iter, int nfev)
 /*
  *       data  : for soft control of printout behaviour, add control
  *                 variables to the data struct
@@ -120,30 +119,30 @@ void lm_printout_std( int n_par, const double *par, int m_dat,
     if( printflags & 1 ){
         /* location of printout call within lmdif */
         if (iflag == 2) {
-            printf("trying step in gradient direction  ");
+	    printf("trying step in gradient direction  ");
         } else if (iflag == 1) {
-            printf("determining gradient (iteration %2d)", iter);
+	    printf("determining gradient (iteration %2d)", iter);
         } else if (iflag == 0) {
-            printf("starting minimization              ");
+	    printf("starting minimization              ");
         } else if (iflag == -1) {
-            printf("terminated after %3d evaluations   ", nfev);
+	    printf("terminated after %3d evaluations   ", nfev);
         }
     }
 
     if( printflags & 2 ){
-        printf("  par: ");
+	printf("  par: ");
         for (i = 0; i < n_par; ++i)
-            printf(" %18.11g", par[i]);
-        printf(" => norm: %18.11g", lm_enorm(m_dat, fvec));
+	    printf(" %18.11g", par[i]);
+	printf(" => norm: %18.11g", lm_enorm(m_dat, fvec));
     }
 
     if( printflags & 3 )
-        printf( "\n" );
+	printf( "\n" );
 
     if ( (printflags & 8) || ((printflags & 4) && iflag == -1) ) {
-        printf("  residuals:\n");
+	printf("  residuals:\n");
         for (i = 0; i < m_dat; ++i)
-            printf("    fvec[%2d]=%12g\n", i, fvec[i] );
+	    printf("    fvec[%2d]=%12g\n", i, fvec[i] );
     }
 }
 
@@ -158,7 +157,7 @@ void lmmin( int n_par, double *par, int m_dat, const void *data,
             const lm_control_struct *control, lm_status_struct *status,
             void (*printout) (int n_par, const double *par, int m_dat,
                               const void *data, const double *fvec,
-                              int printflags, int iflag, int iter, int nfev) )
+			      int printflags, int iflag, int iter, int nfev) )
 {
 
 /*** allocate work space. ***/
@@ -196,11 +195,11 @@ void lmmin( int n_par, double *par, int m_dat, const void *data,
               ( control->scale_diag ? 1 : 2 ),
               control->stepbound, &(status->info),
               &(status->nfev), fjac, ipvt, qtf, wa1, wa2, wa3, wa4,
-              evaluate, printout, control->printflags, data );
+	      evaluate, printout, control->printflags, data );
 
     if ( printout )
         (*printout)( n, par, m, data, fvec,
-                     control->printflags, -1, 0, status->nfev );
+		     control->printflags, -1, 0, status->nfev );
     status->fnorm = lm_enorm(m, fvec);
     if ( status->info < 0 )
         status->info = 11;
@@ -245,8 +244,8 @@ void lm_lmdif( int m, int n, double *x, double *fvec, double ftol,
                                  double *fvec, int *info),
                void (*printout) (int n_par, const double *par, int m_dat,
                                  const void *data, const double *fvec,
-                                 int printflags, int iflag, int iter, int nfev),
-               int printflags, const void *data )
+				 int printflags, int iflag, int iter, int nfev),
+	       int printflags, const void *data )
 {
 /*
  *   The purpose of lmdif is to minimize the sum of the squares of
@@ -438,7 +437,7 @@ void lm_lmdif( int m, int n, double *x, double *fvec, double ftol,
     (*evaluate) (x, m, data, fvec, info);
     ++(*nfev);
     if( printout )
-        (*printout) (n, x, m, data, fvec, printflags, 0, 0, *nfev);
+	(*printout) (n, x, m, data, fvec, printflags, 0, 0, *nfev);
     if (*info < 0)
         return;
     fnorm = lm_enorm(m, fvec);
@@ -451,7 +450,7 @@ void lm_lmdif( int m, int n, double *x, double *fvec, double ftol,
 
     do {
 #ifdef LMFIT_DEBUG_MESSAGES
-        printf("lmdif/ outer loop iter=%d nfev=%d fnorm=%.10e\n",
+	printf("lmdif/ outer loop iter=%d nfev=%d fnorm=%.10e\n",
                iter, *nfev, fnorm);
 #endif
 
@@ -465,7 +464,7 @@ void lm_lmdif( int m, int n, double *x, double *fvec, double ftol,
             (*evaluate) (x, m, data, wa4, info);
             ++(*nfev);
             if( printout )
-                (*printout) (n, x, m, data, wa4, printflags, 1, iter, *nfev);
+		(*printout) (n, x, m, data, wa4, printflags, 1, iter, *nfev);
             if (*info < 0)
                 return; /* user requested break */
             for (i = 0; i < m; i++)
@@ -476,8 +475,8 @@ void lm_lmdif( int m, int n, double *x, double *fvec, double ftol,
         /* print the entire matrix */
         for (i = 0; i < m; i++) {
             for (j = 0; j < n; j++)
-                printf("%.5e ", fjac[j*m+i]);
-            printf("\n");
+		printf("%.5e ", fjac[j*m+i]);
+	    printf("\n");
         }
 #endif
 
@@ -550,7 +549,7 @@ void lm_lmdif( int m, int n, double *x, double *fvec, double ftol,
 /*** the inner loop. ***/
         do {
 #ifdef LMFIT_DEBUG_MESSAGES
-            printf("lmdif/ inner loop iter=%d nfev=%d\n", iter, *nfev);
+	    printf("lmdif/ inner loop iter=%d nfev=%d\n", iter, *nfev);
 #endif
 
 /*** inner: determine the levenberg-marquardt parameter. ***/
@@ -575,13 +574,13 @@ void lm_lmdif( int m, int n, double *x, double *fvec, double ftol,
             (*evaluate) (wa2, m, data, wa4, info);
             ++(*nfev);
             if( printout )
-                (*printout) (n, wa2, m, data, wa4, printflags, 2, iter, *nfev);
+		(*printout) (n, wa2, m, data, wa4, printflags, 2, iter, *nfev);
             if (*info < 0)
                 return; /* user requested break. */
 
             fnorm1 = lm_enorm(m, wa4);
 #ifdef LMFIT_DEBUG_MESSAGES
-            printf("lmdif/ pnorm %.10e  fnorm1 %.10e  fnorm %.10e"
+	    printf("lmdif/ pnorm %.10e  fnorm1 %.10e  fnorm %.10e"
                    " delta=%.10e par=%.10e\n",
                    pnorm, fnorm1, fnorm, delta, par);
 #endif
@@ -610,7 +609,7 @@ void lm_lmdif( int m, int n, double *x, double *fvec, double ftol,
 
             ratio = prered != 0 ? actred / prered : 0;
 #ifdef LMFIT_DEBUG_MESSAGES
-            printf("lmdif/ actred=%.10e prered=%.10e ratio=%.10e"
+	    printf("lmdif/ actred=%.10e prered=%.10e ratio=%.10e"
                    " sq(1)=%.10e sq(2)=%.10e dd=%.10e\n",
                    actred, prered, prered != 0 ? ratio : 0.,
                    SQR(temp1), SQR(temp2), dirder);
@@ -648,7 +647,7 @@ void lm_lmdif( int m, int n, double *x, double *fvec, double ftol,
             }
 #ifdef LMFIT_DEBUG_MESSAGES
             else {
-                printf("ATTN: iteration considered unsuccessful\n");
+		printf("ATTN: iteration considered unsuccessful\n");
             }
 #endif
 
@@ -821,7 +820,7 @@ void lm_lmpar(int n, double *r, int ldr, int *ipvt, double *diag,
     fp = dxnorm - delta;
     if (fp <= p1 * delta) {
 #ifdef LMFIT_DEBUG_MESSAGES
-        printf("lmpar/ terminate (fp<p1*delta)\n");
+	printf("lmpar/ terminate (fp<p1*delta)\n");
 #endif
         *par = 0;
         return;

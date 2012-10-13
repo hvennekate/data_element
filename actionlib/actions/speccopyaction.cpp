@@ -9,6 +9,7 @@ specCopyAction::specCopyAction(QObject *parent) :
 	this->setIcon(QIcon::fromTheme("edit-copy")) ;
 	setToolTip(tr("Copy selected items")) ;
 	setWhatsThis(tr("Copy items to clipboard.  May be pasted in this program or in any other that understands plain text.")) ;
+	setText(tr("Copy")) ;
 }
 
 specUndoCommand* specCopyAction::generateUndoCommand()

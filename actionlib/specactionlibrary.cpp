@@ -1,16 +1,12 @@
 #include "specactionlibrary.h"
 #include "specdeleteaction.h"
 #include "specaddfolderaction.h"
-#include "specaddfoldercommand.h"
-#include "specdeletecommand.h"
 #include "specmovecommand.h"
 #include "speccopyaction.h"
 #include "specpasteaction.h"
 #include "speccutaction.h"
-#include "specplotmovecommand.h"
 #include "changeplotstyleaction.h"
 #include "spectreeaction.h"
-#include "specmulticommand.h"
 #include "specmergeaction.h"
 #include "specremovedataaction.h"
 #include "specaveragedataaction.h"
@@ -22,21 +18,17 @@
 #include "specimportspecaction.h"
 #include "names.h"
 #include "speclabelaction.h"
-#include "specexchangedatacommand.h"
-#include "specresizesvgcommand.h"
-#include "specaddconnectionscommand.h"
-#include "specdeleteconnectionscommand.h"
-#include "speceditdescriptorcommand.h"
-#include "specmetarangecommand.h"
-#include "specplotlabelcommand.h"
 #include <QUndoView>
 #include "utility-functions.h"
 #include "genericexportaction.h"
 #include "specitempropertiesaction.h"
 #include <QClipboard>
 #include <QApplication>
-#include "specexchangefitcurvecommand.h"
 #include "specaddfitaction.h"
+#include "specconductfitaction.h"
+#include "specremovefitaction.h"
+#include "spectogglefitstyleaction.h"
+#include "specmetaitem.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -189,50 +181,6 @@ void specActionLibrary::writeToStream(QDataStream &out) const
 	}
 }
 
-specUndoCommand *specActionLibrary::commandById(int id, specUndoCommand* parent)
-{
-	switch(id)
-	{
-	case specStreamable::exchangeFitCommand:
-		return new specExchangeFitCurveCommand(parent) ;
-	case specStreamable::deleteCommandId :
-		return new specDeleteCommand(parent) ;
-	case specStreamable::newFolderCommandId :
-		return new specAddFolderCommand(parent) ;
-	case specStreamable::moveItemsCommandId :
-		return new specMoveCommand(parent) ;
-	case specStreamable::movePlotCommandId :
-		return new specPlotMoveCommand(parent) ;
-	case specStreamable::multiCommandId :
-		return new specMultiCommand(parent) ;
-	case specStreamable::exchangeDataCommandId:
-		return new specExchangeDataCommand(parent) ;
-	case specStreamable::resizeSVGCommandId :
-		return new specResizeSVGcommand(parent) ;
-	case specStreamable::newConnectionsCommandId :
-		return new specAddConnectionsCommand(parent) ;
-	case specStreamable::deleteConnectionsCommandId :
-		return new specDeleteConnectionsCommand(parent) ;
-	case specStreamable::editDescriptorCommandId :
-		return new specEditDescriptorCommand(parent) ;
-	case specStreamable::penColorCommandId:
-	case specStreamable::lineWidthCommandId:
-	case specStreamable::symbolStyleCommandId:
-	case specStreamable::symbolPenColorCommandId:
-	case specStreamable::symbolSizeCommandId:
-	case specStreamable::symbolBrushColorCommandId:
-		return generateStyleCommand(id,parent) ;
-	case specStreamable::metaRangeCommand :
-		return new specMetaRangeCommand(parent) ;
-	case specStreamable::plotTitleCommandId:
-	case specStreamable::plotYLabelCommandId:
-	case specStreamable::plotXLabelCommandId:
-		generatePlotLabelCommand(id,parent) ;
-	default:
-		return 0 ;
-	}
-}
-
 void specActionLibrary::readFromStream(QDataStream &in)
 {
 	qint32 num, position ;
@@ -244,7 +192,12 @@ void specActionLibrary::readFromStream(QDataStream &in)
 	for (int i = 0 ; i < num ; ++i)
 	{
 		in >> t >> parentIndex[i] ;
-		specUndoCommand *command = commandById(t) ;
+		specUndoCommand *command = commandGenerator.commandById(t) ;
+		if (!command)
+		{
+			undoStack->clear();
+			continue ;
+		}
 		in >> *command ;
 		undoStack->push(command) ;
 	}
@@ -288,10 +241,17 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
 	if (metaView && metaView->model())
 	{
 		specModelItem *currentItem = view->model()->itemPointer(metaView->currentIndex()) ;
-		if (dynamic_cast<specMetaItem*>(currentItem))
+		if (specMetaItem* mi = dynamic_cast<specMetaItem*>(currentItem))
 		{
 			addNewAction(cMenu, new specAddConnectionsAction(w)) ;
-			addNewAction(cMenu, new specAddFitAction(w)) ;
+			if (mi->getFitCurve())
+			{
+				addNewAction(cMenu, new specRemoveFitAction(w)) ;
+				addNewAction(cMenu, new specConductFitAction(w)) ;
+				addNewAction(cMenu, new specToggleFitStyleAction(w)) ;
+			}
+			else
+				addNewAction(cMenu, new specAddFitAction(w)) ;
 		}
 	}
 	if (view && view->model())

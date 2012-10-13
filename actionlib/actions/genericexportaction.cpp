@@ -6,6 +6,7 @@ genericExportAction::genericExportAction(QObject *parent) :
 	setIcon(QIcon(":/export.png")) ;
 	setToolTip(tr("Export to ASCII")) ;
 	setWhatsThis(tr("Export selected items to ASCII file.")) ;
+	setText(tr("Export ASCII..."));
 }
 
 specUndoCommand* genericExportAction::generateUndoCommand()

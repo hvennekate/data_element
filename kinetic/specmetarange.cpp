@@ -18,7 +18,7 @@ specMetaRange::addressObject specMetaRange::address()
 void specMetaRange::attach(QwtPlot *newPlot)
 {
 	if (newPlot == plot()) return ;
-	specPlot *sp = qobject_cast<specPlot*>(newPlot) ;
+	specPlot *sp = qobject_cast<specPlot*>(newPlot) ; // TODO this seems to cause crashes
 	specPlot *oldPlot = qobject_cast<specPlot*>(plot()) ;
 	if (oldPlot && oldPlot->metaPicker())
 		oldPlot->metaPicker()->removeSelectable(this) ;

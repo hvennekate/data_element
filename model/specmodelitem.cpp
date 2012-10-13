@@ -25,6 +25,9 @@ specModelItem::specModelItem(specFolderItem* par, QString desc)
 
 specModelItem::~specModelItem()
 {
+	detach();
+	foreach (specMetaItem* client, clients)
+		disconnectClient(client) ;
 	setParent(0) ;
 }
 		
@@ -43,7 +46,7 @@ void specModelItem::detachChild(specModelItem* child) // TODO review and maybe f
 {
 	child->detach();
 	for (int i = 0 ; i < child->children() ; ++i)
-		detachChild	(((specFolderItem*) child)->child(i)) ;
+		detachChild(((specFolderItem*) child)->child(i)) ;
 }
 
 specFolderItem* specModelItem::parent() const

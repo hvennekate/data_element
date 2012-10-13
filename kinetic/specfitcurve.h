@@ -17,6 +17,7 @@ private:
 		double *x ;
 		QVector<QPointF> samples ;
 	public:
+		QString errorString ;
 		fitData(mu::Parser* p = 0) ;
 		~fitData() ;
 		QRectF boundingRect() const ;
@@ -32,8 +33,6 @@ private:
 	QStringList fitParameters ;
 	specDescriptor expression ;
 	mu::Parser *parser ;
-	qint16 maxSteps ;
-	qreal threshold ;
 	QString errorString ;
 	double coerce(double val, double min, double max) ;
 	static bool acceptableVariable(const QString&) ;
@@ -54,8 +53,8 @@ public:
 	int activeLine(const QString& key) const ;
 	void refreshPlotData();
 	void refit(QwtSeriesData<QPointF>* data) ;
-	QString errors() ;
 	int rtti() const { return specStreamable::fitCurve ; }
+	void attach(QwtPlot *plot) ;
 };
 
 // from lmcurve.c:
@@ -63,6 +62,7 @@ typedef struct {
     double *x;
     const double *y;
     mu::Parser *parser ;
+    QList<std::string>* variableNames ;
 } lmcurve_data_struct;
 
 void evaluateParser(const double *parameters, int count, const void *data, double *fitResults, int *info) ;

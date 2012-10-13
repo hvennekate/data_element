@@ -145,7 +145,7 @@ void specGenealogy::setModel(specModel *model)
 
 void specGenealogy::getItemPointers()
 {
-	for (int i = 0 ; i < Items.size() ; ++i)
+	for (int i = 0 ; i < Items.size() ; ++i) // TODO maybe precautions...
 		Items[i] = Parent->child(i+indexes.first()) ;
 }
 
@@ -172,6 +172,11 @@ specModelItem* specGenealogy::firstItem()
 	if (!valid()) return 0 ;
 	if (Items.isEmpty()) return 0 ;
 	return Items.first() ;
+}
+
+QModelIndex specGenealogy::firstIndex()
+{
+	return model()->index(firstItem()) ;
 }
 
 bool specGenealogy::operator ==(const specGenealogy& other)

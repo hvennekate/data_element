@@ -24,6 +24,7 @@ QRectF specFitCurve::fitData::boundingRect() const
 void specFitCurve::fitData::setRectOfInterest(const QRectF &r)
 {
 	d_boundingRect = r ;
+	reevaluate() ;
 }
 
 size_t specFitCurve::fitData::size() const
@@ -47,32 +48,38 @@ void specFitCurve::fitData::reevaluate()
 		y[i] = NAN ;
 		xc += step ;
 	}
-	if (!parser) return ;
-	try
+	if (parser)
 	{
-		parser->Eval(y, samples.size()) ;
+		try
+		{
+				parser->Eval(y, samples.size()) ;
+		}
+		catch(mu::Parser::exception_type &p)
+		{
+			errorString = QString("Evaluation of fit expression \"%1\" failed\nReason: %2").arg(parser->GetExpr().c_str()).arg(p.GetMsg().c_str()) ;
+			for (int i = 0 ; i < samples.size() ; ++i)
+				samples[i] = QPointF(NAN,NAN) ;
+			delete[] y ;
+			return ;
+		}
 	}
-	catch(...)
-	{}
 	for (int i = 0 ; i < samples.size() ; ++i)
 		samples[i] = QPointF(x[i],y[i]) ;
+	delete[] y ;
 }
 
 specFitCurve::specFitCurve()
 	: expression(specDescriptor("",spec::editable)),
-	  parser(0),
-	  maxSteps(0),
-	  threshold(1e-2)
+	  parser(0)
 {
 }
 
 QStringList specFitCurve::descriptorKeys()
 {
-	return QStringList() << QObject::tr("Variables") <<
+	return QStringList() << QObject::tr("Fit variables") <<
 				QObject::tr("Fit parameters") <<
 				QObject::tr("Fit expression") <<
-				QObject::tr("Max fit steps") <<
-				QObject::tr("Fit threshold") ;
+				QObject::tr("Fit errors") ;
 }
 
 void specFitCurve::refreshPlotData()
@@ -85,14 +92,14 @@ void specFitCurve::refreshPlotData()
 
 QString specFitCurve::descriptor(const QString &key, bool full)
 {
-	if (QObject::tr("Variables") == key)
+	if (QObject::tr("Fit variables") == key)
 	{
 		QStringList variableDescriptors ;
 		foreach(variablePair variable, variables)
 			variableDescriptors << variable.first + " = " + QString::number(variable.second) ;
 		if (full)
 			return variableDescriptors.join("\n") ;
-		if (activeVar > 0 && activeVar < variableDescriptors.size())
+		if (activeVar >= 0 && activeVar < variableDescriptors.size())
 			return variableDescriptors[activeVar] ;
 		return QString() ;
 	}
@@ -100,10 +107,21 @@ QString specFitCurve::descriptor(const QString &key, bool full)
 		return fitParameters.join(", ") ;
 	if (QObject::tr("Fit expression") == key)
 		return expression.content(full) ;
-	if (QObject::tr("Max fit steps") == key)
-		return QString::number(maxSteps) ;
-	if (QObject::tr("Fit threshold") == key)
-		return QString::number(threshold) ;
+	if (QObject::tr("Fit errors") == key)
+	{
+		if (!errorString.isEmpty())
+		{
+			if (full)
+				return errorString ;
+			return errorString.section("\n",0,0) ;
+		}
+		if (fitData* fit = dynamic_cast<fitData*>(data()))
+		{
+			if (full)
+				return fit->errorString ;
+			return fit->errorString.section("\n",0,0) ;
+		}
+	}
 	return QString() ;
 }
 
@@ -114,7 +132,7 @@ double specFitCurve::coerce(double val, double min, double max)
 
 bool specFitCurve::changeDescriptor(QString key, QString value)
 {
-	if (QObject::tr("Variables") == key)
+	if (QObject::tr("Fit variables") == key)
 	{
 		variables.clear();
 		foreach(QString line, value.split("\n"))
@@ -135,25 +153,34 @@ bool specFitCurve::changeDescriptor(QString key, QString value)
 	}
 	if (QObject::tr("Fit expression") == key)
 	{
-		expression.setContent(value) ;
+		expression.setContent(value.replace("**","^")) ;
 	}
-	if (QObject::tr("Max fit steps") == key)
-		maxSteps = qAbs(value.toInt()) ;
-	if (QObject::tr("Fit threshold") == key)
-		threshold = qFabs(value.toDouble()) ;
+
+	generateParser();
+	setParserConstants();
+	qDebug() << "Data size:" << dataSize() ;
+	for (size_t i  = 0 ; i < qMin((size_t) 10,dataSize()) ; ++i)
+		qDebug() << sample(i) ;
+	refreshPlotData();
 	return true ;
 }
 
-QString specFitCurve::errors()
+void specFitCurve::attach(QwtPlot *plot)
 {
-	return errorString ;
+	qDebug() << "Data size:" << dataSize() ;
+	for (size_t i  = 0 ; i < qMin((size_t) 10,dataSize()) ; ++i)
+		qDebug() << sample(i) ;
+//	if (plot)
+//		if (fitData *d = dynamic_cast<fitData*>(data()))
+//			d->setRectOfInterest(plot->);
+	specCanvasItem::attach(plot) ;
 }
 
 bool specFitCurve::setActiveLine(const QString &key, int n)
 {
 	if (key == QObject::tr("Fit expression"))
 		return expression.setActiveLine(n) ;
-	if (key == QObject::tr("Variables"))
+	if (key == QObject::tr("Fit variables"))
 		activeVar = n ;
 	return false ;
 }
@@ -162,7 +189,7 @@ int specFitCurve::activeLine(const QString& key) const
 {
 	if (key == QObject::tr("Fit expression"))
 		return expression.activeLine() ;
-	if (key == QObject::tr("Variables"))
+	if (key == QObject::tr("Fit variables"))
 		return activeVar ;
 	return 0 ;
 }
@@ -177,6 +204,7 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 {
 	generateParser();
 	if (!parser) return ;
+	QList<std::string> variableNames ;
 
 	double x[data->size()], y[data->size()], parameters[fitParameters.size()] ;
 	// Set the fit data up
@@ -192,7 +220,8 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 		{
 			int index = fitParameters.indexOf(var.first) ;
 			parameters[index] = var.second ;
-			parser->DefineVar(var.first.toStdString(), &(parameters[index]));
+			parser->DefineConst(var.first.toStdString(), parameters[index]);
+			variableNames << var.first.toStdString() ;
 		}
 		else
 			parser->DefineConst(var.first.toStdString(), var.second);
@@ -200,13 +229,11 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 
 	//// Perform the fit
 	lm_status_struct status ;
-	lm_control_struct control ;
-	control.ftol = threshold ;
-	control.maxcall = maxSteps ;
-	control.printflags = 0 ;
-	double currentX ;
-	lmcurve_data_struct fitParams = { x, y, parser} ;
-	parser->DefineVar("x",&currentX);
+	lm_control_struct control = lm_control_double ;
+
+//	control.maxcall = maxSteps ;
+//	control.printflags = 11 ;
+	lmcurve_data_struct fitParams = { x, y, parser, &variableNames} ;
 	lmmin(fitParameters.size(),
 	      parameters,
 	      data->size(),
@@ -229,12 +256,26 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 
 void evaluateParser(const double *parameters, int count, const void *data, double *fitResults, int *info)
 {
-	Q_UNUSED(parameters) ;
 	Q_UNUSED(info) ;
 	lmcurve_data_struct *fitData = (lmcurve_data_struct *) data ;
 	fitData->parser->DefineVar("x", ((lmcurve_data_struct*)data)->x);
-	fitData->parser->Eval(fitResults, count) ;
 
+	// prepare parser variables
+	int j = 0 ;
+	foreach(const std::string& variableName, *(fitData->variableNames))
+		fitData->parser->DefineConst(variableName, parameters[j++]);
+
+	// Evaluate and prepare for lm algorithm
+	try
+	{
+		fitData->parser->Eval(fitResults, count) ;
+	}
+	catch(...)
+	{
+		for (int i = 0 ; i < count ; ++i)
+			fitResults[i] = NAN ;
+		return ;
+	}
 	for (int i = 0 ; i < count ; ++i)
 		fitResults[i] = fitData->y[i] - fitResults[i] ;
 }
@@ -247,26 +288,25 @@ void specFitCurve::setParserConstants()
 
 void specFitCurve::writeToStream(QDataStream &out) const
 {
+	specCanvasItem::writeToStream(out);
 	out << variables <<
 	       activeVar <<
 	       fitParameters <<
 	       expression <<
-	       maxSteps <<
-	       threshold <<
 	       errorString ;
 }
 
 void specFitCurve::readFromStream(QDataStream &in)
 {
+	specCanvasItem::readFromStream(in) ;
 	in >> variables >>
 	      activeVar >>
 	      fitParameters >>
 	      expression >>
-	      maxSteps >>
-	      threshold >>
 	      errorString ;
 	generateParser();
 	setParserConstants();
+	setData(new fitData(parser)) ;
 }
 
 void specFitCurve::clearParser()
@@ -279,6 +319,7 @@ void specFitCurve::clearParser()
 void specFitCurve::generateParser()
 {
 	clearParser();
+	parser = new mu::Parser ;
 	try // this is sort of paranoid
 	{
 		parser->SetExpr(expression.content(true).toStdString()) ;

@@ -1,9 +1,11 @@
 #include "specmulticommand.h"
 #include "specactionlibrary.h"
+#include "speccommandgenerator.h"
 
 specMultiCommand::specMultiCommand(specUndoCommand* parent)
 	: specUndoCommand(parent),
-	  mayMerge(true)
+	  mayMerge(true),
+	  commandGenerator(this)
 {
 }
 
@@ -33,14 +35,10 @@ void specMultiCommand::writeCommand(QDataStream &out) const
 
 void specMultiCommand::readCommand(QDataStream &in)
 {
-	qint32 children, id ; // TODO typedef for type-id in file!!!
+	qint32 children ; // TODO typedef for type-id in file!!!
 	in >> mayMerge >> children ;
 	for (int i = 0 ; i < children ; ++i)
-	{
-		in >> id ; // TODO throw if id does not match
-		specUndoCommand *command = specActionLibrary::commandById(id,this) ;
-		in >> *command ;
-	}
+		produceItem(in) ;
 }
 
 bool specMultiCommand::mergeWith(const QUndoCommand *other)
@@ -64,10 +62,15 @@ bool specMultiCommand::mergeWith(const QUndoCommand *other)
 	return true ;
 }
 
-/*void specMultiCommand::parentAssigned() // TODO change calling code to not explicitly set every child's parent widget!
+void specMultiCommand::parentAssigned() // TODO change calling code to not explicitly set every child's parent widget!
 {
 	specUndoCommand *childPointer = 0 ;
 	for (int i = 0 ; i < childCount() ; ++i)
-		if (childPointer = dynamic_cast<specUndoCommand*>(child(i)))
+		if (childPointer = dynamic_cast<specUndoCommand*>(const_cast<QUndoCommand*>(child(i)))) // TODO find a better way!
 			childPointer->setParentObject(parentObject()) ;
-}*/
+}
+
+specStreamable* specMultiCommand::factory(const type &t) const
+{
+	return commandGenerator.commandById(t) ;
+}

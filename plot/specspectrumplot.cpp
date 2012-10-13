@@ -300,7 +300,7 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 	specPlotMoveCommand *command = new specPlotMoveCommand ;
 	command->setItem(view->model()->index( (specModelItem*) item)) ; // TODO do dynamic cast first!!
 	command->setCorrections(shift,offset,offline,scale) ;
-	command->setParentObject(view) ;
+	command->setParentObject(view->model()) ;
 	undoPartner()->push(command) ;
 }
 
@@ -312,6 +312,7 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 	bool noSlope)
 {
 	specMultiCommand *zeroCommand = new specMultiCommand ;
+	zeroCommand->setParentObject(view->model());
 	for (int i = 0 ; i < spectra.size() ; ++i)
 	{
 		QList<QPointF> pointsInRange ;
@@ -397,7 +398,7 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 		if (view && view->model())
 			command->setItem(view->model()->index(spectrum));
 		command->setCorrections(0,-offset,-slope,1.) ;
-		command->setParentObject(view);
+		command->setParentObject(view->model());
 	}
 	return zeroCommand ;
 }
