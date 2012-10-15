@@ -66,7 +66,7 @@ void specMultiCommand::parentAssigned() // TODO change calling code to not expli
 {
 	specUndoCommand *childPointer = 0 ;
 	for (int i = 0 ; i < childCount() ; ++i)
-		if (childPointer = dynamic_cast<specUndoCommand*>(const_cast<QUndoCommand*>(child(i)))) // TODO find a better way!
+		if ((childPointer = dynamic_cast<specUndoCommand*>(const_cast<QUndoCommand*>(child(i))))) // TODO find a better way!
 			childPointer->setParentObject(parentObject()) ;
 }
 

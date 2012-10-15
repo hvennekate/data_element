@@ -413,15 +413,15 @@ void specModel::checkForNewDescriptors(const QList<specModelItem*>& list, const 
 {
 	// TODO: check if descriptors were removed... hm...
 	// Check for possible new column headers
-	for (QList<specModelItem*>::const_iterator i = list.begin() ; i != list.end() ; ++i)
+	foreach(specModelItem* pointer, list)
 	{
-		foreach (const QString& descriptor, (*i)->descriptorKeys())
+		foreach (const QString& descriptor, pointer->descriptorKeys())
 		{
 			if (!Descriptors.contains(descriptor))
 			{
 				insertColumns(columnCount(parent),1,parent) ;
 				setHeaderData(columnCount(parent)-1,Qt::Horizontal,descriptor) ;
-				setHeaderData(columnCount(parent)-1,Qt::Horizontal,(int) (*i)->descriptorProperties(descriptor), 34) ;
+				setHeaderData(columnCount(parent)-1,Qt::Horizontal,(int) pointer->descriptorProperties(descriptor), 34) ;
 			}
 		}
 	}

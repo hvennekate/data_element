@@ -20,8 +20,8 @@ specKineticWidget::specKineticWidget(QString title, QWidget *parent)
 	items = new specMetaView(this) ;
 	
 	plot->setMinimumHeight(100) ;
-	plot->setAxisTitle(QwtPlot::yLeft,"cm<sup>-1</sup> <font face=\"Symbol\">D</font>mOD") ;
-	plot->setAxisTitle(QwtPlot::xBottom,"ps") ;
+//	plot->setAxisTitle(QwtPlot::yLeft,"cm<sup>-1</sup> <font face=\"Symbol\">D</font>mOD") ;
+//	plot->setAxisTitle(QwtPlot::xBottom,"ps") ;
 	
 	items->setModel(new specMetaModel(items)) ;
 	new specGenericMimeConverter(items->model());

@@ -79,7 +79,7 @@ QStringList specFitCurve::descriptorKeys()
 	return QStringList() << QObject::tr("Fit variables") <<
 				QObject::tr("Fit parameters") <<
 				QObject::tr("Fit expression") <<
-				QObject::tr("Fit errors") ;
+				QObject::tr("Fit messages") ;
 }
 
 void specFitCurve::refreshPlotData()
@@ -107,7 +107,7 @@ QString specFitCurve::descriptor(const QString &key, bool full)
 		return fitParameters.join(", ") ;
 	if (QObject::tr("Fit expression") == key)
 		return expression.content(full) ;
-	if (QObject::tr("Fit errors") == key)
+	if (QObject::tr("Fit messages") == key)
 	{
 		if (!errorString.isEmpty())
 		{

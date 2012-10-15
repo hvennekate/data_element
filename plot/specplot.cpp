@@ -46,8 +46,8 @@ specPlot::specPlot(QWidget *parent)
 
 	printAction = new specPrintPlotAction(this) ;
 
-	setAxisTitle(QwtPlot::yLeft,"<font face=\"Symbol\">D</font>mOD") ;
-	setAxisTitle(QwtPlot::xBottom,"cm<sup>-1</sup>") ;
+//	setAxisTitle(QwtPlot::yLeft,"<p><font face=\"Symbol\">D</font>mOD</p>") ;
+//	setAxisTitle(QwtPlot::xBottom,"cm<sup>-1</sup>") ;
 }
 
 void specPlot::replot()
