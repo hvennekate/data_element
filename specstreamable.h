@@ -66,7 +66,8 @@ public:
 		plotXLabelCommandId = 61,
 		fitCurve = 62,
 		exchangeFitCommand = 63,
-		toggleFitStyleCommand = 64
+		toggleFitStyleCommand = 64,
+		penStyleCommandId = 65
 	};
 protected:
 	virtual void writeToStream(QDataStream& out) const = 0;

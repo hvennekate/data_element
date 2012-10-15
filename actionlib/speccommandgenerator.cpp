@@ -54,6 +54,7 @@ specUndoCommand *specCommandGenerator::commandById(int id) const
 	case specStreamable::symbolPenColorCommandId:
 	case specStreamable::symbolSizeCommandId:
 	case specStreamable::symbolBrushColorCommandId:
+	case specStreamable::penStyleCommandId:
 		return generateStyleCommand(id,parent) ;
 	case specStreamable::metaRangeCommand :
 		return new specMetaRangeCommand(parent) ;

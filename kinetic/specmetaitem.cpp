@@ -295,6 +295,7 @@ STYLEROUTINGFUNCTION(int,    symbolStyle, setSymbolStyle)
 STYLEROUTINGFUNCTION(QColor, symbolPenColor, setSymbolPenColor)
 STYLEROUTINGFUNCTION(QColor, symbolBrushColor, setSymbolBrushColor)
 STYLEROUTINGFUNCTION(QSize, symbolSize, setSymbolSize)
+STYLEROUTINGFUNCTION(qint8, penStyle, setPenStyle)
 
 void specMetaItem::setSymbolSize(int w, int h)
 {

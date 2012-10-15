@@ -113,7 +113,7 @@ void specStyleCommandImplFuncTemplate::obtainStyle(specCanvasItem *item)
 
 specStyleCommand *generateStyleCommand(specStreamable::type id, specUndoCommand* parent)
 {
-	switch (id)
+	switch (id) // TODO build object containing the template types
 	{
 	case specStreamable::penColorCommandId :
 		return new specStyleCommandImplementation<QColor, &specCanvasItem::penColor, &specCanvasItem::setPenColor, specStreamable::penColorCommandId>(parent) ;
@@ -127,6 +127,8 @@ specStyleCommand *generateStyleCommand(specStreamable::type id, specUndoCommand*
 		return new specStyleCommandImplementation<QSize, &specCanvasItem::symbolSize, &specCanvasItem::setSymbolSize, specStreamable::symbolSizeCommandId >(parent) ;
 	case specStreamable::lineWidthCommandId:
 		return new specStyleCommandImplementation<double, &specCanvasItem::lineWidth, &specCanvasItem::setLineWidth, specStreamable::lineWidthCommandId>(parent) ;
+	case specStreamable::penStyleCommandId:
+		return new specStyleCommandImplementation<qint8, &specCanvasItem::penStyle, &specCanvasItem::setPenStyle, specStreamable::penStyleCommandId>(parent) ;
 	default:
 		return 0 ;
 	}

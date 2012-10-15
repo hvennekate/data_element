@@ -69,6 +69,8 @@ public:
 	QSize symbolSize() const;
 	void setSymbolSize(int w, int h = -1) ;
 	void setSymbolSize(const QSize&) ;
+	void setPenStyle(const qint8 &);
+	qint8 penStyle() const ;
 };
 
 /* TODO in other classes

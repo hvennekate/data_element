@@ -5,7 +5,8 @@
 	penColor(Qt::black),\
 	symbolPenColor(Qt::black),\
 	symbolBrushColor(Qt::transparent),\
-	symbolStyle(QwtSymbol::NoSymbol)
+	symbolStyle(QwtSymbol::NoSymbol),\
+	penStyle(Qt::SolidLine)
 
 specPlotStyle::specPlotStyle()
 	: PLOTSTYLEINITIALIZER
@@ -30,6 +31,7 @@ void specPlotStyle::initialize(const specCanvasItem *curve)
 	lineWidth = curve->lineWidth() ;
 	penColor = curve->penColor() ;
 	symbolStyle = curve->symbolStyle() ;
+	penStyle = curve->penStyle() ;
 	if (symbolStyle != noSymbol)
 	{
 		symbolSize = curve->symbolSize() ;
@@ -42,7 +44,8 @@ void specPlotStyle::writeToStream(QDataStream &out) const
 {
 	out << lineWidth
 	    << penColor
-	    << symbolStyle ;
+	    << symbolStyle
+	    << penStyle ;
 	if (symbolStyle != noSymbol)
 		out << symbolSize
 		    << symbolPenColor
@@ -53,7 +56,8 @@ void specPlotStyle::readFromStream(QDataStream &in)
 {
 	in >> lineWidth
 	   >> penColor
-	   >> symbolStyle ;
+	   >> symbolStyle
+	   >> penStyle ;
 	if (symbolStyle != noSymbol)
 		in >> symbolSize
 		    >> symbolPenColor
@@ -64,6 +68,7 @@ void specPlotStyle::apply(specCanvasItem *c) const
 {
 	c->setLineWidth(lineWidth) ;
 	c->setPenColor(penColor) ;
+	c->setPenStyle(penStyle) ;
 	c->setSymbolStyle(symbolStyle) ;
 	c->setSymbolPenColor(symbolPenColor) ;
 	c->setSymbolBrushColor(symbolBrushColor) ;

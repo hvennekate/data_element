@@ -199,3 +199,23 @@ QSize specCanvasItem::moveIndicator::boundingSize() const
 {
 	return QSize(11,11) ;
 }
+
+qint8 specCanvasItem::penStyle() const
+{
+//	if (style() != QwtPlotCurve::Lines) return -1 ;
+	return pen().style() ;
+}
+
+void specCanvasItem::setPenStyle(const qint8 &s)
+{
+//	if (s < 0)
+//	{
+//		setStyle(QwtPlotCurve::NoCurve) ;
+//		return ;
+//	}
+//	else
+//		setStyle(QwtPlotCurve::Lines) ;
+	QPen newPen(pen()) ;
+	newPen.setStyle((Qt::PenStyle) s) ;
+	setPen(newPen) ;
+}
