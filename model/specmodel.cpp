@@ -22,6 +22,7 @@
 #include "specaddfoldercommand.h"
 #include "speceditdescriptorcommand.h"
 #include "specresizesvgcommand.h"
+#include <algorithm>
 // TODO replace isFolder() by addChildren(empty list,0)
 
 bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria)
@@ -855,4 +856,20 @@ void specModel::signalChanged(const QModelIndex &i)
 	specModelItem *item = itemPointer(i) ;
 	checkForNewDescriptors(QList<specModelItem*>() << item, i.parent());
 	emit dataChanged(begin,end) ;
+}
+
+void specModel::expandFolders(QModelIndexList &list) const
+{
+	for (QModelIndexList::iterator i = list.begin() ; i != list.end() ; ++i)
+	{
+		if (itemPointer(*i)->isFolder())
+		{
+			QModelIndexList newList = allChildren(*i) ;
+			QModelIndexList reverseNewList ;
+			std::reverse_copy(newList.begin(), newList.end(), std::back_inserter(reverseNewList)) ;
+			i = list.erase(i);
+			foreach(const QModelIndex& index, reverseNewList)
+				i = list.insert(i, index) ;
+		}
+	}
 }
