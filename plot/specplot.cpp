@@ -62,7 +62,6 @@ void specPlot::replot()
 	replotting = true ;
 	emit startingReplot();
 	QwtPlotItemList allItems = itemList();
-	qDebug() << "plot:" << this << "items:" << allItems.size() ;
 	QSet<specCanvasItem*> newMetaRanges; // TODO local variable
 	QVector<specSVGItem*> svgitems ;
 	foreach(QwtPlotItem* item, allItems)
@@ -105,7 +104,7 @@ void specPlot::autoScale(const QwtPlotItemList& allItems)
 			if (pointer->boundingRect().isValid())
 				boundaries |= pointer->boundingRect() ;
 		}
-		if (specRange* r = dynamic_cast<specRange*>(item))
+		if (specMetaRange* r = dynamic_cast<specMetaRange*>(item))
 		{
 			boundaries.setLeft(qMin(boundaries.left(),r->minValue()));
 			boundaries.setRight(qMax(boundaries.right(), r->maxValue()));
