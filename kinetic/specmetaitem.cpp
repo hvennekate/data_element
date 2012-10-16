@@ -2,6 +2,7 @@
 #include "specplot.h"
 #include "metaitemproperties.h"
 #include "specfitcurve.h"
+#include "QApplication"
 
 bool specMetaItem::fitCurveDescriptor(const QString &s) const
 {
@@ -201,7 +202,7 @@ spec::descriptorFlags specMetaItem::descriptorProperties(const QString &key) con
 	if (key == "") return specModelItem::descriptorProperties(key) ;
 	if (variables.contains(key))
 		return variables[key].flags() ;
-	if (fitCurveDescriptor(key)) return spec::editable ;
+	if (fitCurveDescriptor(key) && key != QApplication::tr("Fit messages")) return spec::editable ; // TODO dangerous
 	return spec::def ;
 }
 
