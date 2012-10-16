@@ -112,19 +112,14 @@ specUndoCommand *specTreeAction::generateUndoCommand()
 	insertTree->setParentObject(model) ;
 
 	// move items into the new tree:
-	QVector<specMoveCommand*> moveCommands ;
+	specMoveCommand *moveCommand = new specMoveCommand(command) ;
+	moveCommand->setParentObject(model) ;
 	foreach(destination d, finalPositions)
 	{
 		if (d.second.isEmpty()) continue ;
-		specMoveCommand *moveItems = new specMoveCommand(command) ;
-		moveItems->setParentObject(model) ;
 		QModelIndexList indexes = model->indexList(d.second) ;
-		moveItems->setItems(indexes, model->index(d.first), d.first->children());
-		moveItems->redo(); // TODO optimieren!  Problem:  Die move-commands finden ihre Objekte nicht richtig, wenn man alle am Anfang zuordnet...
-		moveCommands << moveItems ;
+		moveCommand->setItems(indexes, model->index(d.first), d.first->children());
 	}
-	for (int i = moveCommands.size()-1 ; i >= 0 ; --i) // TODO siehe oben!
-		moveCommands[i]->undo();
 
 	// delete superfluous folders:  TODO: connections???
 	specDeleteCommand *deleteOldFolders = new specDeleteCommand(command) ;
