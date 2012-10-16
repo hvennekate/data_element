@@ -311,6 +311,7 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 	specView* view,
 	bool noSlope)
 {
+	qDebug() << "zero ranges:" << zeroRanges.size() << "spectra:" << spectra.size() ;
 	specMultiCommand *zeroCommand = new specMultiCommand ;
 	zeroCommand->setParentObject(view->model());
 	for (int i = 0 ; i < spectra.size() ; ++i)
@@ -415,7 +416,6 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double n
 			referenceSpectrum[reference->sample(i).x()] = reference->sample(i).y() ;
 
 	specMultiCommand *zeroCommand = generateCorrectionCommand(zeroRanges, spectra, referenceSpectrum, view, noSlopeAction->isChecked()) ;
-	zeroCommand->setParentObject(view) ;
 	zeroCommand->setText(tr("Apply range correction"));
 	undoPartner()->push(zeroCommand) ;
 	replot() ;
@@ -483,5 +483,7 @@ QList<QAction*> specSpectrumPlot::actions()
 specSpectrumPlot::~specSpectrumPlot()
 {
 	if (correctionPicker) correctionPicker->purgeSelectable();
-	if (alignmentPicker) alignmentPicker->purgeSelectable();
+//	if (alignmentPicker) alignmentPicker->purgeSelectable(); // TODO might be dangerous
+	delete correctionPicker ;
+	delete alignmentPicker ;
 }
