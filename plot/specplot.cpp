@@ -85,6 +85,11 @@ void specPlot::replot()
 			if (pointer->boundingRect().isValid())
 				boundaries |= pointer->boundingRect() ;
 		}
+		if (specRange* r = dynamic_cast<specRange*>(item))
+		{
+			boundaries.setLeft(qMin(boundaries.left(),r->minValue()));
+			boundaries.setRight(qMax(boundaries.right(), r->maxValue()));
+		}
 	}
 
 	boundaries = boundaries.normalized() ;
