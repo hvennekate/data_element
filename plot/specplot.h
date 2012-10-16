@@ -25,11 +25,13 @@ private:
 		*printAction ;
 	CanvasPicker *MetaPicker, *SVGpicker ; // TODO make pickers more prominent: accessible through
 											// function, attach metaRanges direktly to picker etc.
+	bool autoScaling ;
 	void readFromStream(QDataStream &in);
 	void writeToStream(QDataStream &out) const ;
 	type typeId() const {return specStreamable::mainPlot ;}
 	specActionLibrary *undoP ;
 	void resizeEvent(QResizeEvent *e) ;
+	void autoScale(const QwtPlotItemList& allItems) ;
 protected:
 	specView *view ;
 	specActionLibrary* undoPartner() const ;
@@ -44,6 +46,7 @@ public:
 	void setUndoPartner(specActionLibrary* lib) ;
 	virtual void attachToPicker(specCanvasItem*) ;
 	virtual void detachFromPicker(specCanvasItem*) ;
+	void setAutoScaling(bool) ;
 signals:
 	void startingReplot() ;
 	void replotted() ;

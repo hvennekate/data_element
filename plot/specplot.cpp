@@ -16,6 +16,7 @@ specPlot::specPlot(QWidget *parent)
 	  replotting(false),
 	  MetaPicker(0),
 	  SVGpicker(0),
+	  autoScaling(true),
 	  undoP(0),
 	  view(0)
 {
@@ -50,12 +51,18 @@ specPlot::specPlot(QWidget *parent)
 //	setAxisTitle(QwtPlot::xBottom,"cm<sup>-1</sup>") ;
 }
 
+void specPlot::setAutoScaling(bool on)
+{
+	autoScaling = on ;
+}
+
 void specPlot::replot()
 {
 	if (replotting) return ;
 	replotting = true ;
 	emit startingReplot();
 	QwtPlotItemList allItems = itemList();
+	qDebug() << "plot:" << this << "items:" << allItems.size() ;
 	QSet<specCanvasItem*> newMetaRanges; // TODO local variable
 	QVector<specSVGItem*> svgitems ;
 	foreach(QwtPlotItem* item, allItems)
@@ -74,6 +81,19 @@ void specPlot::replot()
 		return ;
 	}
 	
+	autoScale(allItems) ;
+
+	QwtPlot::replot() ; // TODO optimize
+	foreach(specSVGItem* svgitem, svgitems)
+		svgitem->refreshSVG() ;
+	QwtPlot::replot() ;
+	emit replotted();
+	replotting = false ;
+}
+
+void specPlot::autoScale(const QwtPlotItemList& allItems)
+{
+	if (!autoScaling) return ;
 	QRectF boundaries, zoomBase = zoom->zoomBase() ;
 	specModelItem *pointer = 0 ; // TODO find a more concise version.
 	foreach(QwtPlotItem *item, allItems)
@@ -106,15 +126,8 @@ void specPlot::replot()
 		boundaries.setTop(zoomBase.top()) ;
 		boundaries.setBottom(zoomBase.bottom()) ;
 	}
-	
-	zoom->changeZoomBase(boundaries.isValid() ? boundaries : QRectF(-10,-10,20,20)) ;
 
-	QwtPlot::replot() ; // TODO optimize
-	foreach(specSVGItem* svgitem, svgitems)
-		svgitem->refreshSVG() ;
-	QwtPlot::replot() ;
-	emit replotted();
-	replotting = false ;
+	zoom->changeZoomBase(boundaries.isValid() ? boundaries : QRectF(-10,-10,20,20)) ;
 }
 
 specPlot::~specPlot()
