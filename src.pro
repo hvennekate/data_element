@@ -271,3 +271,5 @@ FORMS += \
 
 OTHER_FILES += icons/oxygen/index.theme \
     icons/oxygen/geticons.py
+
+CODECFORTR = UTF-8
