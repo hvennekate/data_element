@@ -15,6 +15,7 @@
 #include <QScrollArea>
 #include <QLabel>
 #include "specprofiler.h"
+#include <QProgressDialog>
 
 specMergeAction::specMergeAction(QObject *parent)
 	: specUndoAction(parent)
@@ -50,8 +51,12 @@ void specMergeAction::execute()
 
 	// Create and insert new merged items
 	qDebug() << "Beginning merge:" << profiler.restart() ;
+	int total = items.size() ;
+	QProgressDialog progress(tr("Merging items..."),tr("Abort"),0, total) ;
+	progress.show();
 	while (!items.isEmpty())
 	{
+		progress.setValue(total-items.size());
 		// form chunk -> only merge if same parent! (new logic)
 		QList<specDataItem*> chunk ;
 		specFolderItem * const parent = items.first()->parent() ;
@@ -60,8 +65,16 @@ void specMergeAction::execute()
 			chunk << items.takeFirst() ;
 
 		QVector<specModelItem*> toInsert ;
+		int subtotal = progress.value(), chunkSize =chunk.size() ;
 		while (!chunk.isEmpty())
 		{
+			progress.setValue(subtotal+chunkSize-chunk.size()) ;
+			if (progress.wasCanceled())
+			{
+				foreach(specModelItem* item, toInsert) // TODO check clean-up
+					delete item ;
+				return ;
+			}
 			specDataItem* item = chunk.takeFirst() ;
 			specDataItem *newItem = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
 			*newItem += *item ; // TODO ueberarbeiten
@@ -119,6 +132,7 @@ void specMergeAction::execute()
 			newlyInserted += toInsert ; // TODO else...
 		qDebug() << "processing chunk:" << profiler.restart() ;
 	}
+	progress.setValue(total) ;
 	qDebug() << "arranged items:" << profiler.restart() ;
 
 	specMultiCommand *command = new specMultiCommand ;
