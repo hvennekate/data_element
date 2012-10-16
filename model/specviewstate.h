@@ -32,6 +32,8 @@ public:
 	void getState(const specView* view) ;
 	void getState() ;
 	void restoreState() ;
+	static QItemSelection indexesToSelection(const QModelIndexList& selectedItems, const specModel* model) ;
+	static QItemSelection pointersToSelection(const QVector<specModelItem*>& selectedItems, const specModel* model) ;
 };
 
 #endif // SPECVIEWSTATE_H

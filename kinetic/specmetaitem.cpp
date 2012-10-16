@@ -34,6 +34,23 @@ specMetaItem::~specMetaItem()
 	delete fitCurve ;
 }
 
+void specMetaItem::connectedItems(QModelIndexList &dataItems, QModelIndexList &metaItems)
+{
+	if (!dataModel || !metaModel) return ;
+	foreach(specModelItem* item, items)
+	{
+		QModelIndex index = dataModel->index(item) ;
+		if (index.isValid())
+			dataItems << index ;
+		else
+		{
+			index = metaModel->index(item) ;
+			if (index.isValid())
+				metaItems << index ;
+		}
+	}
+}
+
 void specMetaItem::setModels(specModel *m, specModel *d)
 {
 	metaModel = m ;

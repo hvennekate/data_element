@@ -29,6 +29,7 @@
 #include "specremovefitaction.h"
 #include "spectogglefitstyleaction.h"
 #include "specmetaitem.h"
+#include "specselectconnectedaction.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -116,6 +117,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		bar->addSeparator() ;
 		addNewAction(bar, new changePlotStyleAction(target)) ;
 		addNewAction(bar, new specAddConnectionsAction(target)) ;
+		addNewAction(bar, new specSelectConnectedAction(target)) ;
 		addNewAction(bar,new genericExportAction(target)) ;
 
 		return bar ;

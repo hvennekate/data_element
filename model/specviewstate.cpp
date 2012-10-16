@@ -82,6 +82,25 @@ specModelItem* specViewState::hierarchyPointer(const QVector<int> &hierarchy)
 	return pointer ;
 }
 
+QItemSelection specViewState::pointersToSelection(const QVector<specModelItem*>& selectedItems, const specModel* model)
+{
+	QModelIndexList indexes ;
+	foreach(specModelItem* item, selectedItems)
+		indexes << model->index(item) ;
+	return indexesToSelection(indexes, model) ;
+}
+
+QItemSelection specViewState::indexesToSelection(const QModelIndexList& selectedItems, const specModel* model)
+{
+	QItemSelection selectedIndexes ;
+	foreach(const QModelIndex index, selectedItems)
+		selectedIndexes << QItemSelectionRange(index,
+						       model->index(index.row(),
+								    model->columnCount(index)-1,
+								    index.parent()))  ;
+	return selectedIndexes ;
+}
+
 void specViewState::restoreState()
 {
 	if (!parent) return ;
@@ -100,15 +119,7 @@ void specViewState::restoreState()
 		parent->expand(model()->index(openFolders[i])) ;
 
 	// restore selection
-	QItemSelection selectedIndexes ;
-	for (int i = 0 ; i < selectedItems.size() ; ++i)
-	{
-		QModelIndex begin = model()->index(selectedItems[i]);
-		QModelIndex end = model()->index(begin.row(),model()->columnCount(begin)-1,begin.parent()) ;
-		selectedIndexes << QItemSelectionRange(begin,end) ;
-	}
-
-	parent->selectionModel()->select(selectedIndexes,QItemSelectionModel::Select) ;
+	parent->selectionModel()->select(pointersToSelection(selectedItems,model()),QItemSelectionModel::Select) ;
 
 	// restore current index
 	if (currentItem)

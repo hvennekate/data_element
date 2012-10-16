@@ -71,6 +71,7 @@ public:
 	void setSymbolSize(const QSize&) ;
 	void setPenStyle(const qint8 &);
 	qint8 penStyle() const ;
+	void connectedItems(QModelIndexList& dataItems, QModelIndexList& metaItems) ;
 };
 
 /* TODO in other classes
