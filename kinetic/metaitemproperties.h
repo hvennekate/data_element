@@ -18,17 +18,18 @@ public:
 	specUndoCommand* changedConnections(QObject* parent) ;
 private slots:
 	void on_connectedItemsList_itemSelectionChanged();
-
 	void on_moveUpButton_clicked();
-
 	void on_moveDownButton_clicked();
-
+	void refreshMetaPlot() ;
 private:
 	Ui::metaItemProperties *ui;
 	specMetaItem* originalItem ;
 	QList<QPair<int,QwtPlotCurve*> > connectedData ;
 	void moveSelection(bool) ;
 	QModelIndexList generateConnectionList(const QList<specModelItem*>& items) ;
+	QwtPlotCurve metaCurve, currentCurve, selectedCurve ;
+	QVector<int> pointToItem ;
+	bool refreshing ;
 };
 
 #endif // METAITEMPROPERTIES_H
