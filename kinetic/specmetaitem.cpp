@@ -157,7 +157,7 @@ void specMetaItem::refreshOtherPlots()
 		otherPlots << ((specPlot*) item->plot()) ;
 	otherPlots.remove(0) ;
 	if (plot())
-		filter->attachRanges(otherPlots)  ;
+		filter->attachRanges(otherPlots, pen().color())  ;
 	else
 		filter->detachRanges();
 	foreach(QwtPlot *otherPlot, otherPlots)
@@ -308,12 +308,24 @@ void specMetaItem::toggleFitStyle()
 		else return specModelItem::GETNAME() ; }
 
 STYLEROUTINGFUNCTION(double, lineWidth,   setLineWidth)
-STYLEROUTINGFUNCTION(QColor, penColor,    setPenColor)
 STYLEROUTINGFUNCTION(int,    symbolStyle, setSymbolStyle)
 STYLEROUTINGFUNCTION(QColor, symbolPenColor, setSymbolPenColor)
 STYLEROUTINGFUNCTION(QColor, symbolBrushColor, setSymbolBrushColor)
 STYLEROUTINGFUNCTION(QSize, symbolSize, setSymbolSize)
 STYLEROUTINGFUNCTION(qint8, penStyle, setPenStyle)
+
+void specMetaItem::setPenColor(const QColor& arg) {
+	if (styleFitCurve && fitCurve) fitCurve->setPenColor(arg) ;
+	else
+	{
+		specModelItem::setPenColor(arg) ;
+		refreshOtherPlots();
+	}
+}
+
+QColor specMetaItem::penColor() const {
+	if (styleFitCurve && fitCurve) return fitCurve->penColor() ;
+	else return specModelItem::penColor() ; }
 
 void specMetaItem::setSymbolSize(int w, int h)
 {

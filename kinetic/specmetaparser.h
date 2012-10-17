@@ -30,7 +30,7 @@ public:
 	bool ok() const ;
 	void setAssignments(const QString &expressionList, const QString& xExpression, const QString& yExpression) ;
 	QwtSeriesData<QPointF>* evaluate(const QVector<specModelItem*>&);
-	void attachRanges(QSet<specPlot*>) ;
+	void attachRanges(QSet<specPlot*>, QColor) ;
 	void detachRanges() ;
 	specMetaRange::addressObject addressOf(specMetaVariable*) const ;
 	void getRangePoint(int variable, int range, int point, double &x, double &y) const ;

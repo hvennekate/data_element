@@ -33,7 +33,7 @@ public:
 	virtual QVector<double> values(specModelItem*, const QVector<double>&) const ;
 	bool setIndexRange(int& begin, int& end, int& increment, int max) const;
 	static specMetaVariable* factory(QString, specMetaParser* parent = 0) ;
-	void produceRanges(QSet<specPlot*>) ;
+	void produceRanges(QSet<specPlot*>, QColor) ;
 	void detachRanges();
 	QString codeValue() const ;
 	specMetaRange::addressObject address(specMetaRange*) ;

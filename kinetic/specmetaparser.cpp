@@ -183,10 +183,10 @@ bool specMetaParser::containsNan(const QVector<double> &vector)
 	return false ;
 }
 
-void specMetaParser::attachRanges(QSet<specPlot *> plots)
+void specMetaParser::attachRanges(QSet<specPlot *> plots, QColor color)
 {
 	foreach(specMetaVariable* evaluator, evaluators)
-		evaluator->produceRanges(plots) ;
+		evaluator->produceRanges(plots, color) ;
 }
 
 void specMetaParser::detachRanges()

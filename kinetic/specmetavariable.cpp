@@ -145,7 +145,7 @@ void specMetaVariable::clearRanges()
 	ranges.clear();
 }
 
-void specMetaVariable::produceRanges(QSet<specPlot *> plots)
+void specMetaVariable::produceRanges(QSet<specPlot *> plots, QColor color)
 {
 	if (!QwtInterval::isValid()) return ; // TODO consider just disposing of the ranges
 	if (plots.size() != ranges.size())
@@ -155,14 +155,13 @@ void specMetaVariable::produceRanges(QSet<specPlot *> plots)
 		{
 			specMetaRange *range = new specMetaRange(minValue(),maxValue(),this) ;
 			ranges << range ;
-			range->attach((QwtPlot*) plot) ;
 		}
 	}
-	else
+	int i = 0 ;
+	foreach(specPlot* plot, plots)
 	{
-		int i = 0 ;
-		foreach(specPlot* plot, plots)
-			ranges[i++]->attach((QwtPlot*) plot) ;
+		ranges[i]->setPenColor(color) ;
+		ranges[i++]->attach((QwtPlot*) plot) ;
 	}
 }
 
