@@ -308,12 +308,12 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 	const QwtPlotItemList& zeroRanges,
 	const QwtPlotItemList& spectra,
 	const QMap<double, double>& referenceSpectrum,
-	specView* view,
+	specModel* model,
 	bool noSlope)
 {
 	qDebug() << "zero ranges:" << zeroRanges.size() << "spectra:" << spectra.size() ;
 	specMultiCommand *zeroCommand = new specMultiCommand ;
-	zeroCommand->setParentObject(view->model());
+	zeroCommand->setParentObject(model);
 	for (int i = 0 ; i < spectra.size() ; ++i)
 	{
 		QList<QPointF> pointsInRange ;
@@ -396,10 +396,10 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 			}
 		}
 		specPlotMoveCommand *command = new specPlotMoveCommand(zeroCommand) ;
-		if (view && view->model())
-			command->setItem(view->model()->index(spectrum));
+		if (model)
+			command->setItem(model->index(spectrum));
 		command->setCorrections(0,-offset,-slope,1.) ;
-		command->setParentObject(view->model());
+		command->setParentObject(model);
 	}
 	return zeroCommand ;
 }
@@ -415,7 +415,7 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double n
 		for (size_t i = 0 ; i < reference->dataSize() ; ++i)
 			referenceSpectrum[reference->sample(i).x()] = reference->sample(i).y() ;
 
-	specMultiCommand *zeroCommand = generateCorrectionCommand(zeroRanges, spectra, referenceSpectrum, view, noSlopeAction->isChecked()) ;
+	specMultiCommand *zeroCommand = generateCorrectionCommand(zeroRanges, spectra, referenceSpectrum, view->model(), noSlopeAction->isChecked()) ;
 	zeroCommand->setText(tr("Apply range correction"));
 	undoPartner()->push(zeroCommand) ;
 	replot() ;
