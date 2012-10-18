@@ -30,6 +30,7 @@ CanvasPicker::CanvasPicker ( specPlot *plot )
 	  highlighting(true)
 //     mode(spec::none)
 {
+	qDebug() << "creating canvas picker" << this ;
 	QwtPlotCanvas *canvas = plot->canvas();
 
 	canvas->installEventFilter ( this );
@@ -460,6 +461,7 @@ void CanvasPicker::removeSelectable()
 
 CanvasPicker::~CanvasPicker()
 {
+	qDebug() << "Deleting canvas picker" << this ;
 	highlightSelectable(false) ;
 	if (owning) removeSelectable(selectable);
 }

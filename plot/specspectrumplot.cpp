@@ -27,7 +27,10 @@ void specSpectrumPlot::toggleAligning(bool on)
 		connect(alignmentPicker, SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SLOT(applyZeroRanges(specCanvasItem*,int,double,double))) ;
 	}
 	else
+	{
 		delete alignmentPicker ;
+		alignmentPicker = 0 ;
+	}
 }
 
 void specSpectrumPlot::invalidateReference()
@@ -483,7 +486,6 @@ QList<QAction*> specSpectrumPlot::actions()
 specSpectrumPlot::~specSpectrumPlot()
 {
 	if (correctionPicker) correctionPicker->purgeSelectable();
-//	if (alignmentPicker) alignmentPicker->purgeSelectable(); // TODO might be dangerous
 	delete correctionPicker ;
 	delete alignmentPicker ;
 }
