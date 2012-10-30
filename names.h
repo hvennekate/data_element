@@ -16,7 +16,7 @@ namespace spec{
 	Q_DECLARE_OPERATORS_FOR_FLAGS(moveMode)
 	
 	/*! Enum for descriptors.*/
-	enum desc {def = 0, numeric = 1, editable=2} ;
+    enum desc {def = 0, numeric = 1, editable=2, multiline=4} ;
 	Q_DECLARE_FLAGS(descriptorFlags,desc)
 	Q_DECLARE_OPERATORS_FOR_FLAGS(descriptorFlags)
 	

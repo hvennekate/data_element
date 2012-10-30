@@ -24,6 +24,7 @@ specUndoCommand *specImportSpecAction::generateUndoCommand()
 	}
 
 	QStringList fileNames = QFileDialog::getOpenFileNames(view,tr("Files to import")) ; // TODO get proper file type from model
+    if (fileNames.isEmpty()) return 0 ;
 	QList<specModelItem*> importedItems ;
 	for(int i = 0 ; i < fileNames.size() ; ++i)
 	{

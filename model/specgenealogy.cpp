@@ -58,7 +58,7 @@ void specGenealogy::takeItems()
 		seekParent() ;
 	if (!valid()) return ;
 	foreach(specModelItem* item, Items)
-		item->setParent(0) ;
+        if (item) item->setParent(0) ;
 	owning = true ;
 }
 

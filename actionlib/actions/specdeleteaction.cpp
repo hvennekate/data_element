@@ -16,7 +16,7 @@ specDeleteAction::specDeleteAction(QObject *parent) :
 	setText(tr("Delete")) ;
 }
 
-specUndoCommand* specDeleteAction::generateUndoCommand()
+specUndoCommand* specDeleteAction::command(specModel* model, QModelIndexList& selection)
 {
 	specMultiCommand *parentCommand = 0 ;
 	if (!qobject_cast<specLogModel*>(model))
@@ -77,7 +77,7 @@ specUndoCommand* specDeleteAction::generateUndoCommand()
 	command->setParentObject(model);
 	command->setItems(selection) ;
 	command->setParentObject(model); // TODO: Again???
-	view->selectionModel()->clearSelection();
+//	view->selectionModel()->clearSelection();
 
 	if (!parentCommand)
 	{
@@ -86,4 +86,9 @@ specUndoCommand* specDeleteAction::generateUndoCommand()
 	}
 
 	return parentCommand ;
+}
+
+specUndoCommand* specDeleteAction::generateUndoCommand()
+{
+    return command(model, selection) ;
 }

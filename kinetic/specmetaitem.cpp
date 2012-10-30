@@ -219,8 +219,15 @@ spec::descriptorFlags specMetaItem::descriptorProperties(const QString &key) con
 	if (key == "") return specModelItem::descriptorProperties(key) ;
 	if (variables.contains(key))
 		return variables[key].flags() ;
-	if (fitCurveDescriptor(key) && key != QApplication::tr("Fit messages")) return spec::editable ; // TODO dangerous
+    if (fitCurveDescriptor(key)) return fitCurve->descriptorProperties(key) ; // TODO dangerous
 	return spec::def ;
+}
+
+void specMetaItem::setDescriptorProperties(const QString &key, spec::descriptorFlags f)
+{
+    if (key == "") specModelItem::setDescriptorProperties(key, f) ;
+    if (variables.contains(key)) variables[key].setFlags(f) ;
+    if (fitCurveDescriptor(key) && key != "") fitCurve->setDescriptorProperties(key, f) ;
 }
 
 QIcon specMetaItem::decoration() const

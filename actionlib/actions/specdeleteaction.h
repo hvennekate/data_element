@@ -7,9 +7,10 @@ class specDeleteAction : public specRequiresItemAction
 {
     Q_OBJECT
 public:
-	explicit specDeleteAction(QObject *parent = 0);
+    explicit specDeleteAction(QObject *parent = 0);
+    static specUndoCommand* command(specModel *model, QModelIndexList &selection) ;
 protected:
-	specUndoCommand* generateUndoCommand() ;
+    specUndoCommand* generateUndoCommand() ;
 
 };
 

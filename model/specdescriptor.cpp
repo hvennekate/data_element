@@ -33,7 +33,7 @@ double specDescriptor::numericValue() const
 
 QString specDescriptor::content(bool full) const
 {
-	if (currentLine == QString() || full )
+    if (currentLine == QString() || full || (properties & spec::multiline))
 		return contentValue ;
 	else
 		return currentLine ;
@@ -98,4 +98,9 @@ specDescriptor& specDescriptor::operator=(const QString& val)
 	contentValue = val ;
 	currentLine = val.contains(QRegExp("\n")) ? val.section(QRegExp("\n"),0,0) : val ;
 	return *this ;
+}
+
+void specDescriptor::setFlags(spec::descriptorFlags f)
+{
+    properties = f ;
 }

@@ -41,6 +41,7 @@ public:
 	QString descriptor(const QString &key, bool full=false) const ;
 	bool changeDescriptor(QString key, QString value) ; // TODO add changeDescriptor(key,specDescriptor)
 	spec::descriptorFlags descriptorProperties(const QString& key) const ;
+    void setDescriptorProperties(const QString &key, spec::descriptorFlags f);
 	QIcon decoration() const ;
 	void getRangePoint(int variable, int range, int point, double& x, double& y) const ;
 	void setRange(int variableNo, int rangeNo, int pointNo, double newX, double newY) ;

@@ -30,6 +30,8 @@
 #include "spectogglefitstyleaction.h"
 #include "specmetaitem.h"
 #include "specselectconnectedaction.h"
+#include "specsetmultilineaction.h"
+
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -183,6 +185,11 @@ void specActionLibrary::writeToStream(QDataStream &out) const
 	}
 }
 
+specStreamable* specActionLibrary::factory(const type &t) const
+{
+    return commandGenerator.commandById(t) ;
+}
+
 void specActionLibrary::readFromStream(QDataStream &in)
 {
 	qint32 num, position ;
@@ -194,19 +201,24 @@ void specActionLibrary::readFromStream(QDataStream &in)
 	for (int i = 0 ; i < num ; ++i)
 	{
 		in >> t >> parentIndex[i] ;
-		specUndoCommand *command = commandGenerator.commandById(t) ;
+        specStreamable *streamable = produceItem(in) ;
+        specUndoCommand *command = dynamic_cast<specUndoCommand*>(streamable) ;
 		if (!command)
 		{
+            qDebug() << "Error reading command no." << i << "of type" << t ;
 			undoStack->clear();
+            parentIndex.clear();
+            delete streamable ;
 			continue ;
 		}
-		in >> *command ;
+        qDebug() << "Reading item:" << i << "total count:" << undoStack->count() << "/" << num ;
 		undoStack->push(command) ;
 	}
 
 	undoStack->setIndex(position) ;
-	for (int i = 0 ; i < num ; ++i)
+    for (int i = 0 ; i < undoStack->count() ; ++i)
 		((specUndoCommand*) undoStack->command(i))->setParentObject(parents[parentIndex[i]]) ;
+    qDebug() << "to be read:" << num << "actually on stack:" << undoStack->count() ;
 }
 
 void specActionLibrary::setLastRequested(const QModelIndexList &list)
@@ -223,6 +235,15 @@ int specActionLibrary::moveInternally(const QModelIndex &parent, int row, specVi
 	command->setText(tr("Move items"));
 	push(command) ;
 	return count ;
+}
+
+int specActionLibrary::deleteInternally(specModel* model)
+{
+    int count = lastRequested.size() ;
+    specUndoCommand *command = specDeleteAction::command(model, lastRequested) ;
+    command->setText(tr("Move items"));
+    push(command) ;
+    return count ;
 }
 
 void specActionLibrary::addPlot(specPlot *plot)
@@ -260,6 +281,12 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
 	{
 		addNewAction(cMenu, new specAddFolderAction(w)) ;
 		specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;
+        specSetMultilineAction *mlAction = new specSetMultilineAction(w) ;
+        addNewAction(cMenu, mlAction) ;
+        mlAction->setChecked(
+                    currentItem->descriptorProperties(
+                        view->model()->descriptors()[
+                            view->currentIndex().column()]) & spec::multiline) ; // TODO move to action
 		if (dynamic_cast<specDataItem*>(currentItem)
 				|| dynamic_cast<specMetaItem*>(currentItem))
 			addNewAction(cMenu, new specItemPropertiesAction(w)) ;

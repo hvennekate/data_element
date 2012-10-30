@@ -43,6 +43,7 @@ private:
 	void clearParser() ;
 	void generateParser() ;
 	void setParserConstants();
+    bool variablesMulti, parametersMulti, expressionMulti, messagesMulti ;
 public:
 	specFitCurve();
 	~specFitCurve() ;
@@ -55,6 +56,8 @@ public:
 	void refit(QwtSeriesData<QPointF>* data) ;
 	int rtti() const { return specStreamable::fitCurve ; }
 	void attach(QwtPlot *plot) ;
+    void setDescriptorProperties(QString key, spec::descriptorFlags f) ;
+    spec::descriptorFlags descriptorProperties(const QString& key) const ;
 };
 
 // from lmcurve.c:

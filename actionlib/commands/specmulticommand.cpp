@@ -43,8 +43,8 @@ void specMultiCommand::readCommand(QDataStream &in)
 
 bool specMultiCommand::mergeWith(const QUndoCommand *other)
 {
-	if (!mayMerge)
-		return false ;
+    if (!parentObject()) return false ;
+    if (!mayMerge) return false ;
 //	const specMultiCommand *command = (const specMultiCommand*) other ;
 	if (other->childCount() != childCount()) return false ;
 	bool mergeable = true ;

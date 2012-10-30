@@ -216,8 +216,13 @@ void specModelItem::readFromStream(QDataStream & in)
 
 spec::descriptorFlags specModelItem::descriptorProperties(const QString& key) const
 {
-	if(key=="") return spec::editable ;
+    if(key=="") return description.flags() ;
 	return spec::def ;
+}
+
+void specModelItem::setDescriptorProperties(const QString &key, spec::descriptorFlags f)
+{
+    if (key == "") description.setFlags(f) ;
 }
 
 void specModelItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out)

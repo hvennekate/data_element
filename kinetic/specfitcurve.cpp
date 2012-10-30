@@ -70,7 +70,11 @@ void specFitCurve::fitData::reevaluate()
 
 specFitCurve::specFitCurve()
 	: expression(specDescriptor("",spec::editable)),
-	  parser(0)
+      parser(0),
+      variablesMulti(false),
+      parametersMulti(false),
+      expressionMulti(false),
+      messagesMulti(false)
 {
 }
 
@@ -97,7 +101,7 @@ QString specFitCurve::descriptor(const QString &key, bool full)
 		QStringList variableDescriptors ;
 		foreach(variablePair variable, variables)
 			variableDescriptors << variable.first + " = " + QString::number(variable.second) ;
-		if (full)
+        if (full || variablesMulti)
 			return variableDescriptors.join("\n") ;
 		if (activeVar >= 0 && activeVar < variableDescriptors.size())
 			return variableDescriptors[activeVar] ;
@@ -117,7 +121,7 @@ QString specFitCurve::descriptor(const QString &key, bool full)
 		}
 		if (fitData* fit = dynamic_cast<fitData*>(data()))
 		{
-			if (full)
+            if (full || messagesMulti)
 				return fit->errorString ;
 			return fit->errorString.section("\n",0,0) ;
 		}
@@ -336,4 +340,24 @@ void specFitCurve::generateParser()
 specFitCurve::~specFitCurve()
 {
 	clearParser();
+}
+
+void specFitCurve::setDescriptorProperties(QString key, spec::descriptorFlags f)
+{
+    // TODO implement
+    if (key == QObject::tr("Fit variables")) variablesMulti = f & spec::multiline ;
+    if (key == QObject::tr("Fit parameters")) parametersMulti = f & spec::multiline ;
+    if (key == QObject::tr("Fit expression")) expressionMulti = f & spec::multiline ;
+    if (key == QObject::tr("Fit messages")) messagesMulti = f & spec::multiline ;
+}
+
+spec::descriptorFlags specFitCurve::descriptorProperties(const QString &key) const
+{
+    spec::descriptorFlags flags = spec::def ;
+    if (key != QObject::tr("Fit messages")) flags |= spec::editable ;
+    if (key == QObject::tr("Fit variables") && variablesMulti) flags |= spec::multiline ;
+    if (key == QObject::tr("Fit parameters") && parametersMulti) flags |= spec::multiline ;
+    if (key == QObject::tr("Fit expression") && expressionMulti) flags |= spec::multiline ;
+    if (key == QObject::tr("Fit messages") && messagesMulti) flags |= spec::multiline ;
+    return flags ;
 }

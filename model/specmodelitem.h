@@ -77,6 +77,7 @@ public:
 	virtual bool addChildren(QList<specModelItem*> list, QList<specModelItem*>::size_type position) ;
 	virtual QStringList descriptorKeys() const ;
 	virtual spec::descriptorFlags descriptorProperties(const QString& key) const ;
+    virtual void setDescriptorProperties(const QString& key, spec::descriptorFlags f) ;
 	virtual void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
 	virtual QVector<double> intensityData() const ;
 	virtual int removeData(QList<specRange*>*) { refreshPlotData() ; return 0 ; }

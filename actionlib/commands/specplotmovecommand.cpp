@@ -37,6 +37,7 @@ void specPlotMoveCommand::undoIt()
 
 bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
 {
+    if (!parentObject()) return false ;
 	const specPlotMoveCommand *other = (const specPlotMoveCommand*) ot ;
 	if (! (this->items && other->items)) return false ;
 	if (*(other->items) != *(this->items)) return false ;

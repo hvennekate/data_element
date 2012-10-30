@@ -67,7 +67,8 @@ public:
 		fitCurve = 62,
 		exchangeFitCommand = 63,
 		toggleFitStyleCommand = 64,
-		penStyleCommandId = 65
+        penStyleCommandId = 65,
+        descriptorFlagsCommand = 66
 	};
 protected:
 	virtual void writeToStream(QDataStream& out) const = 0;

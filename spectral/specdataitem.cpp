@@ -241,6 +241,12 @@ spec::descriptorFlags specDataItem::descriptorProperties(const QString& key) con
 	return specModelItem::descriptorProperties(key) ;
 }
 
+void specDataItem::setDescriptorProperties(const QString &key, spec::descriptorFlags f)
+{
+    if (description.contains(key)) description[key].setFlags(f) ;
+    else specModelItem::setDescriptorProperties(key, f) ;
+}
+
 
 void specDataItem::scaleBy(const double& mul)
 {

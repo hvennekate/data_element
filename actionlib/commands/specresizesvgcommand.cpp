@@ -61,6 +61,7 @@ bool specResizeSVGcommand::mergeable(const specUndoCommand *other)
 
 bool specResizeSVGcommand::mergeWith(const QUndoCommand *other)
 {
+    if (!parentObject()) return false ;
 	return mergeable((specUndoCommand*) other) ;
 }
 

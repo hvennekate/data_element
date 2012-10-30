@@ -50,6 +50,7 @@ public:
 	int activeLine(const QString &key) const ;
 	QStringList descriptorKeys() const ;
 	spec::descriptorFlags descriptorProperties(const QString& key) const ;
+    void setDescriptorProperties(const QString &key, spec::descriptorFlags f);
 
 	QIcon decoration() const ;
 

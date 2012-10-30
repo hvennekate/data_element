@@ -109,7 +109,9 @@ SOURCES += main.cpp \
     actionlib/actions/spectogglefitstyleaction.cpp \
     actionlib/speccommandgenerator.cpp \
     actionlib/actions/specselectconnectedaction.cpp \
-    actionlib/specworkerthread.cpp
+    actionlib/specworkerthread.cpp \
+    actionlib/commands/specdescriptorflagscommand.cpp \
+    actionlib/actions/specsetmultilineaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -220,7 +222,9 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/spectogglefitstyleaction.h \
     actionlib/speccommandgenerator.h \
     actionlib/actions/specselectconnectedaction.h \
-    actionlib/specworkerthread.h
+    actionlib/specworkerthread.h \
+    actionlib/commands/specdescriptorflagscommand.h \
+    actionlib/actions/specsetmultilineaction.h
 
 INCLUDEPATH += kinetic \
 	log \

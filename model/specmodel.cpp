@@ -23,6 +23,8 @@
 #include "speceditdescriptorcommand.h"
 #include "specresizesvgcommand.h"
 #include <algorithm>
+#include "specdeleteaction.h"
+
 // TODO replace isFolder() by addChildren(empty list,0)
 
 bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria)
@@ -593,18 +595,34 @@ bool specModel::removeRows(int position, int rows, const QModelIndex &parent)
 		dontDelete -- ;
 		return true ;
 	}
-	beginRemoveRows(parent, position, position+rows-1); // TODO this is actually not to be permitted!!
-// 	QList<specModelItem*> list = itemPointer(index)->takeChildren(position,rows) ;
-	QList<specModelItem*> list ;
-	specFolderItem *parentPointer = (specFolderItem*) itemPointer(parent) ;
-	for (int i = 0 ; i < rows ; i++)
-		list << itemPointer(index(position+i,0,parent)) ;
-	parentPointer->haltRefreshes(true) ;
-	while(!list.isEmpty())
-		delete list.takeLast() ;
-	parentPointer->haltRefreshes(false) ;
-	endRemoveRows();
-	return true ;
+
+    if (dropBuddy) dropBuddy->deleteInternally(this) ;
+//    beginRemoveRows(parent, position, position+rows-1); // TODO this is actually not to be permitted!!
+//    QModelIndexList indexes ;
+//    for (int i = 0 ; i < rows ; ++i)
+//        indexes << index(position+i,0,parent) ;
+//    specUndoCommand *deleteCommand = specDeleteAction::command(this, indexes) ;
+//    if (dropBuddy)
+//        dropBuddy->push(deleteCommand) ;
+//    else
+//    {
+//        deleteCommand->redo();
+//        delete deleteCommand ;
+//    }
+//    endRemoveRows();
+    return true ;
+
+//// 	QList<specModelItem*> list = itemPointer(index)->takeChildren(position,rows) ;
+//    QList<specModelItem*> list ;
+//    specFolderItem *parentPointer = (specFolderItem*) itemPointer(parent) ;
+//    for (int i = 0 ; i < rows ; i++)
+//        list << itemPointer(index(position+i,0,parent)) ;
+//    parentPointer->haltRefreshes(true) ;
+//    while(!list.isEmpty())
+//        delete list.takeLast() ;
+//    parentPointer->haltRefreshes(false) ;
+
+//    return true ;
 }
 
 void specModel::setInternalDrop(bool val)
@@ -742,10 +760,10 @@ void specModel::applySubMap(const QModelIndexList & indexList)
 specModelItem* specModel::itemPointer(const QVector<int> &indexes) const
 {
 	specModelItem* pointer = root ;
-	for (int i =  indexes.size() - 1 ; i >= 0 && pointer->isFolder() ; --i)
+    for (int i =  indexes.size() - 1 ; i >= 0 && pointer->isFolder() ; --i)
 	{
 		if (!pointer) return 0 ;
-		pointer = ((specFolderItem*) pointer)->child(indexes[i]) ;
+        pointer = ((specFolderItem*) pointer)->child(indexes[i]) ;
 	}
 	return pointer ;
 }

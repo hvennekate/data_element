@@ -24,6 +24,12 @@ spec::descriptorFlags specLogMessage::descriptorProperties ( const QString& key 
 	return spec::def ;
 }
 
+void specLogMessage::setDescriptorProperties(const QString &key, spec::descriptorFlags f)
+{
+    Q_UNUSED(key)
+    Q_UNUSED(f)
+}
+
 bool specLogMessage::changeDescriptor( QString key, QString value )
 {
 	Q_UNUSED(key)
