@@ -59,6 +59,7 @@ bool specMultiCommand::mergeWith(const QUndoCommand *other)
 
 	for (int i = 0 ; i < childCount() ; ++i)
 		((specUndoCommand*) child(i))->mergeWith((const specUndoCommand*) other->child(i)) ;
+    setText(other->text());
 	return true ;
 }
 

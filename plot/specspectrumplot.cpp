@@ -419,7 +419,13 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double n
 			referenceSpectrum[reference->sample(i).x()] = reference->sample(i).y() ;
 
 	specMultiCommand *zeroCommand = generateCorrectionCommand(zeroRanges, spectra, referenceSpectrum, view->model(), noSlopeAction->isChecked()) ;
-	zeroCommand->setText(tr("Apply range correction"));
+    QStringList rangeStrings ;
+    for (QwtPlotItemList::iterator i = zeroRanges.begin() ; i != zeroRanges.end() ; ++i)
+    {
+        specRange* range = (specRange*) (*i) ;
+        rangeStrings << QString::number(range->minValue()) + "--" + QString::number(range->maxValue()) ;
+    }
+    zeroCommand->setText(tr("Apply range correction. Ranges: ") + rangeStrings.join(", "));
 	undoPartner()->push(zeroCommand) ;
 	replot() ;
 }
