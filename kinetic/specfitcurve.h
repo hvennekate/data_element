@@ -43,7 +43,7 @@ private:
 	void clearParser() ;
 	void generateParser() ;
 	void setParserConstants();
-    bool variablesMulti, parametersMulti, expressionMulti, messagesMulti ;
+    bool variablesMulti, expressionMulti, messagesMulti ;
 public:
 	specFitCurve();
 	~specFitCurve() ;

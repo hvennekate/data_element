@@ -72,7 +72,6 @@ specFitCurve::specFitCurve()
 	: expression(specDescriptor("",spec::editable)),
       parser(0),
       variablesMulti(false),
-      parametersMulti(false),
       expressionMulti(false),
       messagesMulti(false)
 {
@@ -110,7 +109,7 @@ QString specFitCurve::descriptor(const QString &key, bool full)
 	if (QObject::tr("Fit parameters") == key)
 		return fitParameters.join(", ") ;
 	if (QObject::tr("Fit expression") == key)
-		return expression.content(full) ;
+        return expression.content(full || expressionMulti) ;
 	if (QObject::tr("Fit messages") == key)
 	{
 		if (!errorString.isEmpty())
@@ -298,6 +297,8 @@ void specFitCurve::writeToStream(QDataStream &out) const
 	       fitParameters <<
 	       expression <<
 	       errorString ;
+    if (variablesMulti || expressionMulti || messagesMulti)
+        out << qint8(variablesMulti + 2*expressionMulti + 4*messagesMulti) ;
 }
 
 void specFitCurve::readFromStream(QDataStream &in)
@@ -308,6 +309,16 @@ void specFitCurve::readFromStream(QDataStream &in)
 	      fitParameters >>
 	      expression >>
 	      errorString ;
+    if (in.atEnd())
+        expressionMulti = messagesMulti = variablesMulti = false ;
+    else
+    {
+        qint8 a ;
+        in >> a ;
+        messagesMulti = a & qint8(4) ;
+        expressionMulti = a & qint8(2) ;
+        variablesMulti = a & qint8(1) ;
+    }
 	generateParser();
 	setParserConstants();
 	setData(new fitData(parser)) ;
@@ -346,7 +357,6 @@ void specFitCurve::setDescriptorProperties(QString key, spec::descriptorFlags f)
 {
     // TODO implement
     if (key == QObject::tr("Fit variables")) variablesMulti = f & spec::multiline ;
-    if (key == QObject::tr("Fit parameters")) parametersMulti = f & spec::multiline ;
     if (key == QObject::tr("Fit expression")) expressionMulti = f & spec::multiline ;
     if (key == QObject::tr("Fit messages")) messagesMulti = f & spec::multiline ;
 }
@@ -356,7 +366,6 @@ spec::descriptorFlags specFitCurve::descriptorProperties(const QString &key) con
     spec::descriptorFlags flags = spec::def ;
     if (key != QObject::tr("Fit messages")) flags |= spec::editable ;
     if (key == QObject::tr("Fit variables") && variablesMulti) flags |= spec::multiline ;
-    if (key == QObject::tr("Fit parameters") && parametersMulti) flags |= spec::multiline ;
     if (key == QObject::tr("Fit expression") && expressionMulti) flags |= spec::multiline ;
     if (key == QObject::tr("Fit messages") && messagesMulti) flags |= spec::multiline ;
     return flags ;

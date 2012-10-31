@@ -22,6 +22,7 @@ bool specFolderItem::addChild(specModelItem* item, QList<specModelItem*>::size_t
 
 bool specFolderItem::addChildren(QList<specModelItem*> list, QList<specModelItem*>::size_type position)
 {
+    list.removeAll(0) ;
 	for(int i = 0 ; i < list.size() ; i++)
 	{
 		list[i]->setParent(this) ;
