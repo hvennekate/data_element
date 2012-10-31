@@ -11,7 +11,13 @@ class CanvasPicker ;
 
 class specMetaVariable : public QwtInterval // TODO change to specInterval
 {
-	int begin, end, inc ;
+public:
+    struct indexLimit
+    {
+        int begin, end, increment ;
+    } ;
+private:
+    indexLimit limits ;
 	bool refreshingRanges ;
 	static QString extract(QString&, const QRegExp&) ;
 	specMetaParser* parent ; // TODO extract templated version of parent, child to inherit from
@@ -31,7 +37,7 @@ public:
     virtual ~specMetaVariable() ;
 	virtual bool xValues(specModelItem*, QVector<double>&) const;
 	virtual QVector<double> values(specModelItem*, const QVector<double>&) const ;
-	bool setIndexRange(int& begin, int& end, int& increment, int max) const;
+    indexLimit indexRange(int max) const;
 	static specMetaVariable* factory(QString, specMetaParser* parent = 0) ;
 	void produceRanges(QSet<specPlot*>, QColor) ;
 	void detachRanges();

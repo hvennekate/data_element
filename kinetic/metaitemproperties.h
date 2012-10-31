@@ -3,6 +3,10 @@
 
 #include <QDialog>
 #include "specmetaitem.h"
+#include <QMap>
+
+class QListWidgetItem ;
+class QTableWidgetItem ;
 
 namespace Ui {
 class metaItemProperties;
@@ -20,16 +24,37 @@ private slots:
 	void on_connectedItemsList_itemSelectionChanged();
 	void on_moveUpButton_clicked();
 	void on_moveDownButton_clicked();
-	void refreshMetaPlot() ;
+    void on_dataTable_itemSelectionChanged();
+
 private:
 	Ui::metaItemProperties *ui;
 	specMetaItem* originalItem ;
-	QList<QPair<int,QwtPlotCurve*> > connectedData ;
 	void moveSelection(bool) ;
-	QModelIndexList generateConnectionList(const QList<specModelItem*>& items) ;
-	QwtPlotCurve metaCurve, currentCurve, selectedCurve ;
-	QVector<int> pointToItem ;
-	bool refreshing ;
+    QwtPlotCurve metaCurve, currentCurve, selectedCurve ;
+
+    struct itemLink
+    {
+        specModelItem* item ;
+        QVector<QTableWidgetItem*> points ;
+        QwtPlotCurve* curve ;
+        ~itemLink() { delete curve ; }
+    };
+    QMap<QListWidgetItem*,itemLink> itemInfo ;
+
+    struct pointLink
+    {
+        QVector<QListWidgetItem*> items ;
+        QPointF value ;
+    };
+    QMap<QTableWidgetItem*, pointLink> pointInfo ;
+
+    void buildAssignments(const QList<QPair<specModelItem *, bool> > &items) ;
+    void buildPoints() ;
+    void refreshPlots() ;
+    QTableWidgetItem* firstEntry(QTableWidgetItem*) ;
+    bool reselecting ;
+private slots:
+
 };
 
 #endif // METAITEMPROPERTIES_H

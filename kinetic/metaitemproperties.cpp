@@ -10,28 +10,14 @@ metaItemProperties::metaItemProperties(specMetaItem* i,QWidget *parent) :
 	QDialog(parent),
 	ui(new Ui::metaItemProperties),
 	originalItem(i),
-	refreshing(false)
+    reselecting(false)
 {
 	ui->setupUi(this);
 	ui->moveUpButton->setIcon(QIcon::fromTheme("go-up"));
 	ui->moveDownButton->setIcon(QIcon::fromTheme("go-down")) ;
 
 	ui->itemPreview->setAutoDelete(false) ;
-
-	int num = 0 ;
-	foreach(specModelItem* item, i->items)
-	{
-		QListWidgetItem *newItem = new QListWidgetItem(item->descriptor("")) ;
-		newItem->setCheckState(Qt::Checked) ;
-		ui->connectedItemsList->addItem(newItem) ;
-		connectedData << qMakePair(num++, new QwtPlotCurve) ;
-		QVector<QPointF> samples ; // TODO ueberarbeiten
-		for (size_t i = 0 ; i < item->dataSize() ; ++i)
-			samples << item->sample(i) ;
-		connectedData.last().second->setSamples(samples);
-	}
-
-	ui->styleFit->setDisabled(!i->getFitCurve()) ;
+    ui->styleFit->setDisabled(!i->getFitCurve()) ;
 	ui->styleFit->setCheckState(i->styleFitCurve ? Qt::Checked : Qt::Unchecked) ;
 
 	// prepare preview of meta data
@@ -46,76 +32,43 @@ metaItemProperties::metaItemProperties(specMetaItem* i,QWidget *parent) :
 	currentCurve.setSymbol(new QwtSymbol(QwtSymbol::Ellipse, QBrush(Qt::red), QPen(Qt::red), QSize(5,5)));
 	currentCurve.attach(ui->metaPlot) ;
 
-	int count = 0 ;
-	foreach(specModelItem* item, i->items)
-	{
-		QwtSeriesData<QPointF> *itemData = i->filter->evaluate(QVector<specModelItem*>()<< item);
-		int total = itemData->size() ;
-		delete itemData ;
-		for (int j = 0 ; j < total ; ++j)
-			pointToItem << count ;
-		count++ ;
-	}
-
-	ui->dataTable->setRowCount(metaCurve.dataSize()) ;
-	for (size_t i = 0 ; i < metaCurve.dataSize() ; ++i)
-	{
-		QPointF sample = metaCurve.sample(i) ;
-		ui->dataTable->setItem(i,0,new QTableWidgetItem(QString::number(sample.x()))) ;
-		ui->dataTable->setItem(i,1,new QTableWidgetItem(QString::number(sample.y()))) ;
-	}
+    //create list and table
+    QList<QPair<specModelItem*, bool> > originalItems ;
+    foreach(specModelItem* item, originalItem->serverList())
+        originalItems << qMakePair(item, true) ;
+    buildAssignments(originalItems);
 
 	connect(ui->connectedItemsList, SIGNAL(itemSelectionChanged()), this, SLOT(refreshMetaPlot())) ;
 	connect(ui->dataTable, SIGNAL(itemSelectionChanged()), this, SLOT(refreshMetaPlot())) ;
 }
 
-void metaItemProperties::refreshMetaPlot()
+void metaItemProperties::refreshPlots()
 {
-	if (!sender()) return ;
-	if (refreshing) return ;
-	refreshing = true ;
-	QVector<QPointF> selectedSamples ;
-	if (sender() == ui->connectedItemsList)
-	{
-		QItemSelection pointSelection ;
-		foreach(QListWidgetItem* item, ui->connectedItemsList->selectedItems())
-		{
-			int index = ui->connectedItemsList->row(item) ;
-			for (QVector<int>::iterator i = pointToItem.begin() ; i != pointToItem.end() ; i)
-			{
-				i = qFind(i, pointToItem.end(), index) ;
-				if (i != pointToItem.end())
-				{
-					QModelIndex pointIndex = ui->dataTable->model()->index(i-pointToItem.begin(),0) ;
-					pointSelection.append(QItemSelectionRange(pointIndex, pointIndex)) ;
-					++i ;
-				}
-			}
-		}
-		ui->dataTable->selectionModel()->select(pointSelection, QItemSelectionModel::ClearAndSelect) ;
-	}
-	else
-	{
-		QItemSelection itemSelection ;
-		foreach(QTableWidgetItem* item, ui->dataTable->selectedItems()) // TODO might double select
-		{
-			QModelIndex itemIndex = ui->connectedItemsList->model()->index(pointToItem[ui->dataTable->row(item)], 0) ; // TOD dangerous...
-			itemSelection.append(QItemSelectionRange(itemIndex, itemIndex)) ;
-		}
-		ui->connectedItemsList->selectionModel()->select(itemSelection,QItemSelectionModel::ClearAndSelect);
-	}
+    // item plot
+    ui->itemPreview->detachItems(QwtPlotItem::Rtti_PlotItem, false) ;
+    foreach(QListWidgetItem* item, ui->connectedItemsList->selectedItems())
+        itemInfo[item].curve->attach(ui->itemPreview) ;
 
-	// highlight points
-	foreach(QTableWidgetItem* item, ui->dataTable->selectedItems()) // TODO might double select
-		selectedSamples << metaCurve.sample(ui->dataTable->row(item)) ;
-	selectedCurve.setSamples(selectedSamples) ;
-	if (ui->dataTable->currentRow() >= 0)
-		currentCurve.setSamples(QVector<QPointF>() << metaCurve.sample(ui->dataTable->currentRow()));
-	ui->metaPlot->replot() ;
-	refreshing = false ;
+    // point plot
+    QVector<QPointF> selectedPoints ;
+    QSet<QTableWidgetItem*> selectedRows ;
+    foreach(QTableWidgetItem* item, ui->dataTable->selectedItems())
+        selectedRows += firstEntry(item) ;
+    foreach(QTableWidgetItem* item, selectedRows)
+        selectedPoints << pointInfo[item].value ;
+    selectedCurve.setSamples(selectedPoints) ;
+
+    // current point
+    currentCurve.setSamples(QVector<QPointF>() << pointInfo[ui->dataTable->currentItem()].value);
+
+    ui->itemPreview->replot();
+    ui->metaPlot->replot();
 }
 
-// TODO include variable view
+QTableWidgetItem* metaItemProperties::firstEntry(QTableWidgetItem *item)
+{
+    return ui->dataTable->item(item->row(),0) ;
+}
 
 metaItemProperties::~metaItemProperties()
 {
@@ -124,11 +77,14 @@ metaItemProperties::~metaItemProperties()
 
 void metaItemProperties::on_connectedItemsList_itemSelectionChanged()
 {
-	ui->itemPreview->detachItems(QwtPlotItem::Rtti_PlotItem, false) ;
-
-	foreach(QListWidgetItem* item, ui->connectedItemsList->selectedItems())
-		connectedData[ui->connectedItemsList->row(item)].second->attach(ui->itemPreview) ;
-	ui->itemPreview->replot();
+    if (reselecting) return ;
+    reselecting = true ;
+    ui->dataTable->clearSelection();
+    foreach(QListWidgetItem* item, ui->connectedItemsList->selectedItems())
+        foreach(QTableWidgetItem* point, itemInfo[item].points)
+            ui->dataTable->selectRow(point->row()) ;
+    refreshPlots();
+    reselecting = false ;
 }
 
 void metaItemProperties::on_moveUpButton_clicked()
@@ -141,44 +97,138 @@ void metaItemProperties::on_moveDownButton_clicked()
 	moveSelection(true) ;
 }
 
-void metaItemProperties::moveSelection(bool down)
+void metaItemProperties::buildAssignments(const QList<QPair<specModelItem *, bool> >&items) // TODO change back to simple list w/o pair
 {
-	if (ui->connectedItemsList->selectedItems().isEmpty()) return ;
+    // save selection
+    QVector<specModelItem*> selectedItems ;
+    foreach(QListWidgetItem* listItem, ui->connectedItemsList->selectedItems())
+        selectedItems << itemInfo[ui->connectedItemsList->row(listItem)].item ;
 
-	int begin = ui->connectedItemsList->row(ui->connectedItemsList->selectedItems().first()),
-	    end   = ui->connectedItemsList->row(ui->connectedItemsList->selectedItems().last())+1 ;
+    // clear all
+    itemInfo.clear();
+    ui->connectedItemsList->clear();
 
-	if ((begin == 0 && !down) || (end == connectedData.size() && down)) return ;
+    // Construct item map and list widget
+    QMap<specModelItem*, QListWidgetItem*> modelItemInfo ;
+    for (QList<QPair<specModelItem*, bool> >::iterator i = items.begin() ; i != items.end() ; ++i)
+    {
+        // Add item to list widget
+        QListWidgetItem* newItem = new QListWidgetItem(i->first->descriptor("")) ;
+        newItem->setCheckState(i->second);
+        ui->connectedItemsList->addItem(newItem) ;
 
-	if (down)
-	{
-		connectedData = connectedData.mid(0,begin) +
-				connectedData.mid(end,1) +
-				connectedData.mid(begin,end-begin) +
-				connectedData.mid(end+1) ;
-		ui->connectedItemsList->insertItem(begin,ui->connectedItemsList->takeItem(end)) ;
+        // prepare info struct
+        itemLink info ;
+        info.item = i->first ;
+        info.curve = new QwtPlotCurve ;
+        QVector<QPointF> curveData ;
+        for (size_t i = 0 ; i < i->first->dataSize() ; ++i)
+            curveData << i->first->sample(i) ;
+        info.curve->setSamples(curveData) ;
 
-	}
-	else
-	{
-		connectedData = connectedData.mid(0,begin-1) +
-				connectedData.mid(begin,end-begin) +
-				connectedData.mid(begin-1,1) +
-				connectedData.mid(end) ;
-		ui->connectedItemsList->insertItem(end-1,ui->connectedItemsList->takeItem(begin-1)) ;
-	}
+        // add entries to maps
+        modelItemInfo[i->first] = newItem ;
+        itemInfo[newItem] = info ;
+    }
+
+    buildPoints();
+
+    // restore selection
+    QItemSelection selection ;
+    foreach(specModelItem *modelItem, selectedItems)
+    {
+        QModelIndex itemIndex =
+                ui->connectedItemsList->model()->index(
+                    ui->connectedItemsList->row(modelItemInfo[modelItem]),0) ;
+        selection.append(QItemSelectionRange());
+    }
+    ui->connectedItemsList->selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
 }
 
-QModelIndexList metaItemProperties::generateConnectionList(const QList<specModelItem*>& items)
+void metaItemProperties::buildPoints()
 {
-	QModelIndexList indexes ;
-	foreach(specModelItem* item, items)
-	{
-		QModelIndex index = originalItem->metaModel->index(item) ;
-		if (!index.isValid()) index = originalItem->dataModel->index(item) ;
-		indexes << index ;
-	}
-	return indexes ;
+    // clear all
+    pointInfo.clear();
+    ui->dataTable->clear();
+    for (QMap<QListWidgetItem*,itemLink>::iterator i = itemInfo.begin() ; i != itemInfo.end() ; ++i)
+        i->value.points.clear() ;
+
+    // Construct point map and table widget
+    QVector<specModelItem*> itemVector ;
+    for (QList<QPair<specModelItem*, bool> >::iterator i = items.begin() ; i != items.end() ; ++i)
+        itemVector << i->first ;
+
+    QVector<QVector<specModelItem*> > itemsPerPoint ;
+    originalItem->filter->itemsToQuery(itemVector, itemsPerPoint) ;
+    QVector<QPointF> evaluatedData ;
+    for (int i = 0 ; i < itemsPerPoint.size() ; ++i)
+    {
+        // Do evaluation for one set of points
+        QVector<QPointF> dataPoints ;
+        QVector<QVector<double> > variableValues ;
+        originalItem->filter->getVariableValues(itemsPerPoint[i], variableValues) ;
+        originalItem->filter->getPoints(variableValues, dataPoints) ;
+
+        // Prepare point info
+        pointLink info ;
+        foreach(specModelItem* modelItem, itemsPerPoint[i])
+            info.items << modelItemInfo[modelItem] ;
+
+        // add point to table and info vector
+        for (int i = 0 ; i < dataPoints.size() ; ++i)
+        {
+            QTableWidgetItem *newTableEntry = new QTableWidgetItem(QString::number(dataPoints[i].x())) ;
+            // add to list item info
+            foreach(QListWidgetItem* listItem, info.items)
+                itemInfo[listItem].points << newTableEntry ;
+
+            // add point value to info
+            info.value = dataPoints[i] ;
+
+            // add variable values to table
+            int row = ui->dataTable->rowCount() ;
+            ui->dataTable->setRowCount(row+1) ;
+            ui->dataTable->setItem(row,0, newTableEntry) ;
+            ui->dataTable->setItem(row, 1, new QTableWidgetItem(QString::number(dataPoints[i].y()))) ;
+            for (int j = 0 ; j < variableValues.size() ; ++j)
+                ui->dataTable->setItem(row, 2+j, new QTableWidgetItem(QString::number(variableValues[j][i])));
+
+            pointInfo << info ;
+        }
+        // add to overall result
+        evaluatedData << dataPoints ;
+    }
+}
+
+void metaItemProperties::moveSelection(bool down)
+{
+    QList<QListWidgetItem*> selection = ui->connectedItemsList->selectedItems() ;
+    if (selection.isEmpty()) return ;
+    ui->connectedItemsList->selectionModel()->clearSelection();
+
+    int begin = ui->connectedItemsList->row(selection.first()) ,
+        end   = ui->connectedItemsList->row(selection.last())+1 ;
+    if (down)
+    {
+        if(end == ui->connectedItemsList->count()) return ;
+        for (int i = 0 ; i < end-begin ; ++i)
+            ui->connectedItemsList->insertItem(i+1, ui->connectedItemsList->takeItem(begin+i));
+    }
+    else
+    {
+        if(0 == begin) return ;
+        for (int i = 0 ; i < end-begin ; ++i)
+            ui->connectedItemsList->insertItem(i-1, ui->connectedItemsList->takeItem(begin+i));
+    }
+
+    buildPoints();
+    QItemSelection s ;
+    foreach(QListWidgetItem* item, selection)
+    {
+        QModelIndex index = ui->connectedItemsList->model()->index(ui->connectedItemsList->row(item),0) ;
+        s.append(QItemSelection(index,index)) ;
+    }
+    ui->connectedItemsList->setSelection(s, QItemSelectionModel::ClearAndSelect) ;
 }
 
 specUndoCommand* metaItemProperties::changedConnections(QObject *parent)
@@ -187,8 +237,11 @@ specUndoCommand* metaItemProperties::changedConnections(QObject *parent)
 	if (!parent) return 0 ;
 	QList<specModelItem*> newConnections ;
 	for (int i = 0 ; i < ui->connectedItemsList->count() ; ++i)
-		if (ui->connectedItemsList->item(i)->checkState() == Qt::Checked)
-			newConnections << originalItem->items[connectedData[i].first] ;
+    {
+        QListWidgetItem* item = ui->connectedItemsList->item(i) ;
+        if (item->checkState() == Qt::Checked)
+            newConnections << itemInfo[item].item ;
+    }
 
 	specMultiCommand *parentCommand = new specMultiCommand ;
 	parentCommand->setParentObject(parent) ;
@@ -219,3 +272,21 @@ specUndoCommand* metaItemProperties::changedConnections(QObject *parent)
 	return parentCommand ;
 }
 
+
+void metaItemProperties::on_dataTable_itemSelectionChanged()
+{
+    if (reselecting) return ;
+    reselecting = true ;
+//    ui->connectedItemsList->clearSelection();
+    QItemSelection selection ;
+    foreach(QTableWidgetItem* point, ui->dataTable->selectedItems())
+    {
+        foreach(QListWidgetItem* item, pointInfo[firstEntry(point)].items)
+        {
+            QModelIndex index = ui->connectedItemsList->model()->index(ui->connectedItemsList->row(item),0) ;
+            selection.append(QItemSelection(index, index)) ;
+        }
+    }
+    ui->connectedItemsList->selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
+    reselecting = false ;
+}

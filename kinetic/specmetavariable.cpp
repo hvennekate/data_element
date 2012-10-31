@@ -49,10 +49,10 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 	{
 		//interpret the range
 		QStringList indexes = range.remove("[").remove("]").split(':') ;
-		product->begin = qMax(0, indexes[0] == "" ? 0 : indexes[0].toInt()) ;
-		product->end   = qMax(product->begin, indexes.size()==1 ? product->begin + 1
+        product->limits.begin = qMax(0, indexes[0] == "" ? 0 : indexes[0].toInt()) ;
+        product->limits.end   = qMax(product->limits.begin, indexes.size()==1 ? product->limits.begin + 1
 								:(indexes[1] == "" ? int(INFINITY) : indexes[1].toInt())) ;
-		product->inc   = qBound(1, indexes.size() > 2 && indexes[2] != "" ? indexes[2].toInt() : 1, product->end - product->begin) ;
+        product->limits.increment  = qBound(1, indexes.size() > 2 && indexes[2] != "" ? indexes[2].toInt() : 1, product->limits.end - product->limits.begin) ;
 		range = "[" + range + "]" ;
 	}
 
@@ -71,21 +71,22 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 
 specMetaVariable::specMetaVariable(specMetaParser *p)
 	: //QwtInterval(-INFINITY,INFINITY,QwtInterval::IncludeBorders),
-	  begin(0),
-	  end(int(INFINITY)),
-	  inc(1),
 	  refreshingRanges(false),
 	  parent(p),
 	  descriptor("")
 {
+    limits.begin = 0 ;
+    limits.end = int(INFINITY) ;
+    limits.increment = 1 ;
 }
 
-bool specMetaVariable::setIndexRange(int &start, int &finish, int &step, int max) const
+specMetaVariable::indexLimit specMetaVariable::indexRange(int max) const
 {
-	start  = qBound(0,begin,max) ;
-	finish = qBound(start,end,max) ;
-	step   = qBound(1, inc, finish-start) ;
-	return true ; // ????
+    indexLimit l ;
+    l.begin = qBound(0,limits.begin, max) ;
+    l.end = qBound(l.begin,limits.end, max) ;
+    l.increment = qBound(1, limits.increment, l.end-l.begin) ;
+    return l ;
 }
 
 bool specMetaVariable::xValues(specModelItem *item, QVector<double> & xvals) const // false if vector was empty
@@ -151,7 +152,7 @@ void specMetaVariable::produceRanges(QSet<specPlot *> plots, QColor color)
 	if (plots.size() != ranges.size())
 	{
 		clearRanges(); // TODO : consider replotting
-		foreach(specPlot* plot, plots)
+        for (int i = 0 ; i < plots.size() ; ++i)
 		{
 			specMetaRange *range = new specMetaRange(minValue(),maxValue(),this) ;
 			ranges << range ;
