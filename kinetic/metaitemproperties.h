@@ -37,7 +37,6 @@ private:
         specModelItem* item ;
         QVector<QTableWidgetItem*> points ;
         QwtPlotCurve* curve ;
-        ~itemLink() { delete curve ; }
     };
     QMap<QListWidgetItem*,itemLink> itemInfo ;
 
@@ -48,13 +47,18 @@ private:
     };
     QMap<QTableWidgetItem*, pointLink> pointInfo ;
 
-    void buildAssignments(const QList<QPair<specModelItem *, bool> > &items) ;
+    QMap<specModelItem*, QListWidgetItem*> modelItemInfo ;
+
+    void buildAssignments(const QList<specModelItem *> &items) ;
     void buildPoints() ;
     void refreshPlots() ;
+    void clearItemInfo() ;
+    QModelIndexList generateConnectionList(const QList<specModelItem*> items) ;
     QTableWidgetItem* firstEntry(QTableWidgetItem*) ;
     bool reselecting ;
 private slots:
 
+    void on_connectedItemsList_itemChanged(QListWidgetItem *item);
 };
 
 #endif // METAITEMPROPERTIES_H

@@ -90,6 +90,7 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 void specMetaParser::itemsToQuery(const QVector<specModelItem*>& items,
                                   QVector<QVector<specModelItem*> >& itemsPerPoint)
 {
+    if (evaluators.isEmpty() || items.isEmpty()) return ;
     typedef specMetaVariable::indexLimit trackingIndex ;
     typedef QVector<trackingIndex> trackingIndexes ;
     trackingIndexes indexes ;
@@ -122,26 +123,34 @@ void specMetaParser::getVariableValues(const QVector<specModelItem*>& itemsToUse
 
     // Build results
         // get values
+    QVector<QVector<double> > values ;
     for (int i = 0 ; i < evaluators.size() ; ++i)
-        variableValues << evaluators[i]->values(itemsToUse[i], xValues) ;
+        values << evaluators[i]->values(itemsToUse[i], xValues) ;
 
+        // flip matrix
+    for (int i = 0 ; i < xValues.size() ; ++i)
+    {
+        QVector<double> row ;
+        for (int j = 0 ; j < evaluators.size() ; ++j) // TODO additional condition:  enough values
+            row << values[j][i] ;
+        variableValues << row ;
+    }
 }
 
 void specMetaParser::getPoints(const QVector<QVector<double> >& variableValues,
                                QVector<QPointF>& result)
 {
     if (variableValues.isEmpty()) return ;
-    int size = variableValues.first().size() ;
-    if (!size) return ;
-    for (int i = 0 ; i < size ; ++i)
+    if (variableValues.first().isEmpty()) return ;
+    for (int i = 0 ; i < variableValues.size() ; ++i)
     {
-        if(containsNan(variableValues, i))
+        if(containsNan(variableValues[i]))
         {
             result << QPointF(NAN, NAN) ;
             continue ;
         }
         for (int j = 0 ; j < valueVector.size() ; ++j)
-            valueVector[j] = variableValues[j][i] ;
+            valueVector[j] = variableValues[i][j] ;
         try
         {
             result << QPointF(x.Eval(), y.Eval()) ;
