@@ -53,17 +53,6 @@ bool specFolderItem::isEditable(QString key) const
 	return false ;
 }
 
-bool specFolderItem::changeDescriptor(QString key, QString value)
-{
-	if (key=="")
-		return specModelItem::changeDescriptor(key,value) ;
-	
-	bool success = false ;
-	foreach(specModelItem* item, childrenList)
-		success |= item->changeDescriptor(key,value) ;
-	return success ;
-}
-
 void specFolderItem::refreshPlotData()
 { ///! @todo suspend frequent refreshes
 	QTime timer ;

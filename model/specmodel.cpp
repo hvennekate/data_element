@@ -24,6 +24,7 @@
 #include "specresizesvgcommand.h"
 #include <algorithm>
 #include "specdeleteaction.h"
+#include <QStack>
 
 // TODO replace isFolder() by addChildren(empty list,0)
 
@@ -871,9 +872,41 @@ void specModel::signalChanged(const QModelIndex &i)
 
 	QModelIndex begin = index(i.row(),0,i.parent()),
 			end = index(i.row(),columnCount(i)-1,i.parent()) ;
-	specModelItem *item = itemPointer(i) ;
+    signalChanged(begin, end) ;
+    specModelItem *item = itemPointer(i) ;
 	checkForNewDescriptors(QList<specModelItem*>() << item, i.parent());
 	emit dataChanged(begin,end) ;
+}
+
+void specModel::signalChanged(QModelIndex begin, QModelIndex end)
+{
+    while (begin.parent() != end.parent())
+    {
+        if (begin.isValid())
+            begin = begin.parent() ;
+        else
+            end = QModelIndex() ;
+    }
+
+    QModelIndex i(begin) ;
+    QList<specModelItem*> items ;
+
+    do
+    {
+        specModelItem* pointer = itemPointer(i) ;
+        items << pointer;
+        if (pointer->children())
+        {
+            QModelIndex firstChild = index(0,0,i),
+                    lastChild = index(pointer->children()-1, 0, i) ;
+            signalChanged(firstChild, lastChild) ;
+        }
+        i = i.sibling(i.row()+1, 0) ;
+
+    } while (i != end && i.isValid()) ;
+
+    checkForNewDescriptors(items, begin.parent()) ;
+    emit dataChanged(begin, index(end.row(), Descriptors.count(), end.parent())) ;
 }
 
 void specModel::expandFolders(QModelIndexList &list) const

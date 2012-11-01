@@ -30,8 +30,6 @@ public:
 	QList<specModelItem*>::size_type children() const;
 	/*! Wraps specModelItem if key is empty, otherwise returns true if \a key is editable in any child. */
 	bool isEditable(QString key) const;
-	/*! Wraps specModelItem's function if \a key is empty.  Otherwise \a key and \a value are passed on to children and the return value is the \a or result of the children's results. */
-	bool changeDescriptor(QString key, QString value) ;
 	/*! Refreshes Data used for plotting.  Depending on the values of \a mergePlotData and \a sortPlotData this may include merging and/or sorting of plot data obtained from children.*/
 	void refreshPlotData() ;
 	bool isFolder() const ;
