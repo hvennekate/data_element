@@ -97,8 +97,7 @@ public:
 				}
 			}
 			// get set for the next round
-			folderQueue = nextQueue ;
-			// TODO: folderQueue.swap(nextQueue) ;
+            folderQueue.swap(nextQueue) ;
 			emit progressValue(85*descriptors.indexOf(descriptor)/descriptors.size());
 		}
 		// append final round's outcome to move list

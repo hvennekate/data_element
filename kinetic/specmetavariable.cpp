@@ -135,7 +135,7 @@ bool specMetaVariable::extractXs(specModelItem *item, QVector<double> &xvals) co
 			}
 		}
 	}
-	xvals = newXVals ; // TODO: swap
+    xvals.swap(newXVals) ;
 	return true ;
 }
 

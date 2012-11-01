@@ -221,7 +221,7 @@ void specDataItem::flatten(bool oneTime)
 	QVector<specDataPoint> newData ;
 	averageToNew(data.begin(), data.end(), compareDataPoints, std::back_inserter(newData)) ;
 
-	data = newData ; // TODO swap
+    data.swap(newData) ;
 	// average Time
 	if(oneTime)
 	{
@@ -312,7 +312,7 @@ int specDataItem::removeData(QList<specRange *> *listpointer)
 		newData << data[i] ;
 	}
 	int diff = data.size() - newData.size() ;
-	data = newData ; // TODO swap
+    data.swap(newData) ;
 	invalidate() ;
 	return diff ;
 }
