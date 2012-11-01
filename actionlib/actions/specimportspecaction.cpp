@@ -38,6 +38,7 @@ specUndoCommand *specImportSpecAction::generateUndoCommand()
 		fileToImport.open(QFile::ReadOnly | QFile::Text) ;
 		importedItems << importFunction(fileToImport) ;
 	}
+    if (importedItems.isEmpty()) return 0 ;
 
 	if (! model->insertItems(importedItems, currentIndex, row)) return 0 ;
 	specAddFolderCommand *command = new specAddFolderCommand ;
@@ -46,7 +47,8 @@ specUndoCommand *specImportSpecAction::generateUndoCommand()
 		newIndexes << model->index(row+i,0,currentIndex) ;
 	command->setItems(newIndexes) ;
 	command->setParentObject(view->model()) ;
-	command->setText("Import data") ;
+    command->setText((fileNames.size() > 1 ? tr("Import data (files:") : tr("Import data (file:"))
+                     + fileNames.join(", ") + ")") ;
 	return command ;
 }
 
