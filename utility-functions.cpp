@@ -397,6 +397,7 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 	{
 		QHash<QString,specDescriptor> descriptors ;
 		QString firstLine = in.readLine(), secondLine ;
+        // protection agains binary files
 		for (QString::iterator i = firstLine.begin() ; i != firstLine.end() ; ++i)
 		{
 			if (!(QChar(*i).isPrint()))
@@ -404,7 +405,7 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 				QMessageBox::critical(0,QObject::tr("Binary File"),
 						      QObject::tr("File ") +
 						      file.fileName() +
-						      QObject::tr("seems to be binary.  Aborting import (found non-printable character at position ") +
+                              QObject::tr(" seems to be binary.  Aborting import (found non-printable character at position ") +
 						      QString::number(in.pos()) +
 						      QObject::tr(").  Context:\n")+ firstLine) ;
 				for (QList<specModelItem*>::iterator j = logData.begin() ; j != logData.end() ; ++j)
@@ -412,6 +413,21 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 				return QList<specModelItem*>() ;
 			}
 		}
+        // verification of date/time string:
+        QRegExp dateTimeString("^\\d\\d\\.\\d\\d\\.\\d\\d \\d\\d:\\d\\d:\\d\\d : ") ;
+        if (!dateTimeString.exactMatch(firstLine.left(20)))
+        {
+            QMessageBox::critical(0, QObject::tr("Not a log file"),
+                                  QObject::tr("File ") +
+                                  file.fileName() +
+                                  QObject::tr(" does not conform with the log file format (not date and time at beginning of a line at position ") +
+                                  QString::number(in.pos()) +
+                                  QObject::tr("). Offending line:\n")
+                                  + firstLine) ;
+            for (QList<specModelItem*>::iterator j = logData.begin() ; j != logData.end() ; ++j)
+                delete *j ;
+            return QList<specModelItem*>() ;
+        }
 		if (!in.atEnd()) secondLine = in.readLine() ;
 		descriptors["Tag"] = specDescriptor(takeDateOrTime(secondLine)) ;
 		descriptors["Uhrzeit"] = specDescriptor(takeDateOrTime(secondLine)) ;
