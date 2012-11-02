@@ -84,6 +84,7 @@ public:
 	virtual void movingAverage(int) {}
 	virtual void average(int) {}
 	virtual void subMap(const QMap<double,double>&) {}
+    virtual QString toolTip(const QString &column) const ;
 
 	int rtti() const { return spec::spectrum ; }
 	void attach(QwtPlot *plot) ;

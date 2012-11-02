@@ -344,3 +344,8 @@ void specModelItem::detach()
 	foreach(specMetaItem* client, clients)
 		client->refreshOtherPlots();
 }
+
+QString specModelItem::toolTip(const QString &column) const
+{
+    return descriptor(column,true) ;
+}

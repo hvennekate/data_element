@@ -508,7 +508,7 @@ QVariant specModel::data(const QModelIndex &index, int role) const
 		case spec::fullContentRole :
 			return pointer->descriptor(Descriptors[index.column()],true) ;
 		case Qt::ToolTipRole :
-			return pointer->descriptor(Descriptors[index.column()],true) ;
+            return pointer->toolTip(Descriptors[index.column()]) ;
 // 		case 32 : // TODO replace in namespace
 // 			return pointer->plotData() ;
 	}
