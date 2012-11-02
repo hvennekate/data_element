@@ -178,7 +178,7 @@ void specSpectrumPlot::setReference()
 	renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, false);
 	renderer.renderTo(&toolTipPlot,plotImage) ;
 
-	QByteArray byteArray ;
+    QByteArray byteArray ; // TODO extra function (c.f. svgItem)
 	QBuffer buffer(&byteArray) ;
 	buffer.open(QIODevice::WriteOnly) ;
 	plotImage.save(&buffer,"PNG") ;

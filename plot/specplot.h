@@ -3,6 +3,7 @@
 
 #include <qwt_plot.h>
 #include "specstreamable.h"
+#include <QLineEdit>
 
 class specCanvasItem  ;
 class specZoomer ;
@@ -11,6 +12,22 @@ class CanvasPicker ;
 class specActionLibrary ;
 class specView ;
 
+class plotAxisEdit : public QLineEdit
+{
+    Q_OBJECT
+public:
+    plotAxisEdit(QWidget* parent = 0) : QLineEdit(parent) { }
+public slots:
+    void hideAfterEditing(QWidget* old, QWidget* newW)
+    {
+        Q_UNUSED(old)
+        if (newW != (QWidget*) this)
+        {
+            hide() ;
+            disconnect(0,0,this, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
+        }
+    }
+};
 
 class specPlot : public QwtPlot, public specStreamable
 {
@@ -32,6 +49,10 @@ private:
 	specActionLibrary *undoP ;
 	void resizeEvent(QResizeEvent *e) ;
 	void autoScale(const QwtPlotItemList& allItems) ;
+    void mouseDoubleClickEvent(QMouseEvent *e) ;
+    plotAxisEdit xminEdit, xmaxEdit, yminEdit, ymaxEdit ;
+private slots:
+    void setPlotAxis() ;
 protected:
 	specView *view ;
 	specActionLibrary* undoPartner() const ;
