@@ -415,7 +415,7 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 		}
         // verification of date/time string:
         QRegExp dateTimeString("^\\d\\d\\.\\d\\d\\.\\d\\d \\d\\d:\\d\\d:\\d\\d : ") ;
-        if (!dateTimeString.exactMatch(firstLine.left(20)))
+        if (!firstLine.isEmpty() && !dateTimeString.exactMatch(firstLine.left(20)))
         {
             QMessageBox::critical(0, QObject::tr("Not a log file"),
                                   QObject::tr("File ") +
