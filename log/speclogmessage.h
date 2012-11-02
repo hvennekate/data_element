@@ -16,8 +16,6 @@ public:
 	bool changeDescriptor ( QString key, QString value ) ;
 	bool isEditable ( QString key ) const;
 	QIcon decoration() const;
-	spec::descriptorFlags descriptorProperties ( const QString& key ) const;
-    void setDescriptorProperties(const QString &key, spec::descriptorFlags f);
 };
 
 #endif

@@ -47,8 +47,8 @@ spec::descriptorFlags specLogEntryItem::descriptorProperties(const QString& key)
 
 void specLogEntryItem::setDescriptorProperties(const QString &key, spec::descriptorFlags f)
 {
-    if (key == "") specModelItem::setDescriptorProperties(key, f) ;
-    else description[key].setFlags(f) ;
+    if (description.contains(key)) description[key].setFlags(f) ;
+    else specModelItem::setDescriptorProperties(key, f) ;
 }
 
 QString specLogEntryItem::descriptor(const QString &key, bool full) const
