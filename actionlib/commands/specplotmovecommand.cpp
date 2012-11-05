@@ -41,6 +41,7 @@ bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
 	const specPlotMoveCommand *other = (const specPlotMoveCommand*) ot ;
 	if (! (this->items && other->items)) return false ;
 	if (*(other->items) != *(this->items)) return false ;
+    if (isnan(other->scale) || isnan(scale)) return false ;
 	slope += other->slope * scale ;
 	offset+= other->offset * scale - other->slope * scale * shift ;
 	scale *= other->scale ;

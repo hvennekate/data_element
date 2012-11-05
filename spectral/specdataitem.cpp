@@ -9,7 +9,7 @@
 void specDataItem::applyCorrection(specDataPoint& point) const
 {
 	point.nu += xshift ;
-	point.sig = point.sig*factor+offset+slope*point.nu ;
+    point.sig = zeroMultiplications ? 0 : point.sig*factor+offset+slope*point.nu ;
 }
 
 void specDataItem::reverseCorrection(specDataPoint& point) const
@@ -250,9 +250,18 @@ void specDataItem::setDescriptorProperties(const QString &key, spec::descriptorF
 
 void specDataItem::scaleBy(const double& mul)
 {
-	slope  *= mul ;
-	factor *= mul ;
-	offset *= mul ;
+    qDebug() << "Scaling by" << mul ;
+    if (0 == mul)
+        zeroMultiplications ++ ;
+    else if (INFINITY == mul)
+        zeroMultiplications = 0 ;
+    else if (isnan(mul)) return ;
+    else
+    {
+        slope  *= mul ;
+        factor *= mul ;
+        offset *= mul ;
+    }
 	invalidate();
 }
 
