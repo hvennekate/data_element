@@ -383,18 +383,20 @@ void specView::resetDone()
 
 void specView::dragMoveEvent(QDragMoveEvent *event)
 {
-	if (!acceptData(event->mimeData()))
-		event->ignore() ;
+    QTreeView::dragMoveEvent(event) ;
+    if (!acceptData(event->mimeData()))
+        event->ignore() ;
     else
         event->acceptProposedAction();
 }
 
 void specView::dragEnterEvent(QDragEnterEvent *event)
 {
-	if (!acceptData(event->mimeData()))
-		event->ignore();
-	else
-		event->acceptProposedAction();
+    QTreeView::dragEnterEvent(event) ;
+    if (!acceptData(event->mimeData()))
+        event->ignore();
+    else
+        event->acceptProposedAction();
 }
 
 bool specView::acceptData(const QMimeData *data)

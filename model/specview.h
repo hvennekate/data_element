@@ -27,8 +27,8 @@ private:
 	bool setAllSelected(const QVariant&, int role = Qt::EditRole) ;
 	type typeId() const { return specStreamable::mainView ; }
 	bool acceptData(const QMimeData*) ;
-	void dragMoveEvent(QDragMoveEvent *event) ;
-	void dragEnterEvent(QDragEnterEvent *event) ;
+    void dragMoveEvent(QDragMoveEvent *event) ;
+    void dragEnterEvent(QDragEnterEvent *event) ;
 private slots:
 	void averageItems() ;
 	void itemProperties() ;
