@@ -138,6 +138,8 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		addNewAction(bar, new specCutAction(target)) ;
 		addNewAction(bar, new specPasteAction(target)) ;
 		addNewAction(bar, new specDeleteAction(target)) ;
+        bar->addSeparator() ;
+        addNewAction(bar, new specTreeAction(target)) ;
 
 		return bar ;
 	}
