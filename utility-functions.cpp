@@ -346,7 +346,6 @@ QList<specModelItem*> readHVFile(QFile& file)
 
 QPair<QString,QString> interpretString(QString& string)
 {
-	qDebug() << "interpreting string:" << string ;
 	if(string.left(1) == "\"")
 	{
 		string.remove(0,1) ;
@@ -393,10 +392,11 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system
 	
 	QList<specModelItem*> logData ;
+    QString firstLine, secondLine ;
 	while(!in.atEnd())
 	{
 		QHash<QString,specDescriptor> descriptors ;
-		QString firstLine = in.readLine(), secondLine ;
+        if (firstLine.isEmpty()) firstLine = in.readLine() ;
         // protection agains binary files
 		for (QString::iterator i = firstLine.begin() ; i != firstLine.end() ; ++i)
 		{
@@ -429,9 +429,11 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
             return QList<specModelItem*>() ;
         }
 		if (!in.atEnd()) secondLine = in.readLine() ;
-		descriptors["Tag"] = specDescriptor(takeDateOrTime(secondLine)) ;
+        qDebug() << "first" << firstLine ;
+        qDebug() << "second" << secondLine ;
+        descriptors["Tag"] = specDescriptor(takeDateOrTime(secondLine)) ;
 		descriptors["Uhrzeit"] = specDescriptor(takeDateOrTime(secondLine)) ;
-		if (firstLine == "")
+        if (firstLine == "")
 		{
 			while(secondLine.count("\"")%2)
 				secondLine += "\n" + in.readLine() ;
@@ -447,7 +449,7 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 			logData += new specLogMessage(descriptors,0, mainDescriptor) ;
 			qDebug() << "first" << newDescriptor.first << "second" << newDescriptor.second << "rest:" << secondLine ;
 		}
-		else
+        else
 		{
 			descriptors["A-Tag"] = specDescriptor(takeDateOrTime(firstLine)) ;
 			descriptors["A-Zeit"] = specDescriptor(takeDateOrTime(firstLine)) ;
@@ -457,11 +459,20 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 				QPair<QString,QString> newDescriptor = interpretString(firstLine) ;
 				descriptors[newDescriptor.first] = newDescriptor.second ;
 			}
-			while(secondLine.size())
-			{
-				QPair<QString,QString> newDescriptor = interpretString(secondLine) ;
-				descriptors[newDescriptor.first] = newDescriptor.second ;
-			}
+            if (secondLine.left(7) == "Messung")
+            {
+                while(secondLine.size())
+                {
+                    QPair<QString,QString> newDescriptor = interpretString(secondLine) ;
+                    descriptors[newDescriptor.first] = newDescriptor.second ;
+                }
+            }
+            else
+            {
+                firstLine = descriptors["Tag"].content() + " " + descriptors["Uhrzeit"].content() + " : " + secondLine ;
+                descriptors["Tag"] = descriptors["A-Tag"] ;
+                descriptors["Uhrzeit"] = descriptors["A-Zeit"] ;
+            }
 			logData += new specLogEntryItem(descriptors) ;
 		}
 	}
