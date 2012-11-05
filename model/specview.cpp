@@ -378,14 +378,15 @@ void specView::resetDone()
 	if (!state) return ;
 	state->restoreState();
 	delete state ;
+    state = 0 ;
 }
 
 void specView::dragMoveEvent(QDragMoveEvent *event)
 {
 	if (!acceptData(event->mimeData()))
 		event->ignore() ;
-	else
-		event->acceptProposedAction();
+    else
+        event->acceptProposedAction();
 }
 
 void specView::dragEnterEvent(QDragEnterEvent *event)
