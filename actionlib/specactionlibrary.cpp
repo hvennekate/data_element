@@ -281,25 +281,26 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
 	}
 	if (view && view->model())
 	{
-		addNewAction(cMenu, new specAddFolderAction(w)) ;
-		specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;
+        addNewAction(cMenu, new specAddFolderAction(w)) ;
+        specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;
         specSetMultilineAction *mlAction = new specSetMultilineAction(w) ;
         addNewAction(cMenu, mlAction) ;
-        mlAction->setChecked(
+        if (currentItem)
+            mlAction->setChecked(
                     currentItem->descriptorProperties(
                         view->model()->descriptors()[
                             view->currentIndex().column()]) & spec::multiline) ; // TODO move to action
-		if (dynamic_cast<specDataItem*>(currentItem)
-				|| dynamic_cast<specMetaItem*>(currentItem))
-			addNewAction(cMenu, new specItemPropertiesAction(w)) ;
-		if (QApplication::clipboard()->mimeData())
-			addNewAction(cMenu, new specPasteAction(w)) ;
-		if (!view->getSelection().isEmpty())
-		{
-			addNewAction(cMenu, new specCopyAction(w)) ;
-			addNewAction(cMenu, new specCutAction(w)) ;
-			addNewAction(cMenu, new specDeleteAction(w)) ;
-		}
+        if (dynamic_cast<specDataItem*>(currentItem)
+                || dynamic_cast<specMetaItem*>(currentItem))
+            addNewAction(cMenu, new specItemPropertiesAction(w)) ;
+        if (QApplication::clipboard()->mimeData())
+            addNewAction(cMenu, new specPasteAction(w)) ;
+        if (!view->getSelection().isEmpty())
+        {
+            addNewAction(cMenu, new specCopyAction(w)) ;
+            addNewAction(cMenu, new specCutAction(w)) ;
+            addNewAction(cMenu, new specDeleteAction(w)) ;
+        }
 	}
 	return cMenu ;
 }
