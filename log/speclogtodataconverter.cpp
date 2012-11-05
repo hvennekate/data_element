@@ -142,7 +142,9 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
 						     "Kein gueltiger Dateityp:" + fileName) ;
 				continue ;
 			}
-			specFolderItem* newItem = new specFolderItem(0,fileName) ;
+            specFolderItem* newItem = new specFolderItem ;
+            newItem->changeDescriptor("",currentDirectory.absolutePath() + "\n"+ fileName) ;
+            newItem->setActiveLine("",1) ;
 			newItem->addChildren(filter(file)) ;
 			if (parents.isEmpty())
 				items << newItem ;
