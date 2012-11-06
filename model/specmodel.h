@@ -56,6 +56,7 @@ private:
 public:
 	specModel(QObject *par = 0) ;
 	~specModel() ;
+    QStringList mimeTypes() const ;
 	void setMetaModel(specMetaModel*) ;
 	specMetaModel* getMetaModel() const ;
 	// Own functions

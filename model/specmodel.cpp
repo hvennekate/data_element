@@ -924,3 +924,11 @@ void specModel::expandFolders(QModelIndexList &list) const
 		}
 	}
 }
+
+QStringList specModel::mimeTypes() const
+{
+    QStringList types ;
+    foreach(specMimeConverter* converter, mimeConverters())
+        types << converter->importableTypes() ;
+    return types ;
+}

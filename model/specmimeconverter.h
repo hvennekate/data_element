@@ -14,6 +14,7 @@ public:
 	virtual void exportData(QList<specModelItem*>&, QMimeData*) = 0 ;
 	virtual bool canImport(const QStringList&) ;
 	virtual bool canImport(const QMimeData*) ;
+    virtual QStringList importableTypes() const ;
 };
 
 #endif // SPECMIMECONVERTER_H
