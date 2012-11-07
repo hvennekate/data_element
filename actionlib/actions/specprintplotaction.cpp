@@ -7,7 +7,7 @@
 
 specPrintPlotAction::specPrintPlotAction(QObject *parent) :
 	specUndoAction(parent),
-	printer(new QPrinter)
+    printer(new QPrinter) // TODO seems to cause CUPS-related program crashes...
 {
 	specPlot *plot = (specPlot*) parentWidget() ;
 	QSize plotSize = plot->size() ;

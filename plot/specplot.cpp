@@ -145,7 +145,7 @@ void specPlot::autoScale(const QwtPlotItemList& allItems)
 		boundaries.setBottom(zoomBase.bottom()) ;
 	}
 
-	zoom->changeZoomBase(boundaries.isValid() ? boundaries : QRectF(-10,-10,20,20)) ;
+    zoom->changeZoomBase(boundaries.isValid() ? boundaries : QRectF(-10,-10,20,20)) ; // TODO move change to top (-> per axis)
 }
 
 specPlot::~specPlot()
@@ -256,7 +256,7 @@ void specPlot::mouseDoubleClickEvent(QMouseEvent *e)
             connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), &xmaxEdit, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
         }
     }
-    if (child == (QWidget*) yAxisWidget && fixYAxisAction->isEnabled())
+    if (child == (QWidget*) yAxisWidget && fixYAxisAction->isChecked())
     {
         ymaxEdit.setText(QString::number(zoom->zoomBase().bottom())) ;
         yminEdit.setText(QString::number(zoom->zoomBase().top()));
