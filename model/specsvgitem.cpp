@@ -273,6 +273,7 @@ QString specSVGItem::toolTip(const QString &column) const
     QSize defaultSize = renderer.defaultSize() ;
     defaultSize.scale(150,150, Qt::KeepAspectRatio);
     QImage image(defaultSize.width(),defaultSize.height(), QImage::Format_ARGB32) ;
+    image.fill(Qt::transparent);
     QPainter painter(&image) ;
     renderer.render(&painter);
     buffer.open(QIODevice::WriteOnly) ;
