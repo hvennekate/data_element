@@ -374,7 +374,8 @@ specDataItem::specDataItem(const specDataItem &other)
 	  factor(other.factor),
 	  xshift(other.xshift),
 	  description(other.description),
-	  data(other.data)
+      data(other.data),
+      zeroMultiplications(other.zeroMultiplications)
 {
 }
 
