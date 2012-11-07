@@ -31,6 +31,7 @@
 #include "specmetaitem.h"
 #include "specselectconnectedaction.h"
 #include "specsetmultilineaction.h"
+#include "specsvgitem.h"
 
 
 QUndoView* specActionLibrary::undoView()
@@ -291,7 +292,8 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
                         view->model()->descriptors()[
                             view->currentIndex().column()]) & spec::multiline) ; // TODO move to action
         if (dynamic_cast<specDataItem*>(currentItem)
-                || dynamic_cast<specMetaItem*>(currentItem))
+                || dynamic_cast<specMetaItem*>(currentItem)
+                || dynamic_cast<specSVGItem*>(currentItem))
             addNewAction(cMenu, new specItemPropertiesAction(w)) ;
         if (QApplication::clipboard()->mimeData())
             addNewAction(cMenu, new specPasteAction(w)) ;

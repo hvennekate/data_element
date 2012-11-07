@@ -10,6 +10,7 @@ class specStreamable
 public:
 	friend QDataStream& operator<<(QDataStream& out, const specStreamable&) ;
 	friend QDataStream& operator>>(QDataStream& in, specStreamable&) ;
+    virtual ~specStreamable() {}
 	void readDirectly(QDataStream& in) { readFromStream(in) ; } // TODO improve; make factory available broadly
 	typedef quint16 type;
 	enum streamableType

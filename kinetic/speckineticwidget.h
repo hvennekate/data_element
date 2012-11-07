@@ -23,7 +23,8 @@ private:
 	void readFromStream(QDataStream &in) ;
 	type typeId() const { return specStreamable::metaWidget ;}
 private slots:
-	void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) ;
+    void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) ;
+    void svgModification(bool mod) ;
 public:
 	specKineticWidget ( QString, QWidget *parent = 0 );
 	~specKineticWidget();

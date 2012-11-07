@@ -4,6 +4,7 @@
 #include "specgenericmimeconverter.h"
 #include "specmimetextexporter.h"
 #include "specsplitter.h"
+#include "canvaspicker.h"
 
 specMetaView* specKineticWidget::view()
 { return items ; }
@@ -39,6 +40,9 @@ specKineticWidget::specKineticWidget(QString title, QWidget *parent)
 	setWidget(content) ;
 
 	connect(items->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),this,SLOT(selectionChanged(const QItemSelection&, const QItemSelection&))) ;
+
+    connect(plot->svgAction(),SIGNAL(toggled(bool)),this,SLOT(svgModification(bool))) ;
+    svgModification(false) ;
 }
 
 void specKineticWidget::writeToStream(QDataStream &out) const
@@ -80,4 +84,13 @@ void specKineticWidget::addToolbar(specActionLibrary* actions)
 	plotBar->addActions(plot->actions()) ;
 	layout->insertWidget(0,toolbar) ;
 	layout->insertWidget(1,plotBar);
+}
+
+// TODO shift to parent class of kineticWidget and plotWidget
+void specKineticWidget::svgModification(bool mod)
+{
+    if (mod) connect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
+    else disconnect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
+
+    plot->svgPicker()->highlightSelectable(mod) ;
 }

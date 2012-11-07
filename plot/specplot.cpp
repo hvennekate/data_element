@@ -19,12 +19,12 @@ specPlot::specPlot(QWidget *parent)
 	  MetaPicker(0),
 	  SVGpicker(0),
 	  autoScaling(true),
-	  undoP(0),
-      view(0),
+      undoP(0),
       xminEdit(this),
       xmaxEdit(this),
       yminEdit(this),
-      ymaxEdit(this)
+      ymaxEdit(this),
+      view(0)
 {
 	MetaPicker = new CanvasPicker(this) ;
 	SVGpicker  = new CanvasPicker(this) ;
