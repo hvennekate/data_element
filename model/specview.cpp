@@ -178,6 +178,7 @@ specView::specView(QWidget* parent)
 	createContextMenus() ;
 	
 	setAlternatingRowColors(true) ;
+    setSelectionBehavior(QTreeView::SelectRows);
 	setSelectionMode(QAbstractItemView::ExtendedSelection) ;
 	setDragEnabled(true) ;
 	setAcceptDrops(true) ;

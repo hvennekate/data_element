@@ -18,6 +18,7 @@ public:
 	QList<specModelItem*> importData(const QMimeData *);
 	void exportData(QList<specModelItem *> &, QMimeData*) ;
 	bool canImport(const QStringList&) ;
+    QStringList importableTypes() const ;
 };
 
 #endif // SPECGENERICMIMECONVERTER_H

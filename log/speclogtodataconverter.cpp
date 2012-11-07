@@ -25,6 +25,11 @@ bool specLogToDataConverter::canImport(const QStringList &types)
 	       types.contains("application/spec.logged.files") ;
 }
 
+QStringList specLogToDataConverter::importableTypes() const
+{
+    return specMimeConverter::importableTypes() << "application/spec.logged.files" ;
+}
+
 void specLogToDataConverter::toStream(specModelItem *item, QDataStream & out)
 {
 	QPair<qint8, QString> entry ;
