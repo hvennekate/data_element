@@ -590,6 +590,9 @@ QVariant specModel::headerData(int section, Qt::Orientation orientation,
 bool specModel::removeRows(int position, int rows, const QModelIndex &parent) 
 { // TODO check if index is valid?
 // 	if(!(position+rows <= rowCount(index))) return false ; maybe necessary...
+    Q_UNUSED(position)
+    Q_UNUSED(rows)
+    Q_UNUSED(parent)
 	if (position < 0 || rows < 1) return false ;
 	if (dontDelete)
 	{

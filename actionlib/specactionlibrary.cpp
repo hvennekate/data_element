@@ -43,7 +43,7 @@ specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
 {
 	undoStack = new QUndoStack ;
-	connect(undoStack,SIGNAL(indexChanged(int)),this,SIGNAL(stackChanged())) ;
+    connect(undoStack,SIGNAL(cleanChanged(bool)),this,SIGNAL(stackClean(bool))) ;
 }
 
 void specActionLibrary::push(specUndoCommand * cmd)
@@ -186,6 +186,7 @@ void specActionLibrary::writeToStream(QDataStream &out) const
 		out << type(command->id()) << qint32(parents.indexOf(command->parentObject()))
 		    << *command ;
 	}
+    undoStack->setClean();
 }
 
 specStreamable* specActionLibrary::factory(const type &t) const
@@ -222,6 +223,7 @@ void specActionLibrary::readFromStream(QDataStream &in)
     for (int i = 0 ; i < undoStack->count() ; ++i)
 		((specUndoCommand*) undoStack->command(i))->setParentObject(parents[parentIndex[i]]) ;
     qDebug() << "to be read:" << num << "actually on stack:" << undoStack->count() ;
+    undoStack->setClean();
 }
 
 void specActionLibrary::setLastRequested(const QModelIndexList &list)
@@ -251,7 +253,7 @@ int specActionLibrary::deleteInternally(specModel* model)
 
 void specActionLibrary::addPlot(specPlot *plot)
 {
-	connect(this,SIGNAL(stackChanged()),plot,SLOT(replot())) ;
+    connect(undoStack,SIGNAL(indexChanged(int)),plot,SLOT(replot())) ;
 }
 
 void specActionLibrary::purgeUndo()

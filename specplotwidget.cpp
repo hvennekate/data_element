@@ -131,11 +131,13 @@ void specPlotWidget::read(QString fileName)
 	changeFileName(fileName);
 }
 
-void specPlotWidget::modified()
+void specPlotWidget::modified(bool unmod)
 {
 	QString currentTitle = windowTitle() ;
-	if(currentTitle.right(1) != "*")
+    if(currentTitle.right(1) != "*" && !unmod)
 		currentTitle.append(" *") ;
+    if(currentTitle.right(1) == "*" && unmod)
+        currentTitle.remove(currentTitle.size()-2,2) ;
 	setWindowTitle(currentTitle) ;
 	kineticWidget->setWindowTitle(QString("Kinetics of ").append(currentTitle)) ;
 	logWidget->setWindowTitle(QString("Logs of ").append(currentTitle)) ;
@@ -203,7 +205,7 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 		case QMessageBox::Yes :
 			if (! saveFile())
 			{
-				modified() ;
+                modified(true) ;
 				event->ignore();
 				break ;
 			}
@@ -251,7 +253,7 @@ void specPlotWidget::setConnections()
 	connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 	connect(items->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),this,SLOT(selectionChanged(const QItemSelection&, const QItemSelection&))) ;
 
-	connect(actions,SIGNAL(stackChanged()), this, SLOT(modified())) ; // TODO check
+    connect(actions,SIGNAL(stackClean(bool)), this, SLOT(modified(bool))) ; // TODO check
 
 	connect(kineticWidget->internalPlot(),SIGNAL(replotted()),plot,SLOT(replot())) ;
 	connect(kineticWidget->internalPlot(), SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(), SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
