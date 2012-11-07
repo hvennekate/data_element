@@ -56,9 +56,13 @@ private:
     QModelIndexList generateConnectionList(const QList<specModelItem*> items) ;
     QTableWidgetItem* firstEntry(QTableWidgetItem*) ;
     bool reselecting ;
+
+    void checkSelection(Qt::CheckState) ;
 private slots:
 
     void on_connectedItemsList_itemChanged(QListWidgetItem *item);
+    void on_removeSelectedConnections_clicked();
+    void on_addSelectedConnections_clicked();
 };
 
 #endif // METAITEMPROPERTIES_H

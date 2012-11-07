@@ -15,6 +15,8 @@ metaItemProperties::metaItemProperties(specMetaItem* i,QWidget *parent) :
 	ui->setupUi(this);
 	ui->moveUpButton->setIcon(QIcon::fromTheme("go-up"));
 	ui->moveDownButton->setIcon(QIcon::fromTheme("go-down")) ;
+    ui->addSelectedConnections->setIcon(QIcon(":/toKinetic.png")) ;
+    ui->removeSelectedConnections->setIcon(QIcon::fromTheme("edit-delete")) ;
 
 	ui->itemPreview->setAutoDelete(false) ;
     ui->styleFit->setDisabled(!i->getFitCurve()) ;
@@ -330,4 +332,21 @@ void metaItemProperties::on_connectedItemsList_itemChanged(QListWidgetItem *item
     Q_UNUSED(item)
     buildPoints();
     on_connectedItemsList_itemSelectionChanged();
+}
+
+void metaItemProperties::on_removeSelectedConnections_clicked()
+{
+    checkSelection(Qt::Unchecked) ;
+}
+
+void metaItemProperties::checkSelection(Qt::CheckState state)
+{
+    QList<QListWidgetItem*> selectedItems = ui->connectedItemsList->selectedItems() ;
+    foreach(QListWidgetItem* item, selectedItems)
+        item->setCheckState(state) ;
+}
+
+void metaItemProperties::on_addSelectedConnections_clicked()
+{
+    checkSelection(Qt::Checked);
 }
