@@ -764,11 +764,8 @@ void specModel::applySubMap(const QModelIndexList & indexList)
 specModelItem* specModel::itemPointer(const QVector<int> &indexes) const
 {
 	specModelItem* pointer = root ;
-    for (int i =  indexes.size() - 1 ; i >= 0 && pointer->isFolder() ; --i)
-	{
-		if (!pointer) return 0 ;
+    for (int i =  indexes.size() - 1 ; i >= 0 && pointer && pointer->isFolder() ; --i)
         pointer = ((specFolderItem*) pointer)->child(indexes[i]) ;
-	}
 	return pointer ;
 }
 

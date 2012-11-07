@@ -288,7 +288,7 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
         specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;
         specSetMultilineAction *mlAction = new specSetMultilineAction(w) ;
         addNewAction(cMenu, mlAction) ;
-        if (currentItem)
+        if (currentItem && view->currentIndex().isValid())
             mlAction->setChecked(
                     currentItem->descriptorProperties(
                         view->model()->descriptors()[
