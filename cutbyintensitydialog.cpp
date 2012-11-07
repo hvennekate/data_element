@@ -62,15 +62,16 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 		}
 	}
 
-	double y1min = INFINITY, y1max = -INFINITY;
-	foreach(specModelItem* item, items)
-	{
-		QRectF boundaries = item->boundingRect() ;
-		y1min = qMin(y1min,boundaries.top()) ;
-		y1max = qMax(y1max,boundaries.bottom()) ;
-	}
-	plot->setAxisScale(QwtPlot::yLeft,y1min,y1max) ;
-	plot->setAutoScaling(false) ;
+    QRectF boundaries ;
+    foreach(specModelItem* item, items)
+        boundaries |= item->boundingRect() ;
+    QSizeF size = boundaries.size() ;
+    boundaries.translate(-.05*size.width(), -.05*size.height()) ;
+    boundaries.setSize(1.1*size);
+
+    plot->setAxisScale(QwtPlot::yLeft,boundaries.bottom(),boundaries.top()) ;
+    plot->setAxisScale(QwtPlot::xBottom,boundaries.left(), boundaries.right());
+    plot->setAutoScaling(false) ; // false
 	plot->replot() ;
 }
 
