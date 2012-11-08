@@ -174,7 +174,11 @@ specUndoCommand* changePlotStyleAction::generateUndoCommand()
 	if (currentTrigger == symbolMenu)
 	{
 		newCommand = generateStyleCommand(specStreamable::symbolStyleCommandId) ;
-		item.setSymbolStyle(symbolActions.indexOf(currentAction));
+        int symbolStyle = symbolActions.indexOf(currentAction) - 1 ;
+//        if (symbolStyle < 0)
+//            item.setSymbolStyle(specPlotStyle::noSymbol);
+//        else
+            item.setSymbolStyle(symbolStyle);
 		newCommand->setText(tr("Change symbol type"));
 	}
 
