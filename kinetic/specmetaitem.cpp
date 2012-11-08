@@ -156,8 +156,10 @@ void specMetaItem::refreshOtherPlots()
 	foreach(specModelItem* item, items)
 		otherPlots << ((specPlot*) item->plot()) ;
 	otherPlots.remove(0) ;
+    QColor rangeColor = pen().color() ;
+    rangeColor.setAlpha(128);
 	if (plot())
-		filter->attachRanges(otherPlots, pen().color())  ;
+        filter->attachRanges(otherPlots, rangeColor)  ;
 	else
 		filter->detachRanges();
 	foreach(QwtPlot *otherPlot, otherPlots)
