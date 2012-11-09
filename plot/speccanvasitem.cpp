@@ -11,6 +11,7 @@ specCanvasItem::specCanvasItem( QString description)
 		: QwtPlotCurve(description),
 		  oldSymbol(0)
 {
+    setItemAttribute(Legend, false) ;
 }
 
 specCanvasItem::~specCanvasItem()

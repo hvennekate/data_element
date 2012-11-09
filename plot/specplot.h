@@ -39,7 +39,8 @@ private:
 	QAction *fixXAxisAction,
 		*fixYAxisAction,
 		*modifySVGs,
-		*printAction ;
+        *printAction,
+        *legendAction ;
 	CanvasPicker *MetaPicker, *SVGpicker ; // TODO make pickers more prominent: accessible through
 											// function, attach metaRanges direktly to picker etc.
 	bool autoScaling ;
@@ -53,6 +54,7 @@ private:
     plotAxisEdit xminEdit, xmaxEdit, yminEdit, ymaxEdit ;
 private slots:
     void setPlotAxis() ;
+    void showLegend(bool) ;
 protected:
 	specView *view ;
 	specActionLibrary* undoPartner() const ;

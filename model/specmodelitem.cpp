@@ -21,6 +21,10 @@ specModelItem::specModelItem(specFolderItem* par, QString desc)
 	  sortPlotData(true)
 {
 	setParent(par) ;
+    setItemAttribute(Legend, true) ;
+    setLegendAttribute(LegendNoAttribute, false) ;
+    setLegendAttribute(LegendShowLine, true) ;
+    setLegendAttribute(LegendShowSymbol, true) ;
 }
 
 specModelItem::~specModelItem()
@@ -67,6 +71,7 @@ bool specModelItem::changeDescriptor(QString key, QString value)
 	if (key == "" && description.isEditable())
 	{
 		description.setContent(value) ;
+        setTitle(value) ;
 		return true ;
 	}
 	
@@ -211,6 +216,7 @@ void specModelItem::readFromStream(QDataStream & in)
 	specCanvasItem::readFromStream(in) ;
 	in >> mergePlotData >> sortPlotData
 	   >> description ;
+    setTitle(descriptor("",true));
 	invalidate() ;
 }
 

@@ -10,6 +10,7 @@
 #include "specmetaitem.h"
 #include <qwt_scale_widget.h>
 #include <QApplication>
+#include <qwt_legend.h>
 
 // TODO solve the myth of autoscaleaxis...
 
@@ -52,6 +53,12 @@ specPlot::specPlot(QWidget *parent)
 	fixXAxisAction->setChecked(false) ;
 
 	printAction = new specPrintPlotAction(this) ;
+    legendAction = new QAction(QIcon(":/legend.png"),tr("Legend"),this) ;
+    legendAction->setToolTip(tr("Legend")) ;
+    legendAction->setWhatsThis(tr("Turn legend on/off")) ;
+    legendAction->setCheckable(true) ;
+    legendAction->setChecked(false) ;
+    connect(legendAction,SIGNAL(toggled(bool)), this, SLOT(showLegend(bool))) ;
 
 //	setAxisTitle(QwtPlot::yLeft,"<p><font face=\"Symbol\">D</font>mOD</p>") ;
 //	setAxisTitle(QwtPlot::xBottom,"cm<sup>-1</sup>") ;
@@ -68,6 +75,17 @@ specPlot::specPlot(QWidget *parent)
     }
     zoom->changeZoomBase(QRectF(-10,-10,20,20));
 
+}
+
+void specPlot::showLegend(bool l)
+{
+    if (l == true && ! legend())
+        insertLegend(new QwtLegend(this));
+    else
+    {
+        delete legend() ;
+        replot();
+    }
 }
 
 void specPlot::setAutoScaling(bool on)
@@ -156,7 +174,7 @@ specPlot::~specPlot()
 
 QList<QAction*> specPlot::actions()
 {
-	return (QList<QAction*>() << modifySVGs << printAction << fixXAxisAction << fixYAxisAction ) ;
+    return (QList<QAction*>() << modifySVGs << printAction << fixXAxisAction << fixYAxisAction << legendAction) ;
 }
 
 void specPlot::writeToStream(QDataStream &out) const
