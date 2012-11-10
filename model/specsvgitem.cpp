@@ -3,6 +3,8 @@
 #include "canvaspicker.h"
 #include <QSvgRenderer>
 #include "svgitemproperties.h"
+#include <QBuffer>
+#include <QPainter>
 
 void specSVGItem::attach(QwtPlot *newPlot)
 {
@@ -261,4 +263,23 @@ bool specSVGItem::bounds::operator ==(const specSVGItem::bounds& other) const
 	       y      == other.y     &&
 	       width  == other.width &&
 	       height == other.height ;
+}
+
+QString specSVGItem::toolTip(const QString &column) const
+{
+    QByteArray byteArray ;
+    QBuffer buffer(&byteArray) ;
+    QSvgRenderer renderer(data) ;
+    QSize defaultSize = renderer.defaultSize() ;
+    defaultSize.scale(150,150, Qt::KeepAspectRatio);
+    QImage image(defaultSize.width(),defaultSize.height(), QImage::Format_ARGB32) ;
+    image.fill(Qt::transparent);
+    QPainter painter(&image) ;
+    renderer.render(&painter);
+    buffer.open(QIODevice::WriteOnly) ;
+    image.save(&buffer, "PNG") ;
+
+    return QString("%1<br><img src=\"data:image/png;base64,%2\"></img>")
+            .arg(specModelItem::toolTip(column))
+            .arg(QString(buffer.data().toBase64())) ;
 }

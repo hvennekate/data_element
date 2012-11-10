@@ -8,6 +8,9 @@ unix {
 	UI_SOURCES_DIR = ../build/uic-src
 	LIBS += -L../build/target
 	RCC_DIR = ../build/resources
+	build_pass:CONFIG(release) {
+		TARGET = data_element-release
+	}
 }
 win32 {
 	OBJECTS_DIR = ../winbuild/objects
@@ -19,6 +22,9 @@ win32 {
 	UI_SOURCES_DIR = ../winbuild/uic-src
 	LIBS += -L../winbuild/target
 	RCC_DIR = ../winbuild/resources
+	build_pass:CONFIG(release) {
+		TARGET = data_element-release.exe
+	}
 }
 
 

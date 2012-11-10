@@ -10,6 +10,7 @@ class specStreamable
 public:
 	friend QDataStream& operator<<(QDataStream& out, const specStreamable&) ;
 	friend QDataStream& operator>>(QDataStream& in, specStreamable&) ;
+    virtual ~specStreamable() {}
 	void readDirectly(QDataStream& in) { readFromStream(in) ; } // TODO improve; make factory available broadly
 	typedef quint16 type;
 	enum streamableType
@@ -66,7 +67,9 @@ public:
 		plotXLabelCommandId = 61,
 		fitCurve = 62,
 		exchangeFitCommand = 63,
-		toggleFitStyleCommand = 64
+		toggleFitStyleCommand = 64,
+        penStyleCommandId = 65,
+        descriptorFlagsCommand = 66
 	};
 protected:
 	virtual void writeToStream(QDataStream& out) const = 0;

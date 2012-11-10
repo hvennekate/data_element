@@ -43,8 +43,8 @@ void specMultiCommand::readCommand(QDataStream &in)
 
 bool specMultiCommand::mergeWith(const QUndoCommand *other)
 {
-	if (!mayMerge)
-		return false ;
+    if (!parentObject()) return false ;
+    if (!mayMerge) return false ;
 //	const specMultiCommand *command = (const specMultiCommand*) other ;
 	if (other->childCount() != childCount()) return false ;
 	bool mergeable = true ;
@@ -59,6 +59,7 @@ bool specMultiCommand::mergeWith(const QUndoCommand *other)
 
 	for (int i = 0 ; i < childCount() ; ++i)
 		((specUndoCommand*) child(i))->mergeWith((const specUndoCommand*) other->child(i)) ;
+    setText(other->text());
 	return true ;
 }
 
@@ -66,7 +67,7 @@ void specMultiCommand::parentAssigned() // TODO change calling code to not expli
 {
 	specUndoCommand *childPointer = 0 ;
 	for (int i = 0 ; i < childCount() ; ++i)
-		if (childPointer = dynamic_cast<specUndoCommand*>(const_cast<QUndoCommand*>(child(i)))) // TODO find a better way!
+		if ((childPointer = dynamic_cast<specUndoCommand*>(const_cast<QUndoCommand*>(child(i))))) // TODO find a better way!
 			childPointer->setParentObject(parentObject()) ;
 }
 

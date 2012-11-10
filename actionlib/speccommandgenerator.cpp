@@ -14,6 +14,7 @@
 #include "specexchangefitcurvecommand.h"
 #include "spectogglefitstylecommand.h"
 #include "specstylecommand.h"
+#include "specdescriptorflagscommand.h"
 
 specCommandGenerator::specCommandGenerator(specUndoCommand *p)
 	: parent(p)
@@ -54,13 +55,16 @@ specUndoCommand *specCommandGenerator::commandById(int id) const
 	case specStreamable::symbolPenColorCommandId:
 	case specStreamable::symbolSizeCommandId:
 	case specStreamable::symbolBrushColorCommandId:
+	case specStreamable::penStyleCommandId:
 		return generateStyleCommand(id,parent) ;
 	case specStreamable::metaRangeCommand :
 		return new specMetaRangeCommand(parent) ;
 	case specStreamable::plotTitleCommandId:
 	case specStreamable::plotYLabelCommandId:
 	case specStreamable::plotXLabelCommandId:
-		generatePlotLabelCommand(id,parent) ;
+        return generatePlotLabelCommand(id,parent) ;
+    case specStreamable::descriptorFlagsCommand:
+        return new specDescriptorFlagsCommand(parent) ;
 	default:
 		return 0 ;
 	}

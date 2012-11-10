@@ -34,8 +34,8 @@ public:
 	void addDragDropPartner(specModel*) ;
 	void setLastRequested(const QModelIndexList&) ;
 	int moveInternally(const QModelIndex&, int row, specView*) ;
+    int deleteInternally(specModel*) ;
 	void addPlot(specPlot*) ;
-
 	QAction* undoAction(QObject*) ;
 	QAction* redoAction(QObject*) ;
 	void purgeUndo() ;
@@ -44,7 +44,7 @@ public:
 public slots:
 	void push(specUndoCommand*) ;
 signals:
-	void stackChanged() ;
+    void stackClean(bool) ;
 private:
 	void writeToStream(QDataStream &out) const;
 	void readFromStream(QDataStream &in) ;
@@ -56,7 +56,7 @@ private:
 	void addParent(QObject*) ;
 	template<class toolMenu>
 	void addNewAction(toolMenu*, specUndoAction*) ;
-
+    specStreamable* factory(const type &t) const ;
 };
 
 #endif // SPECACTIONLIBRARY_H

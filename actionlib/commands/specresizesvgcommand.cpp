@@ -32,7 +32,7 @@ void specResizeSVGcommand::writeCommand(QDataStream &out) const
 void specResizeSVGcommand::readCommand(QDataStream &in)
 {
 	qint8 newAnchor ;
-	if (!item) new specGenealogy ;
+    if (!item) item = new specGenealogy ;
 	in >> other >> *item >> newAnchor ;
 	anchor = (specSVGItem::SVGCornerPoint) newAnchor ;
 }
@@ -61,6 +61,7 @@ bool specResizeSVGcommand::mergeable(const specUndoCommand *other)
 
 bool specResizeSVGcommand::mergeWith(const QUndoCommand *other)
 {
+    if (!parentObject()) return false ;
 	return mergeable((specUndoCommand*) other) ;
 }
 

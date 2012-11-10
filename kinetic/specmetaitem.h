@@ -41,6 +41,7 @@ public:
 	QString descriptor(const QString &key, bool full=false) const ;
 	bool changeDescriptor(QString key, QString value) ; // TODO add changeDescriptor(key,specDescriptor)
 	spec::descriptorFlags descriptorProperties(const QString& key) const ;
+    void setDescriptorProperties(const QString &key, spec::descriptorFlags f);
 	QIcon decoration() const ;
 	void getRangePoint(int variable, int range, int point, double& x, double& y) const ;
 	void setRange(int variableNo, int rangeNo, int pointNo, double newX, double newY) ;
@@ -69,6 +70,9 @@ public:
 	QSize symbolSize() const;
 	void setSymbolSize(int w, int h = -1) ;
 	void setSymbolSize(const QSize&) ;
+	void setPenStyle(const qint8 &);
+	qint8 penStyle() const ;
+	void connectedItems(QModelIndexList& dataItems, QModelIndexList& metaItems) ;
 };
 
 /* TODO in other classes

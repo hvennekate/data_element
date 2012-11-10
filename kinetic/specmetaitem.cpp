@@ -2,6 +2,7 @@
 #include "specplot.h"
 #include "metaitemproperties.h"
 #include "specfitcurve.h"
+#include "QApplication"
 
 bool specMetaItem::fitCurveDescriptor(const QString &s) const
 {
@@ -31,6 +32,23 @@ specMetaItem::~specMetaItem()
 		disconnectServer(item) ;
 	delete filter ;
 	delete fitCurve ;
+}
+
+void specMetaItem::connectedItems(QModelIndexList &dataItems, QModelIndexList &metaItems)
+{
+	if (!dataModel || !metaModel) return ;
+	foreach(specModelItem* item, items)
+	{
+		QModelIndex index = dataModel->index(item) ;
+		if (index.isValid())
+			dataItems << index ;
+		else
+		{
+			index = metaModel->index(item) ;
+			if (index.isValid())
+				metaItems << index ;
+		}
+	}
 }
 
 void specMetaItem::setModels(specModel *m, specModel *d)
@@ -144,8 +162,10 @@ void specMetaItem::refreshOtherPlots()
 	foreach(specModelItem* item, items)
 		otherPlots << ((specPlot*) item->plot()) ;
 	otherPlots.remove(0) ;
+    QColor rangeColor = pen().color() ;
+    rangeColor.setAlpha(128);
 	if (plot())
-		filter->attachRanges(otherPlots)  ;
+        filter->attachRanges(otherPlots, rangeColor)  ;
 	else
 		filter->detachRanges();
 	foreach(QwtPlot *otherPlot, otherPlots)
@@ -207,8 +227,15 @@ spec::descriptorFlags specMetaItem::descriptorProperties(const QString &key) con
 	if (key == "") return specModelItem::descriptorProperties(key) ;
 	if (variables.contains(key))
 		return variables[key].flags() ;
-	if (fitCurveDescriptor(key)) return spec::editable ;
+    if (fitCurveDescriptor(key)) return fitCurve->descriptorProperties(key) ; // TODO dangerous
 	return spec::def ;
+}
+
+void specMetaItem::setDescriptorProperties(const QString &key, spec::descriptorFlags f)
+{
+    if (key == "") specModelItem::setDescriptorProperties(key, f) ;
+    if (variables.contains(key)) variables[key].setFlags(f) ;
+    if (fitCurveDescriptor(key) && key != "") fitCurve->setDescriptorProperties(key, f) ;
 }
 
 QIcon specMetaItem::decoration() const
@@ -296,11 +323,24 @@ void specMetaItem::toggleFitStyle()
 		else return specModelItem::GETNAME() ; }
 
 STYLEROUTINGFUNCTION(double, lineWidth,   setLineWidth)
-STYLEROUTINGFUNCTION(QColor, penColor,    setPenColor)
 STYLEROUTINGFUNCTION(int,    symbolStyle, setSymbolStyle)
 STYLEROUTINGFUNCTION(QColor, symbolPenColor, setSymbolPenColor)
 STYLEROUTINGFUNCTION(QColor, symbolBrushColor, setSymbolBrushColor)
 STYLEROUTINGFUNCTION(QSize, symbolSize, setSymbolSize)
+STYLEROUTINGFUNCTION(qint8, penStyle, setPenStyle)
+
+void specMetaItem::setPenColor(const QColor& arg) {
+	if (styleFitCurve && fitCurve) fitCurve->setPenColor(arg) ;
+	else
+	{
+		specModelItem::setPenColor(arg) ;
+		refreshOtherPlots();
+	}
+}
+
+QColor specMetaItem::penColor() const {
+	if (styleFitCurve && fitCurve) return fitCurve->penColor() ;
+	else return specModelItem::penColor() ; }
 
 void specMetaItem::setSymbolSize(int w, int h)
 {

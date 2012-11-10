@@ -20,7 +20,8 @@ private:
 		*symbolInnerColorMenu,
 		*symbolOuterColorMenu,
 		*symbolSizeMenu,
-		*lineWidthMenu ;
+		*lineWidthMenu,
+		*penStyleMenu ;
 	QVector<Qt::GlobalColor> colors ;
 	QVector<double> sizes ;
 	QVector<QAction*> symbolActions,
@@ -28,7 +29,8 @@ private:
 		lineColorActions,
 		symbolInnerColorActions,
 		symbolOuterColorActions,
-		symbolSizeActions ;
+		symbolSizeActions,
+		penStyleActions ;
 	QColor getColor(int index) ;
 	double getSize(int index, bool& ok) ;
 	QObject *currentTrigger ;

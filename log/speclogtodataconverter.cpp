@@ -25,6 +25,11 @@ bool specLogToDataConverter::canImport(const QStringList &types)
 	       types.contains("application/spec.logged.files") ;
 }
 
+QStringList specLogToDataConverter::importableTypes() const
+{
+    return specMimeConverter::importableTypes() << "application/spec.logged.files" ;
+}
+
 void specLogToDataConverter::toStream(specModelItem *item, QDataStream & out)
 {
 	QPair<qint8, QString> entry ;
@@ -142,7 +147,9 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
 						     "Kein gueltiger Dateityp:" + fileName) ;
 				continue ;
 			}
-			specFolderItem* newItem = new specFolderItem(0,fileName) ;
+            specFolderItem* newItem = new specFolderItem ;
+            newItem->changeDescriptor("",currentDirectory.absolutePath() + "\n"+ fileName) ;
+            newItem->setActiveLine("",1) ;
 			newItem->addChildren(filter(file)) ;
 			if (parents.isEmpty())
 				items << newItem ;

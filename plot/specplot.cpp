@@ -8,6 +8,9 @@
 #include "specprintplotaction.h"
 #include "specsvgitem.h"
 #include "specmetaitem.h"
+#include <qwt_scale_widget.h>
+#include <QApplication>
+#include <qwt_legend.h>
 
 // TODO solve the myth of autoscaleaxis...
 
@@ -16,8 +19,13 @@ specPlot::specPlot(QWidget *parent)
 	  replotting(false),
 	  MetaPicker(0),
 	  SVGpicker(0),
-	  undoP(0),
-	  view(0)
+	  autoScaling(true),
+      undoP(0),
+      xminEdit(this),
+      xmaxEdit(this),
+      yminEdit(this),
+      ymaxEdit(this),
+      view(0)
 {
 	MetaPicker = new CanvasPicker(this) ;
 	SVGpicker  = new CanvasPicker(this) ;
@@ -45,9 +53,44 @@ specPlot::specPlot(QWidget *parent)
 	fixXAxisAction->setChecked(false) ;
 
 	printAction = new specPrintPlotAction(this) ;
+    legendAction = new QAction(QIcon(":/legend.png"),tr("Legend"),this) ;
+    legendAction->setToolTip(tr("Legend")) ;
+    legendAction->setWhatsThis(tr("Turn legend on/off")) ;
+    legendAction->setCheckable(true) ;
+    legendAction->setChecked(false) ;
+    connect(legendAction,SIGNAL(toggled(bool)), this, SLOT(showLegend(bool))) ;
 
-	setAxisTitle(QwtPlot::yLeft,"<font face=\"Symbol\">D</font>mOD") ;
-	setAxisTitle(QwtPlot::xBottom,"cm<sup>-1</sup>") ;
+//	setAxisTitle(QwtPlot::yLeft,"<p><font face=\"Symbol\">D</font>mOD</p>") ;
+//	setAxisTitle(QwtPlot::xBottom,"cm<sup>-1</sup>") ;
+
+    QList<QLineEdit*> lineEdits ;
+    lineEdits << &yminEdit << &ymaxEdit << &xminEdit << &xmaxEdit ;
+    foreach(QLineEdit* lineEdit, lineEdits)
+    {
+        connect(lineEdit, SIGNAL(returnPressed()), this, SLOT(setPlotAxis())) ;
+        connect(lineEdit, SIGNAL(editingFinished()), lineEdit, SLOT(hide())) ;
+        lineEdit->hide();
+        lineEdit->setFrame(false);
+        lineEdit->adjustSize();
+    }
+    zoom->changeZoomBase(QRectF(-10,-10,20,20));
+
+}
+
+void specPlot::showLegend(bool l)
+{
+    if (l == true && ! legend())
+        insertLegend(new QwtLegend(this));
+    else
+    {
+        delete legend() ;
+        replot();
+    }
+}
+
+void specPlot::setAutoScaling(bool on)
+{
+	autoScaling = on ;
 }
 
 void specPlot::replot()
@@ -74,6 +117,19 @@ void specPlot::replot()
 		return ;
 	}
 	
+	autoScale(allItems) ;
+
+	QwtPlot::replot() ; // TODO optimize
+	foreach(specSVGItem* svgitem, svgitems)
+		svgitem->refreshSVG() ;
+	QwtPlot::replot() ;
+	emit replotted();
+	replotting = false ;
+}
+
+void specPlot::autoScale(const QwtPlotItemList& allItems)
+{
+	if (!autoScaling) return ;
 	QRectF boundaries, zoomBase = zoom->zoomBase() ;
 	specModelItem *pointer = 0 ; // TODO find a more concise version.
 	foreach(QwtPlotItem *item, allItems)
@@ -84,6 +140,11 @@ void specPlot::replot()
 			pointer->revalidate() ;
 			if (pointer->boundingRect().isValid())
 				boundaries |= pointer->boundingRect() ;
+		}
+		if (specMetaRange* r = dynamic_cast<specMetaRange*>(item))
+		{
+			boundaries.setLeft(qMin(boundaries.left(),r->minValue()));
+			boundaries.setRight(qMax(boundaries.right(), r->maxValue()));
 		}
 	}
 
@@ -101,15 +162,8 @@ void specPlot::replot()
 		boundaries.setTop(zoomBase.top()) ;
 		boundaries.setBottom(zoomBase.bottom()) ;
 	}
-	
-	zoom->changeZoomBase(boundaries.isValid() ? boundaries : QRectF(-10,-10,20,20)) ;
 
-	QwtPlot::replot() ; // TODO optimize
-	foreach(specSVGItem* svgitem, svgitems)
-		svgitem->refreshSVG() ;
-	QwtPlot::replot() ;
-	emit replotted();
-	replotting = false ;
+    zoom->changeZoomBase(boundaries.isValid() ? boundaries : QRectF(-10,-10,20,20)) ; // TODO move change to top (-> per axis)
 }
 
 specPlot::~specPlot()
@@ -120,7 +174,7 @@ specPlot::~specPlot()
 
 QList<QAction*> specPlot::actions()
 {
-	return (QList<QAction*>() << modifySVGs << printAction << fixXAxisAction << fixYAxisAction ) ;
+    return (QList<QAction*>() << modifySVGs << printAction << fixXAxisAction << fixYAxisAction << legendAction) ;
 }
 
 void specPlot::writeToStream(QDataStream &out) const
@@ -188,4 +242,80 @@ void specPlot::detachFromPicker(specCanvasItem *i)
 QAction* specPlot::svgAction() const
 {
 	return modifySVGs ;
+}
+
+void specPlot::mouseDoubleClickEvent(QMouseEvent *e)
+{
+    QWidget *child = childAt(e->pos()) ;
+    QwtScaleWidget* xAxisWidget = axisWidget(QwtPlot::xBottom) ;
+    QwtScaleWidget* yAxisWidget = axisWidget(QwtPlot::yLeft) ;
+    qDebug() << "Positions:" << e->pos() << xAxisWidget->pos() << yAxisWidget->pos() ;
+    qDebug() << "Tops/Bottoms:" << xAxisWidget->geometry() << yAxisWidget->geometry() ;
+    qDebug() << yAxisWidget->geometry().top() << yAxisWidget->geometry().bottom() ;
+    if (child == (QWidget*) xAxisWidget && fixXAxisAction->isChecked())
+    {
+        xmaxEdit.setText(QString::number(zoom->zoomBase().right())) ;
+        xminEdit.setText(QString::number(zoom->zoomBase().left()));
+        QRect geom = xAxisWidget->geometry() ;
+        if ((e->pos() - xAxisWidget->pos()).x() < xAxisWidget->width()/2)
+        {
+            geom.setWidth(qMin(xminEdit.width(), geom.width()));
+            geom.moveLeft(xAxisWidget->geometry().left());
+            xminEdit.setGeometry(geom) ;
+            xminEdit.show();
+            connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), &xminEdit, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
+        }
+        else
+        {
+            geom.setWidth(qMin(xmaxEdit.geometry().width(), geom.width()));
+            geom.moveRight(xAxisWidget->geometry().right());
+            xmaxEdit.setGeometry(geom);
+            xmaxEdit.show();
+            connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), &xmaxEdit, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
+        }
+    }
+    if (child == (QWidget*) yAxisWidget && fixYAxisAction->isChecked())
+    {
+        ymaxEdit.setText(QString::number(zoom->zoomBase().bottom())) ;
+        yminEdit.setText(QString::number(zoom->zoomBase().top()));
+        QRect geom = yAxisWidget->geometry() ;
+        if ((e->pos() - yAxisWidget->pos()).y() < yAxisWidget->height()/2)
+        {
+            geom.setHeight(qMin(ymaxEdit.height(), geom.height()));
+            geom.moveTop(yAxisWidget->geometry().top());
+            ymaxEdit.setGeometry(geom) ;
+            ymaxEdit.show();
+            connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), &ymaxEdit, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
+        }
+        else
+        {
+            geom.setHeight(qMin(yminEdit.geometry().height(), geom.height()));
+            geom.moveBottom(yAxisWidget->geometry().bottom());
+            yminEdit.setGeometry(geom);
+            yminEdit.show();
+            connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), &yminEdit, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
+        }
+    }
+}
+
+void specPlot::setPlotAxis()
+{
+    plotAxisEdit *edit = qobject_cast<plotAxisEdit*>(sender()) ;
+    if (!edit) return ;
+    QDoubleValidator dv ;
+    QString text = edit->text() ;
+    int pos = 0 ;
+    if (dv.validate(text, pos) != QValidator::Acceptable) return ;
+
+    double value = text.toDouble() ;
+    QRectF zoomBase = zoom->zoomBase() ;
+    if (edit == &yminEdit && value < zoomBase.bottom())
+        zoomBase.setTop(value) ;
+    if (edit == &ymaxEdit && value > zoomBase.top())
+        zoomBase.setBottom(value) ;
+    if (edit == &xminEdit && value < zoomBase.right())
+        zoomBase.setLeft(value);
+    if (edit == &xmaxEdit && value > zoomBase.left())
+        zoomBase.setRight(value) ;
+    zoom->changeZoomBase(zoomBase);
 }

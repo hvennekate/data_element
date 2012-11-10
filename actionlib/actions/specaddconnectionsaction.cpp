@@ -24,6 +24,8 @@ void specAddConnectionsAction::execute()
 
 	QModelIndex target = view->currentIndex() ;
 	QModelIndexList servers = serverView->getSelection() ;
+	serverView->model()->expandFolders(servers) ;
+
 	if (!target.isValid() || servers.isEmpty()) return ;
 
 	specAddConnectionsCommand *command = new specAddConnectionsCommand ;

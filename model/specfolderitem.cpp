@@ -22,6 +22,7 @@ bool specFolderItem::addChild(specModelItem* item, QList<specModelItem*>::size_t
 
 bool specFolderItem::addChildren(QList<specModelItem*> list, QList<specModelItem*>::size_type position)
 {
+    list.removeAll(0) ;
 	for(int i = 0 ; i < list.size() ; i++)
 	{
 		list[i]->setParent(this) ;
@@ -50,17 +51,6 @@ bool specFolderItem::isEditable(QString key) const
 			return true ;
 	
 	return false ;
-}
-
-bool specFolderItem::changeDescriptor(QString key, QString value)
-{
-	if (key=="")
-		return specModelItem::changeDescriptor(key,value) ;
-	
-	bool success = false ;
-	foreach(specModelItem* item, childrenList)
-		success |= item->changeDescriptor(key,value) ;
-	return success ;
 }
 
 void specFolderItem::refreshPlotData()

@@ -16,3 +16,8 @@ bool specMimeConverter::canImport(const QStringList &)
 {
 	return false ;
 }
+
+QStringList specMimeConverter::importableTypes() const
+{
+    return QStringList() ;
+}

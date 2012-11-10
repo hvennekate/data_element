@@ -7,9 +7,9 @@
 class specEditDescriptorCommand : public specUndoCommand
 {
 private:
-	QString previousContent ;
+    QStringList previousContent ;
 	QString descriptor ;
-	int previousActiveLine ;
+    QVector<int> previousActiveLine ;
 	specGenealogy item ;
 	void doIt() ;
 	void undoIt() ;

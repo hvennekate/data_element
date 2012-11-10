@@ -53,6 +53,8 @@ public:
 	virtual QSize symbolSize() const;
 	virtual void setSymbolSize(int w, int h = -1) ;
 	virtual void setSymbolSize(const QSize&) ;
+	virtual qint8 penStyle() const;
+	virtual void setPenStyle(const qint8&) ;
 };
 
 #endif

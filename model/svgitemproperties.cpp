@@ -79,6 +79,7 @@ specUndoCommand* svgItemProperties::generateCommand(QObject *parent)
 	command->setParentObject(parent) ;
 	item->setBounds(newBounds) ;
 	command->setItem(((specModel*) parent)->index(item),oldBounds,oldAnchor) ;
+    command->setText(tr("Modify SVG item"));
 	return command ;
 }
 

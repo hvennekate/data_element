@@ -9,7 +9,7 @@
 void specDataItem::applyCorrection(specDataPoint& point) const
 {
 	point.nu += xshift ;
-	point.sig = point.sig*factor+offset+slope*point.nu ;
+    point.sig = zeroMultiplications ? 0 : point.sig*factor+offset+slope*point.nu ;
 }
 
 void specDataItem::reverseCorrection(specDataPoint& point) const
@@ -221,7 +221,7 @@ void specDataItem::flatten(bool oneTime)
 	QVector<specDataPoint> newData ;
 	averageToNew(data.begin(), data.end(), compareDataPoints, std::back_inserter(newData)) ;
 
-	data = newData ; // TODO swap
+    data.swap(newData) ;
 	// average Time
 	if(oneTime)
 	{
@@ -241,12 +241,27 @@ spec::descriptorFlags specDataItem::descriptorProperties(const QString& key) con
 	return specModelItem::descriptorProperties(key) ;
 }
 
+void specDataItem::setDescriptorProperties(const QString &key, spec::descriptorFlags f)
+{
+    if (description.contains(key)) description[key].setFlags(f) ;
+    else specModelItem::setDescriptorProperties(key, f) ;
+}
+
 
 void specDataItem::scaleBy(const double& mul)
 {
-	slope  *= mul ;
-	factor *= mul ;
-	offset *= mul ;
+    qDebug() << "Scaling by" << mul ;
+    if (0 == mul)
+        zeroMultiplications ++ ;
+    else if (INFINITY == mul)
+        zeroMultiplications = 0 ;
+    else if (isnan(mul)) return ;
+    else
+    {
+        slope  *= mul ;
+        factor *= mul ;
+        offset *= mul ;
+    }
 	invalidate();
 }
 
@@ -306,7 +321,7 @@ int specDataItem::removeData(QList<specRange *> *listpointer)
 		newData << data[i] ;
 	}
 	int diff = data.size() - newData.size() ;
-	data = newData ; // TODO swap
+    data.swap(newData) ;
 	invalidate() ;
 	return diff ;
 }
@@ -359,7 +374,8 @@ specDataItem::specDataItem(const specDataItem &other)
 	  factor(other.factor),
 	  xshift(other.xshift),
 	  description(other.description),
-	  data(other.data)
+      data(other.data),
+      zeroMultiplications(other.zeroMultiplications)
 {
 }
 

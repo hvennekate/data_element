@@ -178,6 +178,7 @@ specView::specView(QWidget* parent)
 	createContextMenus() ;
 	
 	setAlternatingRowColors(true) ;
+    setSelectionBehavior(QTreeView::SelectRows);
 	setSelectionMode(QAbstractItemView::ExtendedSelection) ;
 	setDragEnabled(true) ;
 	setAcceptDrops(true) ;
@@ -378,22 +379,25 @@ void specView::resetDone()
 	if (!state) return ;
 	state->restoreState();
 	delete state ;
+    state = 0 ;
 }
 
 void specView::dragMoveEvent(QDragMoveEvent *event)
 {
-	if (!acceptData(event->mimeData()))
-		event->ignore() ;
-	else
-		event->acceptProposedAction();
+    QTreeView::dragMoveEvent(event) ;
+    if (!acceptData(event->mimeData()))
+        event->ignore() ;
+    else
+        event->acceptProposedAction();
 }
 
 void specView::dragEnterEvent(QDragEnterEvent *event)
 {
-	if (!acceptData(event->mimeData()))
-		event->ignore();
-	else
-		event->acceptProposedAction();
+    QTreeView::dragEnterEvent(event) ;
+    if (!acceptData(event->mimeData()))
+        event->ignore();
+    else
+        event->acceptProposedAction();
 }
 
 bool specView::acceptData(const QMimeData *data)

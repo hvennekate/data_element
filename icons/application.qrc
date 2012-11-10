@@ -51,5 +51,6 @@
         <file>resizeImage.png</file>
         <file>undoView.png</file>
         <file>moveIndicator.png</file>
+        <file>legend.png</file>
     </qresource>
 </RCC>

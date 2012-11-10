@@ -11,6 +11,7 @@ class specPlotStyle : public specStreamable
 	QColor penColor, symbolPenColor, symbolBrushColor ;
 	qint16 symbolStyle ;
 	QSize symbolSize ;
+	qint8 penStyle ;
 	void initialize(const specCanvasItem*) ;
 	void writeToStream(QDataStream& out) const ;
 	void readFromStream(QDataStream& in) ;

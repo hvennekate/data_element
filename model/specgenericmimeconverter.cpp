@@ -53,3 +53,7 @@ bool specGenericMimeConverter::canImport(const QStringList &types)
 	return false ;
 }
 
+QStringList specGenericMimeConverter::importableTypes() const
+{
+    return specMimeConverter::importableTypes() << ownType() ;
+}

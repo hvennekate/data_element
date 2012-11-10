@@ -56,6 +56,7 @@ private:
 public:
 	specModel(QObject *par = 0) ;
 	~specModel() ;
+    QStringList mimeTypes() const ;
 	void setMetaModel(specMetaModel*) ;
 	specMetaModel* getMetaModel() const ;
 	// Own functions
@@ -83,6 +84,7 @@ public:
 
 	bool isFolder(const QModelIndex&) const ;
 	void eliminateChildren(QModelIndexList&) const ;
+	void expandFolders(QModelIndexList&) const ;
 	virtual bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row=0) ;
 	void fillSubMap(const QModelIndexList&) ;
 	void applySubMap(const QModelIndexList&) ;
@@ -127,6 +129,7 @@ public:
 	void signalBeginReset() { beginResetModel() ; } // TODO just emit from whereever this function is called
 	void signalEndReset() { endResetModel() ; } // TODO just emit from whereever this function is called
 	void signalChanged(const QModelIndex& index) ;
+    void signalChanged(QModelIndex originalBegin, QModelIndex originalEnd) ;
 	
 	
 // //TODO	bool QAbstractItemModel::setHeaderData ( int section, Qt::Orientation orientation, const QVariant & value, int role = Qt::EditRole )

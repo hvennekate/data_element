@@ -48,7 +48,7 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 				ydat << item->sample(i).y() ;
 			}
 			intensity->setSamples(xdat,item->intensityData()) ;
-			dataCurve->setSamples(xdat,ydat); ;
+			dataCurve->setSamples(xdat,ydat);
 			intensity->setYAxis(QwtPlot::yRight);
 			QPen pen = item->pen() ;
 			dataCurve->setPen(pen) ;
@@ -56,17 +56,22 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 			intensity->setPen(pen) ;
 			dataCurve->attach(plot) ;
 			intensity->attach(plot) ;
+
+			for (size_t i = 0 ; i < dataCurve->dataSize() ; ++i)
+				qDebug() << "data:" << dataCurve->sample(i) ;
 		}
 	}
 
-	double y1min = INFINITY, y1max = -INFINITY;
-	foreach(specModelItem* item, items)
-	{
-		QRectF boundaries = item->boundingRect() ;
-		y1min = qMin(y1min,boundaries.top()) ;
-		y1max = qMax(y1max,boundaries.bottom()) ;
-	}
-	plot->setAxisScale(QwtPlot::yLeft,y1min,10.) ;
+    QRectF boundaries ;
+    foreach(specModelItem* item, items)
+        boundaries |= item->boundingRect() ;
+    QSizeF size = boundaries.size() ;
+    boundaries.translate(-.05*size.width(), -.05*size.height()) ;
+    boundaries.setSize(1.1*size);
+
+    plot->setAxisScale(QwtPlot::yLeft,boundaries.bottom(),boundaries.top()) ;
+    plot->setAxisScale(QwtPlot::xBottom,boundaries.left(), boundaries.right());
+    plot->setAutoScaling(false) ; // false
 	plot->replot() ;
 }
 
@@ -94,6 +99,7 @@ void cutByIntensityDialog::removeRange()
 
 cutByIntensityDialog::~cutByIntensityDialog()
 {
+	delete picker ;
 }
 
 void cutByIntensityDialog::rangeModified(specCanvasItem *range, int point, double newX, double newY)

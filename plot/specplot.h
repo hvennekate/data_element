@@ -3,6 +3,7 @@
 
 #include <qwt_plot.h>
 #include "specstreamable.h"
+#include <QLineEdit>
 
 class specCanvasItem  ;
 class specZoomer ;
@@ -11,6 +12,22 @@ class CanvasPicker ;
 class specActionLibrary ;
 class specView ;
 
+class plotAxisEdit : public QLineEdit
+{
+    Q_OBJECT
+public:
+    plotAxisEdit(QWidget* parent = 0) : QLineEdit(parent) { }
+public slots:
+    void hideAfterEditing(QWidget* old, QWidget* newW)
+    {
+        Q_UNUSED(old)
+        if (newW != (QWidget*) this)
+        {
+            hide() ;
+            disconnect(0,0,this, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
+        }
+    }
+};
 
 class specPlot : public QwtPlot, public specStreamable
 {
@@ -22,14 +39,22 @@ private:
 	QAction *fixXAxisAction,
 		*fixYAxisAction,
 		*modifySVGs,
-		*printAction ;
+        *printAction,
+        *legendAction ;
 	CanvasPicker *MetaPicker, *SVGpicker ; // TODO make pickers more prominent: accessible through
 											// function, attach metaRanges direktly to picker etc.
+	bool autoScaling ;
 	void readFromStream(QDataStream &in);
 	void writeToStream(QDataStream &out) const ;
 	type typeId() const {return specStreamable::mainPlot ;}
 	specActionLibrary *undoP ;
 	void resizeEvent(QResizeEvent *e) ;
+	void autoScale(const QwtPlotItemList& allItems) ;
+    void mouseDoubleClickEvent(QMouseEvent *e) ;
+    plotAxisEdit xminEdit, xmaxEdit, yminEdit, ymaxEdit ;
+private slots:
+    void setPlotAxis() ;
+    void showLegend(bool) ;
 protected:
 	specView *view ;
 	specActionLibrary* undoPartner() const ;
@@ -44,6 +69,7 @@ public:
 	void setUndoPartner(specActionLibrary* lib) ;
 	virtual void attachToPicker(specCanvasItem*) ;
 	virtual void detachFromPicker(specCanvasItem*) ;
+	void setAutoScaling(bool) ;
 signals:
 	void startingReplot() ;
 	void replotted() ;

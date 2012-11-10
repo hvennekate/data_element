@@ -56,6 +56,7 @@ public:
 	SVGCornerPoint setAnchor(const SVGCornerPoint&) ;
 	QIcon decoration() const ;
 	specUndoCommand *itemPropertiesAction(QObject *parentObject) ;
+    QString toolTip(const QString &column) const ;
 private:
 	bounds ownBounds ;
 };

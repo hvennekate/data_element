@@ -22,6 +22,10 @@
 #include "specaddfoldercommand.h"
 #include "speceditdescriptorcommand.h"
 #include "specresizesvgcommand.h"
+#include <algorithm>
+#include "specdeleteaction.h"
+#include <QStack>
+
 // TODO replace isFolder() by addChildren(empty list,0)
 
 bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria)
@@ -413,15 +417,15 @@ void specModel::checkForNewDescriptors(const QList<specModelItem*>& list, const 
 {
 	// TODO: check if descriptors were removed... hm...
 	// Check for possible new column headers
-	for (QList<specModelItem*>::const_iterator i = list.begin() ; i != list.end() ; ++i)
+	foreach(specModelItem* pointer, list)
 	{
-		foreach (const QString& descriptor, (*i)->descriptorKeys())
+		foreach (const QString& descriptor, pointer->descriptorKeys())
 		{
 			if (!Descriptors.contains(descriptor))
 			{
 				insertColumns(columnCount(parent),1,parent) ;
 				setHeaderData(columnCount(parent)-1,Qt::Horizontal,descriptor) ;
-				setHeaderData(columnCount(parent)-1,Qt::Horizontal,(int) (*i)->descriptorProperties(descriptor), 34) ;
+				setHeaderData(columnCount(parent)-1,Qt::Horizontal,(int) pointer->descriptorProperties(descriptor), 34) ;
 			}
 		}
 	}
@@ -504,7 +508,7 @@ QVariant specModel::data(const QModelIndex &index, int role) const
 		case spec::fullContentRole :
 			return pointer->descriptor(Descriptors[index.column()],true) ;
 		case Qt::ToolTipRole :
-			return pointer->descriptor(Descriptors[index.column()],true) ;
+            return pointer->toolTip(Descriptors[index.column()]) ;
 // 		case 32 : // TODO replace in namespace
 // 			return pointer->plotData() ;
 	}
@@ -586,24 +590,43 @@ QVariant specModel::headerData(int section, Qt::Orientation orientation,
 bool specModel::removeRows(int position, int rows, const QModelIndex &parent) 
 { // TODO check if index is valid?
 // 	if(!(position+rows <= rowCount(index))) return false ; maybe necessary...
+    Q_UNUSED(position)
+    Q_UNUSED(rows)
+    Q_UNUSED(parent)
 	if (position < 0 || rows < 1) return false ;
 	if (dontDelete)
 	{
 		dontDelete -- ;
 		return true ;
 	}
-	beginRemoveRows(parent, position, position+rows-1); // TODO this is actually not to be permitted!!
-// 	QList<specModelItem*> list = itemPointer(index)->takeChildren(position,rows) ;
-	QList<specModelItem*> list ;
-	specFolderItem *parentPointer = (specFolderItem*) itemPointer(parent) ;
-	for (int i = 0 ; i < rows ; i++)
-		list << itemPointer(index(position+i,0,parent)) ;
-	parentPointer->haltRefreshes(true) ;
-	while(!list.isEmpty())
-		delete list.takeLast() ;
-	parentPointer->haltRefreshes(false) ;
-	endRemoveRows();
-	return true ;
+
+    if (dropBuddy) dropBuddy->deleteInternally(this) ;
+//    beginRemoveRows(parent, position, position+rows-1); // TODO this is actually not to be permitted!!
+//    QModelIndexList indexes ;
+//    for (int i = 0 ; i < rows ; ++i)
+//        indexes << index(position+i,0,parent) ;
+//    specUndoCommand *deleteCommand = specDeleteAction::command(this, indexes) ;
+//    if (dropBuddy)
+//        dropBuddy->push(deleteCommand) ;
+//    else
+//    {
+//        deleteCommand->redo();
+//        delete deleteCommand ;
+//    }
+//    endRemoveRows();
+    return true ;
+
+//// 	QList<specModelItem*> list = itemPointer(index)->takeChildren(position,rows) ;
+//    QList<specModelItem*> list ;
+//    specFolderItem *parentPointer = (specFolderItem*) itemPointer(parent) ;
+//    for (int i = 0 ; i < rows ; i++)
+//        list << itemPointer(index(position+i,0,parent)) ;
+//    parentPointer->haltRefreshes(true) ;
+//    while(!list.isEmpty())
+//        delete list.takeLast() ;
+//    parentPointer->haltRefreshes(false) ;
+
+//    return true ;
 }
 
 void specModel::setInternalDrop(bool val)
@@ -741,11 +764,8 @@ void specModel::applySubMap(const QModelIndexList & indexList)
 specModelItem* specModel::itemPointer(const QVector<int> &indexes) const
 {
 	specModelItem* pointer = root ;
-	for (int i =  indexes.size() - 1 ; i >= 0 && pointer->isFolder() ; --i)
-	{
-		if (!pointer) return 0 ;
-		pointer = ((specFolderItem*) pointer)->child(indexes[i]) ;
-	}
+    for (int i =  indexes.size() - 1 ; i >= 0 && pointer && pointer->isFolder() ; --i)
+        pointer = ((specFolderItem*) pointer)->child(indexes[i]) ;
 	return pointer ;
 }
 
@@ -852,7 +872,63 @@ void specModel::signalChanged(const QModelIndex &i)
 
 	QModelIndex begin = index(i.row(),0,i.parent()),
 			end = index(i.row(),columnCount(i)-1,i.parent()) ;
-	specModelItem *item = itemPointer(i) ;
+    signalChanged(begin, end) ;
+    specModelItem *item = itemPointer(i) ;
 	checkForNewDescriptors(QList<specModelItem*>() << item, i.parent());
 	emit dataChanged(begin,end) ;
+}
+
+void specModel::signalChanged(QModelIndex begin, QModelIndex end)
+{
+    while (begin.parent() != end.parent())
+    {
+        if (begin.isValid())
+            begin = begin.parent() ;
+        else
+            end = QModelIndex() ;
+    }
+
+    QModelIndex i(begin) ;
+    QList<specModelItem*> items ;
+
+    do
+    {
+        specModelItem* pointer = itemPointer(i) ;
+        items << pointer;
+        if (pointer->children())
+        {
+            QModelIndex firstChild = index(0,0,i),
+                    lastChild = index(pointer->children()-1, 0, i) ;
+            signalChanged(firstChild, lastChild) ;
+        }
+        i = i.sibling(i.row()+1, 0) ;
+
+    } while (i != end && i.isValid()) ;
+
+    checkForNewDescriptors(items, begin.parent()) ;
+    emit dataChanged(begin, index(end.row(), Descriptors.count(), end.parent())) ;
+}
+
+void specModel::expandFolders(QModelIndexList &list) const
+{
+	for (QModelIndexList::iterator i = list.begin() ; i != list.end() ; ++i)
+	{
+		if (itemPointer(*i)->isFolder())
+		{
+			QModelIndexList newList = allChildren(*i) ;
+			QModelIndexList reverseNewList ;
+			std::reverse_copy(newList.begin(), newList.end(), std::back_inserter(reverseNewList)) ;
+			i = list.erase(i);
+			foreach(const QModelIndex& index, reverseNewList)
+				i = list.insert(i, index) ;
+		}
+	}
+}
+
+QStringList specModel::mimeTypes() const
+{
+    QStringList types ;
+    foreach(specMimeConverter* converter, mimeConverters())
+        types << converter->importableTypes() ;
+    return types ;
 }

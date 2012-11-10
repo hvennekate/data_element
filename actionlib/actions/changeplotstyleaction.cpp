@@ -25,12 +25,14 @@ changePlotStyleAction::changePlotStyleAction(QObject *parent) :
 	symbolOuterColorMenu = new QMenu("Symbol Outer Color",menu()) ;
 	symbolSizeMenu = new QMenu("Symbol Size",menu()) ;
 	lineWidthMenu = new QMenu("Line Width",menu()) ;
+	penStyleMenu = new QMenu("Line Style", menu()) ;
 	menu()->addMenu(lineColorMenu) ;
 	menu()->addMenu(lineWidthMenu) ;
 	menu()->addMenu(symbolMenu) ;
 	menu()->addMenu(symbolInnerColorMenu) ;
 	menu()->addMenu(symbolOuterColorMenu) ;
 	menu()->addMenu(symbolSizeMenu) ;
+	menu()->addMenu(penStyleMenu) ;
 
 	colors << Qt::black << Qt::red << Qt::green << Qt::blue << Qt::yellow << Qt::magenta << Qt::cyan << Qt::darkYellow ;
 	sizes << 1 << 2 << 2.5 << 3 << 5 << 7 << 10 ;
@@ -38,7 +40,7 @@ changePlotStyleAction::changePlotStyleAction(QObject *parent) :
 	QSize iconSize(16,16) ;
 	QPixmap icon(iconSize) ;
 	QPainter painter(&icon) ;
-	QPen pen ;
+//	QPen pen ;
 	QwtSymbol symbol ;
 	symbol.setSize(iconSize) ;
 
@@ -77,12 +79,20 @@ changePlotStyleAction::changePlotStyleAction(QObject *parent) :
 		symbolSizeActions << new QAction(QString::number(*i),this) ;
 	}
 
+	penStyleActions << new QAction("None",this) <<
+			   new QAction("Solid", this) <<
+			   new QAction("Dashed", this) <<
+			   new QAction("Dotted", this) <<
+			   new QAction("Dash-dotted", this) <<
+			   new QAction("Dash-dot-dotted", this) ;
+
 	symbolMenu->addActions(symbolActions.toList());
 	lineColorMenu->addActions(lineColorActions.toList()) ;
 	lineWidthMenu->addActions(lineWidthActions.toList()) ;
 	symbolInnerColorMenu->addActions(symbolInnerColorActions.toList()) ;
 	symbolOuterColorMenu->addActions(symbolOuterColorActions.toList());
 	symbolSizeMenu->addActions(symbolSizeActions.toList());
+	penStyleMenu->addActions(penStyleActions.toList()) ;
 
 	connect(symbolMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionTriggered(QAction*))) ;
 	connect(lineColorMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionTriggered(QAction*))) ;
@@ -90,6 +100,7 @@ changePlotStyleAction::changePlotStyleAction(QObject *parent) :
 	connect(symbolInnerColorMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionTriggered(QAction*))) ;
 	connect(symbolOuterColorMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionTriggered(QAction*))) ;
 	connect(symbolSizeMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionTriggered(QAction*))) ;
+	connect(penStyleMenu, SIGNAL(triggered(QAction*)), this, SLOT(actionTriggered(QAction*))) ;
 }
 
 QColor changePlotStyleAction::getColor(int index)
@@ -123,6 +134,7 @@ specUndoCommand* changePlotStyleAction::generateUndoCommand()
 		if (!color.isValid()) return 0;
 		newCommand = generateStyleCommand(specStreamable::penColorCommandId) ;
 		item.setPenColor(color) ;
+		newCommand->setText(tr("Change line color"));
 	}
 	if (currentTrigger == symbolInnerColorMenu)
 	{
@@ -130,6 +142,7 @@ specUndoCommand* changePlotStyleAction::generateUndoCommand()
 		if (!color.isValid()) return 0;
 		newCommand = generateStyleCommand(specStreamable::symbolBrushColorCommandId) ;
 		item.setSymbolBrushColor(color) ;
+		newCommand->setText(tr("Change symbol inner color"));
 	}
 	if (currentTrigger == symbolOuterColorMenu)
 	{
@@ -137,6 +150,7 @@ specUndoCommand* changePlotStyleAction::generateUndoCommand()
 		if (!color.isValid()) return 0;
 		newCommand = generateStyleCommand(specStreamable::symbolPenColorCommandId) ;
 		item.setSymbolPenColor(color) ;
+		newCommand->setText(tr("Change symbol outer color"));
 	}
 
 	bool ok = true;
@@ -146,6 +160,7 @@ specUndoCommand* changePlotStyleAction::generateUndoCommand()
 		if (!ok) return 0;
 		newCommand = generateStyleCommand(specStreamable::lineWidthCommandId) ;
 		item.setLineWidth(value) ;
+		newCommand->setText(tr("Change line width"));
 	}
 	if (currentTrigger == symbolSizeMenu)
 	{
@@ -153,19 +168,31 @@ specUndoCommand* changePlotStyleAction::generateUndoCommand()
 		if (!ok) return 0;
 		newCommand = generateStyleCommand(specStreamable::symbolSizeCommandId) ;
 		item.setSymbolSize(value) ;
+		newCommand->setText(tr("Change symbol size"));
 	}
 
 	if (currentTrigger == symbolMenu)
 	{
 		newCommand = generateStyleCommand(specStreamable::symbolStyleCommandId) ;
-		item.setSymbolStyle(symbolActions.indexOf(currentAction));
+        int symbolStyle = symbolActions.indexOf(currentAction) - 1 ;
+//        if (symbolStyle < 0)
+//            item.setSymbolStyle(specPlotStyle::noSymbol);
+//        else
+            item.setSymbolStyle(symbolStyle);
+		newCommand->setText(tr("Change symbol type"));
+	}
+
+	if (currentTrigger == penStyleMenu)
+	{
+		newCommand = generateStyleCommand(specStreamable::penStyleCommandId) ;
+		item.setPenStyle(penStyleActions.indexOf(currentAction));
+		newCommand->setText(tr("Change line style"));
 	}
 
 	if (!newCommand) return 0;
 	newCommand->obtainStyle(&item) ;
 	newCommand->setParentObject(view->model()) ;
 	newCommand->setItems(view->getSelection()) ;
-	newCommand->setText(tr("Change plot style"));
 	return newCommand ;
 }
 

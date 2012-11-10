@@ -29,6 +29,10 @@
 #include "specremovefitaction.h"
 #include "spectogglefitstyleaction.h"
 #include "specmetaitem.h"
+#include "specselectconnectedaction.h"
+#include "specsetmultilineaction.h"
+#include "specsvgitem.h"
+
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -39,7 +43,7 @@ specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
 {
 	undoStack = new QUndoStack ;
-	connect(undoStack,SIGNAL(indexChanged(int)),this,SIGNAL(stackChanged())) ;
+    connect(undoStack,SIGNAL(cleanChanged(bool)),this,SIGNAL(stackClean(bool))) ;
 }
 
 void specActionLibrary::push(specUndoCommand * cmd)
@@ -116,6 +120,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		bar->addSeparator() ;
 		addNewAction(bar, new changePlotStyleAction(target)) ;
 		addNewAction(bar, new specAddConnectionsAction(target)) ;
+		addNewAction(bar, new specSelectConnectedAction(target)) ;
 		addNewAction(bar,new genericExportAction(target)) ;
 
 		return bar ;
@@ -134,6 +139,8 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		addNewAction(bar, new specCutAction(target)) ;
 		addNewAction(bar, new specPasteAction(target)) ;
 		addNewAction(bar, new specDeleteAction(target)) ;
+        bar->addSeparator() ;
+        addNewAction(bar, new specTreeAction(target)) ;
 
 		return bar ;
 	}
@@ -179,6 +186,12 @@ void specActionLibrary::writeToStream(QDataStream &out) const
 		out << type(command->id()) << qint32(parents.indexOf(command->parentObject()))
 		    << *command ;
 	}
+    undoStack->setClean();
+}
+
+specStreamable* specActionLibrary::factory(const type &t) const
+{
+    return commandGenerator.commandById(t) ;
 }
 
 void specActionLibrary::readFromStream(QDataStream &in)
@@ -192,19 +205,25 @@ void specActionLibrary::readFromStream(QDataStream &in)
 	for (int i = 0 ; i < num ; ++i)
 	{
 		in >> t >> parentIndex[i] ;
-		specUndoCommand *command = commandGenerator.commandById(t) ;
+        specStreamable *streamable = produceItem(in) ;
+        specUndoCommand *command = dynamic_cast<specUndoCommand*>(streamable) ;
 		if (!command)
 		{
+            qDebug() << "Error reading command no." << i << "of type" << t ;
 			undoStack->clear();
+            parentIndex.clear();
+            delete streamable ;
 			continue ;
 		}
-		in >> *command ;
+        qDebug() << "Reading item:" << i << "total count:" << undoStack->count() << "/" << num ;
 		undoStack->push(command) ;
 	}
 
 	undoStack->setIndex(position) ;
-	for (int i = 0 ; i < num ; ++i)
+    for (int i = 0 ; i < undoStack->count() ; ++i)
 		((specUndoCommand*) undoStack->command(i))->setParentObject(parents[parentIndex[i]]) ;
+    qDebug() << "to be read:" << num << "actually on stack:" << undoStack->count() ;
+    undoStack->setClean();
 }
 
 void specActionLibrary::setLastRequested(const QModelIndexList &list)
@@ -223,9 +242,18 @@ int specActionLibrary::moveInternally(const QModelIndex &parent, int row, specVi
 	return count ;
 }
 
+int specActionLibrary::deleteInternally(specModel* model)
+{
+    int count = lastRequested.size() ;
+    specUndoCommand *command = specDeleteAction::command(model, lastRequested) ;
+    command->setText(tr("Move items"));
+    push(command) ;
+    return count ;
+}
+
 void specActionLibrary::addPlot(specPlot *plot)
 {
-	connect(this,SIGNAL(stackChanged()),plot,SLOT(replot())) ;
+    connect(undoStack,SIGNAL(indexChanged(int)),plot,SLOT(replot())) ;
 }
 
 void specActionLibrary::purgeUndo()
@@ -256,19 +284,27 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
 	}
 	if (view && view->model())
 	{
-		addNewAction(cMenu, new specAddFolderAction(w)) ;
-		specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;
-		if (dynamic_cast<specDataItem*>(currentItem)
-				|| dynamic_cast<specMetaItem*>(currentItem))
-			addNewAction(cMenu, new specItemPropertiesAction(w)) ;
-		if (QApplication::clipboard()->mimeData())
-			addNewAction(cMenu, new specPasteAction(w)) ;
-		if (!view->getSelection().isEmpty())
-		{
-			addNewAction(cMenu, new specCopyAction(w)) ;
-			addNewAction(cMenu, new specCutAction(w)) ;
-			addNewAction(cMenu, new specDeleteAction(w)) ;
-		}
+        addNewAction(cMenu, new specAddFolderAction(w)) ;
+        specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;
+        specSetMultilineAction *mlAction = new specSetMultilineAction(w) ;
+        addNewAction(cMenu, mlAction) ;
+        if (currentItem && view->currentIndex().isValid())
+            mlAction->setChecked(
+                    currentItem->descriptorProperties(
+                        view->model()->descriptors()[
+                            view->currentIndex().column()]) & spec::multiline) ; // TODO move to action
+        if (dynamic_cast<specDataItem*>(currentItem)
+                || dynamic_cast<specMetaItem*>(currentItem)
+                || dynamic_cast<specSVGItem*>(currentItem))
+            addNewAction(cMenu, new specItemPropertiesAction(w)) ;
+        if (QApplication::clipboard()->mimeData())
+            addNewAction(cMenu, new specPasteAction(w)) ;
+        if (!view->getSelection().isEmpty())
+        {
+            addNewAction(cMenu, new specCopyAction(w)) ;
+            addNewAction(cMenu, new specCutAction(w)) ;
+            addNewAction(cMenu, new specDeleteAction(w)) ;
+        }
 	}
 	return cMenu ;
 }

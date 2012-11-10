@@ -21,6 +21,10 @@ specModelItem::specModelItem(specFolderItem* par, QString desc)
 	  sortPlotData(true)
 {
 	setParent(par) ;
+    setItemAttribute(Legend, true) ;
+    setLegendAttribute(LegendNoAttribute, false) ;
+    setLegendAttribute(LegendShowLine, true) ;
+    setLegendAttribute(LegendShowSymbol, true) ;
 }
 
 specModelItem::~specModelItem()
@@ -67,6 +71,7 @@ bool specModelItem::changeDescriptor(QString key, QString value)
 	if (key == "" && description.isEditable())
 	{
 		description.setContent(value) ;
+        setTitle(value) ;
 		return true ;
 	}
 	
@@ -115,8 +120,8 @@ void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 			xt << xtemplate ;
 			yt << ysum/(i-j) ;
 		}
-		x = xt ;// TODO simply swap the vectors!!!
-		y = yt ;
+        x.swap(xt) ;
+        y.swap(yt) ;
 	}
 }
 
@@ -211,13 +216,19 @@ void specModelItem::readFromStream(QDataStream & in)
 	specCanvasItem::readFromStream(in) ;
 	in >> mergePlotData >> sortPlotData
 	   >> description ;
+    setTitle(descriptor("",true));
 	invalidate() ;
 }
 
 spec::descriptorFlags specModelItem::descriptorProperties(const QString& key) const
 {
-	if(key=="") return spec::editable ;
+    if(key=="") return description.flags() ;
 	return spec::def ;
+}
+
+void specModelItem::setDescriptorProperties(const QString &key, spec::descriptorFlags f)
+{
+    if (key == "") description.setFlags(f) ;
 }
 
 void specModelItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out)
@@ -338,4 +349,9 @@ void specModelItem::detach()
 	specCanvasItem::detach() ;
 	foreach(specMetaItem* client, clients)
 		client->refreshOtherPlots();
+}
+
+QString specModelItem::toolTip(const QString &column) const
+{
+    return descriptor(column,true) ;
 }
