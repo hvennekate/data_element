@@ -15,6 +15,8 @@ QList<specModelItem*> readLogFile(QFile& file) ;
 QList<specModelItem*> readHVFile(QFile&) ;
 QList<specModelItem*> readPEFile(QFile&) ;
 QList<specModelItem*> readJCAMPFile(QFile&) ;
+QList<specModelItem*> readSKHIFile(QFile&) ;
+QList<specModelItem*> readXYFILE(QFile&) ;
 QPair<QString,specDescriptor> readJCAMPldr(QString &first,QTextStream &in) ;
 specModelItem* readJCAMPBlock(QTextStream& in) ;
 void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, double xfactor, double yfactor) ;

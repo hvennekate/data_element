@@ -13,6 +13,7 @@
 #include "specdatapoint.h"
 #include <QMessageBox>
 #include <QObject>
+#include <QDoubleValidator>
 using std::max ;
 using std::min ;
 
@@ -489,8 +490,15 @@ QList<specModelItem*> (*fileFilter(const QString& fileName)) (QFile&)
 	QList<specModelItem*> (*pointer)(QFile&) = 0 ;
 	if (sample == "PE IR") pointer = readPEFile ;
 	else if (sample == "Solve") pointer = readHVFile ;
-	else if (sample == "##") pointer = readJCAMPFile ;
-	else pointer = readLogFile ;
+    else if (sample == "Time ") pointer = readSKHIFile ;
+    else if (sample.left(2) == "##") pointer = readJCAMPFile ; // ???? TODO
+    else
+    {
+        for (int i = 0 ; i < 10 ; ++i)
+            sample += in.readLine() ;
+        if (sample.contains(QRegExp("^\\d\\d\\.\\d\\d\\.\\d\\d \\d\\d:\\d\\d:\\d\\d : "))) pointer = readLogFile ;
+        else pointer = readXYFILE ;
+    }
 	file.close() ;
 	return pointer ;
 }
@@ -573,4 +581,145 @@ QList<double> gaussjinv(QList<QList<double> >& A, QList<double>& b)
 		retval << dummy ;
 	}
 	return retval ;
+}
+
+QList<specModelItem*> readSKHIFile(QFile& file)
+{
+    QTextStream in(&file) ;
+    in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system
+    QVector<QPair<QPair<double, double>,
+            QPair<QVector<double>, QVector<double> > > > integrale ;
+    QStringList integralNamen = in.readLine().split("\t") ;
+    QVector<double> zeiten ;
+    integralNamen.takeFirst() ;
+    integralNamen.takeFirst() ;
+    foreach(QString integralName, integralNamen)
+        integrale << qMakePair(qMakePair(integralName.section(" - ",0,0).toDouble(),
+                               integralName.section(" - ",1,1).toDouble()),
+                               qMakePair(QVector<double>(), QVector<double>()));
+
+
+    QHash<QString,specDescriptor> headerItems ;
+    foreach(QString descriptor, in.readLine().split(", "))
+        headerItems[descriptor.section(": ",0,0)] = specDescriptor(descriptor.section(": ",1,1),spec::numeric | spec::editable) ;
+    headerItems["raw"] = 1 ;
+    headerItems["file"] = QFileInfo(file.fileName()).fileName() ;
+
+    while(!in.atEnd())
+    {
+        QStringList firstLine = in.readLine().split("\t") ;
+        QStringList secondLine = in.readLine().split("\t") ;
+        if (firstLine.size() < 2 || secondLine.size() < 2) break ;
+        zeiten << firstLine.takeFirst().toDouble() ;
+        secondLine.takeFirst() ;
+        firstLine.takeFirst() ;
+        secondLine.takeFirst() ;
+        for (int i = 0 ; i < integrale.size() ; ++i)
+        {
+            double a = firstLine.isEmpty() ? NAN : firstLine.takeFirst().toDouble() ;
+            double b = secondLine.isEmpty()? NAN : secondLine.takeFirst().toDouble() ;
+            integrale[i].second.first << a ;
+            integrale[i].second.second << b ;
+        }
+    }
+
+    QList<specModelItem*> newItems ;
+    for (int i = 0 ; i < integrale.size() ; ++i)
+    {
+        headerItems["begin"] = integrale[i].first.first ;
+        headerItems["end"]   = integrale[i].first.second ;
+        QVector<specDataPoint> rawOne, rawTwo, diff ;
+        for (int j = 0 ; j < integrale[i].second.first.size() ; ++j)
+        {
+            double a =  integrale[i].second.first[j],
+                    b = integrale[i].second.second[j],
+                    t = zeiten[j] ;
+            rawOne << specDataPoint(NAN, t, a, NAN) ;
+            rawTwo << specDataPoint(NAN, t, b, NAN) ;
+            diff   << specDataPoint(NAN,t, a-b, NAN) ;
+        }
+        headerItems["raw"] = 1 ;
+        newItems << new specDataItem(rawOne,headerItems)
+                 << new specDataItem(rawTwo,headerItems) ;
+        headerItems["raw"] = 0 ;
+        newItems << new specDataItem(diff,headerItems) ;
+    }
+    return newItems ;
+}
+
+QList<specModelItem*> readXYFILE(QFile &file)
+{
+    QTextStream in(&file) ;
+    in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system
+    QList<specModelItem*> newItems ;
+
+    // determine separator
+    QChar separator ;
+    QString content = in.readAll() ;
+    if (content.contains('\t')) separator = '\t' ;
+    else if (content.contains(' ')) separator = ' ' ;
+    else if (content.contains(',')) separator = ',' ;
+    else
+    {
+        QMessageBox::critical(0,QObject::tr("XY import failed"), QObject::tr("Could not find valid data field separators (tab, space, comma)")) ;
+        return newItems ;
+    }
+
+    // split entries up
+    QList<QStringList> entries ;
+    foreach(QString line, content.split("\n"))
+        entries << line.split(separator) ;
+
+    // determine if first line can be used as header
+    QDoubleValidator validator ;
+    int pos = 0 ;
+    QStringList headers ;
+    if (validator.validate(entries.first().first(), pos) != QValidator::Acceptable)
+        headers = entries.takeFirst() ;
+
+    // determine number of columns
+    if (entries.isEmpty() || entries.first().isEmpty()) return newItems ;
+    int numberOfColums = entries.first().size() ;
+    int i = 0 ;
+    foreach(QStringList line, entries)
+    {
+        ++i ;
+        if (line.size() != numberOfColums && line.size() > 1)
+        {
+            QMessageBox::critical(0, QObject::tr("XY import failed"),
+                                  QObject::tr("The number of columns differs in at least one line"
+                                              " differs from that determined for the first line. "
+                                              "(Error occured in line %1. Pre-determined number of"
+                                              " columns: %2. The line in question hat %3 columns.)").
+                                  arg(i).arg(numberOfColums).arg(line.size())) ;
+            return newItems ;
+        }
+    }
+
+    // generate data
+    QVector<double> xValues ;
+    QVector<QVector<double> > yValues(numberOfColums-1) ;
+    foreach(QStringList line, entries)
+    {
+        if (!(line.size()>1)) continue ;
+        xValues << line.first().toDouble() ;
+        for (int i = 0 ; i < numberOfColums-1 ; ++i)
+            yValues[i] << line[i+1].toDouble() ;
+    }
+
+    // generate items
+    QHash<QString, specDescriptor> description ;
+    description["File"] = QFileInfo(file.fileName()).fileName() ;
+    for (int i = 0 ; i < numberOfColums-1 ; ++i)
+    {
+        if (headers.size() > i)
+            description["Column"] = headers[i+ (headers.size() == numberOfColums ? 1 : 0)] ;
+        else if (description.contains("Column"))
+            description.remove("Column") ;
+        QVector<specDataPoint> points ;
+        for (int j = 0 ; j < xValues.size() ; ++j)
+            points << specDataPoint(NAN, xValues[j], yValues[i][j], NAN) ;
+        newItems << new specDataItem(points, description) ;
+    }
+    return newItems ;
 }
