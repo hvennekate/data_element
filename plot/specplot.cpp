@@ -249,13 +249,23 @@ void specPlot::mouseDoubleClickEvent(QMouseEvent *e)
     QWidget *child = childAt(e->pos()) ;
     QwtScaleWidget* xAxisWidget = axisWidget(QwtPlot::xBottom) ;
     QwtScaleWidget* yAxisWidget = axisWidget(QwtPlot::yLeft) ;
+
     qDebug() << "Positions:" << e->pos() << xAxisWidget->pos() << yAxisWidget->pos() ;
     qDebug() << "Tops/Bottoms:" << xAxisWidget->geometry() << yAxisWidget->geometry() ;
     qDebug() << yAxisWidget->geometry().top() << yAxisWidget->geometry().bottom() ;
+
+    xmaxEdit.setText(QString::number(zoom->zoomBase().right())) ;
+    xminEdit.setText(QString::number(zoom->zoomBase().left()));
+    ymaxEdit.setText(QString::number(zoom->zoomBase().bottom())) ;
+    yminEdit.setText(QString::number(zoom->zoomBase().top()));
+
+    ymaxEdit.selectAll();
+    xmaxEdit.selectAll();
+    yminEdit.selectAll();
+    xminEdit.selectAll();
+
     if (child == (QWidget*) xAxisWidget && fixXAxisAction->isChecked())
     {
-        xmaxEdit.setText(QString::number(zoom->zoomBase().right())) ;
-        xminEdit.setText(QString::number(zoom->zoomBase().left()));
         QRect geom = xAxisWidget->geometry() ;
         if ((e->pos() - xAxisWidget->pos()).x() < xAxisWidget->width()/2)
         {
@@ -264,6 +274,7 @@ void specPlot::mouseDoubleClickEvent(QMouseEvent *e)
             xminEdit.setGeometry(geom) ;
             xminEdit.show();
             connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), &xminEdit, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
+            xminEdit.setFocus();
         }
         else
         {
@@ -272,12 +283,11 @@ void specPlot::mouseDoubleClickEvent(QMouseEvent *e)
             xmaxEdit.setGeometry(geom);
             xmaxEdit.show();
             connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), &xmaxEdit, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
+            xmaxEdit.setFocus();
         }
     }
     if (child == (QWidget*) yAxisWidget && fixYAxisAction->isChecked())
     {
-        ymaxEdit.setText(QString::number(zoom->zoomBase().bottom())) ;
-        yminEdit.setText(QString::number(zoom->zoomBase().top()));
         QRect geom = yAxisWidget->geometry() ;
         if ((e->pos() - yAxisWidget->pos()).y() < yAxisWidget->height()/2)
         {
@@ -286,6 +296,7 @@ void specPlot::mouseDoubleClickEvent(QMouseEvent *e)
             ymaxEdit.setGeometry(geom) ;
             ymaxEdit.show();
             connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), &ymaxEdit, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
+            ymaxEdit.setFocus();
         }
         else
         {
@@ -294,6 +305,7 @@ void specPlot::mouseDoubleClickEvent(QMouseEvent *e)
             yminEdit.setGeometry(geom);
             yminEdit.show();
             connect(qApp, SIGNAL(focusChanged(QWidget*,QWidget*)), &yminEdit, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
+            yminEdit.setFocus();
         }
     }
 }
