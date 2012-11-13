@@ -19,6 +19,25 @@
 
 #include "specworkerthread.h"
 
+class sortItemsByDescriptionFunctor
+{
+private:
+    const QStringList *comparisons ;
+public:
+    sortItemsByDescriptionFunctor(const QStringList *c) : comparisons(c) {}
+    bool operator() (specModelItem const* a, specModelItem const* b)
+    {
+        foreach(QString value, *comparisons)
+        {
+            if (a->descriptor(value, true) == b->descriptor(value, true)) continue ;
+            return a->descriptor(value, true) < b->descriptor(value, true) ;
+        }
+        if (!b->dataSize()) return false ;
+        if (!a->dataSize()) return true ;
+        return a->sample(0).x() < b->sample(0).x() ;
+    }
+};
+
 class mergeActionThread : public specWorkerThread
 {
 private:
@@ -74,6 +93,10 @@ public:
 		// Create and insert new merged items
 		qDebug() << "Beginning merge:" << profiler.restart() ;
 		int total = items.size() ;
+        QStringList comparisons ;
+        foreach(stringDoublePair pair, criteria)
+            comparisons << pair.first ;
+        sortItemsByDescriptionFunctor sorter(&comparisons) ;
 		while (!items.isEmpty())
 		{
 			int progress = total-items.size() ;
@@ -87,6 +110,7 @@ public:
 
 			QVector<specModelItem*> toInsert ;
 			int chunkSize =chunk.size() ;
+            qSort(chunk.begin(), chunk.end(), sorter) ;
 			while (!chunk.isEmpty())
 			{
 				emit progressValue(progress+chunkSize-chunk.size()) ;
@@ -97,9 +121,12 @@ public:
 				toBeDeleted << item ; // TODO check possibility of immediate deletion
 				QList<specDataItem*> toMergeWith ;
 				// look for items to merge with
-				for (int i = 0 ; i < chunk.size() ; ++i)
-					if (itemsAreEqual(newItem,chunk[i],criteria))
-						toMergeWith << chunk.takeAt(i--) ;
+//				for (int i = 0 ; i < chunk.size() ; ++i)
+//					if (itemsAreEqual(newItem,chunk[i],criteria))
+//						toMergeWith << chunk.takeAt(i--) ;
+                do toMergeWith << chunk.takeFirst() ;
+                while (!chunk.isEmpty() && itemsAreEqual(toMergeWith.first(), chunk.first(), criteria)) ;
+
 				toBeDeleted << toMergeWith.toVector() ;
 				// if there are others, do the merge
 				if (!toMergeWith.isEmpty())
