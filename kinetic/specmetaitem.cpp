@@ -69,8 +69,11 @@ void specMetaItem::setModels(specModel *m, specModel *d)
 
 void specMetaItem::writeToStream(QDataStream &out) const
 {
+	bool stylingWasToFit = styleFitCurve ;
+	const_cast<bool&>(styleFitCurve) = false ; // TODO this is ugly
 	specModelItem::writeToStream(out) ;
-	out << variables ;
+	const_cast<bool&>(styleFitCurve) = stylingWasToFit ;
+	out << ((quint8) styleFitCurve) << variables ;
 	if (!metaModel || !dataModel) return ;
 	QVector<QPair<specGenealogy,qint8> > currentConnections ;
 	QModelIndexList indexes ;
@@ -87,8 +90,11 @@ void specMetaItem::writeToStream(QDataStream &out) const
 void specMetaItem::readFromStream(QDataStream &in)
 {
 	delete fitCurve ;
+	styleFitCurve = false ;
 	specModelItem::readFromStream(in) ;
-	in >> variables >> oldConnections;
+	quint8 stylingWasToFit ;
+	in >> stylingWasToFit >> variables >> oldConnections;
+	styleFitCurve = stylingWasToFit ;
 	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
 	quint8 hasFitCurve ;
 	in >> hasFitCurve ;
