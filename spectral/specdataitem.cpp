@@ -207,6 +207,7 @@ specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 		reverseCorrection(point) ;
 		data << point ;
 	}
+    invalidate() ;
 	return (*this) ;
 }
 

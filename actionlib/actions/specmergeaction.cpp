@@ -30,6 +30,8 @@ public:
         foreach(QString value, *comparisons)
         {
             if (a->descriptor(value, true) == b->descriptor(value, true)) continue ;
+            if (a->descriptorProperties(value) & spec::numeric)
+                return a->descriptor(value).toDouble() <b->descriptor(value).toDouble() ;
             return a->descriptor(value, true) < b->descriptor(value, true) ;
         }
         if (!b->dataSize()) return false ;
@@ -115,15 +117,9 @@ public:
 			{
 				emit progressValue(progress+chunkSize-chunk.size()) ;
 				if (cleanUp()) return ;
-				specDataItem* item = chunk.takeFirst() ;
 				specDataItem *newItem = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
-				*newItem += *item ; // TODO ueberarbeiten
-				toBeDeleted << item ; // TODO check possibility of immediate deletion
 				QList<specDataItem*> toMergeWith ;
 				// look for items to merge with
-//				for (int i = 0 ; i < chunk.size() ; ++i)
-//					if (itemsAreEqual(newItem,chunk[i],criteria))
-//						toMergeWith << chunk.takeAt(i--) ;
                 do toMergeWith << chunk.takeFirst() ;
                 while (!chunk.isEmpty() && itemsAreEqual(toMergeWith.first(), chunk.first(), criteria)) ;
 
@@ -138,30 +134,40 @@ public:
 							// generate reference spectrum
 							QMap<double,double> reference ;
 							newItem->revalidate();
-							const QwtSeriesData<QPointF>* spectrum = newItem->QwtPlotCurve::data() ;
-							for (size_t i = 0 ; i < spectrum->size() ; ++i)
+                            qDebug() << "newItems's data size:" << newItem->dataSize() ;
+                            for (size_t i = 0 ; i < newItem->dataSize() ; ++i)
 							{
-								const QPointF point = spectrum->sample(i) ;
+                                const QPointF point = newItem->sample(i) ;
 								reference[point.x()] = point.y() ;
 							}
 
 							// define spectral ranges
 							QwtPlotItemList ranges ;
-							ranges << new specRange(reference.begin().key(), (reference.end() -1).key()) ; // DANGER
-							// TODO set up sensible ranges to account for "holes" in the spectrum
+                            specRange *range = new specRange(reference.begin().key(), (reference.end() -1).key()) ;
+                            ranges << range ; // DANGER
+                            // protection against nan values (make sure spectra do indeed overlap)
+                            int overlappingCount = 0 ;
+                            for(size_t i = 0 ; i < other->dataSize() ; ++i)
+                            {
+                                overlappingCount += range->contains(other->sample(i).x()) ;
+                                if (overlappingCount == 2) break ;
+                            }
+                            if (overlappingCount == 2)
+                            {
+                                QwtPlotItemList spectra ;
+                                for (QList<specDataItem*>::iterator i = toMergeWith.begin() ; i != toMergeWith.end() ; ++i)
+                                    spectra << (QwtPlotItem*) *i ;
 
-							// generate list of spectra
-							// TODO generate this list directly above
-							QwtPlotItemList spectra ;
-							for (QList<specDataItem*>::iterator i = toMergeWith.begin() ; i != toMergeWith.end() ; ++i)
-								spectra << (QwtPlotItem*) *i ;
-
-							// perform spectral adaptation
-							specMultiCommand *correctionCommand= specSpectrumPlot::generateCorrectionCommand(ranges, QwtPlotItemList() << (QwtPlotItem*) other, reference, model) ;
-							correctionCommand->redo();
-							*newItem += *((specDataItem*) other) ;
-							correctionCommand->undo();
-							delete correctionCommand ;
+                                // perform spectral adaptation
+                                // TODO NAN protection
+                                specMultiCommand *correctionCommand= specSpectrumPlot::generateCorrectionCommand(ranges, QwtPlotItemList() << (QwtPlotItem*) other, reference, model) ;
+                                correctionCommand->redo();
+                                *newItem += *((specDataItem*) other) ;
+                                correctionCommand->undo();
+                                delete correctionCommand ;
+                            }
+                            else
+                                *newItem += *((specDataItem*) other) ;
 						}
 					}
 					else
