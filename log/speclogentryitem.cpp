@@ -23,8 +23,6 @@ bool specLogEntryItem::isEditable(QString key) const
 
 bool specLogEntryItem::changeDescriptor(QString key, QString value)
 {
-	if (key=="")
-		return specModelItem::changeDescriptor(key,value) ;
 	if (description.contains(key))
 		return description[key].setContent(value) ;
 	return specModelItem::changeDescriptor(key,value) ;
@@ -53,11 +51,9 @@ void specLogEntryItem::setDescriptorProperties(const QString &key, spec::descrip
 
 QString specLogEntryItem::descriptor(const QString &key, bool full) const
 {
-	if (key == "")
-		return specModelItem::descriptor(key) ;
 	if (description.contains(key))
 		return description[key].content(full) ;
-	return specModelItem::descriptor(key) ;
+    return specModelItem::descriptor(key, full) ;
 }
 
 void specLogEntryItem::readFromStream ( QDataStream& in)
@@ -70,4 +66,18 @@ void specLogEntryItem::writeToStream ( QDataStream& out) const
 {
 	specModelItem::writeToStream(out) ;
 	out << description ;
+}
+
+bool specLogEntryItem::setActiveLine(const QString& key, int line)
+{
+    if (description.contains(key))
+        return description[key].setActiveLine(line) ;
+    return specModelItem::setActiveLine(key,line) ;
+}
+
+int specLogEntryItem::activeLine(const QString& key) const
+{
+    if (description.contains(key))
+        return description[key].activeLine() ;
+    return specModelItem::activeLine(key) ;
 }
