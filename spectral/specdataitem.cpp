@@ -74,64 +74,25 @@ QVector<double> specDataItem::times() const
 
 
 
-specDataItem::specDataItem(const QVector<specDataPoint>& dat, const QHash<QString,specDescriptor>& desc,
-			   specFolderItem* par, QString description)
-	: specModelItem(par,description),
+specDataItem::specDataItem(const QVector<specDataPoint>& dat, const QHash<QString,specDescriptor>& desc, specFolderItem* par, QString description)
+    : specLogEntryItem(desc, par, description),
 	  offset(0),
 	  slope(0),
 	  factor(1),
 	  xshift(0),
 	  zeroMultiplications(0),
-	  description(desc),
 	  data(dat)
 {
 }
 
 specDataItem::specDataItem()
-	: specModelItem(0,""),
+    : specLogEntryItem(),
 	  offset(0),
 	  slope(0),
 	  factor(1),
 	  xshift(0),
 	  zeroMultiplications(0)
 {
-}
-
-bool specDataItem::isEditable(QString key) const
-{
-	if (key== QString(""))
-		return true ;
-	if (description.contains(key))
-	{
-		return description[key].isEditable() ;
-	}
-	
-	return true ;
-}
-
-bool specDataItem::changeDescriptor(QString key, QString value)
-{
-	if (key=="")
-		return specModelItem::changeDescriptor(key,value) ;
-	if (description.contains(key))
-		return description[key].setContent(value) ;
-	
-	description[key] = specDescriptor(value,spec::editable) ;
-	return true ;
-}
-
-bool specDataItem::setActiveLine(const QString& key, int line)
-{
-	if (description.contains(key))
-		return description[key].setActiveLine(line) ;
-	return specModelItem::setActiveLine(key,line) ;
-}
-
-int specDataItem::activeLine(const QString& key) const
-{
-	if (description.contains(key))
-		return description[key].activeLine() ;
-	return specModelItem::activeLine(key) ;
 }
 
 void specDataItem::refreshPlotData()
@@ -141,25 +102,12 @@ void specDataItem::refreshPlotData()
 	setSamples(x,y) ; // TODO QPointF
 }
 
-QString specDataItem::descriptor(const QString &key, bool full) const
-{
-	if (description.contains(key))
-		return description[key].content(full) ;
-	return specModelItem::descriptor(key, full) ;
-}
-
 QIcon specDataItem::decoration() const { return QIcon(":/data.png") ; }
-
-QStringList specDataItem::descriptorKeys() const
-{
-	return (specModelItem::descriptorKeys() << description.keys()) ;
-}
 
 void specDataItem::readFromStream(QDataStream &in)
 {
-	specModelItem::readFromStream(in) ;
-	in >> description
-	   >> data
+    specLogEntryItem::readFromStream(in) ;
+    in >> data
 	   >> offset
 	   >> slope
 	   >> factor
@@ -169,9 +117,8 @@ void specDataItem::readFromStream(QDataStream &in)
 
 void specDataItem::writeToStream(QDataStream & out) const
 {
-	specModelItem::writeToStream(out) ;
-	out << description
-	    << data
+    specLogEntryItem::writeToStream(out) ;
+    out << data
 	    << offset
 	    << slope
 	    << factor
@@ -182,16 +129,16 @@ void specDataItem::writeToStream(QDataStream & out) const
 specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 {
 	// merging descriptors
-	foreach(QString key, toAdd.description.keys())
+    foreach(QString key, toAdd.description.keys())
 	{
-		if (description.keys().contains(key))
+        if (description.keys().contains(key))
 		{
-			if (description[key].isNumeric())
+            if (description[key].isNumeric())
 			{
 				double total = data.size() + toAdd.data.size() ;
 				description[key] = description[key].numericValue()*data.size()/total + toAdd.description[key].numericValue()*toAdd.data.size()/total ;
 			}
-			else if (!descriptor(key).contains(toAdd.descriptor(key)))
+            else if (!descriptor(key, true).contains(toAdd.descriptor(key, true)))
 				description[key] = descriptor(key).append(", ").append(toAdd.descriptor(key)) ;
 		}
 		else
@@ -235,19 +182,6 @@ void specDataItem::flatten(bool oneTime)
 	}
 	invalidate() ;
 }
-
-spec::descriptorFlags specDataItem::descriptorProperties(const QString& key) const
-{
-	if (description.contains(key)) return description[key].flags() ;
-	return specModelItem::descriptorProperties(key) ;
-}
-
-void specDataItem::setDescriptorProperties(const QString &key, spec::descriptorFlags f)
-{
-    if (description.contains(key)) description[key].setFlags(f) ;
-    else specModelItem::setDescriptorProperties(key, f) ;
-}
-
 
 void specDataItem::scaleBy(const double& mul)
 {
@@ -369,14 +303,13 @@ void specDataItem::setData(const QVector<specDataPoint> &newData)
 }
 
 specDataItem::specDataItem(const specDataItem &other)
-	: specModelItem(0,other.descriptor("",true)),
+    : specLogEntryItem(other),
 	  offset(other.offset),
 	  slope(other.slope),
 	  factor(other.factor),
 	  xshift(other.xshift),
-	  description(other.description),
-      data(other.data),
-      zeroMultiplications(other.zeroMultiplications)
+      zeroMultiplications(other.zeroMultiplications),
+      data(other.data)
 {
 }
 

@@ -7,15 +7,15 @@
 #include "specdatapoint.h"
 #include "specdescriptor.h"
 #include "specstreamable.h"
+#include "speclogentryitem.h"
 
 /*! List item which holds data.*/
-class specDataItem : public specModelItem
+class specDataItem : public specLogEntryItem
 {
 	friend class dataItemProperties ;
 private:
 	double offset, slope, factor, xshift ;
 	int zeroMultiplications ;
-	QHash<QString,specDescriptor> description ;
 	QVector<specDataPoint> data ;
 	QVector<double> wnums() const ;
 	QVector<double> ints() const ;
@@ -43,15 +43,6 @@ public:
 	void reverseCorrection(QVector<specDataPoint>&) const ;
 
 	/* Description related */
-	QString descriptor(const QString &key, bool full =true) const ;
-	bool changeDescriptor(QString key, QString value) ;
-	bool isEditable(QString key) const ;
-	bool setActiveLine(const QString &, int) ;
-	int activeLine(const QString &key) const ;
-	QStringList descriptorKeys() const ;
-	spec::descriptorFlags descriptorProperties(const QString& key) const ;
-    void setDescriptorProperties(const QString &key, spec::descriptorFlags f);
-
 	QIcon decoration() const ;
 
 	/* Data operations */

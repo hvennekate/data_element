@@ -48,6 +48,7 @@ public:
 	
 	/*! Standard constructor.  Expects pointer to parent (zero for root item) and possibly an initial value for the descriptive tag (default: empty string). */
 	specModelItem(specFolderItem* par=0, QString description="");
+    specModelItem(const specModelItem&) ;
 	/*! Standard destructor.*/
 	virtual ~specModelItem();
 	/*! Returns a collection of data points (normally empty, needs to be reimplemented in subclasses). The format is time, signal.*/
@@ -63,7 +64,8 @@ public:
 	/*! Return value of descriptor \a key */
 	virtual QString descriptor(const QString &key, bool full=false) const ;
 	/*! Is the descriptor \a key editable?*/
-	virtual bool isEditable(QString key) const ;
+    virtual bool isEditable(QString key) const ;
+    virtual bool isNumeric(const QString& key) const ;
 	/*! Set descriptor \a key 's value to  \a value. */
 	virtual bool changeDescriptor(QString key, QString value) ; // TODO add changeDescriptor(key,specDescriptor)
 	virtual bool setActiveLine(const QString&, int) ;

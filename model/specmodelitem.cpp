@@ -355,3 +355,16 @@ QString specModelItem::toolTip(const QString &column) const
 {
     return descriptor(column,true) ;
 }
+
+specModelItem::specModelItem(const specModelItem &other)
+    : specCanvasItem(other.description.content()), // TODO hm...
+      iparent(0),
+      dataValid(false),
+      description(other.description)
+{}
+
+bool specModelItem::isNumeric(const QString &key) const
+{
+    Q_UNUSED(key)
+    return false ;
+}
