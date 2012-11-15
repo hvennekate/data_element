@@ -78,7 +78,7 @@ void specFolderItem::removeChild(specModelItem* child)
 	foreach (specModelItem* childPointer, childrenList)
 		if (childPointer != child)
 			newChildren << childPointer ;
-	childrenList = newChildren ;
+    childrenList.swap(newChildren) ;
 	invalidate();///! @todo move this to view/plotwidget (suspend frequent refreshes) -- maybe removeChildren instead
 }
 

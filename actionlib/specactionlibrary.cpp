@@ -308,3 +308,8 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
 	}
 	return cMenu ;
 }
+
+specActionLibrary::~specActionLibrary()
+{
+    delete undoStack ;
+}

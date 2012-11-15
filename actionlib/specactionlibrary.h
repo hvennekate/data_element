@@ -27,6 +27,7 @@ class specActionLibrary : public QObject, public specStreamable
 	Q_OBJECT
 public:
 	explicit specActionLibrary(QObject *parent = 0);
+    ~specActionLibrary() ;
 //	QMenuBar *menuBar(QObject*) ;
 	QToolBar *toolBar(QWidget*) ;
 	QMenu *contextMenu(QWidget*) ; // actionLibrary bekommt Clients in fester Reihenfolge; speichert diese mit den Commands und restauriert so deren Referenz.
