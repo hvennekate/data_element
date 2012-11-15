@@ -275,7 +275,7 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 	if (yvals.size() != xvals.size()) return ; // should not be necessary
 	
 	for (int i = 0 ; i < xvals.size() ; i++)
-		data << specDataPoint(0,xvals[i],yvals[i],0) ;
+        data << specDataPoint(xvals[i],yvals[i],0) ;
 }
 
 QHash<QString,specDescriptor> fileHeader(QTextStream& in) {
@@ -326,17 +326,13 @@ QList<specModelItem*> readHVFile(QFile& file)
             }
             QStringList templist = firstLine.split(" ").replaceInStrings("(","").replaceInStrings(")","") ;
             headerItems["Zeit"] = specDescriptor(templist.takeFirst().toDouble()) ;
-            QVector<double> data ;
-            data << headerItems["Zeit"].numericValue() << 0. << 0. << 0. ;
 
             QVector<specDataPoint> dataPoints ;
             for(QStringList::size_type i = 0 ; 2*i+1 < templist.size() ; i++)
-            {
-                data[1] = wavenumbers[polarisatorMessung ? 32*((i/32)/2)+i%32 : i] ; // Funny formula for doing the wavenumbers once for each polarisation
-                data[2] = templist[2*i].toDouble() ;
-                data[3] = templist[2*i+1].toDouble() ;
-                dataPoints += specDataPoint(data) ;
-            }
+                dataPoints << specDataPoint(wavenumbers[polarisatorMessung ? 32*((i/32)/2)+i%32 : i], // Funny formula for doing the wavenumbers once for each polarisation)
+                                            templist[2*i].toDouble(),
+                                            templist[2*i+1].toDouble()) ;
+
             for (QVector<double>::size_type i = 0 ; i < dataPoints.size() ; i += 32)
             {
                 headerItems["nu"] = specDescriptor((dataPoints[i].nu+dataPoints[qMin(i+31,dataPoints.size()-1)].nu)/2.) ;
@@ -531,7 +527,7 @@ QList<specModelItem*> readPEFile(QFile& file)
 	QStringList buffer ;
 	QVector<specDataPoint> dataPoints ;
 	while(!in.atEnd() && (buffer = in.readLine().split(QRegExp("\\s+"))).size() >1)
-		dataPoints += specDataPoint(0,buffer[0].toDouble(),buffer[1].toDouble(),0) ;
+        dataPoints += specDataPoint(buffer[0].toDouble(),buffer[1].toDouble(),0) ;
 	specData += new specDataItem(dataPoints,headerItems) ;
 	specData.last()->invalidate();
 	return specData ;
@@ -649,9 +645,9 @@ QList<specModelItem*> readSKHIFile(QFile& file)
             double a =  integrale[i].second.first[j],
                     b = integrale[i].second.second[j],
                     t = zeiten[j] ;
-            rawOne << specDataPoint(NAN, t, a, NAN) ;
-            rawTwo << specDataPoint(NAN, t, b, NAN) ;
-            diff   << specDataPoint(NAN,t, a-b, NAN) ;
+            rawOne << specDataPoint(t, a, NAN) ;
+            rawTwo << specDataPoint(t, b, NAN) ;
+            diff   << specDataPoint(t, a-b, NAN) ;
         }
         headerItems["raw"] = 1 ;
         newItems << new specDataItem(rawOne,headerItems)
@@ -733,7 +729,7 @@ QList<specModelItem*> readXYFILE(QFile &file)
             description.remove("Column") ;
         QVector<specDataPoint> points ;
         for (int j = 0 ; j < xValues.size() ; ++j)
-            points << specDataPoint(NAN, xValues[j], yValues[i][j], NAN) ;
+            points << specDataPoint(xValues[j], yValues[i][j], NAN) ;
         newItems << new specDataItem(points, description) ;
     }
     return newItems ;

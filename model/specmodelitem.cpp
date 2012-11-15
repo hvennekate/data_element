@@ -310,6 +310,7 @@ specModelItem* specModelItem::itemFactory(specStreamable::type t)
 	case specStreamable::sysEntry : return new specLogMessage ;
 	case specStreamable::svgItem : return new specSVGItem ;
 	case specStreamable::metaItem : return new specMetaItem ;
+    case specStreamable::legacyDataItem : return new specLegacyDataItem ;
 	default: return 0 ;
 	}
 }

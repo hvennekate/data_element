@@ -7,24 +7,22 @@
 #include <QString>
 
 struct specDataPoint;
+struct legacyDatapoint ;
 
 QDataStream& operator<<(QDataStream&, const specDataPoint&);
 QDataStream& operator>>(QDataStream&, specDataPoint&);
+QDataStream& operator>>(QDataStream&, legacyDatapoint&);
 
 struct specDataPoint{
 // TODO: make inline
-	double t, nu, sig, mint ;
+    double nu, sig, mint ;
 	specDataPoint() ;
-	specDataPoint(const double& time, const double& n, const double& s, const double& m) ;
-	specDataPoint(const QVector<double>& content) ;
-	specDataPoint operator=(const QVector<double>& vec) ;
-	double operator[](int index) const ;
+    specDataPoint(const double& n, const double& s, const double& m) ;
 	
 // Comparison operators
-	bool operator<(const specDataPoint&) const ;
+    bool operator<(const specDataPoint&) const ;
 	bool operator==(const specDataPoint&) const ;
 	bool exactlyEqual(const specDataPoint&) const ;
-	bool operator>(const specDataPoint&) const ;
 	bool operator!=(const specDataPoint& toCompare) const ;
 	specDataPoint& operator+=(const specDataPoint&);
 	specDataPoint& operator/=(const double&) ;
@@ -32,6 +30,11 @@ struct specDataPoint{
 	
 	friend QDataStream& operator<<(QDataStream&, const specDataPoint&);
 	friend QDataStream& operator>>(QDataStream&, specDataPoint&);
+};
+
+struct legacyDatapoint : specDataPoint
+{
+    friend QDataStream& operator>>(QDataStream&, legacyDatapoint&) ;
 };
 
 #endif

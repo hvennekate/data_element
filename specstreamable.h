@@ -21,7 +21,7 @@ public:
 		sysEntry = 3,
 		kineticItem = 4,
 		svgItem = 5,
-		dataItem = 6,
+        legacyDataItem = 6,
 		mainWidget = 7,
 		mainPlot = 8,
 		mainView = 9,
@@ -69,7 +69,8 @@ public:
 		exchangeFitCommand = 63,
 		toggleFitStyleCommand = 64,
         penStyleCommandId = 65,
-        descriptorFlagsCommand = 66
+        descriptorFlagsCommand = 66,
+        dataItem = 67
 	};
 protected:
 	virtual void writeToStream(QDataStream& out) const = 0;

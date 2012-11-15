@@ -10,7 +10,7 @@ exportFormatItem::exportFormatItem ( QWidget *parent )
 	layout = new QHBoxLayout() ;
 	
 	QStringList values, separators ;
-	values << "time" << "wavenumber" << "signal" << "maximum intensity" ;
+    values << "wavenumber" << "signal" << "maximum intensity" ;
 	separators << "none" << "space" << "tab" << "new line" ;
 	Value->addItems(values) ;
 	Separator->addItems(separators) ;

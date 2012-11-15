@@ -64,16 +64,6 @@ QVector<double> specDataItem::ints() const
 	return retval ;
 }
 
-QVector<double> specDataItem::times() const
-{
-	QVector<double> retval ;
-	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
-		retval << data[i].t ;
-	return retval ;
-}
-
-
-
 specDataItem::specDataItem(const QVector<specDataPoint>& dat, const QHash<QString,specDescriptor>& desc, specFolderItem* par, QString description)
     : specLogEntryItem(desc, par, description),
 	  offset(0),
@@ -163,23 +153,13 @@ bool compareDataPoints(const specDataPoint& a, const specDataPoint& b)
 	return a.nu == b.nu ;
 }
 
-void specDataItem::flatten(bool oneTime)
+void specDataItem::flatten()
 {
 	qSort(data) ;
 	QVector<specDataPoint> newData ;
 	averageToNew(data.begin(), data.end(), compareDataPoints, std::back_inserter(newData)) ;
 
     data.swap(newData) ;
-	// average Time
-	if(oneTime)
-	{
-		double time = 0 ;
-		for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
-			time += data[i].t ;
-		time /= data.size() ;
-		for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
-			data[i].t = time ;
-	}
 	invalidate() ;
 }
 
@@ -221,7 +201,7 @@ void specDataItem::moveXBy(const double & value)
 void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out) // TODO split into two
 {
 	revalidate();
-	QVector<double> t = times(), w = wnums(), s = ints(), m = intensityData() ;
+    QVector<double> w = wnums(), s = ints(), m = intensityData() ;
 	
 	for (int i = 0 ; i < headerFormat.size() ; i++)
 		out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
@@ -232,8 +212,7 @@ void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, c
 		{
 			switch(dataFormat[i].first)
 			{
-				case spec::time: out << t[j] ; break ;
-				case spec::wavenumber: out << w[j] ; break ;
+                case spec::wavenumber: out << w[j] ; break ;
 				case spec::signal: out << s[j] ; break ;
 				case spec::maxInt: out << m[j] ; break ;
 			}
@@ -335,4 +314,24 @@ void specDataItem::detach()
 	if (p)
 		p->detachFromPicker(this) ;
 	specModelItem::detach() ;
+}
+
+specLegacyDataItem::specLegacyDataItem()
+    : specDataItem(),
+      myType(legacyDataItem)
+{}
+
+void specLegacyDataItem::readFromStream(QDataStream &in)
+{
+    myType = dataItem ;
+    specLogEntryItem::readFromStream(in) ;
+    QVector<legacyDatapoint>  legacyData ;
+    in >> legacyData
+       >> offset
+       >> slope
+       >> factor
+       >> xshift
+       >> zeroMultiplications ;
+    foreach(legacyDatapoint point, legacyData)
+        data << point ;
 }

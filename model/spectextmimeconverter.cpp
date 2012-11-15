@@ -24,7 +24,7 @@ QList<specModelItem*> specTextMimeConverter::importData(const QMimeData *data)
 		if (validator.validate(values[0],pos) != QValidator::Acceptable) continue ;
 		pos = 0 ; // TODO check if changed!
 		if (validator.validate(values[1],pos) != QValidator::Acceptable) continue ;
-		dataPoints << specDataPoint(0,values[0].toDouble(), values[1].toDouble(),0) ;
+        dataPoints << specDataPoint(values[0].toDouble(), values[1].toDouble(),0) ;
 	}
 	if (dataPoints.isEmpty()) return QList<specModelItem*>() ;
 	return QList<specModelItem*>() << new specDataItem(dataPoints, QHash<QString, specDescriptor>()) ;

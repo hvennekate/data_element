@@ -13,14 +13,14 @@
 class specDataItem : public specLogEntryItem
 {
 	friend class dataItemProperties ;
+    friend class specLegacyDataItem ;
 private:
 	double offset, slope, factor, xshift ;
 	int zeroMultiplications ;
 	QVector<specDataPoint> data ;
 	QVector<double> wnums() const ;
 	QVector<double> ints() const ;
-	QVector<double> times() const ;
-	void applyCorrection(specDataPoint&) const ;  /*!< Korrektur anwenden. */
+    void applyCorrection(specDataPoint&) const ;  /*!< Korrektur anwenden. */
 	void reverseCorrection(specDataPoint&) const; /*!< Korrektur rueckhaengig machen. */
 	void readFromStream(QDataStream &) ;
 	void writeToStream(QDataStream &) const ;
@@ -47,7 +47,7 @@ public:
 
 	/* Data operations */
 	specDataItem& operator+=(const specDataItem& toAdd) ;
-	void flatten(bool oneTime=true) ;
+    void flatten() ;
 	void scaleBy(const double&) ;
 	void addToSlope(const double&) ;
 	void moveYBy(const double&) ;
@@ -66,6 +66,16 @@ public:
 	void subMap(const QMap<double, double>&) ;
 	int removeData(QList<specRange*>*) ; // TODO remove
 	specUndoCommand *itemPropertiesAction(QObject *parentObject) ;
+};
+
+class specLegacyDataItem : public specDataItem
+{
+private:
+    type myType ;
+    type typeId() const { return myType; }
+    void readFromStream(QDataStream & in) ;
+public:
+    specLegacyDataItem() ;
 };
 
 #endif

@@ -24,7 +24,7 @@ namespace spec{
 	
 	/*! Enums for export formats */
 	enum separator{ nosep=0, space=1, tab=2, newline=3 } ;
-	enum value{ time=0, wavenumber=1, signal=2, maxInt=3 } ;
+    enum value{ wavenumber=0, signal=1, maxInt=2 } ;
 
 	enum undoActionIds{ } ;
 	enum itemRoles { activeLineRole = 50, fullContentRole = 51 } ;
