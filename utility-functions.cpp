@@ -14,6 +14,7 @@
 #include <QMessageBox>
 #include <QObject>
 #include <QDoubleValidator>
+#include "specprofiler.h"
 using std::max ;
 using std::min ;
 
@@ -292,66 +293,98 @@ QHash<QString,specDescriptor> fileHeader(QTextStream& in) {
 	return headerItems ;
 }
 
+void fileHeader(QString header, QHash<QString, specDescriptor>& description) {
+    QStringList headerContent = header.split(QRegExp(", (?=(\\w+\\s)*\\w+:)")) ;
+    QHash<QString,specDescriptor> headerItems ;
+    QDoubleValidator validator ;
+    int a = 0 ;
+    foreach(QString headerEntry, headerContent)
+    {
+        a = 0 ;
+        QString name = headerEntry.section(": ",0,0),
+                content = headerEntry.section(": ",1) ;
+        content.remove(QRegExp("^\"")).remove(QRegExp("\"$")) ;
+        description[name] = specDescriptor(content,
+                                           validator.validate(content,a) == QValidator::Acceptable ?
+                                               spec::numeric : spec::editable) ;
+
+    }
+
+    if (description["Kommentar"].content().contains("@"))
+        description["Pump"] = specDescriptor(description["Kommentar"].content().section("@ ",1,-1).section(" nm",0,0),spec::numeric) ; // Pumpwellenlaenge
+}
+
 QVector<double> waveNumbers(const QStringList& wns) {
 	QVector<double> wavenumbers ;
 	foreach(QString wn, wns) wavenumbers += wn.toDouble() ;
 	return wavenumbers ;
 }
 
+QList<specModelItem*> readHVMeasurement(const QString& measurement, QString filename)
+{
+    QStringList lines = measurement.split("\n") ;
+    QList<specModelItem*> newItems ;
+    QHash<QString,specDescriptor> headerItems ;
+    headerItems["Datei"] = filename ;
+    fileHeader(lines.takeFirst(), headerItems) ;
+    QStringList wns = lines.takeFirst().split(" ") ;
+    bool polarisatorMessung = wns.takeFirst().toInt() ;
+    QVector<QVector<double> > wavenumbers ;
+
+    QStringList::iterator wnsIt = wns.begin() ;
+    for (int i = 0 ; i+32 <= wns.size() ; i += 32)
+    {
+        wavenumbers << QVector<double>() ;
+        for (int j = 0 ; j < 32 ; ++j)
+            wavenumbers.last() << (wnsIt++)->toDouble() ;
+    }
+
+    for (QStringList::iterator it = lines.begin() ; it != lines.end() ; ++it)
+    {
+        QStringList dataEntries = it->split(QRegExp("[ ()]"),QString::SkipEmptyParts) ;
+        if (dataEntries.size() < 1) continue ;
+        headerItems["Zeit"] = dataEntries.takeFirst().toDouble() ;
+
+        QStringList::iterator entry = dataEntries.begin() ;
+        for (int i = 0 ; (i+1)*32*2 <= dataEntries.size() ; ++i)
+        {
+            QVector<QVector<double> >::iterator currentWns = wavenumbers.begin()
+                    + i/(polarisatorMessung ? 2 : 1) ;
+            QVector<specDataPoint> dataPoints ;
+            for (int j = 0 ; j < 32 ; ++j)
+            {
+                double value = (entry++)->toDouble() ;
+                double mintv = (entry++)->toDouble() ;
+                dataPoints << specDataPoint(currentWns->at(j), value, mintv) ;
+            }
+            if (polarisatorMessung) headerItems["Polarisation"] = i % 2 ;
+            newItems << new specDataItem(dataPoints, headerItems) ;
+        }
+    }
+    return newItems ;
+}
+
+
+
 QList<specModelItem*> readHVFile(QFile& file)
 {
-	QTextStream in(&file) ;
-	
+    specProfiler profiler("Datei einlesen") ;
+    QTextStream in(&file) ;
 	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system
-    QHash<QString,specDescriptor> headerItems ;
+    QStringList measurements = in.readAll().split(QRegExp("\n(?=Solvens)"), QString::SkipEmptyParts) ;
+
     QList<specModelItem*> newItems ;
-    int lap = 1 ;
-    while (!in.atEnd())
+    QString filename = QFileInfo(file.fileName()).fileName() ;
+    if (measurements.size() == 1) newItems = readHVMeasurement(measurements.first(), filename) ;
+    else
     {
-        headerItems = fileHeader(in) ;
-        headerItems["Datei"] = specDescriptor(QFileInfo(file.fileName()).fileName(),spec::def) ;
-        QStringList wns = in.readLine().split(" ") ;
-        bool polarisatorMessung = wns.takeFirst().toInt() ; // First value before wavenumbers denotes pol measurement
-        QVector<double> wavenumbers = waveNumbers(wns) ;
-	
-        QList<specModelItem*> specData, otherPolarisation ;
-        while(!in.atEnd())
+        int counter = 0 ;
+        foreach(const QString& measurement, measurements)
         {
-            int oldPos = in.pos() ;
-            QString firstLine = in.readLine() ;
-            if (firstLine.left(7) == "Solvens")
-            {
-                in.seek(oldPos) ;
-                break ;
-            }
-            QStringList templist = firstLine.split(" ").replaceInStrings("(","").replaceInStrings(")","") ;
-            headerItems["Zeit"] = specDescriptor(templist.takeFirst().toDouble()) ;
-
-            QVector<specDataPoint> dataPoints ;
-            for(QStringList::size_type i = 0 ; 2*i+1 < templist.size() ; i++)
-                dataPoints << specDataPoint(wavenumbers[polarisatorMessung ? 32*((i/32)/2)+i%32 : i], // Funny formula for doing the wavenumbers once for each polarisation)
-                                            templist[2*i].toDouble(),
-                                            templist[2*i+1].toDouble()) ;
-
-            for (QVector<double>::size_type i = 0 ; i < dataPoints.size() ; i += 32)
-            {
-                headerItems["nu"] = specDescriptor((dataPoints[i].nu+dataPoints[qMin(i+31,dataPoints.size()-1)].nu)/2.) ;
-                if (!polarisatorMessung)
-                    specData += new specDataItem(dataPoints.mid(i,32),headerItems) ;
-                else
-                {
-                    bool polarisation = (i/32)%2 ;
-                    headerItems["polarisation"] = specDescriptor(polarisation) ;
-    //				(polarisation ? otherPolarisation : specData) << new specDataItem(dataPoints.mid(i,32),headerItems) ;
-                    specData << new specDataItem(dataPoints.mid(i,32),headerItems) ;
-                }
-                specData.last()->mergePlotData = false ;
-                specData.last()->invalidate(); ;
-            }
+            specFolderItem *folder = new specFolderItem(0, QString::number(counter++)) ;
+            folder->addChildren(readHVMeasurement(measurement, filename)) ;
+            newItems << folder ;
         }
-        specFolderItem* folder = new specFolderItem(0, QString::number(lap++)) ;
-        folder->addChildren(specData + otherPolarisation) ;
-        newItems << folder ;
     }
     return newItems ;
 }
