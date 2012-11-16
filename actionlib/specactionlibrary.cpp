@@ -42,7 +42,7 @@ QUndoView* specActionLibrary::undoView()
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent)
 {
-	undoStack = new QUndoStack ;
+    undoStack = new QUndoStack(this) ; // TODO consider making this a plain variable
     connect(undoStack,SIGNAL(cleanChanged(bool)),this,SIGNAL(stackClean(bool))) ;
 }
 
