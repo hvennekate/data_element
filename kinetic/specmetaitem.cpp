@@ -94,6 +94,12 @@ void specMetaItem::readFromStream(QDataStream &in)
 	specModelItem::readFromStream(in) ;
 	quint8 stylingWasToFit ;
 	in >> stylingWasToFit >> variables >> oldConnections;
+    /*stylingWasToFit introduced on Oct 12 2012 (Commit:  Fixed meta item peculiarity)
+    Merged into office branch (muParser) on Nov 13 2012 (Commit: Merge branch 'innovations' of /fs/hvennek/dataelement-src into muParser)
+
+    Old files (before Nov 13 2012) do not contain StylingWasToFit!
+    Fix:  remove ">> stylingWasToFit" in specmetaitem.cpp (line 96) and set stylingWasToFit = 0 (line 95)
+          read and save old files. */
 	styleFitCurve = stylingWasToFit ;
 	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
 	quint8 hasFitCurve ;
