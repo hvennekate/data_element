@@ -7,6 +7,7 @@ specItemPropertiesAction::specItemPropertiesAction(QObject *parent) :
 	setToolTip(tr("Edit item properties")) ;
 	setWhatsThis(tr("Displays an item-specific dialog to let you edit the current item's properties")) ;
 	setText(tr("Item properties...")) ;
+	setShortcut(tr("Ctrl+i"));
 }
 
 specUndoCommand* specItemPropertiesAction::generateUndoCommand()

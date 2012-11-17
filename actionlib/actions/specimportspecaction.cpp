@@ -12,6 +12,7 @@ specImportSpecAction::specImportSpecAction(QObject *parent) :
 	setToolTip(tr("Import files")) ;
 	setWhatsThis(tr("Import files.  Use this button to get started."));
 	setText(tr("Import file...")) ;
+	setShortcut(tr("Ctrl+F"));
 }
 
 specUndoCommand *specImportSpecAction::generateUndoCommand()

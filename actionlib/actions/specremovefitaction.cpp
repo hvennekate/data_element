@@ -10,6 +10,7 @@ specRemoveFitAction::specRemoveFitAction(QObject *parent) :
 	setToolTip(tr("Remove fit")) ;
 	setWhatsThis(tr("Removes the fit from the current item.")) ;
 	setText(tr("Remove fit")) ;
+	setShortcut(tr("Ctrl+Shift+F"));
 }
 
 specUndoCommand* specRemoveFitAction::generateUndoCommand()

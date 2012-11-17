@@ -15,6 +15,7 @@ specAddSVGItemAction::specAddSVGItemAction(QObject *parent) :
 	setToolTip(tr("Add SVG image")) ;
 	setWhatsThis(tr("Insert an image to be displayed as an annotation to the plot canvas.  Currently, SVG images are supported.")) ;
 	setText(tr("Add SVG picture item...")) ;
+	setShortcut(tr("i"));
 }
 
 specUndoCommand* specAddSVGItemAction::generateUndoCommand()

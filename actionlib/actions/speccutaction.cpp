@@ -10,6 +10,7 @@ specCutAction::specCutAction(QObject *parent) :
 	setToolTip(tr("Cut selected items")) ;
 	setWhatsThis(tr("Cut items to clipboard.  Removes orginal items from this file.  May be pasted in this program or in any other that understands plain text.")) ;
 	setText(tr("Cut")) ;
+	setShortcut(QKeySequence("Ctrl+x"));
 }
 
 specUndoCommand* specCutAction::generateUndoCommand()

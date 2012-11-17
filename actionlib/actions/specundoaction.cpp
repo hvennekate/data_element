@@ -3,6 +3,9 @@
 specUndoAction::specUndoAction(QObject *parent) :
     QAction(parent)
 {
+	setShortcutContext(Qt::WidgetShortcut);
+	if (QWidget* w = qobject_cast<QWidget*>(parent))
+		w->addAction(this);
 }
 
 void specUndoAction::gotTrigger()

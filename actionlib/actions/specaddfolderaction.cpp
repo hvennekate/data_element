@@ -10,6 +10,7 @@ specAddFolderAction::specAddFolderAction(QObject *parent)
 	setToolTip(tr("Create folder")) ;
 	setWhatsThis(tr("Creates a new folder that may then be filled with items."));
 	setText(tr("Add folder"));
+	setShortcut(tr("f"));
 }
 
 specUndoCommand* specAddFolderAction::generateUndoCommand()

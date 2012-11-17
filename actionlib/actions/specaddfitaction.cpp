@@ -10,6 +10,7 @@ specAddFitAction::specAddFitAction(QObject *parent) :
 	setToolTip(tr("Add fit")) ;
 	setWhatsThis(tr("Adds a fit to the current item.")) ;
 	setText(tr("Add fit")) ;
+	setShortcut(tr("Ctrl+F"));
 }
 
 specUndoCommand* specAddFitAction::generateUndoCommand()

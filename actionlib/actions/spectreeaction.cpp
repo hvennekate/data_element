@@ -171,6 +171,7 @@ specTreeAction::specTreeAction(QObject *parent) :
 	setToolTip(tr("Set up a directory tree")) ;
 	setWhatsThis(tr("Generates a tree of directories and moves the selected items into those directories.  The columns in this dock window's list will be used from left to right to establish the level of folders within the tree."));
 	setText(tr("Build directory tree")) ;
+	setShortcut(tr("Ctrl+T"));
 }
 
 

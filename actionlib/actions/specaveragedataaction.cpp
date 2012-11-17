@@ -18,6 +18,7 @@ specAverageDataAction::specAverageDataAction(QObject *parent) :
 	setToolTip(tr("Average Data")) ;
 	setWhatsThis(tr("Smooth data by averaging.  You can choose between plainly averaging any number of data points or calculating a moving average."));
 	setText(tr("Average data...")) ;
+	setShortcut(tr("Ctrl+Shift+a"));
 }
 
 specUndoCommand* specAverageDataAction::generateUndoCommand()

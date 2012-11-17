@@ -10,6 +10,7 @@ specSelectConnectedAction::specSelectConnectedAction(QObject *parent) :
 	setText(tr("Select connected items"));
 	setWhatsThis(tr("Selects the items connected to the current meta item.")) ;
 	setToolTip(tr("Select connected items"));
+	setShortcut(tr("Ctrl+s"));
 }
 
 bool specSelectConnectedAction::requirements()

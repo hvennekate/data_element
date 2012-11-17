@@ -11,6 +11,7 @@ specNewMetaItemAction::specNewMetaItemAction(QObject *parent) :
 	setToolTip(tr("New item"));
 	setWhatsThis(tr("Create a new item in this dock window's list."));
 	setText(tr("New meta item")) ;
+	setShortcut(tr("Ctrl+Shift+N"));
 }
 
 const std::type_info &specNewMetaItemAction::possibleParent()

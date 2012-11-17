@@ -13,6 +13,7 @@ specPasteAction::specPasteAction(QObject *parent) :
 	setToolTip(tr("Paste")) ;
 	setWhatsThis(tr("Paste data from clipboard, if possible")) ;
 	setText(tr("Paste")) ;
+	setShortcut(tr("Ctrl+V"));
 }
 
 specUndoCommand* specPasteAction::generateUndoCommand()

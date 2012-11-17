@@ -11,6 +11,7 @@ specConductFitAction::specConductFitAction(QObject *parent) :
 	setToolTip(tr("Conduct fit")) ;
 	setWhatsThis(tr("Conducts fits for the selected meta items.")) ;
 	setText(tr("Fit")) ;
+	setShortcut(tr("Ctrl+Alt+f"));
 }
 
 specUndoCommand* specConductFitAction::generateUndoCommand()

@@ -17,6 +17,7 @@ specTitleAction::specTitleAction(QObject *parent)
 	setToolTip("Change Plot Title") ;
 	setWhatsThis("Allows you to edit the plot's title.");
 	setText(tr("Change plot title...")) ;
+	setShortcut(tr("Ctrl+T"));
 }
 
 specXLabelAction::specXLabelAction(QObject *parent)
@@ -26,6 +27,7 @@ specXLabelAction::specXLabelAction(QObject *parent)
 	setToolTip("Change X Label") ;
 	setWhatsThis("Allows you to edit the plot's x axis label.");
 	setText(tr("Plot x label...")) ;
+	setShortcut(tr("Ctrl+Alt+x"));
 }
 
 specYLabelAction::specYLabelAction(QObject *parent)
@@ -35,6 +37,7 @@ specYLabelAction::specYLabelAction(QObject *parent)
 	setToolTip("Change Y Label") ;
 	setWhatsThis("Allows you to edit the plot's y axis label.");
 	setText(tr("Plot y label...")) ;
+	setShortcut(tr("Ctrl+Alt+y"));
 }
 
 const std::type_info& specLabelAction::possibleParent()

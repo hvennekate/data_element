@@ -9,6 +9,7 @@ specSetMultilineAction::specSetMultilineAction(QObject *parent) :
     setWhatsThis(tr("Switches showing all lines of this descriptor on or off."));
     setText(tr("Show all lines"));
     setCheckable(true) ;
+    setShortcut(tr("Ctrl+M"));
 }
 
 specUndoCommand *specSetMultilineAction::generateUndoCommand()
