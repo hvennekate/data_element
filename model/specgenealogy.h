@@ -3,6 +3,7 @@
 
 #include "specmodel.h"
 #include <QVector>
+#include "specmodelitem.h"
 
 class specGenealogy : public specStreamable
 {

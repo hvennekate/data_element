@@ -1,4 +1,5 @@
 #include "specgenealogy.h"
+#include "specfolderitem.h"
 
 //specGenealogy::specGenealogy(const QList<specModelItem *> &Items, specModel *mod)
 //	: Model(mod)

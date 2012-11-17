@@ -2,6 +2,7 @@
 #include "specmetamodel.h"
 #include "speclogmodel.h"
 #include "specmodel.h"
+#include <QMimeData>
 
 specGenericMimeConverter::specGenericMimeConverter(QObject *parent)
 	: specMimeConverter(parent)

@@ -1,30 +1,18 @@
-#include <specmodel.h>
-#include <QIcon>
-#include <QTextStream>
+#include "specmodel.h"
 #include <QString>
+#include <QMimeData>
 #include <QFileDialog>
-#include <QFile>
-#include <utility-functions.h>
 
-#include <QPersistentModelIndex>
-
-#include <QVBoxLayout>
-#include <QScrollArea>
-#include <QGridLayout>
-#include <QCheckBox>
-#include <QDialogButtonBox>
-#include <QDoubleValidator>
-#include <QLineEdit>
-#include "specdataitem.h"
 #include "exportdialog.h"
-#include <QTime>
 #include "specmovecommand.h"
 #include "specaddfoldercommand.h"
 #include "speceditdescriptorcommand.h"
 #include "specresizesvgcommand.h"
-#include <algorithm>
-#include "specdeleteaction.h"
-#include <QStack>
+#include "specfolderitem.h"
+#include "specactionlibrary.h"
+#include "specmimeconverter.h"
+#include "specfolderitem.h"
+
 
 // TODO replace isFolder() by addChildren(empty list,0)
 
@@ -49,50 +37,6 @@ bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QLi
 				itemPointer(second)->descriptor(Descriptors[descriptor]) ;
 	}
 	return equal ;
-}
-
-bool specModel::getMergeCriteria(QList<QPair<QStringList::size_type, double> >& toCompare)
-{ // TODO include smoother
-	QDialog *descriptorMatch = new QDialog() ;
-	QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel) ;
-	connect(buttons,SIGNAL(accepted()), descriptorMatch, SLOT(accept()));
-	connect(buttons,SIGNAL(rejected()), descriptorMatch, SLOT(reject()));
-	QGridLayout *descriptorLayout = new QGridLayout ;
-	QVBoxLayout *dialogLayout = new QVBoxLayout ;
-	//TODO Label fuer tolerance ...
-	for(QStringList::size_type i = 0 ; i < Descriptors.size() ; i++)
-	{
-		descriptorLayout->addWidget(new QCheckBox(Descriptors[i]),i,0) ;
-// 		((QCheckBox*) descriptorLayout->itemAt(descriptorLayout->count()-1)->widget())->setCheckState(Qt::Checked) ;
-		if(DescriptorProperties[i] & spec::numeric)
-		{
-			QLineEdit *validatorLine = new QLineEdit("0") ;
-			validatorLine->setValidator(new QDoubleValidator(validatorLine)) ;
-			((QDoubleValidator*) validatorLine->validator())->setBottom(0) ;
-			descriptorLayout->addWidget(validatorLine,i,1) ;
-		}
-	}
-	QScrollArea *scrollArea = new QScrollArea ;
-	QWidget *areaWidget = new QWidget ;
-	areaWidget->setLayout(descriptorLayout) ;
-	scrollArea->setWidget(areaWidget) ;
-	dialogLayout->addWidget(scrollArea) ;
-	dialogLayout->addWidget(buttons) ;
-	descriptorMatch->setLayout(dialogLayout) ;
-	bool retval = descriptorMatch->exec() ;
-	
-// 	QList<QPair<QStringList::size_type, double> > toCompare ;
-	for (int i = 0 ; i < descriptorLayout->count() ; i++)
-	{
-		int row, column, rowspan, columnspan ;
-		descriptorLayout->getItemPosition(i, &row, &column, &rowspan, &columnspan) ;
-		if (column == 0 && ((QCheckBox*) descriptorLayout->itemAt(i)->widget())->checkState() == Qt::Checked)
-			toCompare << qMakePair(row,
-				DescriptorProperties[row] & spec::numeric ?
-						((QLineEdit*) descriptorLayout->itemAt(i+1)->widget())->text().toDouble() : 0.) ;
-	}
-	
-	return retval ;
 }
 
 bool specModel::exportData(QModelIndexList& list)
@@ -130,17 +74,6 @@ bool lessThanIndex(const QModelIndex& one, const QModelIndex& two)
 // 	return levelOne < levelTwo ;
 }
 
-QModelIndexList specModel::mergeItems(QModelIndexList& list)
-{
-	QList<QPair<QStringList::size_type, double> > criteria ;
-	if (getMergeCriteria(criteria))
-	{
-		eliminateChildren(list) ;
-		return merge(list, criteria) ; // TODO more sophisiticated solution
-	}
-	return list ;
-}
-
 QModelIndexList specModel::allChildren(const QModelIndex& parent) const
 {
 	if (!parent.isValid() || !isFolder(parent))
@@ -161,168 +94,8 @@ const QList<spec::descriptorFlags>& specModel::descriptorProperties() const
 	return DescriptorProperties ;
 }
 
-QModelIndexList specModel::merge(QModelIndexList& list, const QList<QPair<QStringList::size_type, double> >& criteria)
-{
-	for (QModelIndexList::size_type i = 0 ; i < list.size() ; i++)
-		if (isFolder(list[i]))
-			list << allChildren(list.takeAt(i--)) ;
-	qSort(list.begin(),list.end(), lessThanIndex) ;
-	
-	QList<QList<QPersistentModelIndex> > mergeLists ;
-// Setup lists of items to merge
-	while (!list.isEmpty())
-	{
-		QList<QPersistentModelIndex> mergeList ;
-		QModelIndex compareIndex = list.first() ;
-		while(! dynamic_cast<specDataItem*>(itemPointer(list.first())))
-			list.takeFirst() ; // Remove all non-data items
-		mergeList << list.takeFirst() ; // current item is initial entry
-		for (QModelIndexList::size_type i = 0 ; i < list.size() ; i++)
-			if (itemsAreEqual(compareIndex, list[i], criteria) && dynamic_cast<specDataItem*>(itemPointer(list[i])))
-				mergeList << list.takeAt(i--) ; // add more items to list if they match according to predefined criteria
-		mergeLists << mergeList ; 
-	}
-// Create new, merged items
-	QList<specModelItem*> newItems ;
-	foreach(QList<QPersistentModelIndex> mergeList, mergeLists)
-	{
-		//QHash<QString,specDescriptor> temp ;
-		//temp.insert(QString(""),specDescriptor(QString(""),spec::editable)) ;
-		QByteArray *firstItemData = new QByteArray() ;
-		QDataStream outStream(firstItemData,QIODevice::WriteOnly) ;
-		outStream << *(itemPointer(mergeList.takeFirst())) ;
-		QDataStream inStream(firstItemData,QIODevice::ReadOnly) ;
-		type t ;
-		inStream >> t ;
-		specModelItem *newItem = specModelItem::itemFactory(t) ;
-		inStream >> *newItem ;
-		newItems << newItem ;
-//		newItems << new specDataItem(* (specDataItem*) itemPointer(mergeList.takeFirst())) ;
-		//newItems << new specDataItem(QList<specDataPoint>(),  temp) ;// TODO Default constructor?
-		specDataItem *pointer = (specDataItem*) newItems.last() ;
-		foreach(QModelIndex index, mergeList)
-		{
-			specDataItem *currentItem = (specDataItem*) itemPointer(index) ;
-//			if (fitInterpolated // fitting is desired
-//			    && !(currentItem->maxXValue() < pointer->minXValue()) // range is not left...
-//			    && !(currentItem->minXValue() > pointer->maxXValue())) // ... or right of current  TODO: sort Items before merging
-//			{
-//				QVector<double> x, deviation ;
-//				for (int i = 0 ; i < currentItem->dataSize() ; i++)
-//				{
-//// TODO BAUSTELLE
-//				}
-//			}
-			*pointer += *(currentItem) ;
-//			pointer->changeDescriptor("",pointer->descriptor("").append(currentItem->descriptor(""))) ;
-		}
-		pointer->flatten() ; // TODO: flatten with smoother
-	}
-// Determine insert position
-// Criteria for determination: highest level, lowest row number ... TODO should be the first item in the list?
-	QList<QPair<QPersistentModelIndex,int> > designatedInsertPositions ;
-	for(QModelIndexList::size_type i = 0 ; i < mergeLists.size(); i++)
-	{
-		QPersistentModelIndex insertParent = mergeLists[i].first().parent() ;
-		int insertRow = mergeLists[i].first().row() ;
-		while(!mergeLists[i].isEmpty())
-		{
-			QModelIndex index = mergeLists[i].takeLast() ;
-			
-			if (index == insertParent) // precaution if designated parent is to be deleted (move up one level)  TODO maybe add condition that "index" is contained in "insertParent"'s ancestry
-			{
-				insertParent = index.parent() ;
-				insertRow = index.row() ;
-			}
-// If containing folder has only to be removed entry left, append it to list so it will be removed in the next pass
-			if (rowCount(parent(index)) == 1 && parent(index).isValid())
-				mergeLists[i] << parent(index) ;
-			if (parent(index) == insertParent && index.row() < insertRow)
-				insertRow-- ;
-			list << index ;
-// 				removeRows(index.row(),1,parent(index)) ;
-		}
-		designatedInsertPositions << QPair<QPersistentModelIndex,int>(insertParent,insertRow) ;
-// 		if(itemPointer(insertParent)->addChild(newItems[i],insertRow))
-// 			returnList << index(insertRow,0,insertIndex) ;
-	}
-	
-	// remove old items
-	qSort(list.begin(),list.end(),lessThanIndex) ;
-	QModelIndex currentParent ;
-	int rowsToRemove = 0, lastToRemove = -1 ;
-	while (!list.isEmpty())
-	{
-		QModelIndex index = list.takeLast() ;
-		if (parent(index) != currentParent || index.row() != lastToRemove - rowsToRemove)
-		{
-			removeRows(lastToRemove-rowsToRemove+1, rowsToRemove, currentParent) ;
-			currentParent = parent(index) ;
-			rowsToRemove = 0 ;
-			lastToRemove = index.row() ;
-		}
-		rowsToRemove ++ ;
-	}
-	removeRows(lastToRemove-rowsToRemove+1,rowsToRemove,currentParent) ;
-	
-	// look for items of same parent and insert them into model
-	QModelIndexList returnList ;
-	while(!designatedInsertPositions.isEmpty())
-	{
-		QList<specModelItem*> toBeInserted ;
-		toBeInserted << newItems.takeFirst() ;
-		QPair<QPersistentModelIndex,int> parentAndPos = designatedInsertPositions.takeFirst() ;
-		int row=parentAndPos.second ;
-		for (int i = 0 ; i < newItems.size() ; i++)
-		{
-			if (designatedInsertPositions[i].first == parentAndPos.first &&
-						 (designatedInsertPositions[i].second == row-1 ||
-						 designatedInsertPositions[i].second == row + toBeInserted.size()))
-			{
-				toBeInserted << newItems.takeAt(i) ;
-				if (designatedInsertPositions.takeAt(i--).second == row-1)
-					row-- ;
-			}
-		}
-		if (insertItems(toBeInserted,parentAndPos.first,row))
-			for(int i = 0 ; i < toBeInserted.size() ; i++)
-				returnList << index(row+i,0,parentAndPos.first) ;
-	}
-	return returnList ;
-}
-
-bool specModel::buildTree(const QModelIndex& parent) // outsource to folderItem (pass list of descriptors)
-{
-	int col = parent.column() ;
-	if(col >= Descriptors.size()) return false ;
-	if(itemPointer(parent)->isFolder()) return false ;
-// 	itemPointer(parent)->setAutoReplot(false) ;
-	((specFolderItem*) itemPointer(parent))->buildTree(Descriptors) ;
-// 	itemPointer(parent)->setAutoReplot(true) ;
-	return true ;
-}
-
 bool specModel::isFolder(const QModelIndex& index) const
 { return itemPointer(index)->isFolder() ;}
-
-void specModel::importFile(QModelIndex index)
-{
-	index = isFolder(index) ? index : parent(index) ;
-	QStringList fileNames = QFileDialog::getOpenFileNames();
-	QTime timer ;
-	timer.start() ;
-	if (!fileNames.isEmpty())
-	{
-		foreach(QString fileName, fileNames)
-		{
-			QList<specModelItem*> (*importFunction)(QFile&) = fileFilter(fileName);
-			QFile fileToImport(fileName) ;
-			fileToImport.open(QFile::ReadOnly | QFile::Text) ;
-			QList<specModelItem*> importedItems = importFunction(fileToImport) ;
-			insertItems(importedItems,index) ;
-		}
-	}
-}
 
 void specModel::writeToStream(QDataStream &out) const
 {
@@ -367,8 +140,6 @@ specModel::specModel(QObject *par)
 specModel::~specModel()
 {
 	delete root ;
-	Descriptors.clear() ;
-	DescriptorProperties.clear() ;
 }
 
 bool specModel::setHeaderData (int section,Qt::Orientation orientation,const QVariant & value,int role)
@@ -456,7 +227,9 @@ int specModel::columnCount(const QModelIndex &parent) const
 }
 
 int specModel::rowCount(const QModelIndex& parent) const
-{ return itemPointer(parent)->children() ; }
+{
+	return itemPointer(parent)->children() ;
+}
 
 QModelIndex specModel::parent(const QModelIndex & index) const
 {
@@ -495,22 +268,18 @@ QVariant specModel::data(const QModelIndex &index, int role) const
 	
 	switch(role)
 	{
-		case Qt::DecorationRole :
-//			return index.column() ? QVariant() : pointer->decoration() ;
-			return pointer->indicator(Descriptors[index.column()]) ;
-// 			return index.column() != 0 ? QVariant() : QIcon(pointer->isFolder() ? ":/folder.png" : (pointer->isSysEntry() ? ":/sys_message.png" : (pointer->isLogEntry() ? ":/log_message.png" : ":/data.png"))) ;
-		case Qt::DisplayRole :
-			if (index.column() < columnCount(index))
-				return pointer->descriptor(Descriptors[index.column()]) ;
-			return "" ;
-		case Qt::ForegroundRole :
-			return pointer->brush() ;
-		case spec::fullContentRole :
-			return pointer->descriptor(Descriptors[index.column()],true) ;
-		case Qt::ToolTipRole :
-            return pointer->toolTip(Descriptors[index.column()]) ;
-// 		case 32 : // TODO replace in namespace
-// 			return pointer->plotData() ;
+	case Qt::DecorationRole :
+		return pointer->indicator(Descriptors[index.column()]) ;
+	case Qt::DisplayRole :
+		if (index.column() < columnCount(index))
+			return pointer->descriptor(Descriptors[index.column()]) ;
+		return "" ;
+	case Qt::ForegroundRole :
+		return pointer->pen().color() ;
+	case spec::fullContentRole :
+		return pointer->descriptor(Descriptors[index.column()],true) ;
+	case Qt::ToolTipRole :
+		return pointer->toolTip(Descriptors[index.column()]) ;
 	}
 	return QVariant() ;
 }
@@ -577,16 +346,6 @@ QVariant specModel::headerData(int section, Qt::Orientation orientation,
 	return Descriptors[section] ;
 }
 
-// bool specModel::insertRows(int position, int rows, const QModelIndex &parent) // TODO remove this function entirely as it is not known beforehand, what type of item is to be added and parent class is purely virtual.
-// {
-// 	emit layoutAboutToBeChanged() ;
-// 	beginInsertRows(parent, position, position+rows-1);
-// 	bool retval = itemPointer(parent)->addChildren(position,rows) ;
-// 	endInsertRows();
-// 	emit layoutChanged() ; // TODO maybe look for a different signal for refresh after adding children
-// 	return retval ;
-// }
-
 bool specModel::removeRows(int position, int rows, const QModelIndex &parent) 
 { // TODO check if index is valid?
 // 	if(!(position+rows <= rowCount(index))) return false ; maybe necessary...
@@ -601,32 +360,7 @@ bool specModel::removeRows(int position, int rows, const QModelIndex &parent)
 	}
 
     if (dropBuddy) dropBuddy->deleteInternally(this) ;
-//    beginRemoveRows(parent, position, position+rows-1); // TODO this is actually not to be permitted!!
-//    QModelIndexList indexes ;
-//    for (int i = 0 ; i < rows ; ++i)
-//        indexes << index(position+i,0,parent) ;
-//    specUndoCommand *deleteCommand = specDeleteAction::command(this, indexes) ;
-//    if (dropBuddy)
-//        dropBuddy->push(deleteCommand) ;
-//    else
-//    {
-//        deleteCommand->redo();
-//        delete deleteCommand ;
-//    }
-//    endRemoveRows();
     return true ;
-
-//// 	QList<specModelItem*> list = itemPointer(index)->takeChildren(position,rows) ;
-//    QList<specModelItem*> list ;
-//    specFolderItem *parentPointer = (specFolderItem*) itemPointer(parent) ;
-//    for (int i = 0 ; i < rows ; i++)
-//        list << itemPointer(index(position+i,0,parent)) ;
-//    parentPointer->haltRefreshes(true) ;
-//    while(!list.isEmpty())
-//        delete list.takeLast() ;
-//    parentPointer->haltRefreshes(false) ;
-
-//    return true ;
 }
 
 void specModel::setInternalDrop(bool val)
@@ -721,44 +455,6 @@ bool specModel::dropMimeData(const QMimeData *data,
 	}
 	dropSource = 0 ;
 	return true ;
-}
-
-void specModel::insertFromStream(QDataStream& stream, const QModelIndex& parent, int row)
-{
-	QList<specModelItem*> list ;
-	while(!stream.atEnd())
-	{
-		type t ;
-		stream >> t ;
-		specModelItem* pointer = specModelItem::itemFactory(t);
-		pointer->readDirectly(stream);
-		list << pointer ;
-	}
-	insertItems(list,parent,row) ;
-}
-
-void specModel::fillSubMap(const QModelIndexList & indexList)
-{
-	subMap.clear();
-	QMap<double,int> norm ;
-	foreach(QModelIndex index, indexList)
-	{
-		specModelItem *pointer = itemPointer(index) ;
-		for (size_t i = 0 ; i < pointer->dataSize() ; i++)
-		{
-			double xval = pointer->sample(i).x() ;
-			subMap[xval] += pointer->sample(i).y() ; // Qt promises "default-construction" of double as zero.
-			norm[xval] ++ ;
-		}
-	}
-	for (int i = 0 ; i < norm.keys().size() ; i++) // TODO iterators
-		subMap[norm.keys()[i]] /= (double) norm[norm.keys()[i]] ;
-}
-
-void specModel::applySubMap(const QModelIndexList & indexList)
-{
-	foreach(QModelIndex index, indexList)
-		itemPointer(index)->subMap(subMap) ;
 }
 
 specModelItem* specModel::itemPointer(const QVector<int> &indexes) const

@@ -2,24 +2,19 @@
 #define SPECMODEL_H
 
 #include <QAbstractItemModel>
-#include "specfolderitem.h"
-#include "specdataitem.h"
-#include "specmodelitem.h"
 #include <QList>
-#include <QObject>
-#include <QDataStream>
-#include <QMimeData>
-#include <QDataStream>
-#include <names.h>
-#include <QPair>
-#include <QItemSelection>
-#include <QMap>
-#include <QHash>
-#include "specactionlibrary.h"
-#include "specmimeconverter.h"
+#include <QStringList>
+#include "specstreamable.h"
+#include "names.h"
+#include "specfolderitem.h"
 
 class specModel ;
 class specMetaModel ;
+class specModelItem ;
+class specActionLibrary ;
+class specMimeConverter ;
+class specCanvasItem ;
+
 
 QDataStream& operator<<(QDataStream&, specModel&);
 QDataStream& operator>>(QDataStream& in, specModel& model) ;
@@ -38,7 +33,6 @@ private:
 	QStringList Descriptors ;
 	QList<spec::descriptorFlags> DescriptorProperties ;
 	void insertFromStream(QDataStream& stream, const QModelIndex& parent, int row) ;
-	bool getMergeCriteria(QList<QPair<QStringList::size_type, double> >&) ;
 	bool itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria) ;
 	QModelIndexList merge(QModelIndexList& list, const QList<QPair<QStringList::size_type, double> >& criteria) ;
 	QModelIndexList allChildren(const QModelIndex&) const ;
@@ -119,10 +113,6 @@ public:
 	bool dropMimeData(const QMimeData*, Qt::DropAction, int row, int column, const QModelIndex &parent) ;
 	bool mimeAcceptable(const QMimeData*) const ;
 	
-	// Comfort
-	bool buildTree(const QModelIndex&) ;
-	QModelIndexList mergeItems(QModelIndexList&) ;
-	
 	friend QDataStream& operator<<(QDataStream&, specModel&);
 	friend QDataStream& operator>>(QDataStream&, specModel&);
 
@@ -132,13 +122,10 @@ public:
     void signalChanged(QModelIndex originalBegin, QModelIndex originalEnd) ;
 	
 	
-// //TODO	bool QAbstractItemModel::setHeaderData ( int section, Qt::Orientation orientation, const QVariant & value, int role = Qt::EditRole )
 // //TODO	
 public slots:
-	void importFile(QModelIndex) ;
 	bool exportData(QModelIndexList& list) ;
 	void svgMoved(specCanvasItem*, int, double, double) ;
-// 	bool insertRows(int position, int rows, const QModelIndex &parent = QModelIndex());
 };
 
 #endif

@@ -1,25 +1,10 @@
 #include "specview.h"
-#include <specmodelitem.h>
-#include <QTextStream>
-#include <QHeaderView>
-#include <algorithm>
-#include <QColorDialog>
-#include <QPalette>
 #include <specdelegate.h>
-#include <QtAlgorithms>
-#include "specfolderitem.h"
-#include <QSpinBox>
-#include <QDialogButtonBox>
 #include "specviewstate.h"
-#include <QClipboard>
 #include "specmodel.h"
-#include <QVBoxLayout>
-using std::min ;
-using std::max ;
-
-
-//TODO setSelectionBehavior to select only entire rows
-//TODO: sort selection list before passing it on...
+#include "specactionlibrary.h"
+#include <QContextMenuEvent>
+#include <QHeaderView>
 
 QModelIndexList specView::getSelection()
 {
@@ -46,49 +31,15 @@ void specView::columnMoved(int i, int j, int k)
 	{
 		header()->moveSection(k,i) ; // undoing user move
 		QList<QVariant> temp ;
-		for (int a = min(j,k) ; a < max(j,k)+1 ; a++) // read out column heads of concern
+		for (int a = qMin(j,k) ; a < qMax(j,k)+1 ; a++) // read out column heads of concern
 			temp += model()->headerData(a,Qt::Horizontal) ;
 		if(k < j) temp.prepend(temp.takeLast()) ; // doing the move
 		else temp.append(temp.takeFirst()) ;
 		for (QList<QVariant>::size_type a = 0 ; a < temp.size() ; a++) // reinserting the heads
-			model()->setHeaderData(min(j,k)+a,Qt::Horizontal,temp[a]) ;
+			model()->setHeaderData(qMin(j,k)+a,Qt::Horizontal,temp[a]) ;
 	}
 }
 
-void specView::buildTree()
-{ model()->buildTree(currentIndex()) ;}
-
-void specView::exportItems()
-{
-	QModelIndexList list = getSelection() ;
-	model()->eliminateChildren(list) ;
-	model()->exportData(list) ;
-}
-
-void specView::deleteItems()
-{ 
-	QModelIndexList list = getSelection() ;
-	model()->eliminateChildren(list) ;
-	selectionModel()->clearSelection() ;
-	while (!list.empty())
-	{
-		QModelIndexList sameParent ;
-		QModelIndex parent = model()->parent(list.first()) ;
-		sameParent << list.takeFirst() ;
-		for (int i = 0 ; i < list.size() ; i++)
-			if (model()->parent(list[i]) == parent)
-				sameParent << list.takeAt(i--) ;
-		qSort(sameParent) ;
-		while(!sameParent.empty())
-		{
-			int last = sameParent.takeLast().row() ;
-			int first = last ;
-			while(sameParent.last().row() == first -1)
-				first = sameParent.takeLast().row() ;
-			model()->removeRows(first,last-first+1,parent) ;
-		}
-	}
-}
 
 void specView::triggerReselect()
 {
@@ -97,50 +48,8 @@ void specView::triggerReselect()
 	selectionModel()->select(selected,QItemSelectionModel::ClearAndSelect) ; // reselect to emit selectionChanged-signal in order to invoke redrawing of plot
 }
 
-bool specView::setAllSelected(const QVariant & value, int role)
-{
-	bool retVal = true ;
-	QModelIndexList list = getSelection() ;
-	foreach(QModelIndex index, list)
-		retVal = retVal && model()->setData(index,value,role) ;
-	triggerReselect() ;
-	return retVal ;
-}
-
 specModel* specView::model() const
 {return (specModel*) QAbstractItemView::model() ;}
-
-void specView::mergeFolder()
-{ setAllSelected(true,33) ; }
-
-void specView::mergeItems() // TODO maybe change currentIndex
-{
-	QModelIndexList list = getSelection() ;
-	selectionModel()->select(QModelIndex(),QItemSelectionModel::Clear) ;
-	list = model()->mergeItems(list) ;
-	// TODO reselect merged items
-// 	QItemSelection newSelection ;
-// 	foreach(QModelIndex index, list)
-// 	{
-// 		newSelection.select(index,index.model()->index(index.row(),index.model()->columnCount(index.parent())-1,index.parent())) ;
-// 	}
-// 	selectionModel()->select(newSelection,QItemSelectionModel::Select) ;
-// 	
-// // 	foreach(QModelIndex index, list)
-// // 		selectionModel()->select(
-// // 			QItemSelection(index, model()->index(index.row(),model()->columnCount(index)-1,index.parent())),
-// // 			QItemSelectionModel::Select) ;
-}
-
-void specView::changePen()
-{
-	if (getSelection().isEmpty()) return ; // TODO connect to selectionChanged signal
-	QPen pen(QColorDialog::getColor()) ;
-	setAllSelected(pen,Qt::ForegroundRole) ;
-}
-
-void specView::newFolder()
-{ model()->insertItems(QList<specModelItem*>() << new specFolderItem(),currentIndex(),0) ; }
 
 void specView::keyPressEvent(QKeyEvent* event)
 {  // TODO also enable mouse to take focus and eliminate selection
@@ -171,11 +80,10 @@ void specView::keyPressEvent(QKeyEvent* event)
 
 specView::specView(QWidget* parent)
  : QTreeView(parent),
-   actionLibrary(0)
+   actionLibrary(0),
+   state(0)
 {
 	setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
-	createActions() ;
-	createContextMenus() ;
 	
 	setAlternatingRowColors(true) ;
     setSelectionBehavior(QTreeView::SelectRows);
@@ -189,25 +97,6 @@ specView::specView(QWidget* parent)
 	setAllColumnsShowFocus(true) ;
 	
 	connect(header(),SIGNAL(sectionMoved(int,int,int)),this,SLOT(columnMoved(int,int,int))) ;
-}
-
-void specView::createContextMenus()
-{
-	itemContextMenu = new QMenu(this) ;
-//	itemContextMenu->addAction(deleteAction) ;
-//	itemContextMenu->addAction(changePenAction) ;
-	itemContextMenu->addAction(propertiesAction) ;
-
-	folderContextMenu = new QMenu(this) ;
-//	folderContextMenu->addAction(deleteAction) ;
-//	folderContextMenu->addAction(treeAction) ;
-//	folderContextMenu->addAction(changePenAction) ;
-//	folderContextMenu->addAction(mergeFolderAction) ;
-}
-
-QList<QAction*> specView::actions()
-{
-	return QList<QAction*>() << newItemAction << deleteAction << treeAction << changePenAction << mergeFolderAction << mergeAction << exportAction << averageAction << movingAverageAction << getSubtractionDataAction << applySubtractionAction;
 }
 
 void specView::contextMenuEvent(QContextMenuEvent* event)
@@ -235,112 +124,9 @@ void specView::setModel(specModel* model)
 	connect(model,SIGNAL(columnsInserted(const QModelIndex&,int,int)), this, SLOT(columnsInserted(QModelIndex,int,int))) ;
 }
 
-void specView::itemProperties()
-{
-	if (!model()) return ;
-	specModelItem* item = 0;
-	if (!(item = model()->itemPointer(currentIndex()))) return ;
-	emit newUndoCommand(item->itemPropertiesAction(model())) ;
-}
-
-void specView::createActions()
-{// TODO connect actions to modified slot of parent
-	propertiesAction = new QAction(tr("Properties..."), this) ;
-	connect(propertiesAction, SIGNAL(triggered()), this, SLOT(itemProperties())) ;
-
-	deleteAction = new QAction(QIcon(":/item_delete.png"), tr("&Löschen"), this) ;
-	deleteAction->setShortcut(tr("Entf"));
-	deleteAction->setStatusTip(tr("Markierte Einträge löschen"));
-	connect(deleteAction, SIGNAL(triggered()), this, SLOT(deleteItems()));
-	
-	newItemAction = new QAction(QIcon(":/folder_new.png"), tr("&Neuer Eintrag"), this);
-	newItemAction->setShortcut(tr("Ctrl+E"));
-	newItemAction->setStatusTip(tr("Neuen Eintrag anlegen"));
-	connect(newItemAction, SIGNAL(triggered()), this, SLOT(newFolder()));
-	
-	treeAction = new QAction(QIcon(":/tree.png"), tr("Baum aufbauen"), this) ;
-	treeAction->setShortcut(tr("Ctrl+T"));
-	treeAction->setStatusTip(tr("Elemente kategorisieren"));
-	connect(treeAction, SIGNAL(triggered()), this, SLOT(buildTree())) ;
-	
-	changePenAction = new QAction(QIcon(":/color.png"), tr("Plot-Stil ändern"), this) ;
-	changePenAction->setShortcut(tr("Ctrl+P"));
-	changePenAction->setStatusTip(tr("Linienfarbe einstellen"));
-	connect(changePenAction, SIGNAL(triggered()), this, SLOT(changePen())) ;
-	
-	mergeFolderAction = new QAction(QIcon(":/merge_folder.png"), tr("Plots zusammenfassen"), this) ;
-	mergeFolderAction->setShortcut(tr("Ctrl+M"));
-	mergeFolderAction->setStatusTip(tr("Plots der Einträge zusammenfassen"));
-	connect(mergeFolderAction, SIGNAL(triggered()), this, SLOT(mergeFolder())) ;
-	
-	mergeAction = new QAction(QIcon(":/merge.png"), tr("Einträge vereinen"), this) ;
-	mergeAction->setShortcut(tr("Ctrl+M")) ;
-	mergeAction->setStatusTip(tr("Einträge (ggf. in Verzeichnis) zusammenführen")) ;
-	connect(mergeAction, SIGNAL(triggered()), this, SLOT(mergeItems())) ;
-	
-	exportAction = new QAction(QIcon(":/export.png"), tr("Daten exportieren"), this) ;
-	exportAction->setShortcut(tr("Ctrl+E")) ;
-	exportAction->setStatusTip(tr("Daten exportieren")) ;
-	connect(exportAction,SIGNAL(triggered()),this,SLOT(exportItems())) ;
-
-	averageAction = new QAction(QIcon(":/ave.png"), tr("Mitteln"), this) ;
-	connect(averageAction,SIGNAL(triggered()),this,SLOT(averageItems())) ;
-
-	movingAverageAction = new QAction(QIcon(":/mave.png"), tr("Laufend mitteln"), this) ;
-	connect(movingAverageAction,SIGNAL(triggered()),this,SLOT(averageItems())) ;
-
-	getSubtractionDataAction = new QAction(QIcon(":/newMinus.png"), tr("Subtraktionsdaten setzen"), this) ;
-	connect(getSubtractionDataAction, SIGNAL(triggered()), this, SLOT(currentlySelectedToSubMap())) ;
-
-	applySubtractionAction = new QAction(QIcon(":/multiminus.png"), tr("Subtraktion anwenden"), this) ;
-	connect(applySubtractionAction,SIGNAL(triggered()), this, SLOT(applySubMapToSelection())) ;
-}
-
 specView::~specView()
 {
-}
-
-void specView::averageItems()
-{
-	QDialog *numberDialog = new QDialog(this) ;
-	QVBoxLayout *dialogLayout = new QVBoxLayout(numberDialog) ;
-	QSpinBox *spinBox = new QSpinBox(numberDialog) ;
-	QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel,Qt::Horizontal,numberDialog) ;
-
-	dialogLayout->addWidget(spinBox) ;
-	dialogLayout->addWidget(buttons) ;
-
-	spinBox->setMinimum(1) ;
-	numberDialog->setWindowTitle("Wieviele mitteln?") ;
-	numberDialog->setLayout(dialogLayout) ;
-
-	connect(buttons,SIGNAL(accepted()),numberDialog,SLOT(accept())) ;
-	connect(buttons,SIGNAL(rejected()),numberDialog,SLOT(reject())) ;
-
-	numberDialog->exec() ;
-
-	if (numberDialog->result() == QDialog::Accepted)
-	{
-		QModelIndexList list = getSelection() ;
-		if (sender() == averageAction)
-			foreach(QModelIndex index, list)
-				((specModelItem*) index.internalPointer())->average(spinBox->value()) ;
-		else if (sender() == movingAverageAction)
-			foreach(QModelIndex index, list)
-				((specModelItem*) index.internalPointer())->movingAverage(spinBox->value()) ;
-	}
-
-	delete numberDialog ;
-}
-
-void specView::currentlySelectedToSubMap()
-{
-	model()->fillSubMap(getSelection());
-}
-
-void specView::applySubMapToSelection()
-{
-	model()->applySubMap(getSelection()) ;
+	delete state ;
 }
 
 void specView::dropEvent(QDropEvent *event)
@@ -379,7 +165,7 @@ void specView::resetDone()
 	if (!state) return ;
 	state->restoreState();
 	delete state ;
-    state = 0 ;
+	state = 0 ;
 }
 
 void specView::dragMoveEvent(QDragMoveEvent *event)
