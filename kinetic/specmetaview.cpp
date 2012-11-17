@@ -6,6 +6,7 @@
 #include "specmetaitem.h"
 #include "specactionlibrary.h"
 #include <QQueue>
+#include "speccanvasitem.h"
 
 specMetaView::specMetaView(QWidget *parent) :
 	specView(parent),

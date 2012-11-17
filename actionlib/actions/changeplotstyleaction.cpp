@@ -8,6 +8,7 @@
 #include <QPainter>
 #include "specstylecommand.h"
 #include <QInputDialog>
+#include "specdataitem.h"
 
 changePlotStyleAction::changePlotStyleAction(QObject *parent) :
 	specRequiresItemAction(parent),

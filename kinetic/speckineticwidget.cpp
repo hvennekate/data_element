@@ -5,6 +5,7 @@
 #include "specmimetextexporter.h"
 #include "specsplitter.h"
 #include "canvaspicker.h"
+#include "specactionlibrary.h"
 
 specMetaView* specKineticWidget::view()
 { return items ; }

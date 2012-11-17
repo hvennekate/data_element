@@ -93,7 +93,6 @@ SOURCES += main.cpp \
     actionlib/actions/speclabelaction.cpp \
     specprofiler.cpp \
     actionlib/actions/genericexportaction.cpp \
-    actionlib/actions/specplotaction.cpp \
     actionlib/actions/specitemaction.cpp \
     actionlib/actions/specrequiresitemaction.cpp \
     model/specmimetextexporter.cpp \
@@ -206,7 +205,6 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/speclabelaction.h \
     specprofiler.h \
     actionlib/actions/genericexportaction.h \
-    actionlib/actions/specplotaction.h \
     actionlib/actions/specitemaction.h \
     actionlib/actions/specrequiresitemaction.h \
     model/specmimetextexporter.h \

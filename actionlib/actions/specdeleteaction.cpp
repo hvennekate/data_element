@@ -7,6 +7,8 @@
 #include <QMap>
 #include "speclogmodel.h"
 
+#include "specdataview.h"
+
 specDeleteAction::specDeleteAction(QObject *parent) :
     specRequiresItemAction(parent)
 {
@@ -14,6 +16,7 @@ specDeleteAction::specDeleteAction(QObject *parent) :
 	setToolTip(tr("Delete")) ;
 	setWhatsThis(tr("Deletes selected items.")) ;
 	setText(tr("Delete")) ;
+	setShortcut(Qt::Key_Delete);
 }
 
 specUndoCommand* specDeleteAction::command(specModel* model, QModelIndexList& selection)

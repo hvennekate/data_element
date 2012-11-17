@@ -1,6 +1,7 @@
 #include "specresizesvgcommand.h"
 #include "specsvgitem.h"
 #include "specgenealogy.h"
+#include "qwt_plot.h"
 
 specResizeSVGcommand::specResizeSVGcommand(specUndoCommand *parent)
 	: specUndoCommand(parent),

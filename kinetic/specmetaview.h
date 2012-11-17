@@ -3,6 +3,8 @@
 
 #include "specview.h"
 
+class specCanvasItem ;
+
 class specMetaModel ;
 
 class specMetaView : public specView

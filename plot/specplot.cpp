@@ -11,6 +11,7 @@
 #include <qwt_scale_widget.h>
 #include <QApplication>
 #include <qwt_legend.h>
+#include <QMouseEvent>
 
 // TODO solve the myth of autoscaleaxis...
 
@@ -39,14 +40,14 @@ specPlot::specPlot(QWidget *parent)
 	zoom  = new specZoomer(this->canvas()) ;
 
 	fixYAxisAction = new QAction(QIcon(":/fixyaxis.png"), tr("fixate &y axis"), this);
-	fixYAxisAction->setShortcut(tr("Ctrl+y"));
+	fixYAxisAction->setShortcut(tr("Ctrl+Shift+y"));
 	fixYAxisAction->setWhatsThis(tr("Disables auto scaling for the y axis and fixates the current axis range."));
 	fixYAxisAction->setIcon(QIcon(":/fixYAxis.png")) ;
 	fixYAxisAction->setCheckable(true) ;
 	fixYAxisAction->setChecked(false) ;
 	
 	fixXAxisAction = new QAction(QIcon(":/fixxaxis.png"), tr("fixate &x axis"), this);
-	fixXAxisAction->setShortcut(tr("Ctrl+x"));
+	fixXAxisAction->setShortcut(tr("Ctrl+Shift+x"));
 	fixXAxisAction->setWhatsThis(tr("Disables auto scaling for the y axis and fixates the current axis range.")) ;
 	fixXAxisAction->setIcon(QIcon(":/fixXAxis.png")) ;
 	fixXAxisAction->setCheckable(true) ;

@@ -1,4 +1,5 @@
 #include "specexchangedatacommand.h"
+#include "qwt_plot.h"
 
 specExchangeDataCommand::specExchangeDataCommand(specUndoCommand *parent)
 	: specUndoCommand(parent),

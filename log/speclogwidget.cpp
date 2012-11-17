@@ -4,6 +4,7 @@
 #include "specgenericmimeconverter.h"
 #include "speclogtodataconverter.h"
 #include "specmimetextexporter.h"
+#include "specactionlibrary.h"
 
 specLogWidget::specLogWidget(QWidget *parent)
 	: QDockWidget("Logs", parent),

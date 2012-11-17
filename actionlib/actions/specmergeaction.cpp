@@ -16,6 +16,7 @@
 #include <QLabel>
 #include "specprofiler.h"
 #include <QProgressDialog>
+#include "specdataitem.h"
 
 #include "specworkerthread.h"
 
@@ -214,6 +215,7 @@ specMergeAction::specMergeAction(QObject *parent)
 	setToolTip(tr("Merge items")) ;
 	setWhatsThis(tr("Merge selected data items.  You may define criteria and processing options for merging."));
 	setText(tr("Merge items...")) ;
+	setShortcut(tr("Ctrl+M"));
 }
 
 specUndoCommand* specMergeAction::generateUndoCommand()

@@ -19,6 +19,7 @@
 #include "speclogwidget.h"
 #include "canvaspicker.h"
 #include <QUndoView>
+#include <QCloseEvent>
 
 specPlotWidget::specPlotWidget(QWidget *parent)
 	: QDockWidget(tr("untitled"),parent),
