@@ -369,3 +369,30 @@ bool specModelItem::isNumeric(const QString &key) const
     Q_UNUSED(key)
     return false ;
 }
+
+void specModelItem::renameDescriptors(const QMap<QString, QString> &map)
+{
+    Q_UNUSED(map) ;
+}
+
+void specModelItem::deleteDescriptor(const QString &descriptors)
+{
+    Q_UNUSED(descriptors) ;
+}
+
+void specModelItem::dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const
+{
+    if (key == "")
+        destination << description ;
+    else
+        destination << specDescriptor() ;
+}
+
+void specModelItem::restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key)
+{
+    if (!origin.hasNext()) return ;
+    if (key == "")
+        description = origin.next() ;
+    else
+        origin.next() ;
+}

@@ -90,6 +90,11 @@ public:
 	void applySubMap(const QModelIndexList&) ;
 	const QStringList& descriptors() const ;
 	const QList<spec::descriptorFlags> & descriptorProperties() const;
+    void setDescriptorProperties(spec::descriptorFlags flags, const QString& key) ;
+    void renameDescriptors(const QMap<QString, QString>&) ;
+    void deleteDescriptor(const QString&) ;
+    void dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const ;
+    void restoreDescriptor(QListIterator<specDescriptor>& origin, const QString& key) ;
 	
 	// QAbstractItemModel virtual functions:
 	
@@ -130,7 +135,6 @@ public:
 	void signalEndReset() { endResetModel() ; } // TODO just emit from whereever this function is called
 	void signalChanged(const QModelIndex& index) ;
     void signalChanged(QModelIndex originalBegin, QModelIndex originalEnd) ;
-	
 	
 // //TODO	bool QAbstractItemModel::setHeaderData ( int section, Qt::Orientation orientation, const QVariant & value, int role = Qt::EditRole )
 // //TODO	

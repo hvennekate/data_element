@@ -87,6 +87,10 @@ public:
 	virtual void average(int) {}
 	virtual void subMap(const QMap<double,double>&) {}
     virtual QString toolTip(const QString &column) const ;
+    virtual void renameDescriptors(const QMap<QString, QString>& map) ;
+    virtual void deleteDescriptor(const QString& key) ;
+    virtual void dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const ;
+    virtual void restoreDescriptor(QListIterator<specDescriptor>& origin, const QString& key) ;
 
 	int rtti() const { return spec::spectrum ; }
 	void attach(QwtPlot *plot) ;

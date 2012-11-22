@@ -111,7 +111,10 @@ SOURCES += main.cpp \
     actionlib/actions/specselectconnectedaction.cpp \
     actionlib/specworkerthread.cpp \
     actionlib/commands/specdescriptorflagscommand.cpp \
-    actionlib/actions/specsetmultilineaction.cpp
+    actionlib/actions/specsetmultilineaction.cpp \
+    actionlib/commands/specdeletedescriptorcommand.cpp \
+    actionlib/commands/specrenamedescriptorcommand.cpp \
+    actionlib/actions/specdescriptoreditaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -224,7 +227,10 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/specselectconnectedaction.h \
     actionlib/specworkerthread.h \
     actionlib/commands/specdescriptorflagscommand.h \
-    actionlib/actions/specsetmultilineaction.h
+    actionlib/actions/specsetmultilineaction.h \
+    actionlib/commands/specdeletedescriptorcommand.h \
+    actionlib/commands/specrenamedescriptorcommand.h \
+    actionlib/actions/specdescriptoreditaction.h
 
 INCLUDEPATH += kinetic \
 	log \

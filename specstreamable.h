@@ -70,7 +70,9 @@ public:
 		toggleFitStyleCommand = 64,
         penStyleCommandId = 65,
         descriptorFlagsCommand = 66,
-        dataItem = 67
+        dataItem = 67,
+        deleteDescriptorCommandId = 68,
+        renameDescriptorCommandId = 69
 	};
 protected:
 	virtual void writeToStream(QDataStream& out) const = 0;

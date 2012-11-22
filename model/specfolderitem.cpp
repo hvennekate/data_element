@@ -240,3 +240,29 @@ void specFolderItem::subMap(const QMap<double, double> & map)
 		item->subMap(map) ;
 	haltRefreshes(false) ;
 }
+
+void specFolderItem::deleteDescriptor(const QString &descriptorName)
+{
+    foreach(specModelItem* child, childrenList)
+        child->deleteDescriptor(descriptorName) ;
+}
+
+void specFolderItem::renameDescriptors(const QMap<QString, QString> &map)
+{
+    foreach(specModelItem* child, childrenList)
+        child->renameDescriptors(map) ;
+}
+
+void specFolderItem::dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const
+{
+    specModelItem::dumpDescriptor(destination, key) ;
+    foreach(specModelItem* child, childrenList)
+        child->dumpDescriptor(destination, key) ;
+}
+
+void specFolderItem::restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key)
+{
+    specModelItem::restoreDescriptor(origin, key) ;
+    foreach(specModelItem *child, childrenList)
+        child->restoreDescriptor(origin, key) ;
+}

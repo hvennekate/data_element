@@ -49,6 +49,10 @@ public:
 	void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
 	void haltRefreshes(bool halt = true) ;
 	void subMap(const QMap<double,double>&) ;
+    void deleteDescriptor(const QString& key) ;
+    void renameDescriptors(const QMap<QString, QString> &map);
+    void dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const ;
+    void restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key) ;
 };
 
 #endif

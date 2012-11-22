@@ -15,6 +15,8 @@
 #include "spectogglefitstylecommand.h"
 #include "specstylecommand.h"
 #include "specdescriptorflagscommand.h"
+#include "specdeletedescriptorcommand.h"
+#include "specrenamedescriptorcommand.h"
 
 specCommandGenerator::specCommandGenerator(specUndoCommand *p)
 	: parent(p)
@@ -65,6 +67,10 @@ specUndoCommand *specCommandGenerator::commandById(int id) const
         return generatePlotLabelCommand(id,parent) ;
     case specStreamable::descriptorFlagsCommand:
         return new specDescriptorFlagsCommand(parent) ;
+    case specStreamable::deleteDescriptorCommandId:
+        return new specDeleteDescriptorCommand(parent) ;
+    case specStreamable::renameDescriptorCommandId:
+        return new specRenameDescriptorCommand(parent) ;
 	default:
 		return 0 ;
 	}
