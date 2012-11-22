@@ -80,8 +80,8 @@ void specView::keyPressEvent(QKeyEvent* event)
 
 specView::specView(QWidget* parent)
  : QTreeView(parent),
-   actionLibrary(0),
-   state(0)
+   state(0),
+   actionLibrary(0)
 {
 	setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
 	

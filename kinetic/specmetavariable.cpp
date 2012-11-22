@@ -64,8 +64,11 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 		product->setBorderFlags(QwtInterval::IncludeBorders);
 	}
 
-	product->parent = par ;
-	product->code = range + descString ;
+    if (product)
+    {
+        product->parent = par ;
+        product->code = range + descString ;
+    }
 	return product ;
 }
 

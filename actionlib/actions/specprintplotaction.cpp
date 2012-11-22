@@ -4,11 +4,14 @@
 #include <QPrintDialog>
 #include <qwt_plot_renderer.h>
 #include <QMessageBox>
+#include <csignal>
 
 specPrintPlotAction::specPrintPlotAction(QObject *parent) :
 	specUndoAction(parent),
-    printer(new QPrinter) // TODO seems to cause CUPS-related program crashes...
+    printer(0)
 {
+    signal(SIGPIPE, SIG_IGN) ;
+    printer = new QPrinter ; // TODO seems to cause CUPS-related program crashes...
 	specPlot *plot = (specPlot*) parentWidget() ;
 	QSize plotSize = plot->size() ;
 	double aspectRatio = (double) plotSize.width() / plotSize.height() ;

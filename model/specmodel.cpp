@@ -628,3 +628,48 @@ QStringList specModel::mimeTypes() const
         types << converter->importableTypes() ;
     return types ;
 }
+
+void specModel::setDescriptorProperties(spec::descriptorFlags flags, const QString& key)
+{
+    if(Descriptors.contains(key))
+        DescriptorProperties[Descriptors.indexOf(key)] = flags ;
+    else
+    {
+        Descriptors << key ;
+        DescriptorProperties << flags ;
+    }
+}
+
+void specModel::deleteDescriptor(const QString &key)
+{
+    int i = Descriptors.indexOf(key) ;
+    if (i < Descriptors.size() && i < DescriptorProperties.size())
+    {
+        Descriptors.takeAt(i) ;
+        DescriptorProperties.takeAt(i) ;
+    }
+    root->deleteDescriptors(list) ;
+}
+
+void specModel::renameDescriptors(const QMap<QString, QString> &map)
+{
+    for (QStringList::iterator i = Descriptors.begin() ; i != Descriptors.end() ; ++i)
+        if (map.contains(*i))
+            *i = map[*i] ;
+    root->renameDescriptors(map) ;
+}
+
+void specModel::dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const
+{
+    root->dumpDescriptor(destination, key) ;
+}
+
+void specModel::restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key)
+{
+    if (!Descriptors.contains(key))
+    {
+        Descriptors << key ;
+        DescriptorProperties << spec::def ;
+    }
+    root->restoreDescriptor(origin, key) ;
+}

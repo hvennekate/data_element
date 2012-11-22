@@ -23,6 +23,7 @@ public:
 	void attach(QwtPlot *plot);
 	void detach();
 	~specMetaRange() ;
+    int rtti() const { return spec::kineticRange ; }
 };
 
 #endif // SPECMETARANGE_H

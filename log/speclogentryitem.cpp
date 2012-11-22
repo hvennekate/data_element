@@ -94,3 +94,52 @@ double specLogEntryItem::numericalValue(const QString &key) const
     if (description.contains(key)) return description[key].numericValue() ;
     return NAN ;
 }
+
+void specLogEntryItem::renameDescriptors(const QMap<QString, QString> &map)
+{
+    QHash<QString, specDescriptor> newDescription ;
+    foreach(const QString& key, map.keys())
+        newDescription[map[key]] = description[key] ;
+    foreach(const QString& key, description.keys())
+        if (!map.contains(key))
+            newDescription[key] = description[key] ;
+    description.swap(newDescription) ;
+}
+
+QList<specDescriptor> specLogEntryItem::getDescriptors(const QStringList &descriptors) const
+{
+    QList<specDescriptor> values ;
+    foreach(const QString& key, descriptors)
+        values << description[key] ;
+    values << specModelItem::getDescriptors(descriptors) ;
+    return values ;
+}
+
+void specLogEntryItem::setDescriptors(const QStringList &descriptorNames, const QList<specDescriptor> &contentValues)
+{
+    QStringList::const_iterator descriptorIterator = descriptorNames.begin() ;
+    QList<specDescriptor>::const_iterator contentIterator = contentValues.begin() ;
+    while (descriptorIterator != descriptorNames.end() &&
+           contentIterator    != contentValues.  end())
+        description[*(descriptorIterator++)] = *(contentIterator++) ;
+}
+
+void specLogEntryItem::deleteDescriptors(const QString &key)
+{
+    description.remove(key) ;
+}
+
+void specLogEntryItem::dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const
+{
+    if (description.contains(key))
+        destination << description[key] ;
+    else
+        specModelItem::dumpDescriptor(destination, key) ;
+}
+
+void specLogEntryItem::restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key)
+{
+    if (!origin.hasNext()) return ;
+    if (key == "") specModelItem::restoreDescriptor(origin, key) ;
+    else description[key] = origin.next() ;
+}

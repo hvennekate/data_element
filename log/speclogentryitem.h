@@ -29,6 +29,10 @@ public:
     QString descriptor ( const QString &key, bool full = false) const ;
     bool setActiveLine(const QString &, int) ;
     int activeLine(const QString &key) const ;
+    void renameDescriptors(const QMap<QString, QString> &map);
+    void deleteDescriptor(const QString &descriptor);
+    void dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const;
+    void restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key) ;
 };
 
 #endif

@@ -165,7 +165,6 @@ void specDataItem::flatten()
 
 void specDataItem::scaleBy(const double& mul)
 {
-    qDebug() << "Scaling by" << mul ;
     if (0 == mul)
         zeroMultiplications ++ ;
     else if (INFINITY == mul)
