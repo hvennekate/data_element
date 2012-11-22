@@ -1,49 +1,3 @@
-#include <QDialog>
-#include <QValidator>
-class QLineEdit ;
-class QCheckBox ;
-
-class stringListEntryWidget : public QWidget
-{
-    Q_OBJECT
-private:
-    QLineEdit *newValue ;
-    QCheckBox *Active ;
-private slots:
-    void checkStateChanged(int) ;
-public:
-    explicit stringListEntryWidget(QString content, QWidget *parent = 0) ;
-    void setAllWidgets(QList<stringListEntryWidget*> widgets) ;
-    QString content() const ;
-    QString oldContent() const ;
-    bool active() const ;
-signals:
-    void contentChanged() ;
-};
-
-class stringListEntryValidator : public QValidator
-{
-    Q_OBJECT
-    QList<stringListEntryWidget*> allWidgets ;
-public:
-    stringListEntryValidator(QList<stringListEntryWidget*> allWidgets, stringListEntryWidget* parent = 0) ;
-    State validate(QString &, int &) const ;
-    void fixup(QString &s) const;
-};
-
-class stringListChangeDialog : public QDialog
-{
-    Q_OBJECT
-    QList<stringListEntryWidget*> widgets ;
-public:
-    explicit stringListChangeDialog(QStringList strings, QWidget *parent = 0);
-    QStringList inactive() const ;
-    QMap<QString,QString> active() const ;
-};
-
-/* ============== Former Header ============== */
-
-
 #include "specdescriptoreditaction.h"
 #include <QHBoxLayout>
 #include <QCheckBox>
@@ -93,8 +47,10 @@ stringListEntryWidget::stringListEntryWidget(QString content, QWidget *parent)
 	newValue = new QLineEdit(content, this) ;
 
 	layout->addWidget(Active) ;
+	layout->addStretch();
 	layout->addWidget(newValue) ;
 	connect(Active,SIGNAL(stateChanged(int)),this,SLOT(checkStateChanged(int))) ;
+	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
 bool stringListEntryWidget::active() const
@@ -138,7 +94,8 @@ stringListChangeDialog::stringListChangeDialog(QStringList strings, QWidget *par
 	QDialog(parent)
 {
 	QScrollArea *scrollArea = new QScrollArea(this) ;
-	QVBoxLayout *layout = new QVBoxLayout(this), *scrollLayout = new QVBoxLayout(scrollArea) ;
+	QWidget *areaWidget = new QWidget(scrollArea) ;
+	QVBoxLayout *layout = new QVBoxLayout(this), *scrollLayout = new QVBoxLayout(areaWidget) ;
 	layout->addWidget(scrollArea) ;
 	foreach(QString string, strings)
 	{
@@ -149,6 +106,7 @@ stringListChangeDialog::stringListChangeDialog(QStringList strings, QWidget *par
 	foreach(stringListEntryWidget *widget, widgets)
 		widget->setAllWidgets(widgets);
 	QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this) ;
+	scrollArea->setWidget(areaWidget);
 	layout->addWidget(buttonBox) ;
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept())) ;
 	connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject())) ;
@@ -182,7 +140,7 @@ specDescriptorEditAction::specDescriptorEditAction(QObject *parent)
 
 }
 
-specUndoCommand* specDescriptorEditAction::generateUndoCommand()
+void specDescriptorEditAction::execute()
 {
     specView *view = qobject_cast<specView*>(parent()) ;
     if (!view) return ;
@@ -190,11 +148,14 @@ specUndoCommand* specDescriptorEditAction::generateUndoCommand()
     if (!model) return ;
     QStringList descriptors = model->descriptors() ;
     descriptors.removeAll("") ;
-    stringListChangeDialog dialog(descriptors,this) ;
+    stringListChangeDialog dialog(descriptors) ;
     dialog.exec() ;
     if (dialog.result() != QDialog::Accepted) return ;
     QStringList toDelete = dialog.inactive() ;
     QMap<QString, QString> toExchange = dialog.active() ;
+    foreach(const QString& key, toExchange.keys())
+	    if (toExchange[key] == key)
+		    toExchange.remove(key) ;
 
     // TODO check for actual changes
 
@@ -208,5 +169,17 @@ specUndoCommand* specDescriptorEditAction::generateUndoCommand()
     specRenameDescriptorCommand *renameCommand = new specRenameDescriptorCommand(command) ;
     renameCommand->setRenamingMap(toExchange) ;
     renameCommand->setParentObject(model) ;
-    return command ;
+    command->setParentObject(model);
+    if (!library)
+    {
+	    command->redo();
+	    delete command ;
+    }
+    else
+	    library->push(command) ;
+}
+
+const std::type_info& specDescriptorEditAction::possibleParent()
+{
+	return typeid(specView) ;
 }

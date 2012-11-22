@@ -106,25 +106,7 @@ void specLogEntryItem::renameDescriptors(const QMap<QString, QString> &map)
     description.swap(newDescription) ;
 }
 
-QList<specDescriptor> specLogEntryItem::getDescriptors(const QStringList &descriptors) const
-{
-    QList<specDescriptor> values ;
-    foreach(const QString& key, descriptors)
-        values << description[key] ;
-    values << specModelItem::getDescriptors(descriptors) ;
-    return values ;
-}
-
-void specLogEntryItem::setDescriptors(const QStringList &descriptorNames, const QList<specDescriptor> &contentValues)
-{
-    QStringList::const_iterator descriptorIterator = descriptorNames.begin() ;
-    QList<specDescriptor>::const_iterator contentIterator = contentValues.begin() ;
-    while (descriptorIterator != descriptorNames.end() &&
-           contentIterator    != contentValues.  end())
-        description[*(descriptorIterator++)] = *(contentIterator++) ;
-}
-
-void specLogEntryItem::deleteDescriptors(const QString &key)
+void specLogEntryItem::deleteDescriptor(const QString &key)
 {
     description.remove(key) ;
 }

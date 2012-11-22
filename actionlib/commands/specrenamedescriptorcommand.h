@@ -7,7 +7,7 @@
 
 class specRenameDescriptorCommand : public specUndoCommand
 {
-    QMap<QString, Qstring> map ;
+    QMap<QString, QString> map ;
     void writeCommand(QDataStream &out) const ;
     void readCommand(QDataStream &in) ;
     void doIt();

@@ -32,7 +32,7 @@
 #include "specselectconnectedaction.h"
 #include "specsetmultilineaction.h"
 #include "specsvgitem.h"
-
+#include "specdescriptoreditaction.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -97,6 +97,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		bar->addSeparator() ;
 		addNewAction(bar, new specTreeAction(target)) ;
 		addNewAction(bar, new specMergeAction(target)) ;
+		addNewAction(bar, new specDescriptorEditAction(target)) ;
 		addNewAction(bar,new genericExportAction(target)) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specRemoveDataAction(target)) ;
@@ -139,8 +140,10 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		addNewAction(bar, new specCutAction(target)) ;
 		addNewAction(bar, new specPasteAction(target)) ;
 		addNewAction(bar, new specDeleteAction(target)) ;
-        bar->addSeparator() ;
-        addNewAction(bar, new specTreeAction(target)) ;
+		bar->addSeparator() ;
+		addNewAction(bar, new specTreeAction(target)) ;
+		addNewAction(bar, new specDescriptorEditAction(target)) ;
+
 
 		return bar ;
 	}

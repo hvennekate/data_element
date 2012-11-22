@@ -1,6 +1,52 @@
 #ifndef SPECDESCRIPTOREDITACTION_H
 #define SPECDESCRIPTOREDITACTION_H
 
+#include <QDialog>
+#include <QValidator>
+class QLineEdit ;
+class QCheckBox ;
+
+class stringListEntryWidget : public QWidget
+{
+    Q_OBJECT
+private:
+    QLineEdit *newValue ;
+    QCheckBox *Active ;
+private slots:
+    void checkStateChanged(int) ;
+public:
+    explicit stringListEntryWidget(QString content, QWidget *parent = 0) ;
+    void setAllWidgets(QList<stringListEntryWidget*> widgets) ;
+    QString content() const ;
+    QString oldContent() const ;
+    bool active() const ;
+signals:
+    void contentChanged() ;
+};
+
+class stringListEntryValidator : public QValidator
+{
+    Q_OBJECT
+    QList<stringListEntryWidget*> allWidgets ;
+public:
+    stringListEntryValidator(QList<stringListEntryWidget*> allWidgets, stringListEntryWidget* parent = 0) ;
+    State validate(QString &, int &) const ;
+    void fixup(QString &s) const;
+};
+
+class stringListChangeDialog : public QDialog
+{
+    Q_OBJECT
+    QList<stringListEntryWidget*> widgets ;
+public:
+    explicit stringListChangeDialog(QStringList strings, QWidget *parent = 0);
+    QStringList inactive() const ;
+    QMap<QString,QString> active() const ;
+};
+
+/* ============== Former Header ============== */
+
+
 #include "specundoaction.h"
 
 class specDescriptorEditAction : public specUndoAction
@@ -9,7 +55,8 @@ class specDescriptorEditAction : public specUndoAction
 public:
     explicit specDescriptorEditAction(QObject* parent = 0) ;
 private:
-    specUndoCommand* generateUndoCommand() ;
+    void execute() ;
+    const std::type_info& possibleParent() ;
 };
 
 #endif // STRINGLISTCHANGEDIALOG_H

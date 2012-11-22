@@ -27,5 +27,5 @@ void specDeleteDescriptorCommand::readCommand(QDataStream &in)
     }
 
 DELETEDESCRIPTORFUNCTIONMACRO(doIt, myModel->deleteDescriptor(key))
-DELETEDESCRIPTORFUNCTIONMACRO(undoIt, myModel->restoreDescriptor(contents.begin(), key))
+DELETEDESCRIPTORFUNCTIONMACRO(undoIt, QListIterator<specDescriptor> it(contents) ; myModel->restoreDescriptor(it, key))
 DELETEDESCRIPTORFUNCTIONMACRO(parentAssigned, if(contents.isEmpty()) myModel->dumpDescriptor(contents, key))

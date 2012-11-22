@@ -648,7 +648,7 @@ void specModel::deleteDescriptor(const QString &key)
         Descriptors.takeAt(i) ;
         DescriptorProperties.takeAt(i) ;
     }
-    root->deleteDescriptors(list) ;
+    root->deleteDescriptor(key) ;
 }
 
 void specModel::renameDescriptors(const QMap<QString, QString> &map)
