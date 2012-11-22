@@ -9,6 +9,8 @@ class specDeleteDescriptorCommand : public specUndoCommand
 private:
     QList<specDescriptor> contents ;
     QString key ;
+    qint16 position ;
+    spec::descriptorFlags flags ;
     void writeCommand(QDataStream &out) const ;
     void readCommand(QDataStream &in) ;
     void doIt() ;

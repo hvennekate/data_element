@@ -3,18 +3,21 @@
 
 specDeleteDescriptorCommand::specDeleteDescriptorCommand(specUndoCommand *parent,QString k)
     : specUndoCommand(parent),
-      key(k)
+      key(k),
+      position(0)
 {
 }
 
 void specDeleteDescriptorCommand::writeCommand(QDataStream &out) const
 {
-    out << key << contents ;
+    out << position << (qint8) flags << key << contents ;
 }
 
 void specDeleteDescriptorCommand::readCommand(QDataStream &in)
 {
-    in >> key >> contents ;
+	qint8 f ;
+    in >> position >> f >> key >> contents ;
+    flags = (spec::descriptorFlags) f ;
 }
 
 #define DELETEDESCRIPTORFUNCTIONMACRO(fname, code)     void specDeleteDescriptorCommand::fname() \
@@ -27,5 +30,10 @@ void specDeleteDescriptorCommand::readCommand(QDataStream &in)
     }
 
 DELETEDESCRIPTORFUNCTIONMACRO(doIt, myModel->deleteDescriptor(key))
-DELETEDESCRIPTORFUNCTIONMACRO(undoIt, QListIterator<specDescriptor> it(contents) ; myModel->restoreDescriptor(it, key))
-DELETEDESCRIPTORFUNCTIONMACRO(parentAssigned, if(contents.isEmpty()) myModel->dumpDescriptor(contents, key))
+DELETEDESCRIPTORFUNCTIONMACRO(undoIt, QListIterator<specDescriptor> it(contents) ; myModel->restoreDescriptor(position, flags, it, key))
+DELETEDESCRIPTORFUNCTIONMACRO(parentAssigned, if(contents.isEmpty()) \
+{ \
+	myModel->dumpDescriptor(contents, key) ; \
+	position = myModel->descriptors().indexOf(key) ; \
+	flags = myModel->descriptorProperties()[position] ; \
+})

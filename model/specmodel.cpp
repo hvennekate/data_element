@@ -664,12 +664,12 @@ void specModel::dumpDescriptor(QList<specDescriptor> &destination, const QString
     root->dumpDescriptor(destination, key) ;
 }
 
-void specModel::restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key)
+void specModel::restoreDescriptor(qint16 position, spec::descriptorFlags flags, QListIterator<specDescriptor> &origin, const QString &key)
 {
     if (!Descriptors.contains(key))
     {
-        Descriptors << key ;
-        DescriptorProperties << spec::def ;
+	Descriptors.insert(position, key) ;
+	DescriptorProperties.insert(position, flags) ;
     }
     root->restoreDescriptor(origin, key) ;
 }

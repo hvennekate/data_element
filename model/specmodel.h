@@ -88,7 +88,7 @@ public:
     void renameDescriptors(const QMap<QString, QString>&) ;
     void deleteDescriptor(const QString&) ;
     void dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const ;
-    void restoreDescriptor(QListIterator<specDescriptor>& origin, const QString& key) ;
+    void restoreDescriptor(qint16 position, spec::descriptorFlags flags, QListIterator<specDescriptor>& origin, const QString& key) ;
 	
 	// QAbstractItemModel virtual functions:
 	
