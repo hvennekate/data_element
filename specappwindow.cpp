@@ -114,6 +114,12 @@ void specAppWindow::createMenus()
 
 void specAppWindow::about()
 {
-	QMessageBox::about(this, tr("About SpecDataElement"), tr("This is a simple program for efficiently managing two dimensional data and keeping track of experimental logs.")) ;
+    QMessageBox::about(this, tr("About SpecDataElement"),
+                       tr("This is a simple program for efficiently managing two dimensional data and keeping track of experimental logs.\n\n"
+                          "It makes use of the following libraries:\n"
+                          "- Qt 4.8 (qt.digia.com)\n"
+                          "- Qwt 6 (qwt.sourceforge.net)\n"
+                          "- muParser 2.2 (muparser.sourceforge.net)\n"
+                          "- lmfit 3.3 (joachimwuttke.de/lmfit)")) ;
 }
 
