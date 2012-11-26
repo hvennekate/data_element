@@ -105,8 +105,11 @@ bool CanvasPicker::eventFilter ( QObject *object, QEvent *e )
 		{
 			select ( ( ( QMouseEvent* ) e )->pos() );
 			if(d_selectedCurve)
+			{
 				movePointExplicitly() ;
-			return true;
+				return true;
+			}
+			return false ;
 		}
 		case QEvent::MouseButtonPress:
 		{

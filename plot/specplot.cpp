@@ -164,7 +164,17 @@ void specPlot::autoScale(const QwtPlotItemList& allItems)
 		boundaries.setBottom(zoomBase.bottom()) ;
 	}
 
-    zoom->changeZoomBase(boundaries.isValid() ? boundaries : QRectF(-10,-10,20,20)) ; // TODO move change to top (-> per axis)
+	if (boundaries.width() <= 0)
+	{
+		boundaries.setLeft(-10);
+		boundaries.setWidth(20) ;
+	}
+	if (boundaries.height() <= 0)
+	{
+		boundaries.setTop(-10);
+		boundaries.setHeight(20);
+	}
+	zoom->changeZoomBase(boundaries) ;
 }
 
 specPlot::~specPlot()
