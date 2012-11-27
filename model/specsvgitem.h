@@ -37,6 +37,7 @@ private:
 	QRectF boundRect() const ;
 	QPointF getPoint(SVGCornerPoint, const QRectF&) const ;
 	void setBoundRect(const QRectF&) ;
+	QWidget* legendItem() const ;
 public:
 	specSVGItem(specFolderItem* par=0, QString description="") ;
 	int rtti() const { return spec::SVGItem ; }

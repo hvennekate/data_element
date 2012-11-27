@@ -23,6 +23,7 @@ void specSVGItem::detach()
 	if (oldPlot && oldPlot->svgPicker())
 		oldPlot->svgPicker()->removeSelectable(this);
 	image.detach();
+	specModelItem::detach() ;
 }
 
 void specSVGItem::highlight(bool highlight)
@@ -282,4 +283,9 @@ QString specSVGItem::toolTip(const QString &column) const
     return QString("%1<br><img src=\"data:image/png;base64,%2\"></img>")
             .arg(specModelItem::toolTip(column))
             .arg(QString(buffer.data().toBase64())) ;
+}
+
+QWidget* specSVGItem::legendItem() const
+{
+	return 0 ;
 }
