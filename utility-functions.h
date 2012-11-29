@@ -29,11 +29,10 @@ bool comparePoints(const QPointF&, const QPointF&) ;
 
 /*! Accumulate items equal to begin and average them in return value.
     begin will be changed to past the last accumulated item.*/
-template<class T, class forwardIterator> // TODO mehr benutzen!
-inline T average(forwardIterator& begin,const forwardIterator& end,
-		 bool (*equal)(const T&,const T&))
+template<typename T, class forwardIterator, typename binaryPredicate> // TODO mehr benutzen!
+inline T average(forwardIterator& begin,const forwardIterator& end, binaryPredicate equal, const T first)
 {
-	const T first = *begin++ ;
+	begin++ ;
 	T retVal = first ;
 	int count = 1 ;
 	while (begin != end && equal(*begin,first))
@@ -44,34 +43,34 @@ inline T average(forwardIterator& begin,const forwardIterator& end,
 	return retVal /= (double) count ;
 }
 
-template<class T, class forwardIterator> // TODO mehr benutzen!
-inline T average(forwardIterator& begin,const forwardIterator& end)
+//template<class T, class forwardIterator> // TODO mehr benutzen!
+//inline T average(forwardIterator& begin,const forwardIterator& end)
+//{
+//	const T first = *begin++ ;
+//	T retVal = first ;
+//	int count = 1 ;
+//	while (begin != end && *begin == first)
+//	{
+//		retVal += *begin++ ;
+//		++ count ;
+//	}
+//	return retVal /= (double) count ;
+//}
+
+template<class forwardIterator, class outputIterator, typename binaryPredicate>
+inline void averageToNew(forwardIterator begin, forwardIterator end,
+		  binaryPredicate equal, outputIterator target)
 {
-	const T first = *begin++ ;
-	T retVal = first ;
-	int count = 1 ;
-	while (begin != end && *begin == first)
-	{
-		retVal += *begin++ ;
-		++ count ;
-	}
-	return retVal /= (double) count ;
+	while (begin != end)
+		*target++ = average(begin, end, equal, *begin) ;
 }
 
-template<class T, class forwardIterator, class outputIterator>
-inline void averageToNew(forwardIterator begin, forwardIterator end,
-		  bool (*equal)(const T&,const T&), outputIterator target)
-{
-	while (begin != end)
-		*target++ = average(begin, end, equal) ;
-} ;
-
-template<class forwardIterator, class outputIterator>
-inline void averageToNew(forwardIterator begin, forwardIterator end,
-		  outputIterator target)
-{
-	while (begin != end)
-		*target++ = average(begin, end) ;
-} ;
+//template<class forwardIterator, class outputIterator>
+//inline void averageToNew(forwardIterator begin, forwardIterator end,
+//		  outputIterator target)
+//{
+//	while (begin != end)
+//		*target++ = average(begin, end) ;
+//}
 
 #endif

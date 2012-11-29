@@ -252,7 +252,7 @@ QVector<specDataPoint> specDataItem::getDataExcept(const QList<specRange*>& rang
 	{
 		specDataPoint point = data[i] ;
 		applyCorrection(point) ;
-		bool include = true ;
+		bool include = true ; // TODO std::copy_remove
 		foreach(specRange* range, ranges)
 		{
 			if (range->contains(point.nu))

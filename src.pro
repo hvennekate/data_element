@@ -113,7 +113,8 @@ SOURCES += main.cpp \
     actionlib/actions/specsetmultilineaction.cpp \
     actionlib/commands/specdeletedescriptorcommand.cpp \
     actionlib/commands/specrenamedescriptorcommand.cpp \
-    actionlib/actions/specdescriptoreditaction.cpp
+    actionlib/actions/specdescriptoreditaction.cpp \
+    actionlib/actions/specaverageneighboraction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -228,7 +229,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/specsetmultilineaction.h \
     actionlib/commands/specdeletedescriptorcommand.h \
     actionlib/commands/specrenamedescriptorcommand.h \
-    actionlib/actions/specdescriptoreditaction.h
+    actionlib/actions/specdescriptoreditaction.h \
+    actionlib/actions/specaverageneighboraction.h
 
 INCLUDEPATH += kinetic \
 	log \

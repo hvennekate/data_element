@@ -1,7 +1,6 @@
 #ifndef SPECREMOVEDATAACTION_H
 #define SPECREMOVEDATAACTION_H
 
-#include "specdataview.h"
 #include "specrequiresitemaction.h"
 
 class specRemoveDataAction : public specRequiresItemAction

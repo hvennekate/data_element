@@ -2,6 +2,7 @@
 #include "specmulticommand.h"
 #include "specexchangedatacommand.h"
 #include "cutbyintensitydialog.h"
+#include "specdataview.h"
 
 specRemoveDataAction::specRemoveDataAction(QObject *parent)
 	: specRequiresItemAction(parent)

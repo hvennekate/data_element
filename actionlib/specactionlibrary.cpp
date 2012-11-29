@@ -33,6 +33,7 @@
 #include "specsetmultilineaction.h"
 #include "specsvgitem.h"
 #include "specdescriptoreditaction.h"
+#include "specaverageneighboraction.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -102,6 +103,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		bar->addSeparator() ;
 		addNewAction(bar, new specRemoveDataAction(target)) ;
 		addNewAction(bar, new specAverageDataAction(target)) ;
+		addNewAction(bar, new specAverageNeighborAction(target)) ;
 		addNewAction(bar, new changePlotStyleAction(target)) ;
 
 		return bar ;
