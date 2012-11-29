@@ -56,7 +56,8 @@ CanvasPicker::CanvasPicker ( specPlot *plot )
 	    "Points in this plot may be moved by dragging (if indicated) or positioned precisely by "
 	    "double clicking on them.  If zooming is enabled, step-wise zoom may be performed using "
 	    "the middle mouse button (click and drag the zoom region).  Clicking the right mouse "
-	    "button will go back one zoom step.";
+	    "button will go back one zoom step, while clicking the middle mouse button while holding "
+	    "the Ctrl key will go back to the unzoomed view.";
 #if QT_VERSION >= 0x040000
 	canvas->setWhatsThis ( text );
 #else

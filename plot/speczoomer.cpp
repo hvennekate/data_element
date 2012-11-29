@@ -8,7 +8,7 @@ specZoomer::specZoomer(QwtPlotCanvas *canvas)
 	
 	setMousePattern(QwtEventPattern::MouseSelect1, Qt::MidButton) ;
 	setMousePattern(QwtEventPattern::MouseSelect4, Qt::MidButton) ;
-	setMousePattern(QwtEventPattern::MouseSelect2, Qt::RightButton, Qt::ControlModifier);
+	setMousePattern(QwtEventPattern::MouseSelect2, Qt::MidButton, Qt::ControlModifier);
 	setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
 	
 	setRubberBandPen(QColor(Qt::darkBlue)) ;
