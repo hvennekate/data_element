@@ -83,6 +83,7 @@ specView::specView(QWidget* parent)
    state(0),
    actionLibrary(0)
 {
+	setAutoExpandDelay(500);
 	setVerticalScrollMode(QAbstractItemView::ScrollPerItem);
 	
 	setAlternatingRowColors(true) ;
