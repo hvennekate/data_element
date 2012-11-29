@@ -19,7 +19,14 @@
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
-     <widget class="QwtPlot" name="dataPreview"/>
+     <widget class="specPlot" name="dataPreview">
+      <property name="frameShape">
+       <enum>QFrame::StyledPanel</enum>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Raised</enum>
+      </property>
+     </widget>
      <widget class="QWidget" name="layoutWidget">
       <layout class="QHBoxLayout" name="horizontalLayout">
        <item>
@@ -140,9 +147,10 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QwtPlot</class>
+   <class>specPlot</class>
    <extends>QFrame</extends>
-   <header>qwt_plot.h</header>
+   <header>specplot.h</header>
+   <container>1</container>
   </customwidget>
   <customwidget>
    <class>specSplitter</class>

@@ -146,10 +146,24 @@
      <widget class="QWidget" name="layoutWidget2">
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <widget class="QwtPlot" name="itemPreview"/>
+        <widget class="specPlot" name="itemPreview">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+        </widget>
        </item>
        <item>
-        <widget class="QwtPlot" name="metaPlot"/>
+        <widget class="specPlot" name="metaPlot">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+        </widget>
        </item>
        <item>
         <widget class="QCheckBox" name="styleFit">
@@ -176,9 +190,10 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>QwtPlot</class>
+   <class>specPlot</class>
    <extends>QFrame</extends>
-   <header>qwt_plot.h</header>
+   <header>specplot.h</header>
+   <container>1</container>
   </customwidget>
  </customwidgets>
  <resources/>
