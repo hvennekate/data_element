@@ -16,8 +16,9 @@ bool specDataPoint::operator<(const specDataPoint& toCompare) const
 { return nu < toCompare.nu ;}
 
 bool specDataPoint::operator==(const specDataPoint& toCompare) const
-{ return toCompare.nu == nu ; }
-// TODO Introduce time tolerance
+{
+    return toCompare.nu == nu ;
+}
 
 bool specDataPoint::operator!=(const specDataPoint& toCompare) const
 { return !(toCompare == *this) ; }

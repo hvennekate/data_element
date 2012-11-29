@@ -150,14 +150,20 @@ specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 
 bool compareDataPoints(const specDataPoint& a, const specDataPoint& b)
 {
-	return a.nu == b.nu ;
+    // this is an evil hack to overcome double precision's limitations...
+#ifdef DOUBLEDEVIATIONCORRECTION
+    return fabs(a.nu - b.nu) <=
+            (1./(1L << (NUMBEROFFRACTIONBITSINDOUBLE-ilogb(a.nu)))) ;
+#else
+    return a == b ;
+#endif
 }
 
 void specDataItem::flatten()
 {
 	qSort(data) ;
 	QVector<specDataPoint> newData ;
-	averageToNew(data.begin(), data.end(), compareDataPoints, std::back_inserter(newData)) ;
+    averageToNew(data.begin(), data.end(), compareDataPoints, std::back_inserter(newData)) ;
 
     data.swap(newData) ;
 	invalidate() ;
