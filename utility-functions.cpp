@@ -357,6 +357,9 @@ QList<specModelItem*> readHVMeasurement(const QString& measurement, QString file
                 double mintv = (entry++)->toDouble() ;
                 dataPoints << specDataPoint(currentWns->at(j), value, mintv) ;
             }
+            headerItems["nu"] = (dataPoints.size() > 1) ?
+                        (dataPoints.first().nu + dataPoints.last().nu)/2. :
+                        ((dataPoints.size() == 1) ? dataPoints.first().nu : NAN) ;
             if (polarisatorMessung) headerItems["Polarisation"] = i % 2 ;
             newItems << new specDataItem(dataPoints, headerItems) ;
         }
