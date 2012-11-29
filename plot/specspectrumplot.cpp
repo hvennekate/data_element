@@ -339,29 +339,32 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 		if (referenceSpectrum.size() > 1 && !pointsInRange.empty()) // TODO general return condition if pointsInRange is empty
 		{
 			// try to find two bordering points for linear interpolation for each point in range.
-			for (QList<QPointF>::iterator i = pointsInRange.begin() ; i != pointsInRange.end() ; ++i)
+            QList<QPointF>::iterator i = pointsInRange.begin() ;
+            while (i != pointsInRange.end())
 			{
-				double x = i->x() ;
+                double x = i->x() ;
 				// if exact same x value is contained in reference, just take it.
 				if (referenceSpectrum.contains(x))
-				{
 					i->setY(i->y()-referenceSpectrum[x]) ;
-					continue ;
-				}
-				QMap<double,double>::const_iterator pointAfter = referenceSpectrum.upperBound(x);
-				// no points for lin interpol found -> take point from correction list
-				if (pointAfter == referenceSpectrum.begin() || pointAfter == referenceSpectrum.end())
-				{
-					pointsInRange.erase(i) ;
-					continue ;
-				}
-				QMap<double,double>::const_iterator pointBefore  = pointAfter - 1;
-				// subtract linear interpolation
-				i->setY(i->y()
-					- pointBefore.value()
-					- (pointAfter.value() - pointBefore.value()) /
-					  (pointAfter.key()   - pointBefore.key()  ) *
-					  (x - pointBefore.key())) ;
+                else
+                {
+                    QMap<double,double>::const_iterator pointAfter = referenceSpectrum.upperBound(x);
+                    // no points for lin interpol found -> take point from correction list
+                    if (pointAfter == referenceSpectrum.begin() || // no point before to interpolate with
+                            pointAfter == referenceSpectrum.end()) // no point after to interpolate with
+                    {
+                        i = pointsInRange.erase(i) ;
+                        continue ;
+                    }
+                    QMap<double,double>::const_iterator pointBefore  = pointAfter - 1;
+                    // subtract linear interpolation
+                    i->setY(i->y()
+                        - pointBefore.value()
+                        - (pointAfter.value() - pointBefore.value()) /
+                          (pointAfter.key()   - pointBefore.key()  ) *
+                          (x - pointBefore.key())) ;
+                }
+                ++i ; // move on...
 			}
 		}
 
