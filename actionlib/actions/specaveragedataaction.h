@@ -8,6 +8,7 @@ class specAverageDataAction : public specRequiresItemAction
     Q_OBJECT
 public:
 	explicit specAverageDataAction(QObject *parent = 0);
+    const std::type_info& possibleParent() ;
 protected:
 	specUndoCommand* generateUndoCommand() ;
 };

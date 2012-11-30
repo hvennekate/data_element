@@ -275,7 +275,7 @@ bool specMergeAction::getMergeCriteria(QList<stringDoublePair>& toCompare, const
 		descriptorLayout->addWidget(new QLabel("Numerical tolerance",descriptorMatch),0,1);
 	QScrollArea *scrollArea = new QScrollArea ;
 	QWidget *areaWidget = new QWidget ;
-	QCheckBox *spectralAdaptation = new QCheckBox(tr("Try to align merged data sets\n using offset/slope correction"),descriptorMatch) ;
+    QCheckBox *spectralAdaptation = new QCheckBox(tr("Try to align merged data sets using offset/slope correction"),descriptorMatch) ;
 	areaWidget->setLayout(descriptorLayout) ;
 	scrollArea->setWidget(areaWidget) ;
 	dialogLayout->addWidget(scrollArea) ;
