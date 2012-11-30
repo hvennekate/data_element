@@ -4,7 +4,9 @@
 #include <QPrintDialog>
 #include <qwt_plot_renderer.h>
 #include <QMessageBox>
+#ifndef WIN32BUILD
 #include <csignal>
+#endif
 
 specPrintPlotAction::specPrintPlotAction(QObject *parent) :
 	specUndoAction(parent),

@@ -86,6 +86,7 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 		return 0 ;
 
 	int numAverages = number->value() ;
+    if (byPointNumber->isChecked() && numAverages == 1 && !running->isChecked()) return 0 ;
 	specMultiCommand *groupCommand = new specMultiCommand ;
     groupCommand->setParentObject(model) ;
     groupCommand->setMergeable(false) ;
