@@ -110,6 +110,9 @@ specUndoCommand* dataItemProperties::changeCommands(QObject* parent)
 			       item.offset == originalItem->offset &&
 			       item.xshift == originalItem->xshift &&
 			       item.factor == originalItem->factor) ;
+
+    if (correctionUnchanged && dataUnchanged) return 0 ;
+
 	specUndoCommand *parentMulti = 0 ;
 	if (!dataUnchanged && !correctionUnchanged)
 	{
