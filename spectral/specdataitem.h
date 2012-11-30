@@ -38,6 +38,7 @@ public:
 	/* For undo commands managing raw data */
 	const QVector<specDataPoint>& allData() const { return data ; }
 	void setData(const QVector<specDataPoint>&) ;
+    void swapData(QVector<specDataPoint>&) ;
 	QVector<specDataPoint> getDataExcept(const QList<specRange*>& ranges) ;
 	void applyCorrection(QVector<specDataPoint>&) const ;
 	void reverseCorrection(QVector<specDataPoint>&) const ;

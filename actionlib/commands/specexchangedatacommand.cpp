@@ -34,14 +34,10 @@ void specExchangeDataCommand::undoIt()
 
 void specExchangeDataCommand::doIt()
 {
-	if (!item)
-		return ;
-	specDataItem *pointer = (specDataItem*) (item->firstItem()) ;
-	QVector<specDataPoint> currentData(pointer->allData()) ; // TODO introduce swap here via function of the data item
-	pointer->setData(data);
-	data = currentData ;
-	if (pointer->plot()) // TODO is this really necessary?
-		pointer->plot()->replot() ;
+    if (!item) return ;
+    specDataItem *pointer = dynamic_cast<specDataItem*>(item->firstItem()) ;
+    if (!pointer) return ;
+    pointer->swapData(data);
 }
 
 void specExchangeDataCommand::writeCommand(QDataStream &out) const

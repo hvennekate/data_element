@@ -279,11 +279,11 @@ void specDataItem::reverseCorrection(QVector<specDataPoint> &newData) const
 		reverseCorrection(newData[i]) ;
 }
 
-void specDataItem::setData(const QVector<specDataPoint> &newData)
+void specDataItem::swapData(QVector<specDataPoint> &newData)
 {
-	data = newData ;
-	qSort(data) ;
-	invalidate();
+    data.swap(newData) ;
+    qSort(data) ;
+    invalidate() ;
 }
 
 specDataItem::specDataItem(const specDataItem &other)
