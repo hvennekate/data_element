@@ -11,6 +11,7 @@ class QAction ;
 class CanvasPicker ;
 class specActionLibrary ;
 class specView ;
+class QwtPlotMarker ;
 
 class plotAxisEdit : public QLineEdit
 {
@@ -43,6 +44,7 @@ private:
         *legendAction ;
 	CanvasPicker *MetaPicker, *SVGpicker ; // TODO make pickers more prominent: accessible through
 											// function, attach metaRanges direktly to picker etc.
+    QwtPlotMarker *zeroLine ;
 	bool autoScaling ;
 	void readFromStream(QDataStream &in);
 	void writeToStream(QDataStream &out) const ;

@@ -12,6 +12,7 @@
 #include <QApplication>
 #include <qwt_legend.h>
 #include <QMouseEvent>
+#include <qwt_plot_marker.h>
 
 // TODO solve the myth of autoscaleaxis...
 
@@ -20,6 +21,7 @@ specPlot::specPlot(QWidget *parent)
 	  replotting(false),
 	  MetaPicker(0),
 	  SVGpicker(0),
+      zeroLine(0),
 	  autoScaling(true),
       undoP(0),
       xminEdit(this),
@@ -28,6 +30,11 @@ specPlot::specPlot(QWidget *parent)
       ymaxEdit(this),
       view(0)
 {
+    zeroLine = new QwtPlotMarker ;
+    zeroLine->setLineStyle(QwtPlotMarker::HLine);
+    zeroLine->setLinePen(QPen(Qt::DotLine));
+    zeroLine->attach(this);
+
 	MetaPicker = new CanvasPicker(this) ;
 	SVGpicker  = new CanvasPicker(this) ;
 	modifySVGs    = new QAction(QIcon(":/resizeImage.png"),"Modify SVGs",this) ;
@@ -136,11 +143,12 @@ void specPlot::autoScale(const QwtPlotItemList& allItems)
 	foreach(QwtPlotItem *item, allItems)
 	{
 		if(!(dynamic_cast<specSVGItem*>(item))
-				&& (pointer = dynamic_cast<specModelItem*>(item)))
+                && !(dynamic_cast<specRange*>(item)))
 		{
-			pointer->revalidate() ;
-			if (pointer->boundingRect().isValid())
-				boundaries |= pointer->boundingRect() ;
+            if ((pointer = dynamic_cast<specModelItem*>(item)))
+                pointer->revalidate() ;
+            if (item->boundingRect().isValid())
+                boundaries |= item->boundingRect() ;
 		}
 		if (specMetaRange* r = dynamic_cast<specMetaRange*>(item))
 		{
@@ -179,6 +187,7 @@ void specPlot::autoScale(const QwtPlotItemList& allItems)
 
 specPlot::~specPlot()
 {
+    delete zeroLine ;
 	MetaPicker->purgeSelectable();
 	SVGpicker->purgeSelectable();
 }
