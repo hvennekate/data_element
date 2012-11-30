@@ -10,6 +10,7 @@
 #include "specmetaparser.h"
 #include "canvaspicker.h"
 #include <QDebug>
+#include <specplot.h>
 
 QString specMetaVariable::extract(QString & source, const QRegExp& expression)
 {
@@ -155,11 +156,10 @@ void specMetaVariable::produceRanges(QSet<specPlot *> plots, QColor color)
 	if (plots.size() != ranges.size())
 	{
 		clearRanges(); // TODO : consider replotting
-        for (int i = 0 ; i < plots.size() ; ++i)
-		{
-			specMetaRange *range = new specMetaRange(minValue(),maxValue(),this) ;
-			ranges << range ;
-		}
+        foreach(specPlot* plot, plots)
+            ranges << new specMetaRange(minValue(),maxValue(),
+                                          (plot->axisScaleDiv(QwtPlot::yLeft)->lowerBound()+
+                                           plot->axisScaleDiv(QwtPlot::yLeft)->upperBound())/2.,this) ;
 	}
 	int i = 0 ;
 	foreach(specPlot* plot, plots)

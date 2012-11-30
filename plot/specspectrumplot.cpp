@@ -196,7 +196,9 @@ void specSpectrumPlot::alignmentChanged(QAction *action)
 	else if (action == addRangeAction)
 	{
 		double min = axisScaleDiv(QwtPlot::xBottom)->lowerBound(), max = axisScaleDiv(QwtPlot::xBottom)->upperBound() ;
-		specRange *newRange = new specRange(min+.1*(max-min),max-.1*(max-min)) ;
+        specRange *newRange = new specRange(min+.1*(max-min),max-.1*(max-min),
+                                            (axisScaleDiv(QwtPlot::yLeft)->lowerBound()+
+                                             axisScaleDiv(QwtPlot::yLeft)->upperBound())/2.) ;
 		newRange->attach(this) ;
 		alignmentPicker->addSelectable(newRange) ;
 	}

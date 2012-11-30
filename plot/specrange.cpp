@@ -3,12 +3,12 @@
 #include <QTextStream>
 #include "specplot.h"
 
-specRange::specRange(double min, double max)
+specRange::specRange(double min, double max, double yinit)
 	: QwtInterval(min,max,QwtInterval::IncludeBorders) // TODO check if ok
 { // TODO set curve properties
 	QVector<double> x, y ;
 	x << min << max ;
-	y << 0 << 0 ;
+    y << yinit << yinit ;
 	QwtPlotCurve::setSamples(x,y) ;
 	
 	QPen pen ( QColor ( 255,139,15,100 ) ) ;

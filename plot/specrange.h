@@ -14,17 +14,11 @@ private:
 protected:
 	double yVal ;
 public:
-	specRange ( double,double );
+    specRange ( double,double, double y = 0 );
 	void pointMoved ( const int&, const double&, const double& ) ;
 	virtual void refreshPlotData() ;
 	int rtti() const { return spec::zeroRange ; }
 	~specRange();
 };
-
-class specSelectRange : public specRange
-{
-public:
-	specSelectRange(double a, double b) : specRange(a,b) {}
-} ;
 
 #endif
