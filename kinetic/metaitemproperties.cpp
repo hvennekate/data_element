@@ -279,7 +279,7 @@ specUndoCommand* metaItemProperties::changedConnections(QObject *parent)
 	addCommand->setParentObject(parent) ;
 	indexList = generateConnectionList(newConnections) ;
 	addCommand->setItems(model->index(originalItem), indexList) ;
-	parentCommand->setText(tr("Modify meta item propertis"));
+    parentCommand->setText(tr("Modify meta item properties"));
 
 	if (ui->styleFit->checkState() != originalItem->styleFitCurve)
 	{

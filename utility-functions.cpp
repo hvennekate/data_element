@@ -105,7 +105,7 @@ specModelItem* readJCAMPBlock(QTextStream& in)
 		}
 		else if (parsedLabel == "XYDATA") // TODO keep this and interpret after total block has been read (in case any important keywords follow later)
 		{
-			QString content = ldr.second.content() ;
+            QString content = ldr.second.content(true) ;
 			QTextStream dataStream(&content) ;
 			QString typeOfData = dataStream.readLine() ;
 			if (typeOfData=="(X++(Y..Y))")
@@ -118,16 +118,16 @@ specModelItem* readJCAMPBlock(QTextStream& in)
 		else
 			descriptors[ldr.first] = ldr.second ;
 	}
-	specModelItem *item = 0 ;
+    specModelItem *item = 0 ;
 	
 	if(descriptors["DATA TYPE"].content() == "LINK")
 	{
 		item = new specFolderItem() ;
 		// pass description down to children
-		for(QHash<QString,specDescriptor>::iterator i = descriptors.begin() ; i != descriptors.end() ; i++)
+        for(QHash<QString,specDescriptor>::iterator i = descriptors.begin() ; i != descriptors.end() ; i++)
 			foreach (specModelItem *child, children)
-				child->changeDescriptor(i.key(),i.value().content()) ;
-		item->addChildren(children,0) ;
+                child->changeDescriptor(i.key(),i.value().content()) ;
+        item->addChildren(children,0) ;
 	}
 	else
 	{
@@ -154,11 +154,11 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 		QString line = in.readLine() ;
 		QString x = line.left(line.indexOf(specialCharacters)) ;
 		line.remove(0,line.indexOf(specialCharacters)) ;
-		if (!xvals.isEmpty() && fabs((x.toDouble()-((xvals.last()+step)/xfactor))/ x.toDouble()) > 1e-5 ) // TODO arbitrary limit!!
+//    	if (!xvals.isEmpty() && fabs((x.toDouble()-((xvals.last()+step)/xfactor))/ x.toDouble()) > 1e-5 ) // TODO arbitrary limit!!
 			// TODO check first and last X and Y val.
-		xvals << (xvals.isEmpty() ? x.toDouble()*xfactor : xvals.last()+step) ;
+        xvals << (xvals.isEmpty() ? x.toDouble()*xfactor : xvals.last()+step) ;
 		// yvalue check -> (5.8.2) in paper Appl. Spec. 42(1), 151
-		if(wasDiff)
+        if(wasDiff)
 		{
 			xvals.remove(xvals.size()-1) ;
 			// identify, retrieve and remove item from head of string.
@@ -275,7 +275,7 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 	// turn vectors into data
 	if (yvals.size() != xvals.size()) return ; // should not be necessary
 	
-	for (int i = 0 ; i < xvals.size() ; i++)
+    for (int i = 0 ; i < xvals.size() ; i++)
         data << specDataPoint(xvals[i],yvals[i],0) ;
 }
 
