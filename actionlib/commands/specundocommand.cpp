@@ -2,7 +2,7 @@
 
 specUndoCommand::specUndoCommand(specUndoCommand *parent) :
     QUndoCommand(parent),
-	pO(0) //parent->parentWidget()) // TODO adapt calling code
+    pO(parent ? parent->parentObject() : 0) //parent->parentWidget()) // TODO adapt calling code
 {
 }
 
