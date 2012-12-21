@@ -376,9 +376,10 @@ QList<specModelItem*> readHVFile(QFile& file)
 	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system
     QStringList measurements = in.readAll().split(QRegExp("\n(?=Solvens)"), QString::SkipEmptyParts) ;
 
-    QList<specModelItem*> newItems ;
+//    QList<specModelItem*> newItems ;
     QString filename = QFileInfo(file.fileName()).fileName() ;
-    if (measurements.size() == 1) newItems = readHVMeasurement(measurements.first(), filename) ;
+    specFolderItem *top = new specFolderItem(0,filename) ;
+    if (measurements.size() == 1) top->addChildren(readHVMeasurement(measurements.first(), filename)) ;
     else
     {
         int counter = 0 ;
@@ -386,10 +387,10 @@ QList<specModelItem*> readHVFile(QFile& file)
         {
             specFolderItem *folder = new specFolderItem(0, QString::number(counter++)) ;
             folder->addChildren(readHVMeasurement(measurement, filename)) ;
-            newItems << folder ;
+            top->addChild(folder, top->children()) ;
         }
     }
-    return newItems ;
+    return QList<specModelItem*>() << top ;
 }
 
 QPair<QString,QString> interpretString(QString& string)
