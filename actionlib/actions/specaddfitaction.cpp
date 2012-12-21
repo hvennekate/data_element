@@ -2,6 +2,7 @@
 #include "specmetaitem.h"
 #include "specfitcurve.h"
 #include "specexchangefitcurvecommand.h"
+#include "specmulticommand.h"
 
 specAddFitAction::specAddFitAction(QObject *parent) :
     specItemAction(parent)
@@ -15,12 +16,23 @@ specAddFitAction::specAddFitAction(QObject *parent) :
 
 specUndoCommand* specAddFitAction::generateUndoCommand()
 {
-	specMetaItem *item = dynamic_cast<specMetaItem*>(currentItem) ; // TODO template itemAction
-	if (!item) return 0 ;
-	if (item->getFitCurve()) return 0 ;
-	specExchangeFitCurveCommand *command = new specExchangeFitCurveCommand ;
-	command->setText(tr("Add fit curve"))  ;
-	command->setParentObject(model) ;
-	command->setup(currentIndex, new specFitCurve) ;
-	return command ;
+    specMultiCommand *parentCommand = new specMultiCommand ;
+    parentCommand->setText(tr("Add fit curve")) ;
+    parentCommand->setParentObject(model) ;
+    foreach(QModelIndex index, selection)
+    {
+        specMetaItem *item = dynamic_cast<specMetaItem*>(model->itemPointer(index)) ; // TODO template itemAction
+        if (!item) continue ;
+        if (item->getFitCurve()) continue ;
+        specExchangeFitCurveCommand *command = new specExchangeFitCurveCommand(parentCommand) ;
+        // TODO changed this to inherit parentObject from parent -> check other places for redundancy: command->setParentObject(model) ;
+        command->setup(currentIndex, new specFitCurve) ;
+    }
+
+    if (!parentCommand->childCount())
+    {
+        delete parentCommand ;
+        return 0 ;
+    }
+    return parentCommand ;
 }
