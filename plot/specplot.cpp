@@ -13,6 +13,7 @@
 #include <qwt_legend.h>
 #include <QMouseEvent>
 #include <qwt_plot_marker.h>
+#include "specfitcurve.h"
 
 // TODO solve the myth of autoscaleaxis...
 
@@ -144,7 +145,8 @@ void specPlot::autoScale(const QwtPlotItemList& allItems)
 	{
 		if(!(dynamic_cast<specSVGItem*>(item))
                 && !(dynamic_cast<specRange*>(item))
-                && !(dynamic_cast<QwtPlotSvgItem*>(item)))
+                && !(dynamic_cast<QwtPlotSvgItem*>(item))
+                && !(dynamic_cast<specFitCurve*>(item)))
 		{
             if ((pointer = dynamic_cast<specModelItem*>(item)))
                 pointer->revalidate() ;
