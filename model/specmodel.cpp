@@ -153,7 +153,7 @@ bool specModel::setHeaderData (int section,Qt::Orientation orientation,const QVa
 		return true ;
 	}
 	
-	if (role == 34) // TODO introduce in names.h
+    if (role == spec::descriptorPropertyRole) // TODO introduce in names.h
 	{
 		DescriptorProperties[section] = (spec::descriptorFlags) value.toInt() ;
 		return true ;
@@ -196,7 +196,7 @@ void specModel::checkForNewDescriptors(const QList<specModelItem*>& list, const 
 			{
 				insertColumns(columnCount(parent),1,parent) ;
 				setHeaderData(columnCount(parent)-1,Qt::Horizontal,descriptor) ;
-				setHeaderData(columnCount(parent)-1,Qt::Horizontal,(int) pointer->descriptorProperties(descriptor), 34) ;
+                setHeaderData(columnCount(parent)-1,Qt::Horizontal,(int) pointer->descriptorProperties(descriptor), spec::descriptorPropertyRole) ;
 			}
 		}
 	}
@@ -341,9 +341,12 @@ QVariant specModel::headerData(int section, Qt::Orientation orientation,
 		    int role) const
 {
 	Q_UNUSED(orientation)
-	if (role != Qt::DisplayRole)
-		return QVariant();
-	return Descriptors[section] ;
+    if (role == Qt::DisplayRole)
+        return Descriptors[section] ;
+    if (role == spec::descriptorPropertyRole)
+        return (int) DescriptorProperties[section] ;
+    return QVariant();
+
 }
 
 bool specModel::removeRows(int position, int rows, const QModelIndex &parent) 
