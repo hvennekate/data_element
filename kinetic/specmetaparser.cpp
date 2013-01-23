@@ -79,6 +79,7 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 		symbols << symbol ;
 		evaluators << specMetaVariable::factory(value,this) ;
 	}
+    evaluators.removeAll(0) ;
 	valueVector.resize(symbols.size());
 	x = prepare(xExpression) ;
 	y = prepare(yExpression) ;
