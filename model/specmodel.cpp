@@ -39,11 +39,20 @@ bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QLi
 	return equal ;
 }
 
+QStringList specModel::dataTypes() const
+{
+    return QStringList() << "wavenumber" << "signal" << "maximum intensity" ;
+}
+
 bool specModel::exportData(QModelIndexList& list)
 {
 	QFile *exportFile = new QFile(QFileDialog::getSaveFileName(0,"File name","","ASCII files (*.asc)")) ;
-	exportDialog *exportFormat = new exportDialog(&Descriptors) ;
-	if ( exportFile->fileName() == "" || ! exportFormat->exec() ) return false ;
+    exportDialog *exportFormat = new exportDialog(&Descriptors, dataTypes()) ;
+    if ( exportFile->fileName() == "" || ! exportFormat->exec() )
+    {
+        delete exportFormat ;
+        return false ;
+    }
 	exportFile->open(QIODevice::WriteOnly | QIODevice::Text) ;
 	QTextStream out(exportFile) ;
 	QList<QPair<bool,QString> > headerFormat = exportFormat->headerFormat() ;
@@ -55,6 +64,7 @@ bool specModel::exportData(QModelIndexList& list)
 		for (int i = 0 ; i < list.size() ; i++)
 			itemPointer(list[i])->exportData(headerFormat, dataFormat, out) ;
 	exportFile->close() ;
+    delete exportFormat ;
 	return true ;
 }
 

@@ -39,3 +39,8 @@ void specMetaModel::setModels(specModelItem *item)
 	if (mitem)
 		mitem->setModels(this, dataModel) ;
 }
+
+QStringList specMetaModel::dataTypes() const
+{
+    return QStringList() << "x" << "y" << "fit" ;
+}

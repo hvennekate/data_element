@@ -17,6 +17,7 @@ class exportDialog : public QDialog
 		QPushButton *addButton, *addDataButton ;
 		QBoxLayout *layout, *inLayout, *dataLayout ;
 		QStringList *descriptors ;
+        QStringList dataTypes ;
 		QScrollArea *scrollHeader, *scrollData ;
 		void prepareHeader() ;
 		void prepareData() ;
@@ -24,7 +25,7 @@ class exportDialog : public QDialog
 		void addHeaderItem() ;
 		void addDataItem() ;
 	public:
-		exportDialog (QStringList* , QWidget *parent = 0 );
+        exportDialog (QStringList* descriptors, const QStringList& dataTypes, QWidget *parent = 0 );
 		QList<QPair<bool,QString> > headerFormat() ;
 		QList<QPair<spec::value,QString> > dataFormat() ;
 		~exportDialog();

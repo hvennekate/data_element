@@ -11,6 +11,7 @@ private:
 	specModel* dataModel ;
 //	QHash<specModelItem*,specModelItem*> generate // TODO
 	void setModels(specModelItem*) ;
+    QStringList dataTypes() const ;
 public:
 	explicit specMetaModel(QObject *parent = 0);
 	void setDataModel(specModel*) ;

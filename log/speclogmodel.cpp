@@ -7,3 +7,8 @@ specLogModel::specLogModel(QObject *parent)
 	: specModel(parent)
 {
 }
+
+QStringList specLogModel::dataTypes() const
+{
+    return QStringList() ;
+}

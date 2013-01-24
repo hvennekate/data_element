@@ -47,6 +47,8 @@ private:
 	QList<specMimeConverter*> mimeConverters() const ;
 	specMetaModel* metaModel ;
 	void checkForNewDescriptors(const QList<specModelItem*>& list, const QModelIndex& parent) ;
+protected:
+    virtual QStringList dataTypes() const ;
 public:
 	specModel(QObject *par = 0) ;
 	~specModel() ;

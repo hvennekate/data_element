@@ -257,6 +257,29 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	setData(new fitData(parser));
 }
 
+QVector<double> specFitCurve::getFitData(QwtSeriesData<QPointF> *data)
+{
+    double *xvals = new double[dataSize()] ;
+    for (size_t i = 0 ; i < dataSize() ; ++i)
+        xvals[i] = data->sample(i).x() ;
+    double *oldX = (double*) (parser->GetVar().at("x")) ;
+    parser->DefineVar("x", xvals);
+
+    QVector<double> yValues(dataSize(), NAN) ;
+
+    try
+    {
+        parser->Eval(yValues.data(), dataSize()) ;
+    }
+    catch(...)
+    {
+    }
+
+    parser->DefineVar("x", oldX) ;
+    delete[] xvals ;
+    return yValues ;
+}
+
 void evaluateParser(const double *parameters, int count, const void *data, double *fitResults, int *info)
 {
 	Q_UNUSED(info) ;
@@ -285,6 +308,7 @@ void evaluateParser(const double *parameters, int count, const void *data, doubl
 
 void specFitCurve::setParserConstants()
 {
+    if (!parser) return ;
 	foreach (const variablePair& var, variables)
 		parser->DefineConst(var.first.toStdString(), var.second) ;
 }

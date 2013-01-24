@@ -73,6 +73,7 @@ public:
 	void setPenStyle(const qint8 &);
 	qint8 penStyle() const ;
 	void connectedItems(QModelIndexList& dataItems, QModelIndexList& metaItems) ;
+    void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
 };
 
 /* TODO in other classes

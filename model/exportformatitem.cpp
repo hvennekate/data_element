@@ -1,16 +1,15 @@
 #include "exportformatitem.h"
 #include <QLabel>
 
-exportFormatItem::exportFormatItem ( QWidget *parent )
-	: QWidget ( parent )
+exportFormatItem::exportFormatItem ( const QStringList& values, QWidget *parent )
+    : QWidget ( parent )
 {
 	Value = new QComboBox() ;
 	Separator = new QComboBox() ;
 	removeButton = new QPushButton(QIcon(":/remove.png"),"") ;
 	layout = new QHBoxLayout() ;
 	
-	QStringList values, separators ;
-    values << "wavenumber" << "signal" << "maximum intensity" ;
+    QStringList separators ;
 	separators << "none" << "space" << "tab" << "new line" ;
 	Value->addItems(values) ;
 	Separator->addItems(separators) ;
@@ -62,4 +61,14 @@ QString exportFormatItem::separator()
 spec::value exportFormatItem::value()
 {
 	return (spec::value) Value->currentIndex() ;
+}
+
+void exportFormatItem::setValue(spec::value v)
+{
+    Value->setCurrentIndex(v) ;
+}
+
+void exportFormatItem::setSeparator(spec::separator s)
+{
+    Separator->setCurrentIndex(s) ;
 }

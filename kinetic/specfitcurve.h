@@ -53,7 +53,8 @@ public:
 	bool setActiveLine(const QString& key, int n) ;
 	int activeLine(const QString& key) const ;
 	void refreshPlotData();
-	void refit(QwtSeriesData<QPointF>* data) ;
+    void refit(QwtSeriesData<QPointF>* data) ;
+    QVector<double> getFitData(QwtSeriesData<QPointF>* data) ;
 	int rtti() const { return specStreamable::fitCurve ; }
 	void attach(QwtPlot *plot) ;
     void setDescriptorProperties(QString key, spec::descriptorFlags f) ;
