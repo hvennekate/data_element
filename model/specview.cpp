@@ -176,19 +176,36 @@ void specView::resetDone()
 void specView::dragMoveEvent(QDragMoveEvent *event)
 {
     QTreeView::dragMoveEvent(event) ;
+    handleDropEventAction(event) ;
+}
+
+void specView::handleDropEventAction(QDropEvent *event)
+{
     if (!acceptData(event->mimeData()))
-        event->ignore() ;
-    else
+    {
+        event->ignore();
+        return ;
+    }
+    if (qobject_cast<specView*>(event->source()) || event->proposedAction() == Qt::LinkAction)
+    {
         event->acceptProposedAction();
+        event->accept();
+        return ;
+    }
+    if (event->possibleActions() & Qt::LinkAction)
+    {
+        event->setDropAction(Qt::LinkAction) ;
+        event->accept();
+        return ;
+    }
+    event->ignore();
+    return ;
 }
 
 void specView::dragEnterEvent(QDragEnterEvent *event)
 {
     QTreeView::dragEnterEvent(event) ;
-    if (!acceptData(event->mimeData()))
-        event->ignore();
-    else
-        event->acceptProposedAction();
+    handleDropEventAction(event) ;
 }
 
 bool specView::acceptData(const QMimeData *data)

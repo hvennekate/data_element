@@ -383,7 +383,7 @@ void specModel::setInternalDrop(bool val)
 }
 
 Qt::DropActions specModel::supportedDropActions() const
-{ return Qt::CopyAction | Qt::MoveAction; }
+{ return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction ; }
 
 void specModel::eliminateChildren(QModelIndexList& list) const
 {

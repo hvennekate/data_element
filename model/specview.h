@@ -23,6 +23,7 @@ private:
 	bool acceptData(const QMimeData*) ;
     void dragMoveEvent(QDragMoveEvent *event) ;
     void dragEnterEvent(QDragEnterEvent *event) ;
+    void handleDropEventAction(QDropEvent* event) ;
 private slots:
 	void columnsInserted(const QModelIndex& parent, int start, int end) ;
 protected:
