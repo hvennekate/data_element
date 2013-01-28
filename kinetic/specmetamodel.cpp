@@ -44,3 +44,8 @@ QStringList specMetaModel::dataTypes() const
 {
     return QStringList() << "x" << "y" << "fit" ;
 }
+
+QList<specFileImportFunction> specMetaModel::acceptableImportFunctions() const
+{
+    return QList<specFileImportFunction>() ;
+}

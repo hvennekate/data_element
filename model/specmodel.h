@@ -127,6 +127,7 @@ public:
 	void signalEndReset() { endResetModel() ; } // TODO just emit from whereever this function is called
 	void signalChanged(const QModelIndex& index) ;
     void signalChanged(QModelIndex originalBegin, QModelIndex originalEnd) ;
+    virtual QList<specFileImportFunction> acceptableImportFunctions() const ;
 	
 // //TODO	
 public slots:

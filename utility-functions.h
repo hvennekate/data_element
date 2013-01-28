@@ -9,6 +9,7 @@
 #include "specdataitem.h"
 #include <QTextStream>
 #include <QFile>
+#include <names.h>
 
 // bool roundedEqual(double a, double b) ;
 QList<specModelItem*> readLogFile(QFile& file) ;
@@ -22,7 +23,7 @@ specModelItem* readJCAMPBlock(QTextStream& in) ;
 void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, double xfactor, double yfactor) ;
 QVector<double> waveNumbers(QTextStream&) ;
 QHash<QString,specDescriptor> fileHeader(QTextStream&) ;
-QList<specModelItem*> (*fileFilter(const QString& fileName)) (QFile&);
+specFileImportFunction fileFilter(const QString& fileName);
 QList<double> gaussjinv(QList<QList<double> >&,QList<double>&) ;
 
 bool comparePoints(const QPointF&, const QPointF&) ;

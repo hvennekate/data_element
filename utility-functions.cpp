@@ -528,10 +528,10 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 	return logData ;
 }
 
-QList<specModelItem*> (*fileFilter(const QString& fileName)) (QFile&)
+specFileImportFunction fileFilter(const QString &fileName)
 {
 	QFile file(fileName) ;
-	file.open(QFile::ReadOnly | QFile::Text) ;
+    if (!file.open(QFile::ReadOnly | QFile::Text)) return 0 ;
 	QTextStream in(&file) ;
 	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ;
 	QString sample = in.readLine(5) ;

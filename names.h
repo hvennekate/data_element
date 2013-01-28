@@ -1,6 +1,8 @@
 #ifndef NAMES_H
 #define NAMES_H
 
+class specModelItem ;
+class QFile ;
 
 /*! Namespace (mainly for enums) */
 namespace spec{
@@ -31,5 +33,7 @@ namespace spec{
 
 	enum rtti {canvasItem = 1001, spectrum = 1010, zeroRange = 1020, metaItem = 1030, kineticRange = 1040, SVGItem = 1050, metaRange = 1060 } ;
 }
+
+typedef QList<specModelItem*> (* specFileImportFunction) (QFile&)  ;
 
 #endif

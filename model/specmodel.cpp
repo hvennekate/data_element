@@ -12,6 +12,7 @@
 #include "specactionlibrary.h"
 #include "specmimeconverter.h"
 #include "specfolderitem.h"
+#include "utility-functions.h"
 
 
 // TODO replace isFolder() by addChildren(empty list,0)
@@ -685,4 +686,14 @@ void specModel::restoreDescriptor(qint16 position, spec::descriptorFlags flags, 
 	DescriptorProperties.insert(position, flags) ;
     }
     root->restoreDescriptor(origin, key) ;
+}
+
+QList<specFileImportFunction> specModel::acceptableImportFunctions() const
+{
+    return QList<specFileImportFunction>()
+            << readHVFile
+            << readPEFile
+            << readJCAMPFile
+            << readSKHIFile
+            << readXYFILE ;
 }
