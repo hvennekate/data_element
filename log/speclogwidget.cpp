@@ -4,6 +4,7 @@
 #include "specgenericmimeconverter.h"
 #include "speclogtodataconverter.h"
 #include "specmimetextexporter.h"
+#include "specmimefileimporter.h"
 #include "specactionlibrary.h"
 
 specLogWidget::specLogWidget(QWidget *parent)
@@ -17,7 +18,8 @@ specLogWidget::specLogWidget(QWidget *parent)
 	logView->setModel(new specLogModel(logView));
 	new specGenericMimeConverter(logView->model()) ;
 	new specLogToDataConverter(logView->model()) ;
-	new specMimeTextExporter(logView->model()) ;
+    new specMimeFileImporter(logView->model()) ;
+    new specMimeTextExporter(logView->model()) ;
 	layout->addWidget(logView) ;
 	content->setLayout(layout);
 	setWidget(content);

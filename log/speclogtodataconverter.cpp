@@ -139,7 +139,8 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
 						     "Kann Datei nicht oeffnen: " + fileName) ;
 				continue ;
 			}
-			QList<specModelItem*> (*filter)(QFile& )  = fileFilter(file.fileName()) ;
+            // TODO check if this works under windows... (opening an open file again...)
+            specFileImportFunction filter = fileFilter(file.fileName()) ;
 			if (!filter)
 			{
 				QMessageBox::warning(0,
