@@ -20,6 +20,8 @@
 #include "canvaspicker.h"
 #include <QUndoView>
 #include <QCloseEvent>
+#include "bzipiodevice.h"
+#include <QBuffer>
 
 specPlotWidget::specPlotWidget(QWidget *parent)
 	: QDockWidget(tr("untitled"),parent),
@@ -115,20 +117,33 @@ void specPlotWidget::read(QString fileName)
 	// Basic layout of the file:
 	quint64 check ;
 	in >> check ;
-	if (check != FILECHECKRANDOMNUMBER)
+	if (check != FILECHECKRANDOMNUMBER && check != FILECHECKCOMPRESSNUMBER)
 	{
 		file->close();
+		QMessageBox::critical(0,tr("Error opening"), tr("File ") + fileName + tr("does not seem to have the right format.")) ;
 		return ; // TODO warning
 	}
 	QByteArray fileContent = file->readAll() ;
 	file->close();
 
 	QDataStream inStream(fileContent) ;
+	bzipIODevice *zipDevice = 0 ;
+	QBuffer buffer(&fileContent) ; // does not take ownership of byteArray
+	if (FILECHECKCOMPRESSNUMBER == check)
+	{
+		zipDevice = new bzipIODevice(&buffer) ; // takes ownership of buffer
+		qDebug() << "opening buffer:" << zipDevice->open(bzipIODevice::ReadOnly) ;
+		inStream.setDevice(zipDevice);
+	}
+//	if (!inStream.device()) inStream.setDevice(&buffer) ;
+
 	inStream >> *plot
 		 >> *items
 		 >> *logWidget
 		 >> *kineticWidget
 		 >> *actions ;
+	if (zipDevice) zipDevice->releaseDevice(); // release ownership of buffer
+	delete zipDevice ;
 	changeFileName(fileName);
 }
 
@@ -226,15 +241,23 @@ bool specPlotWidget::saveFile()
 			QFileDialog::getSaveFileName(this,"Name?","","spec-Dateien (*.spec)") :
 			file->fileName()) ;
 	if (file->fileName() == "") return false ;
-	file->open(QFile::WriteOnly) ;
+	if (!file->open(QFile::WriteOnly)) return false ;
+
 	QDataStream out(file) ;
-	out << quint64(FILECHECKRANDOMNUMBER)
-	    << *plot
+	out << quint64(FILECHECKCOMPRESSNUMBER) ;
+//	QBuffer *outBuffer = new QBuffer;
+	bzipIODevice zipDevice(file) ;
+	zipDevice.open(bzipIODevice::WriteOnly) ;
+	QDataStream zipOut(&zipDevice) ;
+
+	zipOut << *plot
 	    << *items
 	    << *logWidget
 	    << *kineticWidget
 	    << *actions ;
-	file->close() ;
+	zipDevice.close() ;
+//	qDebug() << "written buffer:" << outBuffer->size() ;
+//	out << outBuffer->data() ;
 	return true ;
 }
 

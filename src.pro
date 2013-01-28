@@ -113,7 +113,8 @@ SOURCES += main.cpp \
     actionlib/actions/specsetmultilineaction.cpp \
     actionlib/commands/specdeletedescriptorcommand.cpp \
     actionlib/commands/specrenamedescriptorcommand.cpp \
-    actionlib/actions/specdescriptoreditaction.cpp
+    actionlib/actions/specdescriptoreditaction.cpp \
+    utilities/bzipiodevice.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -228,7 +229,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/specsetmultilineaction.h \
     actionlib/commands/specdeletedescriptorcommand.h \
     actionlib/commands/specrenamedescriptorcommand.h \
-    actionlib/actions/specdescriptoreditaction.h
+    actionlib/actions/specdescriptoreditaction.h \
+    utilities/bzipiodevice.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -238,7 +240,8 @@ INCLUDEPATH += kinetic \
 	actionlib \
 	actionlib/actions \
 	actionlib/commands \
-	lmfit
+	lmfit \
+	utilities
 
 
 TEMPLATE = app
@@ -251,7 +254,8 @@ INCLUDEPATH += . \
     /usr/include/qwt6 \
     /usr/include/qwt
 LIBS += -lqwt \
-	-lmuparser
+	-lmuparser \
+	-lbz2
 }
 win32 {
 INCLUDEPATH += . \
