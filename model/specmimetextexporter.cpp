@@ -54,8 +54,3 @@ QList<specModelItem*> specMimeTextExporter::importData(const QMimeData *data)
 	return QList<specModelItem*>() ;
 }
 
-bool specMimeTextExporter::canImport(const QStringList &types)
-{
-	Q_UNUSED(types) ;
-	return false;
-}

@@ -17,7 +17,6 @@ public:
 	explicit specGenericMimeConverter(QObject *parent = 0);
 	QList<specModelItem*> importData(const QMimeData *);
 	void exportData(QList<specModelItem *> &, QMimeData*) ;
-	bool canImport(const QStringList&) ;
     QStringList importableTypes() const ;
 };
 

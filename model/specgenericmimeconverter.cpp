@@ -46,14 +46,6 @@ QString specGenericMimeConverter::ownType() const
 	return QString() ;
 }
 
-bool specGenericMimeConverter::canImport(const QStringList &types)
-{
-	QString type = ownType() ;
-	if (type != "")
-		return types.contains(type) ;
-	return false ;
-}
-
 QStringList specGenericMimeConverter::importableTypes() const
 {
     return specMimeConverter::importableTypes() << ownType() ;
