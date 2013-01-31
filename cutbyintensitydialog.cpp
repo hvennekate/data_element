@@ -57,9 +57,7 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 			dataCurve->attach(plot) ;
 			intensity->attach(plot) ;
 
-			for (size_t i = 0 ; i < dataCurve->dataSize() ; ++i)
-				qDebug() << "data:" << dataCurve->sample(i) ;
-		}
+        }
 	}
 
 //    QRectF boundaries ;
