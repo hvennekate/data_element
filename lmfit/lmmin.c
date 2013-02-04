@@ -157,7 +157,9 @@ void lmmin( int n_par, double *par, int m_dat, const void *data,
             const lm_control_struct *control, lm_status_struct *status,
             void (*printout) (int n_par, const double *par, int m_dat,
                               const void *data, const double *fvec,
-			      int printflags, int iflag, int iter, int nfev) )
+                  int printflags, int iflag, int iter, int nfev),
+            double *covarianceMatrix,
+            double *sumOfSquaredResiduals)
 {
 
 /*** allocate work space. ***/
@@ -195,7 +197,8 @@ void lmmin( int n_par, double *par, int m_dat, const void *data,
               ( control->scale_diag ? 1 : 2 ),
               control->stepbound, &(status->info),
               &(status->nfev), fjac, ipvt, qtf, wa1, wa2, wa3, wa4,
-	      evaluate, printout, control->printflags, data );
+          evaluate, printout, control->printflags, data,
+              covarianceMatrix, sumOfSquaredResiduals);
 
     if ( printout )
         (*printout)( n, par, m, data, fvec,
@@ -245,7 +248,8 @@ void lm_lmdif( int m, int n, double *x, double *fvec, double ftol,
                void (*printout) (int n_par, const double *par, int m_dat,
                                  const void *data, const double *fvec,
 				 int printflags, int iflag, int iter, int nfev),
-	       int printflags, const void *data )
+           int printflags, const void *data,
+               double* covarianceMatrix, double* sumOfSquaredResiduals)
 {
 /*
  *   The purpose of lmdif is to minimize the sum of the squares of
@@ -479,6 +483,29 @@ void lm_lmdif( int m, int n, double *x, double *fvec, double ftol,
 	    printf("\n");
         }
 #endif
+
+        if (covarianceMatrix)
+        {
+            double dummy ;
+            for (i = 0 ; i < n ; ++i)
+            {
+                for (j = 0 ; j <= i ; ++j)
+                {
+                    dummy = 0 ;
+                    int k ;
+                    for (k = 0 ; k < m ; ++k)
+                        dummy += fjac[i*m+k]*fjac[j*m+k] ;
+                    covarianceMatrix[j*n+i] = dummy ;
+                    covarianceMatrix[i*n+j] = dummy ;
+                }
+            }
+        }
+        if (sumOfSquaredResiduals)
+        {
+            *sumOfSquaredResiduals = 0 ;
+            for (i = 0 ; i < m ; ++i)
+                *sumOfSquaredResiduals += SQR(wa4[i]) ;
+        }
 
 /*** outer: compute the qr factorization of the Jacobian. ***/
 

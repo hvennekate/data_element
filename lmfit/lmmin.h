@@ -52,20 +52,20 @@ void lm_printout_std( int n_par, const double *par, int m_dat,
 double lm_enorm( int, const double * );
 
 /* The actual minimization. */
-void lmmin( int n_par, double *par, int m_dat, const void *data, 
+void lmmin(int n_par, double *par, int m_dat, const void *data,
             void (*evaluate) (const double *par, int m_dat, const void *data,
                               double *fvec, int *info),
             const lm_control_struct *control, lm_status_struct *status,
             void (*printout) (int n_par, const double *par, int m_dat,
                               const void *data, const double *fvec,
-                              int printflags, int iflag, int iter, int nfev) );
+                              int printflags, int iflag, int iter, int nfev) , double *covarianceMatrix, double *sumOfSquaredResiduals);
 
 
 /** Legacy low-level interface. **/
 
 /* Alternative to lm_minimize, allowing full control, and read-out
    of auxiliary arrays. For usage, see implementation of lmmin. */
-void lm_lmdif( int m, int n, double *x, double *fvec, double ftol,
+void lm_lmdif(int m, int n, double *x, double *fvec, double ftol,
                double xtol, double gtol, int maxfev, double epsfcn,
                double *diag, int mode, double factor, int *info, int *nfev,
                double *fjac, int *ipvt, double *qtf, double *wa1,
@@ -75,7 +75,7 @@ void lm_lmdif( int m, int n, double *x, double *fvec, double ftol,
                void (*printout) (int n_par, const double *par, int m_dat,
                                  const void *data, const double *fvec,
                                  int printflags, int iflag, int iter, int nfev),
-               int printflags, const void *data );
+               int printflags, const void *data , double *covarianceMatrix, double *sumOfSquaredResiduals);
 
 extern const char *lm_infmsg[];
 extern const char *lm_shortmsg[];

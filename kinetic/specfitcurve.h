@@ -29,6 +29,7 @@ private:
 
 	typedef QPair<QString,double> variablePair;
 	QList<variablePair> variables ;
+    QVector<double> numericalErrors ;
 	qint16 activeVar ;
 	QStringList fitParameters ;
 	specDescriptor expression ;
@@ -49,6 +50,7 @@ public:
 	~specFitCurve() ;
 	QStringList descriptorKeys() ;
 	QString descriptor(const QString& key, bool full=false) ;
+    QString editDescriptor(const QString& key) ;
 	bool changeDescriptor(QString key, QString value) ;
 	bool setActiveLine(const QString& key, int n) ;
 	int activeLine(const QString& key) const ;
