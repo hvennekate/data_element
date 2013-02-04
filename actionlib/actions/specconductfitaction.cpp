@@ -25,12 +25,14 @@ specUndoCommand* specConductFitAction::generateUndoCommand()
 		if (!item) continue;
 		if(!(item->getFitCurve())) continue ;
 		QString oldDescriptor = item->descriptor(tr("Fit variables"), true) ;
+        int oldActiveLine = item->activeLine(tr("Fit variables")) ;
 		item->conductFit();
 		QString newDescriptor = item->descriptor(tr("Fit variables"), true) ;
 		specEditDescriptorCommand *editCommand = new specEditDescriptorCommand(parentCommand) ;
 		editCommand->setParentObject(model) ;
 		editCommand->setItem(index,tr("Fit variables"), newDescriptor, item->activeLine(tr("Fit variables"))) ;
 		item->changeDescriptor(tr("Fit variables"), oldDescriptor) ;
+        item->setActiveLine(tr("Fit variables"), oldActiveLine) ;
 	}
 	if (!parentCommand->childCount())
 	{
