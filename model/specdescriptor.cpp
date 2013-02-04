@@ -1,106 +1,128 @@
 #include "specdescriptor.h"
 #include <QRegExp>
+#include <QStringList>
 
 void specDescriptor::writeToStream(QDataStream &out) const
 {
-	out << contentValue << currentLine << (qint8) properties ;
+	// TODO this is the legacy version.  Write the actual variant!
+	out << content(true) << content(false) << (qint8) flags() ;
 }
 
 void specDescriptor::readFromStream(QDataStream &in)
 {
 	qint8 prop ;
-	in  >> contentValue >> currentLine >> prop ;
-	properties = (spec::descriptorFlags) prop ;
+	QString contentValue, cLine ;
+	in  >> contentValue >> cLine >> prop ;
+	readOnly = !((spec::descriptorFlags) prop & spec::editable);
+	multiLine = ((spec::descriptorFlags) prop & spec::multiline) ;
+	bool numeric = ((spec::descriptorFlags) prop & spec::numeric) ;
+	if (numeric)
+	{
+		*this = contentValue.toDouble() ;
+		currentLine = 0 ;
+	}
+	else
+	{
+		*this = contentValue ;
+		currentLine = contentValue.left(contentValue.indexOf(cLine)).count("\n") ;
+	}
 }
 
 
 specDescriptor::specDescriptor(QString cont, spec::descriptorFlags prop)
-	: currentLine(QString()),
-	  properties(prop)
+	: QVariant(),
+	  currentLine(0),
+	  readOnly(!(prop & spec::editable))
 {
-	(*this) = cont ;
+	*this = cont ;
 }
 
 specDescriptor::specDescriptor(double d)
-	: currentLine(QString()),
-	  properties(spec::numeric)
+	: QVariant(d),
+	  currentLine(0),
+	  readOnly(true)
 {
-	(*this) = d ;
 }
 
 double specDescriptor::numericValue() const
-{ return contentValue.toDouble() ; }
+{
+	return toDouble() ;
+}
 
 QString specDescriptor::content(bool full) const
 {
-    if (currentLine == QString() || full || (properties & spec::multiline))
-		return contentValue ;
-	else
-		return currentLine ;
+	if (isNumeric()) return toString() ;
+	if (canConvert(QVariant::StringList))
+	{
+		if (full || multiLine) return toStringList().join("\n") ;
+		return toStringList()[currentLine] ;
+	}
+	return QString() ;
 }
 
 bool specDescriptor::setContent(const QString& string)
 {
-	if (isEditable())
-	{
-		(*this) = string ;
-		return true ;
-	}
-	return false ;
+	if (readOnly) return false ;
+	setValue(string.split("\n")) ;
+	return true ;
 }
 
 bool specDescriptor::setActiveLine(int line)
 {
-	int lineCount = 0 ;
-	int lastNewLine = 0 ;
-	while ((lastNewLine = 1+ contentValue.indexOf(QRegExp("\n"),lastNewLine) ))
-		lineCount ++ ;
-	if (line > lineCount)
-		return false ;
-	currentLine = contentValue.section(QRegExp("\n"),line,line) ;
+	currentLine = qBound(0,line,toStringList().size()) ;
 	return true ;
 }
 
 int specDescriptor::activeLine() const
 {
-	return contentValue.left(contentValue.indexOf(currentLine)).count("\n") ;
+	return currentLine ;
 }
 
 bool specDescriptor::setContent(const double& number)
 {
-	if (isNumeric() && isEditable())
-	{
-		(*this) = number ;
-		return true ;
-	}
-	return false ;
+	if (readOnly) return false ;
+	if (!isNumeric()) return false ;
+	setValue(number) ;
+	return true ;
 }
 
 bool specDescriptor::isNumeric() const
-{ return properties & spec::numeric ; }
-
-bool specDescriptor::isEditable() const
-{ return properties & spec::editable ; }
-
-spec::descriptorFlags specDescriptor::flags() const
-{ return properties ;}
-
-specDescriptor& specDescriptor::operator=(const double& val)
 {
-	(*this) = QString("%1").arg(val) ;
-	properties |= spec::numeric ;
-	return *this ;
+	return canConvert(QVariant::Double) ;
 }
 
-
-specDescriptor& specDescriptor::operator=(const QString& val)
+bool specDescriptor::isEditable() const
 {
-	contentValue = val ;
-	currentLine = val.contains(QRegExp("\n")) ? val.section(QRegExp("\n"),0,0) : val ;
-	return *this ;
+	return !readOnly ;
+}
+
+spec::descriptorFlags specDescriptor::flags() const
+{
+	return (isNumeric() ? spec::numeric : spec::def) |
+			(isEditable() ? spec::editable : spec::def) |
+			(multiLine ? spec::multiline : spec::def) ;
 }
 
 void specDescriptor::setFlags(spec::descriptorFlags f)
 {
-    properties = f ;
+	multiLine = f & spec::multiline ;
+	readOnly = (!f & spec::editable) ;
+	if (f & spec::numeric) convert(QVariant::Double) ;
+	else convert(QVariant::StringList) ;
+}
+
+QDataStream& operator<<(QDataStream& out, const specDescriptor& d)
+{
+	return out << (const specStreamable&) d ;
+}
+
+QDataStream& operator>>(QDataStream& in, specDescriptor& d)
+{
+	return in >> (specStreamable&) d ;
+}
+
+specDescriptor& specDescriptor::operator =(const QString& s)
+{
+	setValue(s.split("\n")) ;
+	return *this ;
 }

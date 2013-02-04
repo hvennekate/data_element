@@ -4,16 +4,17 @@
 #include <QString>
 #include <names.h>
 #include "specstreamable.h"
+#include <QVariant>
 
-class specDescriptor : public specStreamable
+class specDescriptor : public specStreamable, private QVariant
 { //make inline
 private:
-	QString contentValue ;
-	QString currentLine ;
-	spec::descriptorFlags properties ;
+	qint16 currentLine ;
+	bool readOnly ;
+	bool multiLine ;
 	void writeToStream(QDataStream &out) const ;
 	void readFromStream(QDataStream &in) ;
-	type typeId() const { return specStreamable::descriptor ; }
+	specStreamable::type typeId() const { return specStreamable::descriptor ; }
 public:
 	specDescriptor(QString cont="", spec::descriptorFlags prop = spec::def) ;
 	specDescriptor(double d) ;
@@ -25,12 +26,13 @@ public:
 	bool isNumeric() const;
 	bool isEditable() const;
 	spec::descriptorFlags flags() const ;
-    void setFlags(spec::descriptorFlags) ;
+	void setFlags(spec::descriptorFlags) ;
 	int activeLine() const ;
 	
-	specDescriptor& operator=(const double&) ;
 	specDescriptor& operator=(const QString&) ;
-
 };
+
+QDataStream& operator<<(QDataStream& out, const specDescriptor&) ;
+QDataStream& operator>>(QDataStream& in, specDescriptor&) ;
 
 #endif
