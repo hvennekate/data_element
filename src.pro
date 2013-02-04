@@ -97,7 +97,6 @@ SOURCES += main.cpp \
     actionlib/actions/specrequiresitemaction.cpp \
     model/specmimetextexporter.cpp \
     lmfit/lmmin.c \
-    lmfit/lmcurve.c \
     kinetic/specfitcurve.cpp \
     actionlib/commands/specexchangefitcurvecommand.cpp \
     actionlib/actions/specitempropertiesaction.cpp \
@@ -214,7 +213,6 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/specrequiresitemaction.h \
     model/specmimetextexporter.h \
     lmfit/lmmin.h \
-    lmfit/lmcurve.h \
     kinetic/specfitcurve.h \
     actionlib/commands/specexchangefitcurvecommand.h \
     actionlib/actions/specitempropertiesaction.h \
