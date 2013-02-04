@@ -17,10 +17,7 @@ bool specDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const Q
 QWidget* specDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
 	Q_UNUSED(option)
-	Q_UNUSED(index)
-	QTextEdit *editor = new QTextEdit(parent) ;
-//	editor->setFrame(false) ;
-//	editor->setTextBackgroundColor(Qt::yellow);
+    QTextEdit *editor = new QTextEdit(parent) ;
 	QPalette palette = editor->palette() ;
 	palette.setColor(QPalette::Base,palette.toolTipBase().color());
 	palette.setColor(QPalette::Text,palette.toolTipText().color());
@@ -35,9 +32,11 @@ QWidget* specDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 	return editor ;
 }
 
-void specDelegate::setEditorData(QWidget *editor, const QModelIndex &index) const
+void specDelegate::setEditorData(QWidget *e, const QModelIndex &index) const
 {
-	((QTextEdit*) editor)->setText(index.model()->data(index, spec::fullContentRole).toString()) ;
+    QTextEdit *editor = qobject_cast<QTextEdit*>(e) ;
+    if (!editor) return ;
+    editor->setText(index.model()->data(index, Qt::EditRole).toString()) ;
 }
 
 void specDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const

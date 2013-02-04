@@ -289,6 +289,8 @@ QVariant specModel::data(const QModelIndex &index, int role) const
 		return pointer->pen().color() ;
 	case spec::fullContentRole :
 		return pointer->descriptor(Descriptors[index.column()],true) ;
+    case Qt::EditRole :
+        return pointer->editDescriptor(Descriptors[index.column()]) ;
 	case Qt::ToolTipRole :
 		return pointer->toolTip(Descriptors[index.column()]) ;
 	}
@@ -696,4 +698,11 @@ QList<specFileImportFunction> specModel::acceptableImportFunctions() const
             << readJCAMPFile
             << readSKHIFile
             << readXYFILE ;
+}
+
+QValidator* specModel::createValidator(const QModelIndex &i) const
+{
+    if (itemPointer(i)->isNumeric(Descriptors[i.column()]))
+        return new QDoubleValidator ;
+    return 0 ;
 }

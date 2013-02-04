@@ -14,7 +14,7 @@ class specModelItem ;
 class specActionLibrary ;
 class specMimeConverter ;
 class specCanvasItem ;
-
+class QValidator ;
 
 QDataStream& operator<<(QDataStream&, specModel&);
 QDataStream& operator>>(QDataStream& in, specModel& model) ;
@@ -129,6 +129,8 @@ public:
     void signalChanged(QModelIndex originalBegin, QModelIndex originalEnd) ;
     virtual QList<specFileImportFunction> acceptableImportFunctions() const ;
 	
+    virtual QValidator* createValidator(const QModelIndex&) const ;
+
 // //TODO	
 public slots:
 	bool exportData(QModelIndexList& list) ;

@@ -91,6 +91,7 @@ public:
     virtual void deleteDescriptor(const QString& key) ;
     virtual void dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const ;
     virtual void restoreDescriptor(QListIterator<specDescriptor>& origin, const QString& key) ;
+    virtual QString editDescriptor(const QString& key) const ;
 
 	int rtti() const { return spec::spectrum ; }
 	void attach(QwtPlot *plot) ;
