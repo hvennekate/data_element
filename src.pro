@@ -255,7 +255,9 @@ INCLUDEPATH += . \
     /usr/include/qwt
 LIBS += -lqwt \
 	-lmuparser \
-	-lbz2
+	-lbz2 \
+	-lgsl \
+	-lgslcblas
 }
 win32 {
 INCLUDEPATH += . \

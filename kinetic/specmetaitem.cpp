@@ -90,6 +90,7 @@ void specMetaItem::writeToStream(QDataStream &out) const
 void specMetaItem::readFromStream(QDataStream &in)
 {
 	delete fitCurve ;
+    fitCurve = 0 ;
 	styleFitCurve = false ;
 	specModelItem::readFromStream(in) ;
 	quint8 stylingWasToFit ;
@@ -103,14 +104,12 @@ void specMetaItem::readFromStream(QDataStream &in)
 	styleFitCurve = stylingWasToFit ;
 	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
 	quint8 hasFitCurve ;
-	in >> hasFitCurve ;
-	if (hasFitCurve)
-	{
-		fitCurve = new specFitCurve ;
-		in >> *fitCurve ;
-	}
-	else
-		fitCurve = 0 ;
+    in >> hasFitCurve ; // redundant
+    if (hasFitCurve)
+    {
+        fitCurve = new specFitCurve ;
+        in >> *fitCurve ;
+    }
 	invalidate() ; // TODO maybe insert in data item or just model item.
 }
 
@@ -211,9 +210,15 @@ QStringList specMetaItem::descriptorKeys() const
 QString specMetaItem::descriptor(const QString &key, bool full) const
 {
 	if (key == "") return specModelItem::descriptor(key,full) ;
-	if (fitCurve && fitCurve->descriptorKeys().contains(key))
+    if (fitCurveDescriptor(key))
 		return fitCurve->descriptor(key,full) ;
 	return variables[key].content(full) ;
+}
+
+QString specMetaItem::editDescriptor(const QString &key) const
+{
+    if(fitCurveDescriptor(key)) return fitCurve->editDescriptor(key) ;
+    return specModelItem::editDescriptor(key) ;
 }
 
 bool specMetaItem::changeDescriptor(QString key, QString value)

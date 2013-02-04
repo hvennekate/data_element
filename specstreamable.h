@@ -65,7 +65,7 @@ public:
 		plotTitleCommandId = 59,
 		plotYLabelCommandId = 60,
 		plotXLabelCommandId = 61,
-		fitCurve = 62,
+        fitCurve = 62,
 		exchangeFitCommand = 63,
 		toggleFitStyleCommand = 64,
         penStyleCommandId = 65,

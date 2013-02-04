@@ -1,6 +1,8 @@
 #include "specfitcurve.h"
 #include "lmmin.h"
 #include <algorithm>
+#include <gsl/gsl_linalg.h>
+#include <gsl/gsl_math.h>
 
 specFitCurve::fitData::fitData(mu::Parser *p)
 	: parser(p),
@@ -93,13 +95,28 @@ void specFitCurve::refreshPlotData()
 	fit->reevaluate();
 }
 
+QString specFitCurve::editDescriptor(const QString &key)
+{
+    if (key == QObject::tr("Fit variables"))
+    {
+        QStringList results ;
+        foreach(variablePair vpair, variables)
+            results << vpair.first + " = " + QString::number(vpair.second) ;
+        return results.join("\n") ;
+    }
+    return descriptor(key, true) ;
+}
+
 QString specFitCurve::descriptor(const QString &key, bool full)
 {
 	if (QObject::tr("Fit variables") == key)
 	{
 		QStringList variableDescriptors ;
-		foreach(variablePair variable, variables)
-			variableDescriptors << variable.first + " = " + QString::number(variable.second) ;
+        for (int i = 0 ; i < variables.size() ; ++i)
+            variableDescriptors << variables[i].first + " = " + QString::number(variables[i].second)
+                                   + ((i < numericalErrors.size() && !isnan(numericalErrors[i])) ?
+                                          " +/- " + QString::number(numericalErrors[i])
+                                        : QString(""));
         if (full || variablesMulti)
 			return variableDescriptors.join("\n") ;
 		if (activeVar >= 0 && activeVar < variableDescriptors.size())
@@ -138,14 +155,24 @@ bool specFitCurve::changeDescriptor(QString key, QString value)
 	if (QObject::tr("Fit variables") == key)
 	{
 		variables.clear();
+        numericalErrors.clear();
 		foreach(QString line, value.split("\n"))
 		{
-			line.remove(QRegExp("\\s")) ;
-			if (! line.contains("=")) continue ;
+            line.remove(QRegExp("\\s")) ;
+            double errorValue = NAN ;
+            bool ok = true ;
+            QStringList l = line.split("+/-") ;
+            line = l.first() ;
+            errorValue = (l.size() > 1 ? l[1].toDouble(&ok) : NAN) ;
+            if (!ok) errorValue =  NAN ;
+            if (! line.contains("=")) continue ;
 			QString var = line.section("=",0,0) ;
 			double value = line.section("=",1,1).toDouble() ;
 			if (acceptableVariable(var))
-				variables << qMakePair(var,value) ;
+            {
+                numericalErrors << errorValue ;
+                variables << qMakePair(var,value) ;
+            }
 		}
 	}
 	if (QObject::tr("Fit parameters") == key)
@@ -234,9 +261,9 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	lm_status_struct status ;
 	lm_control_struct control = lm_control_double ;
 
-//	control.maxcall = maxSteps ;
-//	control.printflags = 11 ;
 	lmcurve_data_struct fitParams = { x, y, parser, &variableNames} ;
+    gsl_matrix *covarianceMatrix = gsl_matrix_alloc(variables.size(),variables.size()) ;
+    double sumOfSquaredResiduals = 0 ;
 	lmmin(fitParameters.size(),
 	      parameters,
 	      data->size(),
@@ -244,17 +271,36 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	      evaluateParser,
 	      &control,
 	      &status,
-	      0) ;
+          0,
+          covarianceMatrix->data,
+          &sumOfSquaredResiduals) ;
 
 	// get the fit parameters back out:
 	for (QList<variablePair>::iterator i = variables.begin() ; i != variables.end() ; ++i)
 		if (fitParameters.contains(i->first))
 			i->second = parameters[fitParameters.indexOf(i->first)] ;
 
-	// set up the new parser
-	generateParser();
-	setParserConstants();
-	setData(new fitData(parser));
+    // compute asymptotic standard error of fit parameters:
+    gsl_set_error_handler_off() ;
+    numericalErrors.clear();
+    if (GSL_EDOM != gsl_linalg_cholesky_decomp(covarianceMatrix))
+    {
+        gsl_linalg_cholesky_invert(covarianceMatrix) ;
+        for (int i = 0 ; i < variables.size(); ++i)
+            numericalErrors << sqrt(gsl_matrix_get(covarianceMatrix,i,i)*sumOfSquaredResiduals / (data->size()-fitParameters.size())) ;
+    }
+    else
+    {
+        errorString = QObject::tr("Covariance matrix not positive definite.") +
+                  QObject::tr("Could not determine errors.") ;
+    }
+
+    gsl_matrix_free(covarianceMatrix) ;
+
+    // set up the new parser
+    generateParser();
+    setParserConstants();
+    setData(new fitData(parser));
 }
 
 QVector<double> specFitCurve::getFitData(QwtSeriesData<QPointF> *data)
@@ -320,19 +366,21 @@ void specFitCurve::writeToStream(QDataStream &out) const
 	       activeVar <<
 	       fitParameters <<
 	       expression <<
-	       errorString ;
+           errorString <<
+           numericalErrors ;
     if (variablesMulti || expressionMulti || messagesMulti)
         out << qint8(variablesMulti + 2*expressionMulti + 4*messagesMulti) ;
 }
 
 void specFitCurve::readFromStream(QDataStream &in)
 {
-	specCanvasItem::readFromStream(in) ;
-	in >> variables >>
-	      activeVar >>
-	      fitParameters >>
-	      expression >>
-	      errorString ;
+    specCanvasItem::readFromStream(in) ;
+    in >> variables >>
+          activeVar >>
+          fitParameters >>
+          expression >>
+          errorString >>
+          numericalErrors ;
     if (in.atEnd())
         expressionMulti = messagesMulti = variablesMulti = false ;
     else
@@ -343,9 +391,9 @@ void specFitCurve::readFromStream(QDataStream &in)
         expressionMulti = a & qint8(2) ;
         variablesMulti = a & qint8(1) ;
     }
-	generateParser();
-	setParserConstants();
-	setData(new fitData(parser)) ;
+    generateParser();
+    setParserConstants();
+//	setData(new fitData(parser)) ;
 }
 
 void specFitCurve::clearParser()
