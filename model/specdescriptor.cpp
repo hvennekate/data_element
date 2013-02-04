@@ -1,28 +1,31 @@
 #include "specdescriptor.h"
 #include <QRegExp>
+#include <QStringList>
 
 void specDescriptor::writeToStream(QDataStream &out) const
 {
-	out << contentValue << currentLine << (qint8) properties ;
+	// TODO bad legacy...
+	out << contentValue << contentValue.split("\n")[currentLine] << (qint8) properties ;
 }
 
 void specDescriptor::readFromStream(QDataStream &in)
 {
 	qint8 prop ;
-	in  >> contentValue >> currentLine >> prop ;
+	QString cline ;
+	in >> contentValue >> cline >> prop ;
+	currentLine = contentValue.left(contentValue.indexOf(cline)).count("\n") ;
 	properties = (spec::descriptorFlags) prop ;
 }
 
-
 specDescriptor::specDescriptor(QString cont, spec::descriptorFlags prop)
-	: currentLine(QString()),
+	: currentLine(0),
 	  properties(prop)
 {
 	(*this) = cont ;
 }
 
 specDescriptor::specDescriptor(double d)
-	: currentLine(QString()),
+	: currentLine(0),
 	  properties(spec::numeric)
 {
 	(*this) = d ;
@@ -33,10 +36,10 @@ double specDescriptor::numericValue() const
 
 QString specDescriptor::content(bool full) const
 {
-    if (currentLine == QString() || full || (properties & spec::multiline))
+	if (full || (properties & spec::multiline))
 		return contentValue ;
 	else
-		return currentLine ;
+		return contentValue.split("\n")[currentLine] ;
 }
 
 bool specDescriptor::setContent(const QString& string)
@@ -51,19 +54,13 @@ bool specDescriptor::setContent(const QString& string)
 
 bool specDescriptor::setActiveLine(int line)
 {
-	int lineCount = 0 ;
-	int lastNewLine = 0 ;
-	while ((lastNewLine = 1+ contentValue.indexOf(QRegExp("\n"),lastNewLine) ))
-		lineCount ++ ;
-	if (line > lineCount)
-		return false ;
-	currentLine = contentValue.section(QRegExp("\n"),line,line) ;
+	currentLine = qBound(0,line,contentValue.count("\n")) ;
 	return true ;
 }
 
 int specDescriptor::activeLine() const
 {
-	return contentValue.left(contentValue.indexOf(currentLine)).count("\n") ;
+	return currentLine ;
 }
 
 bool specDescriptor::setContent(const double& number)
@@ -77,17 +74,23 @@ bool specDescriptor::setContent(const double& number)
 }
 
 bool specDescriptor::isNumeric() const
-{ return properties & spec::numeric ; }
+{
+	return properties & spec::numeric ;
+}
 
 bool specDescriptor::isEditable() const
-{ return properties & spec::editable ; }
+{
+	return properties & spec::editable ;
+}
 
 spec::descriptorFlags specDescriptor::flags() const
-{ return properties ;}
+{
+	return properties ;
+}
 
 specDescriptor& specDescriptor::operator=(const double& val)
 {
-	(*this) = QString("%1").arg(val) ;
+	(*this) = QString::number(val) ;
 	properties |= spec::numeric ;
 	return *this ;
 }
@@ -96,7 +99,7 @@ specDescriptor& specDescriptor::operator=(const double& val)
 specDescriptor& specDescriptor::operator=(const QString& val)
 {
 	contentValue = val ;
-	currentLine = val.contains(QRegExp("\n")) ? val.section(QRegExp("\n"),0,0) : val ;
+	setActiveLine(currentLine) ;
 	return *this ;
 }
 

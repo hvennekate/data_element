@@ -9,7 +9,7 @@ class specDescriptor : public specStreamable
 { //make inline
 private:
 	QString contentValue ;
-	QString currentLine ;
+	int currentLine ;
 	spec::descriptorFlags properties ;
 	void writeToStream(QDataStream &out) const ;
 	void readFromStream(QDataStream &in) ;
