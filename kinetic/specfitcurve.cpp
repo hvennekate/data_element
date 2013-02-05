@@ -114,7 +114,7 @@ QString specFitCurve::descriptor(const QString &key, bool full)
 		QStringList variableDescriptors ;
         for (int i = 0 ; i < variables.size() ; ++i)
             variableDescriptors << variables[i].first + " = " + QString::number(variables[i].second)
-                                   + ((i < numericalErrors.size() && !isnan(numericalErrors[i])) ?
+                                   + ((i < numericalErrors.size() && !std::isnan(numericalErrors[i])) ?
                                           " +/- " + QString::number(numericalErrors[i])
                                         : QString(""));
         if (full || variablesMulti)
@@ -262,7 +262,7 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	lm_control_struct control = lm_control_double ;
 
 	lmcurve_data_struct fitParams = { x, y, parser, &variableNames} ;
-    gsl_matrix *covarianceMatrix = gsl_matrix_alloc(variables.size(),variables.size()) ;
+    gsl_matrix *covarianceMatrix = gsl_matrix_alloc(fitParameters.size(),fitParameters.size()) ;
     double sumOfSquaredResiduals = 0 ;
 	lmmin(fitParameters.size(),
 	      parameters,
@@ -286,8 +286,13 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
     if (GSL_EDOM != gsl_linalg_cholesky_decomp(covarianceMatrix))
     {
         gsl_linalg_cholesky_invert(covarianceMatrix) ;
-        for (int i = 0 ; i < variables.size(); ++i)
-            numericalErrors << sqrt(gsl_matrix_get(covarianceMatrix,i,i)*sumOfSquaredResiduals / (data->size()-fitParameters.size())) ;
+        for(QList<variablePair>::Iterator i = variables.begin() ; i != variables.end() ; ++i)
+        {
+            int j = fitParameters.indexOf(i->first) ;
+            numericalErrors << (j > -1 ?
+                                  sqrt(gsl_matrix_get(covarianceMatrix,j,j)*sumOfSquaredResiduals / (data->size()-fitParameters.size()))
+                                  : NAN) ;
+        }
     }
     else
     {
