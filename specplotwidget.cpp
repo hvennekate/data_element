@@ -260,6 +260,8 @@ bool specPlotWidget::saveFile()
 	zipDevice.close() ;
 //	qDebug() << "written buffer:" << outBuffer->size() ;
 //	out << outBuffer->data() ;
+    zipDevice.releaseDevice() ;
+    file->close();
 	return true ;
 }
 
