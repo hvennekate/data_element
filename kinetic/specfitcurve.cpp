@@ -234,7 +234,7 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 {
 	generateParser();
 	if (!parser) return ;
-	QList<std::string> variableNames ;
+    QVector<std::string> variableNames(fitParameters.size()) ;
 
 	double x[data->size()], y[data->size()], parameters[fitParameters.size()] ;
 	// Set the fit data up
@@ -251,7 +251,7 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 			int index = fitParameters.indexOf(var.first) ;
 			parameters[index] = var.second ;
 			parser->DefineConst(var.first.toStdString(), parameters[index]);
-			variableNames << var.first.toStdString() ;
+            variableNames[index] = var.first.toStdString() ;
 		}
 		else
 			parser->DefineConst(var.first.toStdString(), var.second);
