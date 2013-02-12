@@ -192,6 +192,12 @@ void specView::handleDropEventAction(QDropEvent *event)
         event->accept();
         return ;
     }
+    if (event->possibleActions() & Qt::CopyAction)
+    {
+        event->setDropAction(Qt::CopyAction) ;
+        event->accept();
+        return ;
+    }
     if (event->possibleActions() & Qt::LinkAction)
     {
         event->setDropAction(Qt::LinkAction) ;
