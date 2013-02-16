@@ -28,15 +28,19 @@ void specView::columnMoved(int i, int j, int k)
 	QTreeView::columnMoved() ;
 	//TODO
 	if(k != i)
-	{
+    {// TODO move to model
 		header()->moveSection(k,i) ; // undoing user move
-		QList<QVariant> temp ;
+        QList<QPair<QVariant, QVariant> > descriptors ;
 		for (int a = qMin(j,k) ; a < qMax(j,k)+1 ; a++) // read out column heads of concern
-			temp += model()->headerData(a,Qt::Horizontal) ;
-		if(k < j) temp.prepend(temp.takeLast()) ; // doing the move
-		else temp.append(temp.takeFirst()) ;
-		for (QList<QVariant>::size_type a = 0 ; a < temp.size() ; a++) // reinserting the heads
-			model()->setHeaderData(qMin(j,k)+a,Qt::Horizontal,temp[a]) ;
+            descriptors += qMakePair(model()->headerData(a,Qt::Horizontal),
+                                     model()->headerData(a, Qt::Horizontal, spec::descriptorPropertyRole)) ;
+        if(k < j) descriptors.prepend(descriptors.takeLast()) ; // doing the move
+        else descriptors.append(descriptors.takeFirst()) ;
+        for (QList<QVariant>::size_type a = 0 ; a < descriptors.size() ; a++) // reinserting the heads
+        {
+            model()->setHeaderData(qMin(j,k)+a,Qt::Horizontal,descriptors[a].first) ;
+            model()->setHeaderData(qMin(j,k)+a,Qt::Horizontal,descriptors[a].second,spec::descriptorPropertyRole) ;
+        }
 	}
 }
 
@@ -172,19 +176,42 @@ void specView::resetDone()
 void specView::dragMoveEvent(QDragMoveEvent *event)
 {
     QTreeView::dragMoveEvent(event) ;
+    handleDropEventAction(event) ;
+}
+
+void specView::handleDropEventAction(QDropEvent *event)
+{
     if (!acceptData(event->mimeData()))
-        event->ignore() ;
-    else
+    {
+        event->ignore();
+        return ;
+    }
+    if (qobject_cast<specView*>(event->source()) || event->proposedAction() == Qt::LinkAction)
+    {
         event->acceptProposedAction();
+        event->accept();
+        return ;
+    }
+    if (event->possibleActions() & Qt::CopyAction)
+    {
+        event->setDropAction(Qt::CopyAction) ;
+        event->accept();
+        return ;
+    }
+    if (event->possibleActions() & Qt::LinkAction)
+    {
+        event->setDropAction(Qt::LinkAction) ;
+        event->accept();
+        return ;
+    }
+    event->ignore();
+    return ;
 }
 
 void specView::dragEnterEvent(QDragEnterEvent *event)
 {
     QTreeView::dragEnterEvent(event) ;
-    if (!acceptData(event->mimeData()))
-        event->ignore();
-    else
-        event->acceptProposedAction();
+    handleDropEventAction(event) ;
 }
 
 bool specView::acceptData(const QMimeData *data)

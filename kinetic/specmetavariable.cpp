@@ -24,7 +24,7 @@ QString specMetaVariable::extract(QString & source, const QRegExp& expression)
 
 specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 {
-	const QRegExp rangeExp("(\\[[0-9]*(:[0-9]?(:[0-9]?)?)?\\])"),
+    const QRegExp rangeExp("(\\[[0-9]*(:([0-9]*)?(:([0-9]*)?)?)?\\])"),
 			descriptorExp("(\\\"[^\\\"]*\\\"|" "(x|y|i|u|l))"),
 			number("[+\\-]?([0-9]+|[0-9]*\\.[0-9]+)([eE][+-]?[0-9]+)?");
 	QString range = extract(init, rangeExp) ;
@@ -46,6 +46,8 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 	if (descString[0] == 'x') product = new specXVariable ;
 	if (descString[0] == 'y') product = new specYVariable;
 
+    if (!product) return 0 ;
+
 	if (!range.isEmpty())
 	{
 		//interpret the range
@@ -65,11 +67,8 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 		product->setBorderFlags(QwtInterval::IncludeBorders);
 	}
 
-    if (product)
-    {
-        product->parent = par ;
-        product->code = range + descString ;
-    }
+    product->parent = par ;
+    product->code = range + descString ;
 	return product ;
 }
 

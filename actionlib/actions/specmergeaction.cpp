@@ -135,7 +135,6 @@ public:
 							// generate reference spectrum
 							QMap<double,double> reference ;
 							newItem->revalidate();
-                            qDebug() << "newItems's data size:" << newItem->dataSize() ;
                             for (size_t i = 0 ; i < newItem->dataSize() ; ++i)
 							{
                                 const QPointF point = newItem->sample(i) ;
@@ -143,8 +142,8 @@ public:
 							}
 
 							// define spectral ranges
-							QwtPlotItemList ranges ;
                             specRange *range = new specRange(reference.begin().key(), (reference.end() -1).key()) ;
+                            QwtPlotItemList ranges ;
                             ranges << range ; // DANGER
                             // protection against nan values (make sure spectra do indeed overlap)
                             int overlappingCount = 0 ;
@@ -169,6 +168,7 @@ public:
                             }
                             else
                                 *newItem += *((specDataItem*) other) ;
+                            delete range ;
 						}
 					}
 					else

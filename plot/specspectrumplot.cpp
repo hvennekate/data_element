@@ -316,7 +316,6 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 	specModel* model,
 	bool noSlope)
 {
-	qDebug() << "zero ranges:" << zeroRanges.size() << "spectra:" << spectra.size() ;
 	specMultiCommand *zeroCommand = new specMultiCommand ;
 	zeroCommand->setParentObject(model);
 	for (int i = 0 ; i < spectra.size() ; ++i)
@@ -388,6 +387,7 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
 			for (int j = 0 ; j < pointsInRange.size() ; ++j)
 			{
 				double x = pointsInRange[j].x(), y = pointsInRange[j].y() ;
+                if (isnan(y) || isnan(x)) continue ;
 				vector[0] += y ;
 				vector[1] += y*x ;
 				matrix[0][0] += x ;

@@ -90,6 +90,7 @@ void specMetaItem::writeToStream(QDataStream &out) const
 void specMetaItem::readFromStream(QDataStream &in)
 {
 	delete fitCurve ;
+    fitCurve = 0 ;
 	styleFitCurve = false ;
 	specModelItem::readFromStream(in) ;
 	quint8 stylingWasToFit ;
@@ -103,14 +104,12 @@ void specMetaItem::readFromStream(QDataStream &in)
 	styleFitCurve = stylingWasToFit ;
 	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
 	quint8 hasFitCurve ;
-	in >> hasFitCurve ;
-	if (hasFitCurve)
-	{
-		fitCurve = new specFitCurve ;
-		in >> *fitCurve ;
-	}
-	else
-		fitCurve = 0 ;
+    in >> hasFitCurve ; // redundant
+    if (hasFitCurve)
+    {
+        fitCurve = new specFitCurve ;
+        in >> *fitCurve ;
+    }
 	invalidate() ; // TODO maybe insert in data item or just model item.
 }
 
@@ -211,9 +210,15 @@ QStringList specMetaItem::descriptorKeys() const
 QString specMetaItem::descriptor(const QString &key, bool full) const
 {
 	if (key == "") return specModelItem::descriptor(key,full) ;
-	if (fitCurve && fitCurve->descriptorKeys().contains(key))
+    if (fitCurveDescriptor(key))
 		return fitCurve->descriptor(key,full) ;
 	return variables[key].content(full) ;
+}
+
+QString specMetaItem::editDescriptor(const QString &key) const
+{
+    if(fitCurveDescriptor(key)) return fitCurve->editDescriptor(key) ;
+    return specModelItem::editDescriptor(key) ;
 }
 
 bool specMetaItem::changeDescriptor(QString key, QString value)
@@ -354,4 +359,31 @@ void specMetaItem::setSymbolSize(int w, int h)
 		fitCurve->setSymbolSize(w,h) ;
 	else
 		specCanvasItem::setSymbolSize(w,h) ;
+}
+
+void specMetaItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out) // TODO split into two
+{
+    revalidate();
+
+    for (int i = 0 ; i < headerFormat.size() ; i++)
+        out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
+    out << endl ;
+    QVector<double> fitValues ;
+    if (fitCurve) fitValues = fitCurve->getFitData(data()) ;
+    for (size_t j = 0 ; j < dataSize() ; j++)
+    {
+        for (int i = 0 ; i < dataFormat.size() ; i++)
+        {
+            switch(dataFormat[i].first)
+            {
+                case spec::wavenumber: out << sample(j).x() ; break ;
+                case spec::signal: out << sample(j).y() ; break ;
+                case spec::maxInt:
+                    if (j < (size_t) fitValues.size())
+                        out <<  fitValues[j] ; break ;
+            }
+            out << dataFormat[i].second ;
+        }
+    }
+    out << endl ;
 }

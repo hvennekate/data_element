@@ -12,6 +12,7 @@
 #include "specactionlibrary.h"
 #include "specmimeconverter.h"
 #include "specfolderitem.h"
+#include "utility-functions.h"
 
 
 // TODO replace isFolder() by addChildren(empty list,0)
@@ -39,11 +40,20 @@ bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QLi
 	return equal ;
 }
 
+QStringList specModel::dataTypes() const
+{
+    return QStringList() << "wavenumber" << "signal" << "maximum intensity" ;
+}
+
 bool specModel::exportData(QModelIndexList& list)
 {
 	QFile *exportFile = new QFile(QFileDialog::getSaveFileName(0,"File name","","ASCII files (*.asc)")) ;
-	exportDialog *exportFormat = new exportDialog(&Descriptors) ;
-	if ( exportFile->fileName() == "" || ! exportFormat->exec() ) return false ;
+    exportDialog *exportFormat = new exportDialog(&Descriptors, dataTypes()) ;
+    if ( exportFile->fileName() == "" || ! exportFormat->exec() )
+    {
+        delete exportFormat ;
+        return false ;
+    }
 	exportFile->open(QIODevice::WriteOnly | QIODevice::Text) ;
 	QTextStream out(exportFile) ;
 	QList<QPair<bool,QString> > headerFormat = exportFormat->headerFormat() ;
@@ -55,6 +65,7 @@ bool specModel::exportData(QModelIndexList& list)
 		for (int i = 0 ; i < list.size() ; i++)
 			itemPointer(list[i])->exportData(headerFormat, dataFormat, out) ;
 	exportFile->close() ;
+    delete exportFormat ;
 	return true ;
 }
 
@@ -153,7 +164,7 @@ bool specModel::setHeaderData (int section,Qt::Orientation orientation,const QVa
 		return true ;
 	}
 	
-	if (role == 34) // TODO introduce in names.h
+    if (role == spec::descriptorPropertyRole) // TODO introduce in names.h
 	{
 		DescriptorProperties[section] = (spec::descriptorFlags) value.toInt() ;
 		return true ;
@@ -196,7 +207,7 @@ void specModel::checkForNewDescriptors(const QList<specModelItem*>& list, const 
 			{
 				insertColumns(columnCount(parent),1,parent) ;
 				setHeaderData(columnCount(parent)-1,Qt::Horizontal,descriptor) ;
-				setHeaderData(columnCount(parent)-1,Qt::Horizontal,(int) pointer->descriptorProperties(descriptor), 34) ;
+                setHeaderData(columnCount(parent)-1,Qt::Horizontal,(int) pointer->descriptorProperties(descriptor), spec::descriptorPropertyRole) ;
 			}
 		}
 	}
@@ -278,6 +289,8 @@ QVariant specModel::data(const QModelIndex &index, int role) const
 		return pointer->pen().color() ;
 	case spec::fullContentRole :
 		return pointer->descriptor(Descriptors[index.column()],true) ;
+    case Qt::EditRole :
+        return pointer->editDescriptor(Descriptors[index.column()]) ;
 	case Qt::ToolTipRole :
 		return pointer->toolTip(Descriptors[index.column()]) ;
 	}
@@ -341,9 +354,12 @@ QVariant specModel::headerData(int section, Qt::Orientation orientation,
 		    int role) const
 {
 	Q_UNUSED(orientation)
-	if (role != Qt::DisplayRole)
-		return QVariant();
-	return Descriptors[section] ;
+    if (role == Qt::DisplayRole)
+        return Descriptors[section] ;
+    if (role == spec::descriptorPropertyRole)
+        return (int) DescriptorProperties[section] ;
+    return QVariant();
+
 }
 
 bool specModel::removeRows(int position, int rows, const QModelIndex &parent) 
@@ -369,7 +385,7 @@ void specModel::setInternalDrop(bool val)
 }
 
 Qt::DropActions specModel::supportedDropActions() const
-{ return Qt::CopyAction | Qt::MoveAction; }
+{ return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction ; }
 
 void specModel::eliminateChildren(QModelIndexList& list) const
 {
@@ -672,4 +688,21 @@ void specModel::restoreDescriptor(qint16 position, spec::descriptorFlags flags, 
 	DescriptorProperties.insert(position, flags) ;
     }
     root->restoreDescriptor(origin, key) ;
+}
+
+QList<specFileImportFunction> specModel::acceptableImportFunctions() const
+{
+    return QList<specFileImportFunction>()
+            << readHVFile
+            << readPEFile
+            << readJCAMPFile
+            << readSKHIFile
+            << readXYFILE ;
+}
+
+QValidator* specModel::createValidator(const QModelIndex &i) const
+{
+    if (itemPointer(i)->isNumeric(Descriptors[i.column()]))
+        return new QDoubleValidator ;
+    return 0 ;
 }

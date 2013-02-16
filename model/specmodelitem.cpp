@@ -396,3 +396,8 @@ void specModelItem::restoreDescriptor(QListIterator<specDescriptor> &origin, con
     else
         origin.next() ;
 }
+
+QString specModelItem::editDescriptor(const QString &key) const
+{
+    return descriptor(key, true) ;
+}

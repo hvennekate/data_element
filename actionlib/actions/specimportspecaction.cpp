@@ -30,7 +30,7 @@ specUndoCommand *specImportSpecAction::generateUndoCommand()
 	for(int i = 0 ; i < fileNames.size() ; ++i)
 	{
 		QList<specModelItem*> (*importFunction)(QFile&) = fileFilter(fileNames[i]);
-		if (!acceptableFunctions.contains(importFunction))
+        if (!model->acceptableImportFunctions().contains(importFunction))
 		{
 			QMessageBox::critical(0,tr("Cannot import"),tr("Cannot import this type of data here:")+ fileNames[i],QMessageBox::Ok) ;
 			continue ;
@@ -56,9 +56,4 @@ specUndoCommand *specImportSpecAction::generateUndoCommand()
 void specImportSpecAction::setFilters(const QStringList &f)
 {
 	filters = f ;
-}
-
-void specImportSpecAction::setAcceptableImportFunctions(const QList<QList<specModelItem *> (*)(QFile &)> &f)
-{
-	acceptableFunctions = f ;
 }

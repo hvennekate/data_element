@@ -80,7 +80,7 @@ public:
 	virtual QStringList descriptorKeys() const ;
 	virtual spec::descriptorFlags descriptorProperties(const QString& key) const ;
     virtual void setDescriptorProperties(const QString& key, spec::descriptorFlags f) ;
-	virtual void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
+    virtual void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
 	virtual QVector<double> intensityData() const ;
 	virtual int removeData(QList<specRange*>*) { refreshPlotData() ; return 0 ; }
 	virtual void movingAverage(int) {}
@@ -91,6 +91,7 @@ public:
     virtual void deleteDescriptor(const QString& key) ;
     virtual void dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const ;
     virtual void restoreDescriptor(QListIterator<specDescriptor>& origin, const QString& key) ;
+    virtual QString editDescriptor(const QString& key) const ;
 
 	int rtti() const { return spec::spectrum ; }
 	void attach(QwtPlot *plot) ;

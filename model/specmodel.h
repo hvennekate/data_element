@@ -14,7 +14,7 @@ class specModelItem ;
 class specActionLibrary ;
 class specMimeConverter ;
 class specCanvasItem ;
-
+class QValidator ;
 
 QDataStream& operator<<(QDataStream&, specModel&);
 QDataStream& operator>>(QDataStream& in, specModel& model) ;
@@ -47,6 +47,8 @@ private:
 	QList<specMimeConverter*> mimeConverters() const ;
 	specMetaModel* metaModel ;
 	void checkForNewDescriptors(const QList<specModelItem*>& list, const QModelIndex& parent) ;
+protected:
+    virtual QStringList dataTypes() const ;
 public:
 	specModel(QObject *par = 0) ;
 	~specModel() ;
@@ -125,7 +127,10 @@ public:
 	void signalEndReset() { endResetModel() ; } // TODO just emit from whereever this function is called
 	void signalChanged(const QModelIndex& index) ;
     void signalChanged(QModelIndex originalBegin, QModelIndex originalEnd) ;
+    virtual QList<specFileImportFunction> acceptableImportFunctions() const ;
 	
+    virtual QValidator* createValidator(const QModelIndex&) const ;
+
 // //TODO	
 public slots:
 	bool exportData(QModelIndexList& list) ;

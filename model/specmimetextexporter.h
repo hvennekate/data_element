@@ -8,12 +8,11 @@ class specMimeTextExporter : public specMimeConverter
 {
 	Q_OBJECT
 private:
-	void writeItem(const specModelItem*, QTextStream& out) ;
+    void writeItem(specModelItem*, QTextStream& out) ;
 public:
 	explicit specMimeTextExporter(QObject *parent = 0);
 	virtual QList<specModelItem*> importData(const QMimeData *data) ;
 	void exportData(QList<specModelItem *> &, QMimeData *) ;
-	bool canImport(const QStringList & types) ;
 };
 
 #endif // SPECMIMETEXTEXPORTER_H

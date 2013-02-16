@@ -12,6 +12,7 @@
 #include "specgenericmimeconverter.h"
 #include "speclogtodataconverter.h"
 #include "spectextmimeconverter.h"
+#include "specmimefileimporter.h"
 #include "speckineticwidget.h"
 #include "specactionlibrary.h"
 #include "specdataview.h"
@@ -68,6 +69,7 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 
 	new specGenericMimeConverter(items->model()) ;
 	new specLogToDataConverter(items->model()) ;
+    new specMimeFileImporter(items->model()) ;
 	new specTextMimeConverter(items->model()) ;
 
 	actions->addDragDropPartner(items->model()) ;
@@ -258,6 +260,8 @@ bool specPlotWidget::saveFile()
 	zipDevice.close() ;
 //	qDebug() << "written buffer:" << outBuffer->size() ;
 //	out << outBuffer->data() ;
+    zipDevice.releaseDevice() ;
+    file->close();
 	return true ;
 }
 

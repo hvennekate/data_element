@@ -7,3 +7,13 @@ specLogModel::specLogModel(QObject *parent)
 	: specModel(parent)
 {
 }
+
+QStringList specLogModel::dataTypes() const
+{
+    return QStringList() ;
+}
+
+QList<specFileImportFunction> specLogModel::acceptableImportFunctions() const
+{
+    return QList<specFileImportFunction>() << readLogFile ;
+}

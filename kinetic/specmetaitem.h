@@ -39,6 +39,7 @@ public:
 	void refreshPlotData();
 	QStringList descriptorKeys() const ;
 	QString descriptor(const QString &key, bool full=false) const ;
+    QString editDescriptor(const QString &key) const ;
 	bool changeDescriptor(QString key, QString value) ; // TODO add changeDescriptor(key,specDescriptor)
 	spec::descriptorFlags descriptorProperties(const QString& key) const ;
     void setDescriptorProperties(const QString &key, spec::descriptorFlags f);
@@ -73,6 +74,7 @@ public:
 	void setPenStyle(const qint8 &);
 	qint8 penStyle() const ;
 	void connectedItems(QModelIndexList& dataItems, QModelIndexList& metaItems) ;
+    void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
 };
 
 /* TODO in other classes

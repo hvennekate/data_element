@@ -97,7 +97,6 @@ SOURCES += main.cpp \
     actionlib/actions/specrequiresitemaction.cpp \
     model/specmimetextexporter.cpp \
     lmfit/lmmin.c \
-    lmfit/lmcurve.c \
     kinetic/specfitcurve.cpp \
     actionlib/commands/specexchangefitcurvecommand.cpp \
     actionlib/actions/specitempropertiesaction.cpp \
@@ -114,7 +113,8 @@ SOURCES += main.cpp \
     actionlib/commands/specdeletedescriptorcommand.cpp \
     actionlib/commands/specrenamedescriptorcommand.cpp \
     actionlib/actions/specdescriptoreditaction.cpp \
-    utilities/bzipiodevice.cpp
+    utilities/bzipiodevice.cpp \
+    model/specmimefileimporter.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -213,7 +213,6 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/specrequiresitemaction.h \
     model/specmimetextexporter.h \
     lmfit/lmmin.h \
-    lmfit/lmcurve.h \
     kinetic/specfitcurve.h \
     actionlib/commands/specexchangefitcurvecommand.h \
     actionlib/actions/specitempropertiesaction.h \
@@ -230,7 +229,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/commands/specdeletedescriptorcommand.h \
     actionlib/commands/specrenamedescriptorcommand.h \
     actionlib/actions/specdescriptoreditaction.h \
-    utilities/bzipiodevice.h
+    utilities/bzipiodevice.h \
+    model/specmimefileimporter.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -255,7 +255,9 @@ INCLUDEPATH += . \
     /usr/include/qwt
 LIBS += -lqwt \
 	-lmuparser \
-	-lbz2
+	-lbz2 \
+	-lgsl \
+	-lgslcblas
 }
 win32 {
 INCLUDEPATH += . \

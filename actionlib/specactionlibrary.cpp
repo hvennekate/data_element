@@ -87,7 +87,6 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		addNewAction(bar, new specAddFolderAction(target)) ;
 		addNewAction(bar, new specAddSVGItemAction(target)) ;
 		specImportSpecAction *importAction = new specImportSpecAction(target) ;
-        importAction->setAcceptableImportFunctions(QList<QList<specModelItem *> (*)(QFile &)>() << readHVFile << readPEFile << readJCAMPFile << readSKHIFile << readXYFILE);
 		addNewAction(bar, importAction) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specCopyAction(target)) ;
@@ -133,7 +132,6 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		addNewAction(bar, new specAddFolderAction(target)) ;
 		specImportSpecAction *importAction = new specImportSpecAction(target) ;
 		importAction->setFilters(QStringList() << "Log-files (*.log)");
-		importAction->setAcceptableImportFunctions(QList<QList<specModelItem*> (*)(QFile&)>() << readLogFile);
 		addNewAction(bar, importAction) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specCopyAction(target)) ;

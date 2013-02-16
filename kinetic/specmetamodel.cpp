@@ -39,3 +39,13 @@ void specMetaModel::setModels(specModelItem *item)
 	if (mitem)
 		mitem->setModels(this, dataModel) ;
 }
+
+QStringList specMetaModel::dataTypes() const
+{
+    return QStringList() << "x" << "y" << "fit" ;
+}
+
+QList<specFileImportFunction> specMetaModel::acceptableImportFunctions() const
+{
+    return QList<specFileImportFunction>() ;
+}
