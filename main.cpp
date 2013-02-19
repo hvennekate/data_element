@@ -27,6 +27,11 @@
 // TODO : ranges point correction
 #include <QApplication>
 #include <specappwindow.h>
+#include <QVector>
+#include "asciiexporter.h"
+#include <QFile>
+#include "bzipiodevice.h"
+#include <QPair>
 
 int main(int argc, char *argv[])
 {
@@ -38,8 +43,64 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationDomain("mpibpc.mpg.de") ;
 	QCoreApplication::setApplicationName("spec-PumpProbe") ;
 	QApplication app(argc, argv) ;
-	specAppWindow* mainWindow = new specAppWindow();
-	mainWindow->show();
-	return app.exec();
+    if (argc > 1 && (QString(argv[1]) == "-e" || QString(argv[1]) == "-E"))
+    {
+        bool withFiles(QString(argv[1]) == "-E") ;
+        QVector<QPair<QVector<int>, QString> > items ;
+        for (int i = 3 ; i < argc ; ++i)
+        {
+            QStringList l =  QString(argv[i]).split("/") ;
+            QVector<int> item ;
+            foreach(QString n, l)
+                item << n.toInt() ;
+            QString filename ;
+            if (withFiles && i < argc) filename = argv[++i] ;
+            items << qMakePair(item, filename) ;
+        }
+        QFile *file = new QFile(argv[2]) ;
+        if (!file->open(QFile::ReadOnly))
+            return 1 ;
+        QFile stdoutfile ;
+        stdoutfile.open(stdout, QIODevice::WriteOnly) ;
+        QTextStream out(&stdoutfile) ;
+        QDataStream in(file) ;
+        asciiExporter exporter(asciiExporter::meta) ;
+
+        // TODO make static public in specplotwidget
+        // Basic layout of the file:
+        quint64 check ;
+        in >> check ;
+        if (check != FILECHECKRANDOMNUMBER && check != FILECHECKCOMPRESSNUMBER) return 2 ;
+        QByteArray fileContent = file->readAll() ;
+        file->close();
+
+        QDataStream inStream(fileContent) ;
+        bzipIODevice *zipDevice = 0 ;
+        QBuffer buffer(&fileContent) ; // does not take ownership of byteArray
+        if (FILECHECKCOMPRESSNUMBER == check)
+        {
+            zipDevice = new bzipIODevice(&buffer) ; // takes ownership of buffer
+            qDebug() << "opening buffer:" << zipDevice->open(bzipIODevice::ReadOnly) ;
+            inStream.setDevice(zipDevice);
+        }
+        exporter.readFromStream(inStream) ;
+        zipDevice->releaseDevice() ;
+        delete zipDevice ;
+        delete file ;
+        typedef QPair<QVector<int>, QString> itemPair ;
+        foreach (const itemPair& item, items)
+        {
+            QFile outfile(item.second) ;
+            if (outfile.open(QFile::WriteOnly)) out.setDevice(&outfile) ;
+            else out.setDevice(&stdoutfile) ;
+            out << exporter.content(item.first) ;
+        }
+    }
+    else
+    {
+        specAppWindow* mainWindow = new specAppWindow();
+        mainWindow->show();
+        return app.exec();
+    }
 }
 
