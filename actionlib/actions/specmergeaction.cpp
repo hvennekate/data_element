@@ -94,7 +94,6 @@ public:
 		QVector<specModelItem*> newlyInserted ;
 
 		// Create and insert new merged items
-		qDebug() << "Beginning merge:" << profiler.restart() ;
 		int total = items.size() ;
         QStringList comparisons ;
         foreach(stringDoublePair pair, criteria)
@@ -180,10 +179,8 @@ public:
 			}
 			if (model->insertItems(toInsert.toList(), model->index(parent), row))
 				newlyInserted += toInsert ; // TODO else...
-			qDebug() << "processing chunk:" << profiler.restart() ;
 		}
 		emit progressValue(total) ;
-		qDebug() << "arranged items:" << profiler.restart() ;
 
 		Command = new specMultiCommand ;
 		Command->setParentObject(model) ;
@@ -232,7 +229,6 @@ specUndoCommand* specMergeAction::generateUndoCommand()
 	// let user define similarities
 	QList<stringDoublePair > criteria ;
 	bool spectralAdaptation ;
-	qDebug() << "gathered items:" << profiler.restart() ;
 	if (!getMergeCriteria(criteria, model->descriptors(), model->descriptorProperties(),spectralAdaptation)) return 0 ;
 
 	mergeActionThread mat(model,items,criteria,spectralAdaptation) ;
@@ -306,7 +302,6 @@ bool mergeActionThread::itemsAreEqual(specModelItem* first, specModelItem* secon
 		{
 			double a = first->descriptor(criterion.first).toDouble(),
 				b = second->descriptor(criterion.first).toDouble() ;
-//			qDebug() <<"items equal?" << a << b << tolerance << (b-tolerance <= a && a <= b+tolerance) ;
 			if (!(b-tolerance <= a && a <= b+tolerance)) return false ;
 		}
 		else if (first->descriptor(criterion.first,true) != second->descriptor(criterion.first,true))

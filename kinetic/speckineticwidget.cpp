@@ -53,6 +53,7 @@ void specKineticWidget::writeToStream(QDataStream &out) const
 
 void specKineticWidget::readFromStream(QDataStream &in)
 {
+    qDebug() << "reading kinetics" ;
 	in >> *plot >> *items ;
 }
 

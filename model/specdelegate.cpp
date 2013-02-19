@@ -17,6 +17,7 @@ bool specDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const Q
 QWidget* specDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
 	Q_UNUSED(option)
+    Q_UNUSED(index)
     QTextEdit *editor = new QTextEdit(parent) ;
 	QPalette palette = editor->palette() ;
 	palette.setColor(QPalette::Base,palette.toolTipBase().color());

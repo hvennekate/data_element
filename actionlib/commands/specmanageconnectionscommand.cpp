@@ -101,7 +101,6 @@ void specManageConnectionsCommand::parentAssigned()
 QVector<specModelItem*> specManageConnectionsCommand::itemPointers() const
 {
 	QVector<specModelItem*> pointers ;
-//	qDebug() << items ;
 	foreach(specGenealogy *genealogy,items)
 		pointers << genealogy->items() ; // TODO think over
 	return pointers ;
