@@ -142,7 +142,7 @@ void specPlotWidget::read(QString fileName)
 //	if (!inStream.device()) inStream.setDevice(&buffer) ;
 
     QProgressDialog progress ;
-    progress.setMaximum(5) ;
+    progress.setMaximum(30) ;
     progress.setMinimumDuration(300);
     progress.setWindowModality(Qt::WindowModal);
     progress.setCancelButton(0);
@@ -161,6 +161,7 @@ void specPlotWidget::read(QString fileName)
     inStream >> *kineticWidget ;
     progress.setLabel(new QLabel(tr("Reading undo history")));
     progress.setValue(4);
+    actions->setProgressDialog(&progress);
     inStream >> *actions ;
     progress.setValue(5);
 	if (zipDevice) zipDevice->releaseDevice(); // release ownership of buffer
@@ -276,7 +277,7 @@ bool specPlotWidget::saveFile()
     progress.setMinimumDuration(300);
     progress.setWindowModality(Qt::WindowModal);
     progress.setWindowTitle(tr("Saving ") + file->fileName());
-    progress.setMaximum(5);
+    progress.setMaximum(30);
     progress.setLabel(new QLabel(tr("Saving plot"))) ;
     progress.setValue(0);
     zipOut << *plot ;
@@ -291,8 +292,9 @@ bool specPlotWidget::saveFile()
     zipOut << *kineticWidget ;
     progress.setLabel(new QLabel(tr("Saving undo history"))) ;
     progress.setValue(4);
+    actions->setProgressDialog(&progress) ;
     zipOut<< *actions ;
-    progress.setValue(5);
+    progress.setValue(progress.maximum());
 	zipDevice.close() ;
 //	qDebug() << "written buffer:" << outBuffer->size() ;
 //	out << outBuffer->data() ;

@@ -33,6 +33,7 @@
 #include "specsetmultilineaction.h"
 #include "specsvgitem.h"
 #include "specdescriptoreditaction.h"
+#include <QProgressDialog>
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -40,7 +41,8 @@ QUndoView* specActionLibrary::undoView()
 }
 
 specActionLibrary::specActionLibrary(QObject *parent) :
-    QObject(parent)
+    QObject(parent),
+    progress(0)
 {
     undoStack = new QUndoStack(this) ; // TODO consider making this a plain variable
     connect(undoStack,SIGNAL(cleanChanged(bool)),this,SIGNAL(stackClean(bool))) ;
@@ -181,8 +183,16 @@ void specActionLibrary::writeToStream(QDataStream &out) const
 {
 	out << qint32(undoStack->count()) ;
 	out << qint32(undoStack->index()) ;
+    int progressToGo = 0, progressStart = 0 ;
+    if (progress)
+    {
+        progressStart = progress->value() ;
+        progressToGo = progress->maximum() - progressStart ;
+
+    }
 	for (int i = 0 ; i < undoStack->count() ; ++i)
 	{
+        if (progress) progress->setValue(progressStart + (i*progressToGo)/undoStack->count());
 		specUndoCommand* command = (specUndoCommand*) undoStack->command(i) ;
 		out << type(command->id()) << qint32(parents.indexOf(command->parentObject()))
 		    << *command ;
@@ -202,9 +212,17 @@ void specActionLibrary::readFromStream(QDataStream &in)
 
 	type t ;
 	QVector<qint32> parentIndex(num,0) ;
+    int progressToGo = 0, progressStart = 0 ;
+    if (progress)
+    {
+        progressStart = progress->value() ;
+        progressToGo = progress->maximum() - progressStart ;
+
+    }
 
 	for (int i = 0 ; i < num ; ++i)
 	{
+        if (progress) progress->setValue(progressStart + (i*progressToGo)/num);
 		in >> t >> parentIndex[i] ;
         specStreamable *streamable = produceItem(in) ;
         specUndoCommand *command = dynamic_cast<specUndoCommand*>(streamable) ;
@@ -313,4 +331,9 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
 specActionLibrary::~specActionLibrary()
 {
     delete undoStack ;
+}
+
+void specActionLibrary::setProgressDialog(QProgressDialog *p)
+{
+    progress = p ;
 }
