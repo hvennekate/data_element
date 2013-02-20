@@ -212,8 +212,7 @@ void metaItemProperties::buildPoints()
             ui->dataTable->setRowCount(row+1) ;
             ui->dataTable->setItem(row,0, newTableEntry) ;
             ui->dataTable->setItem(row, 1, new QTableWidgetItem(QString::number(dataPoints[i].y()))) ;
-            qDebug() << "variableValues.size:" << variableValues.size() ;
-            for (int j = 0 ; j < variableValues[i].size() ; ++j)
+	    for (int j = 0 ; j < variableValues[i].size() ; ++j)
                 ui->dataTable->setItem(row, 2+j, new QTableWidgetItem(QString::number(variableValues[i][j])));
 
             pointInfo[newTableEntry] = info ;

@@ -9,7 +9,6 @@
 #include "specmetarange.h"
 #include "specmetaparser.h"
 #include "canvaspicker.h"
-#include <QDebug>
 #include <specplot.h>
 
 QString specMetaVariable::extract(QString & source, const QRegExp& expression)

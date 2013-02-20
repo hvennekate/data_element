@@ -478,9 +478,7 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
             return QList<specModelItem*>() ;
         }
 		if (!in.atEnd()) secondLine = in.readLine() ;
-        qDebug() << "first" << firstLine ;
-        qDebug() << "second" << secondLine ;
-        descriptors["Tag"] = specDescriptor(takeDateOrTime(secondLine)) ;
+	descriptors["Tag"] = specDescriptor(takeDateOrTime(secondLine)) ;
 		descriptors["Uhrzeit"] = specDescriptor(takeDateOrTime(secondLine)) ;
         if (firstLine == "")
 		{
@@ -491,12 +489,10 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 			QString mainDescriptor = newDescriptor.first ;
 			while(!secondLine.isEmpty())
 			{
-				qDebug() << "first" << newDescriptor.first << "second" << newDescriptor.second << "rest:" << secondLine ;
 				newDescriptor = interpretString(secondLine) ;
 				descriptors[newDescriptor.first] = newDescriptor.second ;
 			}
 			logData += new specLogMessage(descriptors,0, mainDescriptor) ;
-			qDebug() << "first" << newDescriptor.first << "second" << newDescriptor.second << "rest:" << secondLine ;
 		}
         else
 		{

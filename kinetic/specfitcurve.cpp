@@ -191,18 +191,12 @@ bool specFitCurve::changeDescriptor(QString key, QString value)
 
 	generateParser();
 	setParserConstants();
-	qDebug() << "Data size:" << dataSize() ;
-	for (size_t i  = 0 ; i < qMin((size_t) 10,dataSize()) ; ++i)
-		qDebug() << sample(i) ;
 	refreshPlotData();
 	return true ;
 }
 
 void specFitCurve::attach(QwtPlot *plot)
 {
-	qDebug() << "Data size:" << dataSize() ;
-	for (size_t i  = 0 ; i < qMin((size_t) 10,dataSize()) ; ++i)
-		qDebug() << sample(i) ;
 //	if (plot)
 //		if (fitData *d = dynamic_cast<fitData*>(data()))
 //			d->setRectOfInterest(plot->);

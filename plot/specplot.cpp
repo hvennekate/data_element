@@ -273,10 +273,6 @@ void specPlot::mouseDoubleClickEvent(QMouseEvent *e)
     QwtScaleWidget* xAxisWidget = axisWidget(QwtPlot::xBottom) ;
     QwtScaleWidget* yAxisWidget = axisWidget(QwtPlot::yLeft) ;
 
-    qDebug() << "Positions:" << e->pos() << xAxisWidget->pos() << yAxisWidget->pos() ;
-    qDebug() << "Tops/Bottoms:" << xAxisWidget->geometry() << yAxisWidget->geometry() ;
-    qDebug() << yAxisWidget->geometry().top() << yAxisWidget->geometry().bottom() ;
-
     xmaxEdit.setText(QString::number(zoom->zoomBase().right())) ;
     xminEdit.setText(QString::number(zoom->zoomBase().left()));
     ymaxEdit.setText(QString::number(zoom->zoomBase().bottom())) ;

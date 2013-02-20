@@ -136,7 +136,7 @@ void specPlotWidget::read(QString fileName)
 	if (FILECHECKCOMPRESSNUMBER == check)
 	{
 		zipDevice = new bzipIODevice(&buffer) ; // takes ownership of buffer
-		qDebug() << "opening buffer:" << zipDevice->open(bzipIODevice::ReadOnly) ;
+		zipDevice->open(bzipIODevice::ReadOnly) ;
 		inStream.setDevice(zipDevice);
 	}
 //	if (!inStream.device()) inStream.setDevice(&buffer) ;
@@ -308,8 +308,6 @@ bool specPlotWidget::saveFile()
     if (logWidget->isVisible()) visibility |= spec::logVisible ;
     zipOut << (qint8) visibility ;
 	zipDevice.close() ;
-//	qDebug() << "written buffer:" << outBuffer->size() ;
-//	out << outBuffer->data() ;
     zipDevice.releaseDevice() ;
     file->close();
 	return true ;
