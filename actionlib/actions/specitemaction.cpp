@@ -17,7 +17,6 @@ const std::type_info& specItemAction::possibleParent()
 
 void specItemAction::execute()
 {
-	qDebug() << "execute item action" ;
 	if (!(view = qobject_cast<specView*>(parent()))) return ;
 	if (!(model = view->model())) return ;
 	currentIndex = view->currentIndex() ;

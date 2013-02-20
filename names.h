@@ -21,6 +21,10 @@ namespace spec{
     enum desc {def = 0, numeric = 1, editable=2, multiline=4} ;
 	Q_DECLARE_FLAGS(descriptorFlags,desc)
 	Q_DECLARE_OPERATORS_FOR_FLAGS(descriptorFlags)
+
+    enum subDockVisibility { noneVisible = 0, logVisible = 1, metaVisible = 2, undoVisible = 4 } ;
+    Q_DECLARE_FLAGS(subDockVisibilityFlags, subDockVisibility)
+    Q_DECLARE_OPERATORS_FOR_FLAGS(subDockVisibilityFlags)
 	
 	// originial dataItem enum value: 0
 	

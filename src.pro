@@ -114,7 +114,8 @@ SOURCES += main.cpp \
     actionlib/commands/specrenamedescriptorcommand.cpp \
     actionlib/actions/specdescriptoreditaction.cpp \
     utilities/bzipiodevice.cpp \
-    model/specmimefileimporter.cpp
+    model/specmimefileimporter.cpp \
+    asciiexporter.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -230,7 +231,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/commands/specrenamedescriptorcommand.h \
     actionlib/actions/specdescriptoreditaction.h \
     utilities/bzipiodevice.h \
-    model/specmimefileimporter.h
+    model/specmimefileimporter.h \
+    asciiexporter.h
 
 INCLUDEPATH += kinetic \
 	log \

@@ -53,6 +53,7 @@ protected :
 public:
 	specPlotWidget(QWidget *parent = 0);
 	~specPlotWidget();
+    QString fileName() const ;
 
 	void read(QString fileName) ;
 	specView* mainView() ;

@@ -35,7 +35,6 @@ void specMoveCommand::moveUnit::indexesToPointers(specModel *model)
 	}
 	firstItemIndex.clear();
 	parentIndex.clear();
-	qDebug() << "IndexesToPointers" << count ;
 }
 
 void specMoveCommand::moveUnit::moveIt()

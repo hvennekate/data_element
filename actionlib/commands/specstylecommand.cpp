@@ -71,7 +71,6 @@ specStyleCommandImplTemplate
 void specStyleCommandImplFuncTemplate::parentAssigned()
 {
 	specModel *model = qobject_cast<specModel*>(parentObject()) ;
-	qDebug() << "assigning parent to style genealogy" << model ;
 	for (QList<specGenealogy>::iterator i = Genealogies.begin() ; i != Genealogies.end() ; ++i)
 		i->setModel(model) ;
 }

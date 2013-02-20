@@ -738,7 +738,7 @@ QList<specModelItem*> readXYFILE(QFile &file)
                                   QObject::tr("The number of columns differs in at least one line"
                                               " differs from that determined for the first line. "
                                               "(Error occured in line %1. Pre-determined number of"
-                                              " columns: %2. The line in question hat %3 columns.)").
+                                              " columns: %2. The line in question has %3 columns.)").
                                   arg(i).arg(numberOfColums).arg(line.size())) ;
             return newItems ;
         }

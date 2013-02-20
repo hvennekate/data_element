@@ -21,6 +21,7 @@ class specView ;
 class specModel ;
 class specUndoAction ;
 class QUndoView ;
+class QProgressDialog ;
 
 class specActionLibrary : public QObject, public specStreamable
 {
@@ -42,6 +43,7 @@ public:
 	void purgeUndo() ;
 	QUndoView* undoView() ;
 	specCommandGenerator commandGenerator ;
+    void setProgressDialog(QProgressDialog*) ;
 public slots:
 	void push(specUndoCommand*) ;
 signals:
@@ -58,6 +60,7 @@ private:
 	template<class toolMenu>
 	void addNewAction(toolMenu*, specUndoAction*) ;
     specStreamable* factory(const type &t) const ;
+    QProgressDialog *progress ;
 };
 
 #endif // SPECACTIONLIBRARY_H

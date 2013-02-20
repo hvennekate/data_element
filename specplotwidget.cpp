@@ -142,7 +142,7 @@ void specPlotWidget::read(QString fileName)
 //	if (!inStream.device()) inStream.setDevice(&buffer) ;
 
     QProgressDialog progress ;
-    progress.setMaximum(5) ;
+    progress.setMaximum(30) ;
     progress.setMinimumDuration(300);
     progress.setWindowModality(Qt::WindowModal);
     progress.setCancelButton(0);
@@ -161,11 +161,19 @@ void specPlotWidget::read(QString fileName)
     inStream >> *kineticWidget ;
     progress.setLabel(new QLabel(tr("Reading undo history")));
     progress.setValue(4);
+    actions->setProgressDialog(&progress);
     inStream >> *actions ;
     progress.setValue(5);
+    qint8 vint = 0 ;
+    inStream >> vint ;
+    spec::subDockVisibilityFlags visibility(vint) ;
 	if (zipDevice) zipDevice->releaseDevice(); // release ownership of buffer
 	delete zipDevice ;
+
 	changeFileName(fileName);
+    logWidget->setVisible(visibility & spec::logVisible);
+    kineticWidget->setVisible(visibility & spec::metaVisible) ;
+    undoViewWidget->setVisible(visibility & spec::undoVisible) ;
 }
 
 void specPlotWidget::modified(bool unmod)
@@ -276,7 +284,7 @@ bool specPlotWidget::saveFile()
     progress.setMinimumDuration(300);
     progress.setWindowModality(Qt::WindowModal);
     progress.setWindowTitle(tr("Saving ") + file->fileName());
-    progress.setMaximum(5);
+    progress.setMaximum(30);
     progress.setLabel(new QLabel(tr("Saving plot"))) ;
     progress.setValue(0);
     zipOut << *plot ;
@@ -291,8 +299,14 @@ bool specPlotWidget::saveFile()
     zipOut << *kineticWidget ;
     progress.setLabel(new QLabel(tr("Saving undo history"))) ;
     progress.setValue(4);
+    actions->setProgressDialog(&progress) ;
     zipOut<< *actions ;
-    progress.setValue(5);
+    progress.setValue(progress.maximum());
+    spec::subDockVisibilityFlags visibility = spec::noneVisible ;
+    if (kineticWidget->isVisible()) visibility |= spec::metaVisible ;
+    if (undoViewWidget->isVisible()) visibility |= spec::undoVisible ;
+    if (logWidget->isVisible()) visibility |= spec::logVisible ;
+    zipOut << (qint8) visibility ;
 	zipDevice.close() ;
 //	qDebug() << "written buffer:" << outBuffer->size() ;
 //	out << outBuffer->data() ;
@@ -359,4 +373,10 @@ void specPlotWidget::changeFileName(const QString& name)
 	kineticWidget->setWindowTitle(QString("Kinetics of ").append(QFileInfo(name).fileName())) ;
 	logWidget->setWindowTitle(QString("Logs of ").append(QFileInfo(name).fileName())) ;
 	undoViewWidget->setWindowTitle(QString("History of ").append(QFileInfo(name).fileName()));
+}
+
+QString specPlotWidget::fileName() const
+{
+    if (!file) return "" ;
+    return file->fileName() ;
 }
