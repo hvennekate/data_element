@@ -4,6 +4,7 @@
 #include "speclogwidget.h"
 #include "speckineticwidget.h"
 #include <QMimeData>
+#include "specmimetextexporter.h"
 
 asciiExporter::asciiExporter(modelType m)
     : modelPointer(0),
@@ -11,9 +12,10 @@ asciiExporter::asciiExporter(modelType m)
 {
     view.setModel(&itemModel) ;
     kineticWidget.view()->assignDataView(&view);
+    new specMimeTextExporter(view.model()) ;
     switch (m)
     {
-    case data: modelPointer = &itemModel ; break ;
+    case data: modelPointer = view.model() ; break ;
     case log:  modelPointer = logWidget.view()->model() ; break ;
     case meta: modelPointer = kineticWidget.view()->model()  ; break ;
     }
