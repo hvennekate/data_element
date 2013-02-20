@@ -43,9 +43,10 @@ int main(int argc, char *argv[])
 	QCoreApplication::setOrganizationDomain("mpibpc.mpg.de") ;
 	QCoreApplication::setApplicationName("spec-PumpProbe") ;
 	QApplication app(argc, argv) ;
-    if (argc > 1 && (QString(argv[1]) == "-e" || QString(argv[1]) == "-E"))
+    QString parameter(argc > 1 ? QString(argv[1]) : QString("")) ;
+    if (parameter.left(2).toLower() == "-e")
     {
-        bool withFiles(QString(argv[1]) == "-E") ;
+        bool withFiles(parameter.left(2) == "-E") ;
         QVector<QPair<QVector<int>, QString> > items ;
         for (int i = 3 ; i < argc ; ++i)
         {
@@ -59,18 +60,28 @@ int main(int argc, char *argv[])
         }
         QFile *file = new QFile(argv[2]) ;
         if (!file->open(QFile::ReadOnly))
+        {
+            qDebug() << "Could not open file " << file->fileName() << " for export.";
+            delete file ;
             return 1 ;
+        }
         QFile stdoutfile ;
         stdoutfile.open(stdout, QIODevice::WriteOnly) ;
         QTextStream out(&stdoutfile) ;
         QDataStream in(file) ;
-        asciiExporter exporter(asciiExporter::meta) ;
+        asciiExporter exporter(parameter.mid(2) == "d" ? asciiExporter::data :
+                                                         (parameter.mid(2) == "l" ? asciiExporter::log : asciiExporter::meta)) ;
 
         // TODO make static public in specplotwidget
         // Basic layout of the file:
         quint64 check ;
         in >> check ;
-        if (check != FILECHECKRANDOMNUMBER && check != FILECHECKCOMPRESSNUMBER) return 2 ;
+        if (check != FILECHECKRANDOMNUMBER && check != FILECHECKCOMPRESSNUMBER)
+        {
+            qDebug() << "File " << file->fileName() << " is not valid." ;
+            delete file ;
+            return 2 ;
+        }
         QByteArray fileContent = file->readAll() ;
         file->close();
 
@@ -79,6 +90,7 @@ int main(int argc, char *argv[])
         QBuffer buffer(&fileContent) ; // does not take ownership of byteArray
         if (FILECHECKCOMPRESSNUMBER == check)
         {
+            qDebug() << "File " << file->fileName() << " is compressed." ;
             zipDevice = new bzipIODevice(&buffer) ; // takes ownership of buffer
             qDebug() << "opening buffer:" << zipDevice->open(bzipIODevice::ReadOnly) ;
             inStream.setDevice(zipDevice);
@@ -88,8 +100,10 @@ int main(int argc, char *argv[])
         delete zipDevice ;
         delete file ;
         typedef QPair<QVector<int>, QString> itemPair ;
+        qDebug() << "Exporting from file " << file->fileName() ;
         foreach (const itemPair& item, items)
         {
+            qDebug() << "Exporting item " << item.first << " to " << item.second ;
             QFile outfile(item.second) ;
             if (outfile.open(QFile::WriteOnly)) out.setDevice(&outfile) ;
             else out.setDevice(&stdoutfile) ;
