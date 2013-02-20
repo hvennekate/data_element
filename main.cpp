@@ -65,9 +65,7 @@ int main(int argc, char *argv[])
             delete file ;
             return 1 ;
         }
-        QFile stdoutfile ;
-        stdoutfile.open(stdout, QIODevice::WriteOnly) ;
-        QTextStream out(&stdoutfile) ;
+        QTextStream cout(stdout, QIODevice::WriteOnly)  ;
         QDataStream in(file) ;
         asciiExporter exporter(parameter.mid(2) == "d" ? asciiExporter::data :
                                                          (parameter.mid(2) == "l" ? asciiExporter::log : asciiExporter::meta)) ;
@@ -98,16 +96,21 @@ int main(int argc, char *argv[])
         exporter.readFromStream(inStream) ;
         zipDevice->releaseDevice() ;
         delete zipDevice ;
-        delete file ;
         typedef QPair<QVector<int>, QString> itemPair ;
         qDebug() << "Exporting from file " << file->fileName() ;
+        delete file ;
         foreach (const itemPair& item, items)
         {
+            QFile outfile(item.second);
             qDebug() << "Exporting item " << item.first << " to " << item.second ;
-            QFile outfile(item.second) ;
-            if (outfile.open(QFile::WriteOnly)) out.setDevice(&outfile) ;
-            else out.setDevice(&stdoutfile) ;
-            out << exporter.content(item.first) ;
+            if (!item.second.isEmpty() && outfile.open(QFile::WriteOnly))
+            {
+                QTextStream out(&outfile) ;
+                out << exporter.content(item.first) ;
+                out.setDevice(&outfile) ;
+            }
+            else
+                cout << exporter.content(item.first) ;
         }
     }
     else

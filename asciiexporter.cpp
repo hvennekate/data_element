@@ -11,6 +11,7 @@ asciiExporter::asciiExporter(modelType m)
 {
     view.setModel(&itemModel) ;
     kineticWidget.view()->assignDataView(&view);
+    qDebug() << "model type:" << m ;
     switch (m)
     {
     case data: modelPointer = &itemModel ; break ;
