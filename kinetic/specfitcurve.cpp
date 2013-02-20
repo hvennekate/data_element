@@ -240,11 +240,11 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	// Set the fit data up
 	for (size_t i = 0 ; i < data->size() ; ++i)
 	{
-		x[i] = data->sample(i).x() ;
+        x[i] = data->sample(i).x() ;
 		y[i] = data->sample(i).y() ;
 	}
 	// Set the parser up for fitting
-	foreach (const variablePair& var, variables)
+    foreach (const variablePair& var, variables)
 	{
 		if (fitParameters.contains(var.first))
 		{
@@ -423,6 +423,23 @@ void specFitCurve::generateParser()
 		parser = 0 ;
 	}
 	setData(new fitData(parser));
+
+    // Make sure all fit parameters are actually variables!
+    QStringList::iterator i = fitParameters.begin() ;
+    while (i != fitParameters.end())
+    {
+        bool isVariable = false ;
+        foreach(variablePair variable, variables)
+        {
+            if (*i == variable.first)
+            {
+                isVariable = true ;
+                break ;
+            }
+        }
+        if (!isVariable) i = fitParameters.erase(i) ;
+        else ++i ;
+    }
 }
 
 specFitCurve::~specFitCurve()

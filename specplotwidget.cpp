@@ -23,6 +23,8 @@
 #include <QCloseEvent>
 #include "bzipiodevice.h"
 #include <QBuffer>
+#include <QProgressDialog>
+#include <QLabel>
 
 specPlotWidget::specPlotWidget(QWidget *parent)
 	: QDockWidget(tr("untitled"),parent),
@@ -139,11 +141,28 @@ void specPlotWidget::read(QString fileName)
 	}
 //	if (!inStream.device()) inStream.setDevice(&buffer) ;
 
-	inStream >> *plot
-		 >> *items
-		 >> *logWidget
-		 >> *kineticWidget
-		 >> *actions ;
+    QProgressDialog progress ;
+    progress.setMaximum(5) ;
+    progress.setMinimumDuration(300);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setCancelButton(0);
+    progress.setWindowTitle(tr("Opening ") + file->fileName());
+    progress.setLabel(new QLabel(tr("Reading plot"))) ;
+    progress.setValue(0);
+    inStream >> *plot ;
+    progress.setLabel(new QLabel(tr("Reading data items"))) ;
+    progress.setValue(1);
+    inStream >> *items ;
+    progress.setLabel(new QLabel(tr("Reading log data"))) ;
+    progress.setValue(2);
+    inStream >> *logWidget ;
+    progress.setLabel(new QLabel(tr("Reading meta items"))) ;
+    progress.setValue(3) ;
+    inStream >> *kineticWidget ;
+    progress.setLabel(new QLabel(tr("Reading undo history")));
+    progress.setValue(4);
+    inStream >> *actions ;
+    progress.setValue(5);
 	if (zipDevice) zipDevice->releaseDevice(); // release ownership of buffer
 	delete zipDevice ;
 	changeFileName(fileName);
@@ -252,11 +271,28 @@ bool specPlotWidget::saveFile()
 	zipDevice.open(bzipIODevice::WriteOnly) ;
 	QDataStream zipOut(&zipDevice) ;
 
-	zipOut << *plot
-	    << *items
-	    << *logWidget
-	    << *kineticWidget
-	    << *actions ;
+    QProgressDialog progress ;
+    progress.setCancelButton(0);
+    progress.setMinimumDuration(300);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setWindowTitle(tr("Saving ") + file->fileName());
+    progress.setMaximum(5);
+    progress.setLabel(new QLabel(tr("Saving plot"))) ;
+    progress.setValue(0);
+    zipOut << *plot ;
+    progress.setLabel(new QLabel(tr("Saving data items"))) ;
+    progress.setValue(1);
+    zipOut<< *items ;
+    progress.setLabel(new QLabel(tr("Saving log data"))) ;
+    progress.setValue(2);
+    zipOut<< *logWidget ;
+    progress.setLabel(new QLabel(tr("Saving meta data"))) ;
+    progress.setValue(3) ;
+    zipOut << *kineticWidget ;
+    progress.setLabel(new QLabel(tr("Saving undo history"))) ;
+    progress.setValue(4);
+    zipOut<< *actions ;
+    progress.setValue(5);
 	zipDevice.close() ;
 //	qDebug() << "written buffer:" << outBuffer->size() ;
 //	out << outBuffer->data() ;
