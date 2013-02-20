@@ -374,3 +374,9 @@ void specPlotWidget::changeFileName(const QString& name)
 	logWidget->setWindowTitle(QString("Logs of ").append(QFileInfo(name).fileName())) ;
 	undoViewWidget->setWindowTitle(QString("History of ").append(QFileInfo(name).fileName()));
 }
+
+QString specPlotWidget::fileName() const
+{
+    if (!file) return "" ;
+    return file->fileName() ;
+}

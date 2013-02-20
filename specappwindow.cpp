@@ -9,13 +9,17 @@ specAppWindow::specAppWindow()
 	createActions();
 	createMenus();
 	createToolBars();
-	restoreGeometry(settings.value("mainWindow/geometry").toByteArray()) ;
+    restoreGeometry(settings.value("mainWindow/geometry").toByteArray()) ;
 
 	setObjectName("specDataElementApplicationWindow") ;
 	setWindowTitle("SpecDataElement");
 	setWindowFlags(windowFlags() | Qt::WindowContextHelpButtonHint);
 
 	setWhatsThis("This is the main application window.  It can be used for docking data windows, log windows, and kinetic windows to it. to it.\nStart by creating a new file or by opening a saved file. Use the \"What's this?\" help from the title bar for further hints.");
+    setMinimumSize(300,300);
+    if (restoreSessionAction->isChecked())
+        foreach(QString fileName, settings.value("mainWindow/previousSessionFiles").toStringList())
+            openFile(fileName) ;
 }
 
 
@@ -23,10 +27,21 @@ specAppWindow::~specAppWindow()
 {
 }
 
+QStringList specAppWindow::openFileNames() const
+{
+    QStringList result ;
+    foreach(specPlotWidget* plotWidget, findChildren<specPlotWidget*>())
+        result << plotWidget->fileName() ;
+    result.removeAll(QString()) ;
+    return result ;
+}
+
 void specAppWindow::closeEvent(QCloseEvent* event)
 {
 	event->ignore() ;
 	bool allClosed = true ;
+    settings.setValue("mainWindow/previousSessionFiles",
+                      restoreSessionAction->isChecked() ? QVariant(openFileNames()) : QVariant());
 	while(!docks.isEmpty())
 	{
 		if (!docks.first()->close())
@@ -36,6 +51,7 @@ void specAppWindow::closeEvent(QCloseEvent* event)
 	}
 	event->setAccepted(allClosed) ;
 	settings.setValue("mainWindow/geometry",saveGeometry()) ;
+    settings.setValue("mainWindow/sessionRestoration", restoreSessionAction->isChecked()) ;
 }
 
 void specAppWindow::newFile()
@@ -52,18 +68,28 @@ void specAppWindow::addDock(specPlotWidget *newDock)
 {
 	docks << newDock ;
 	connect(newDock,SIGNAL(destroyed()),this,SLOT(removeDock())) ;
+    specPlotWidget *inAreaWidget = 0 ;
+    foreach(specPlotWidget* widget, docks)
+        if (dockWidgetArea(widget) == Qt::LeftDockWidgetArea)
+            inAreaWidget = widget ;
 	addDockWidget(Qt::LeftDockWidgetArea, newDock) ;
+    if (inAreaWidget)
+        tabifyDockWidget(inAreaWidget, newDock);
 }
 
 void specAppWindow::openFile()
 {
-	QString fileName = QFileDialog::getOpenFileName(this,"Name?","","spec-Dateien (*.spec)");
-	if (fileName != "" && QFile::exists(fileName))
-	{
-		specPlotWidget *newWidget = new specPlotWidget(this) ;
-		newWidget->read(fileName) ;
-		addDock(newWidget) ;
-	}
+    openFile(QFileDialog::getOpenFileName(this,"Name?","","spec-Dateien (*.spec)"));
+}
+
+void specAppWindow::openFile(const QString &fileName)
+{
+    if (fileName != "" && QFile::exists(fileName))
+    {
+        specPlotWidget *newWidget = new specPlotWidget(this) ;
+        newWidget->read(fileName) ;
+        addDock(newWidget) ;
+    }
 }
 
 void specAppWindow::createActions()
@@ -77,6 +103,12 @@ void specAppWindow::createActions()
 	openAction->setShortcut(tr("Ctrl+O"));
 	openAction->setStatusTip(tr("Open an existing file"));
 	connect(openAction, SIGNAL(triggered()), this, SLOT(openFile()));
+
+    restoreSessionAction = new QAction(QIcon::fromTheme("document-revert"), tr("Session &restoration"), this) ;
+    restoreSessionAction->setStatusTip(tr("Toggle saving of session information")) ;
+    restoreSessionAction->setCheckable(true) ;
+    restoreSessionAction->setChecked(settings.value("mainWindow/sessionRestoration",false).toBool()) ;
+
 
 	whatsThisAction = new QAction(QIcon::fromTheme("help-contextual"), tr("&What's this"), this) ;
 	whatsThisAction->setStatusTip(tr("What's this?")) ;
@@ -93,6 +125,7 @@ void specAppWindow::createToolBars()
 	fileToolBar = addToolBar(tr("File"));
 	fileToolBar->addAction(newAction);
 	fileToolBar->addAction(openAction);
+    fileToolBar->addAction(restoreSessionAction) ;
 	fileToolBar->addAction(whatsThisAction) ;
 }
 
@@ -101,6 +134,7 @@ void specAppWindow::createMenus()
 	fileMenu = menuBar()->addMenu(tr("&File"));
 	fileMenu->addAction(newAction);
 	fileMenu->addAction(openAction);
+    fileMenu->addAction(restoreSessionAction) ;
 
 	helpMenu = menuBar()->addMenu(tr("&Help")) ;
 	helpMenu->addAction(whatsThisAction) ;
