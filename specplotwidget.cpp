@@ -164,9 +164,16 @@ void specPlotWidget::read(QString fileName)
     actions->setProgressDialog(&progress);
     inStream >> *actions ;
     progress.setValue(5);
+    qint8 vint = 0 ;
+    inStream >> vint ;
+    spec::subDockVisibilityFlags visibility(vint) ;
 	if (zipDevice) zipDevice->releaseDevice(); // release ownership of buffer
 	delete zipDevice ;
+
 	changeFileName(fileName);
+    logWidget->setVisible(visibility & spec::logVisible);
+    kineticWidget->setVisible(visibility & spec::metaVisible) ;
+    undoViewWidget->setVisible(visibility & spec::undoVisible) ;
 }
 
 void specPlotWidget::modified(bool unmod)
@@ -295,6 +302,11 @@ bool specPlotWidget::saveFile()
     actions->setProgressDialog(&progress) ;
     zipOut<< *actions ;
     progress.setValue(progress.maximum());
+    spec::subDockVisibilityFlags visibility = spec::noneVisible ;
+    if (kineticWidget->isVisible()) visibility |= spec::metaVisible ;
+    if (undoViewWidget->isVisible()) visibility |= spec::undoVisible ;
+    if (logWidget->isVisible()) visibility |= spec::logVisible ;
+    zipOut << (qint8) visibility ;
 	zipDevice.close() ;
 //	qDebug() << "written buffer:" << outBuffer->size() ;
 //	out << outBuffer->data() ;
