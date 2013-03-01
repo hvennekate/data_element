@@ -115,7 +115,9 @@ SOURCES += main.cpp \
     actionlib/actions/specdescriptoreditaction.cpp \
     utilities/bzipiodevice.cpp \
     model/specmimefileimporter.cpp \
-    asciiexporter.cpp
+    asciiexporter.cpp \
+    kinetic/specminposvariable.cpp \
+    kinetic/specmaxposvariable.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -232,7 +234,9 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/specdescriptoreditaction.h \
     utilities/bzipiodevice.h \
     model/specmimefileimporter.h \
-    asciiexporter.h
+    asciiexporter.h \
+    kinetic/specminposvariable.h \
+    kinetic/specmaxposvariable.h
 
 INCLUDEPATH += kinetic \
 	log \

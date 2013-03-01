@@ -37,7 +37,7 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 	//  Jedes symbol ist ein Array aus den beteiligten items und wird ausgewertet nach
 	//   - index ([i], [i:j], [:j], [:],[::inc] etc) -> nur diese items heranziehen
 	//   - "string" -> diesen Deskriptor verwenden
-	//   - x,y,i,u,l -> x, y, integral, upper, lower mit optionaler range/punkt
+    //   - x,y,i,u,l,p,P -> x, y, integral, upper, lower mit optionaler range/punkt, lower/upper x value
 	//  Bei jeder Auswertung fuer ein item werden die Ergebnisarrays an das
 	//  master-array fuer das jeweilige Symbol angefuegt.  Padding, wenn ein
 	//  symbol-array mehr als ein neues Element bekommt.  Wenn mehrere mehr als ein Element:
@@ -46,7 +46,7 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 	//  Dann x, y auswerten.
 	const QRegExp acceptable("(\\[[0-9]*(:[0-9]*(:[0-9]*)?)?\\])?"
 				 "(\"[^\"]*\"|"
-				 "((x|y|i|u|l)"
+                 "((x|y|i|u|l|p|P)"
 				 "("
 				 "(([+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?"
 				 "(:[+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?)|"

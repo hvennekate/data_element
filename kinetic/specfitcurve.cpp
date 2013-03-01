@@ -231,6 +231,7 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 {
 	generateParser();
 	if (!parser) return ;
+    if (fitParameters.isEmpty()) return ;
     QVector<std::string> variableNames(fitParameters.size()) ;
 
 	double x[data->size()], y[data->size()], parameters[fitParameters.size()] ;

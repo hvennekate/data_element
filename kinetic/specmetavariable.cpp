@@ -9,6 +9,8 @@
 #include "specmetarange.h"
 #include "specmetaparser.h"
 #include "canvaspicker.h"
+#include "specminposvariable.h"
+#include "specmaxposvariable.h"
 #include <specplot.h>
 
 QString specMetaVariable::extract(QString & source, const QRegExp& expression)
@@ -24,7 +26,7 @@ QString specMetaVariable::extract(QString & source, const QRegExp& expression)
 specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 {
     const QRegExp rangeExp("(\\[[0-9]*(:([0-9]*)?(:([0-9]*)?)?)?\\])"),
-			descriptorExp("(\\\"[^\\\"]*\\\"|" "(x|y|i|u|l))"),
+            descriptorExp("(\\\"[^\\\"]*\\\"|" "(x|y|i|u|l|p|P))"),
 			number("[+\\-]?([0-9]+|[0-9]*\\.[0-9]+)([eE][+-]?[0-9]+)?");
 	QString range = extract(init, rangeExp) ;
 	QString descString = extract(init, descriptorExp) ;
@@ -44,6 +46,8 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 	if (descString[0] == 'l') product = new specMinVariable ;
 	if (descString[0] == 'x') product = new specXVariable ;
 	if (descString[0] == 'y') product = new specYVariable;
+    if (descString[0] == 'p') product = new specMinPosVariable ;
+    if (descString[0] == 'P') product = new specMaxPosVariable ;
 
     if (!product) return 0 ;
 
