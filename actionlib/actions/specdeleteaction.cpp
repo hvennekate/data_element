@@ -19,7 +19,7 @@ specDeleteAction::specDeleteAction(QObject *parent) :
 	setShortcut(Qt::Key_Delete);
 }
 
-specUndoCommand* specDeleteAction::command(specModel* model, QModelIndexList& selection)
+specUndoCommand* specDeleteAction::command(specModel* model, QModelIndexList& selection, specUndoCommand* parentsParent)
 {
 	specMultiCommand *parentCommand = 0 ;
 	if (!qobject_cast<specLogModel*>(model))
@@ -27,7 +27,7 @@ specUndoCommand* specDeleteAction::command(specModel* model, QModelIndexList& se
 		specMetaModel *metaModel = model->getMetaModel() ;
 		specModel *dataModel = metaModel->getDataModel() ;
 
-		parentCommand = new specMultiCommand ;
+        parentCommand = new specMultiCommand(parentsParent) ;
 		parentCommand->setParentObject(model) ;
 
 		// collect all indexes and remove connections
