@@ -115,6 +115,8 @@ SOURCES += main.cpp \
     actionlib/actions/specdescriptoreditaction.cpp \
     utilities/bzipiodevice.cpp \
     model/specmimefileimporter.cpp \
+    actionlib/actions/spectiltmatrixaction.cpp \
+    actionlib/actions/specexchangedescriptorxdialog.cpp \
     spectral/specpefile.cpp
 
 HEADERS += cutbyintensitydialog.h \
@@ -232,6 +234,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/specdescriptoreditaction.h \
     utilities/bzipiodevice.h \
     model/specmimefileimporter.h \
+    actionlib/actions/spectiltmatrixaction.h \
+    actionlib/actions/specexchangedescriptorxdialog.h \
     spectral/specpefile.h
 
 INCLUDEPATH += kinetic \
@@ -287,7 +291,8 @@ QT += svg
 FORMS += \
     spectral/dataitemproperties.ui \
     kinetic/metaitemproperties.ui \
-    model/svgitemproperties.ui
+    model/svgitemproperties.ui \
+    actionlib/actions/specexchangedescriptorxdialog.ui
 
 OTHER_FILES += icons/oxygen/index.theme \
     icons/oxygen/geticons.py
