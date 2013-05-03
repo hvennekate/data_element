@@ -125,3 +125,9 @@ void specLogEntryItem::restoreDescriptor(QListIterator<specDescriptor> &origin, 
     if (key == "") specModelItem::restoreDescriptor(origin, key) ;
     else description[key] = origin.next() ;
 }
+
+double specLogEntryItem::descriptorValue(const QString &key) const // TODO more elegant with a protected worker function!
+{
+    if (description.contains(key)) return description[key].numericValue() ;
+    return specModelItem::descriptorValue(key) ;
+}

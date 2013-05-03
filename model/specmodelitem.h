@@ -63,6 +63,7 @@ public:
 	virtual bool isFolder() const ;
 	/*! Return value of descriptor \a key */
 	virtual QString descriptor(const QString &key, bool full=false) const ;
+    virtual double descriptorValue(const QString& key) const { Q_UNUSED(key) ; return NAN ; }
 	/*! Is the descriptor \a key editable?*/
     virtual bool isEditable(QString key) const ;
     virtual bool isNumeric(const QString& key) const ;
