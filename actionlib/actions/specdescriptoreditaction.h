@@ -24,14 +24,25 @@ signals:
     void contentChanged() ;
 };
 
-class stringListEntryValidator : public QValidator
+class stringListValidator : public QValidator
+{
+private:
+    QStringList *forbiddenList ;
+public:
+    stringListValidator(QWidget* parent = 0) ;
+    void fixup(QString&) const ;
+    State validate(QString &, int &) const ;
+    void setForbidden(const QStringList& fl) const ;
+    ~stringListValidator() ;
+};
+
+class stringListEntryValidator : public stringListValidator
 {
     Q_OBJECT
     QList<stringListEntryWidget*> allWidgets ;
 public:
     stringListEntryValidator(QList<stringListEntryWidget*> allWidgets, stringListEntryWidget* parent = 0) ;
     State validate(QString &, int &) const ;
-    void fixup(QString &s) const;
 };
 
 class stringListChangeDialog : public QDialog

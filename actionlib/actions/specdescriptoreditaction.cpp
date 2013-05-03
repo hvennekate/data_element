@@ -11,25 +11,48 @@
 #include "specrenamedescriptorcommand.h"
 
 stringListEntryValidator::stringListEntryValidator(QList<stringListEntryWidget *> aW, stringListEntryWidget *parent)
-	: QValidator(parent),
+    : stringListValidator(parent),
 	  allWidgets(aW)
 {}
+
+stringListValidator::stringListValidator(QWidget *parent)
+    : QValidator(parent),
+      forbiddenList(new QStringList)
+{}
+
+stringListValidator::~stringListValidator()
+{
+    delete forbiddenList ;
+}
+
+QValidator::State stringListValidator::validate(QString &s, int &pos) const
+{
+    Q_UNUSED(pos)
+    return forbiddenList->contains(s) ? Intermediate : Acceptable ;
+}
+
+void stringListValidator::setForbidden(const QStringList &fl) const
+{
+    *forbiddenList = fl ;
+}
 
 QValidator::State stringListEntryValidator::validate(QString &s, int &pos) const
 {
 	Q_UNUSED(pos)
-    if (s == "") return Intermediate ;
-	if (stringListEntryWidget* p = qobject_cast<stringListEntryWidget*>(parent()))
-		if (!p->active()) return Acceptable ;
-	foreach(stringListEntryWidget* widget, allWidgets)
-		if (widget != (stringListEntryWidget*) parent() &&
-				widget->active() &&
-				widget->content() == s)
-			return Intermediate ;
-	return Acceptable ;
+    stringListEntryWidget* parentPointer = qobject_cast<stringListEntryWidget*>(parent()) ;
+    if (!parentPointer || !parentPointer->active()) return Acceptable ;
+
+    QStringList forbiddenStrings ;
+    forbiddenStrings << QString() ;
+    foreach(stringListEntryWidget* widget, allWidgets)
+        if (widget != parentPointer &&
+                widget->active())
+            forbiddenStrings << widget->content() ;
+    setForbidden(forbiddenStrings);
+    return stringListValidator::validate(s, pos) ;
 }
 
-void stringListEntryValidator::fixup(QString &s) const
+void stringListValidator::fixup(QString &s) const
 {
 	int n = 0 ;
 	int count = 0 ;
