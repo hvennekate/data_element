@@ -1,11 +1,8 @@
 #include "specfitcurve.h"
 #include "lmmin.h"
 #include <algorithm>
-
-#ifndef WIN32BUILD
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_math.h>
-#endif
 
 specFitCurve::fitData::fitData(mu::Parser *p)
 	: parser(p),
@@ -191,12 +188,18 @@ bool specFitCurve::changeDescriptor(QString key, QString value)
 
 	generateParser();
 	setParserConstants();
+	qDebug() << "Data size:" << dataSize() ;
+	for (size_t i  = 0 ; i < qMin((size_t) 10,dataSize()) ; ++i)
+		qDebug() << sample(i) ;
 	refreshPlotData();
 	return true ;
 }
 
 void specFitCurve::attach(QwtPlot *plot)
 {
+	qDebug() << "Data size:" << dataSize() ;
+	for (size_t i  = 0 ; i < qMin((size_t) 10,dataSize()) ; ++i)
+		qDebug() << sample(i) ;
 //	if (plot)
 //		if (fitData *d = dynamic_cast<fitData*>(data()))
 //			d->setRectOfInterest(plot->);
@@ -230,8 +233,7 @@ bool specFitCurve::acceptableVariable(const QString &s)
 void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 {
 	generateParser();
-	if (!parser) return ;
-    if (fitParameters.isEmpty()) return ;
+    if (!parser || fitParameters.isEmpty()) return ;
     QVector<std::string> variableNames(fitParameters.size()) ;
 
 	double x[data->size()], y[data->size()], parameters[fitParameters.size()] ;
@@ -260,10 +262,8 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	lm_control_struct control = lm_control_double ;
 
 	lmcurve_data_struct fitParams = { x, y, parser, &variableNames} ;
-#ifndef WIN32BUILD
     gsl_matrix *covarianceMatrix = gsl_matrix_alloc(fitParameters.size(),fitParameters.size()) ;
     double sumOfSquaredResiduals = 0 ;
-#endif
 	lmmin(fitParameters.size(),
 	      parameters,
 	      data->size(),
@@ -272,19 +272,14 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	      &control,
 	      &status,
           0,
-#ifdef WIN32BUILD
-          0, 0
-#else
           covarianceMatrix->data,
-          &sumOfSquaredResiduals
-#endif
-          ) ;
+          &sumOfSquaredResiduals) ;
+
 	// get the fit parameters back out:
 	for (QList<variablePair>::iterator i = variables.begin() ; i != variables.end() ; ++i)
 		if (fitParameters.contains(i->first))
 			i->second = parameters[fitParameters.indexOf(i->first)] ;
 
-#ifndef WIN32BUILD
     // compute asymptotic standard error of fit parameters:
     gsl_set_error_handler_off() ;
     numericalErrors.clear();
@@ -306,7 +301,6 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
     }
 
     gsl_matrix_free(covarianceMatrix) ;
-#endif
 
     // set up the new parser
     generateParser();

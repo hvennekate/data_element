@@ -34,6 +34,7 @@
 #include "specsvgitem.h"
 #include "specdescriptoreditaction.h"
 #include <QProgressDialog>
+#include "spectiltmatrixaction.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -98,6 +99,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		bar->addSeparator() ;
 		addNewAction(bar, new specTreeAction(target)) ;
 		addNewAction(bar, new specMergeAction(target)) ;
+        addNewAction(bar, new specTiltMatrixAction(target)) ;
 		addNewAction(bar, new specDescriptorEditAction(target)) ;
 		addNewAction(bar,new genericExportAction(target)) ;
 		bar->addSeparator() ;

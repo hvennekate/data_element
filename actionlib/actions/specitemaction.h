@@ -19,9 +19,10 @@ protected:
 	void execute();
 	specView* view ;
 	specModel* model ;
-	QModelIndex currentIndex ;
+    QModelIndex currentIndex, insertionIndex ;
 	QModelIndexList selection ;
 	specModelItem* currentItem ;
+    int insertionRow ;
 protected:
 	virtual specUndoCommand* generateUndoCommand() = 0 ;
 };

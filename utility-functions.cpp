@@ -15,6 +15,7 @@
 #include <QObject>
 #include <QDoubleValidator>
 #include "specprofiler.h"
+#include "specpefile.h"
 using std::max ;
 using std::min ;
 
@@ -533,6 +534,7 @@ specFileImportFunction fileFilter(const QString &fileName)
 	QString sample = in.readLine(5) ;
 	QList<specModelItem*> (*pointer)(QFile&) = 0 ;
 	if (sample == "PE IR") pointer = readPEFile ;
+    else if (sample.left(4) == "PEPE") pointer = readPEBinary ;
 	else if (sample == "Solve") pointer = readHVFile ;
     else if (sample == "Time ") pointer = readSKHIFile ;
     else if (sample.left(2) == "##") pointer = readJCAMPFile ; // ???? TODO
@@ -545,6 +547,17 @@ specFileImportFunction fileFilter(const QString &fileName)
     }
 	file.close() ;
 	return pointer ;
+}
+
+QList<specModelItem*> readPEBinary(QFile &file)
+{
+    file.close();
+    if (!file.open(QFile::ReadOnly)) return QList<specModelItem*>() ;
+    specPEFile peData(file.readAll()) ;
+    specDataItem dataItem(peData) ; // TODO interface is clumsy...
+    dataItem.changeDescriptor("Datei", QFileInfo(file.fileName()).fileName()) ;
+    dataItem.setDescriptorProperties("Datei", spec::def);
+    return QList<specModelItem*>() << new specDataItem(dataItem) ;
 }
 
 QList<specModelItem*> readPEFile(QFile& file)

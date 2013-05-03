@@ -44,7 +44,7 @@ SOURCES += main.cpp \
     actionlib/actions/speccutaction.cpp \
     plot/specspectrumplot.cpp \
     actionlib/commands/specplotmovecommand.cpp \
-	textEditor/specsimpletextedit.cpp \
+    textEditor/specsimpletextedit.cpp \
     actionlib/actions/changeplotstyleaction.cpp \
     actionlib/commands/specstylecommand.cpp \
     actionlib/actions/spectreeaction.cpp \
@@ -117,7 +117,10 @@ SOURCES += main.cpp \
     model/specmimefileimporter.cpp \
     asciiexporter.cpp \
     kinetic/specminposvariable.cpp \
-    kinetic/specmaxposvariable.cpp
+    kinetic/specmaxposvariable.cpp \
+    actionlib/actions/spectiltmatrixaction.cpp \
+    actionlib/actions/specexchangedescriptorxdialog.cpp \
+    spectral/specpefile.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -163,7 +166,7 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/speccutaction.h \
     plot/specspectrumplot.h \
     actionlib/commands/specplotmovecommand.h \
-	textEditor/specsimpletextedit.h \
+    textEditor/specsimpletextedit.h \
     actionlib/actions/changeplotstyleaction.h \
     actionlib/commands/specstylecommand.h \
     actionlib/actions/spectreeaction.h \
@@ -236,7 +239,10 @@ HEADERS += cutbyintensitydialog.h \
     model/specmimefileimporter.h \
     asciiexporter.h \
     kinetic/specminposvariable.h \
-    kinetic/specmaxposvariable.h
+    kinetic/specmaxposvariable.h \
+    actionlib/actions/spectiltmatrixaction.h \
+    actionlib/actions/specexchangedescriptorxdialog.h \
+    spectral/specpefile.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -291,7 +297,8 @@ QT += svg
 FORMS += \
     spectral/dataitemproperties.ui \
     kinetic/metaitemproperties.ui \
-    model/svgitemproperties.ui
+    model/svgitemproperties.ui \
+    actionlib/actions/specexchangedescriptorxdialog.ui
 
 OTHER_FILES += icons/oxygen/index.theme \
     icons/oxygen/geticons.py

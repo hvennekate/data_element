@@ -27,6 +27,7 @@ public:
     spec::descriptorFlags descriptorProperties ( const QString& key ) const ;
     void setDescriptorProperties(const QString &key, spec::descriptorFlags f) ;
     QString descriptor ( const QString &key, bool full = false) const ;
+    double descriptorValue(const QString &key) const ;
     bool setActiveLine(const QString &, int) ;
     int activeLine(const QString &key) const ;
     void renameDescriptors(const QMap<QString, QString> &map);
