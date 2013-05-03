@@ -695,6 +695,7 @@ QList<specFileImportFunction> specModel::acceptableImportFunctions() const
     return QList<specFileImportFunction>()
             << readHVFile
             << readPEFile
+            << readPEBinary
             << readJCAMPFile
             << readSKHIFile
             << readXYFILE ;

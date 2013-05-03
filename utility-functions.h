@@ -15,6 +15,7 @@
 QList<specModelItem*> readLogFile(QFile& file) ;
 QList<specModelItem*> readHVFile(QFile&) ;
 QList<specModelItem*> readPEFile(QFile&) ;
+QList<specModelItem*> readPEBinary(QFile&) ;
 QList<specModelItem*> readJCAMPFile(QFile&) ;
 QList<specModelItem*> readSKHIFile(QFile&) ;
 QList<specModelItem*> readXYFILE(QFile&) ;
