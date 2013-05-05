@@ -120,7 +120,10 @@ SOURCES += main.cpp \
     kinetic/specmaxposvariable.cpp \
     actionlib/actions/spectiltmatrixaction.cpp \
     actionlib/actions/specexchangedescriptorxdialog.cpp \
-    spectral/specpefile.cpp
+    spectral/specpefile.cpp \
+    actionlib/actions/specspectrumcalculatoraction.cpp \
+    actionlib/actions/specformulavalidator.cpp \
+    actionlib/actions/spectrumcalculatordialog.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -242,7 +245,10 @@ HEADERS += cutbyintensitydialog.h \
     kinetic/specmaxposvariable.h \
     actionlib/actions/spectiltmatrixaction.h \
     actionlib/actions/specexchangedescriptorxdialog.h \
-    spectral/specpefile.h
+    spectral/specpefile.h \
+    actionlib/actions/specspectrumcalculatoraction.h \
+    actionlib/actions/specformulavalidator.h \
+    actionlib/actions/spectrumcalculatordialog.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -298,7 +304,8 @@ FORMS += \
     spectral/dataitemproperties.ui \
     kinetic/metaitemproperties.ui \
     model/svgitemproperties.ui \
-    actionlib/actions/specexchangedescriptorxdialog.ui
+    actionlib/actions/specexchangedescriptorxdialog.ui \
+    actionlib/actions/spectrumcalculatordialog.ui
 
 OTHER_FILES += icons/oxygen/index.theme \
     icons/oxygen/geticons.py

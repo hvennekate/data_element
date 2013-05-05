@@ -35,6 +35,7 @@
 #include "specdescriptoreditaction.h"
 #include <QProgressDialog>
 #include "spectiltmatrixaction.h"
+#include "specspectrumcalculatoraction.h"
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -99,7 +100,8 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		bar->addSeparator() ;
 		addNewAction(bar, new specTreeAction(target)) ;
 		addNewAction(bar, new specMergeAction(target)) ;
-        addNewAction(bar, new specTiltMatrixAction(target)) ;
+		addNewAction(bar, new specTiltMatrixAction(target)) ;
+		addNewAction(bar, new specSpectrumCalculatorAction(target)) ;
 		addNewAction(bar, new specDescriptorEditAction(target)) ;
 		addNewAction(bar,new genericExportAction(target)) ;
 		bar->addSeparator() ;
@@ -287,6 +289,7 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
 	QMenu *cMenu = new QMenu(w) ;
 	specMetaView* metaView = dynamic_cast<specMetaView*>(w) ;
 	specView *view = dynamic_cast<specView*>(w) ;
+	specDataView* dataView = dynamic_cast<specDataView*>(w) ;
 	if (metaView && metaView->model())
 	{
 		specModelItem *currentItem = view->model()->itemPointer(metaView->currentIndex()) ;
@@ -303,29 +306,36 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
 				addNewAction(cMenu, new specAddFitAction(w)) ;
 		}
 	}
+
+	if (dataView && dataView->model())
+	{
+		addNewAction(cMenu, new specTiltMatrixAction(w)) ;
+		addNewAction(cMenu, new specSpectrumCalculatorAction(w)) ;
+	}
+
 	if (view && view->model())
 	{
-        addNewAction(cMenu, new specAddFolderAction(w)) ;
-        specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;
-        specSetMultilineAction *mlAction = new specSetMultilineAction(w) ;
-        addNewAction(cMenu, mlAction) ;
-        if (currentItem && view->currentIndex().isValid())
-            mlAction->setChecked(
-                    currentItem->descriptorProperties(
-                        view->model()->descriptors()[
-                            view->currentIndex().column()]) & spec::multiline) ; // TODO move to action
-        if (dynamic_cast<specDataItem*>(currentItem)
-                || dynamic_cast<specMetaItem*>(currentItem)
-                || dynamic_cast<specSVGItem*>(currentItem))
-            addNewAction(cMenu, new specItemPropertiesAction(w)) ;
-        if (QApplication::clipboard()->mimeData())
-            addNewAction(cMenu, new specPasteAction(w)) ;
-        if (!view->getSelection().isEmpty())
-        {
-            addNewAction(cMenu, new specCopyAction(w)) ;
-            addNewAction(cMenu, new specCutAction(w)) ;
-            addNewAction(cMenu, new specDeleteAction(w)) ;
-        }
+		addNewAction(cMenu, new specAddFolderAction(w)) ;
+		specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;
+		specSetMultilineAction *mlAction = new specSetMultilineAction(w) ;
+		addNewAction(cMenu, mlAction) ;
+		if (currentItem && view->currentIndex().isValid())
+			mlAction->setChecked(
+						currentItem->descriptorProperties(
+							view->model()->descriptors()[
+							view->currentIndex().column()]) & spec::multiline) ; // TODO move to action
+		if (dynamic_cast<specDataItem*>(currentItem)
+				|| dynamic_cast<specMetaItem*>(currentItem)
+				|| dynamic_cast<specSVGItem*>(currentItem))
+			addNewAction(cMenu, new specItemPropertiesAction(w)) ;
+		if (QApplication::clipboard()->mimeData())
+			addNewAction(cMenu, new specPasteAction(w)) ;
+		if (!view->getSelection().isEmpty())
+		{
+			addNewAction(cMenu, new specCopyAction(w)) ;
+			addNewAction(cMenu, new specCutAction(w)) ;
+			addNewAction(cMenu, new specDeleteAction(w)) ;
+		}
 	}
 	return cMenu ;
 }
