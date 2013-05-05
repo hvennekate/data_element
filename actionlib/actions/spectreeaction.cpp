@@ -8,11 +8,13 @@
 class treeActionThread : public specWorkerThread
 {
 private:
+	typedef QList<specModelItem*> itemPointerList ;
+
 	specUndoCommand *Command ;
 	specFolderItem *treeRoot ;
 	specModel* model ;
-	QModelIndexList& selection ;
 	specModelItem *currentItem ;
+	itemPointerList items, toBeDeletedFolders ;
 
 	bool cleanUp()
 	{
@@ -27,24 +29,10 @@ public:
 	void run()
 	{
 		emit progressValue(0) ;
-		typedef QList<specModelItem*> itemPointerList ;
 		typedef QPair<specFolderItem*, itemPointerList> destination ; // TODO make sub class for this
 		typedef QList<destination> destinationList ;
 
 		treeRoot = new specFolderItem(0, tr("Tree")) ;
-		itemPointerList items = model->pointerList(selection),
-				toBeDeletedFolders ;
-
-		// eliminate folders
-		for (int i = 0 ; i < items.size() ; ++i)
-		{
-			if (items[i]->isFolder())
-			{
-				for (int j = 0 ; j < items[i]->children() ; ++j)
-					items << ((specFolderItem*) (items[i]))->child(i) ;
-				toBeDeletedFolders << items.takeAt(i--) ;
-			}
-		}
 
 		// no doubles...:
 		items = items.toSet().toList() ;
@@ -153,13 +141,14 @@ public:
 		return c ;
 	}
 
-	treeActionThread(specModel* Model, QModelIndexList& Selection, specModelItem *CurrentItem)
+	treeActionThread(specModel* Model, const itemPointerList& Items, const itemPointerList& Folders, specModelItem *CurrentItem)
 		: specWorkerThread(100),
 		  Command(0),
 		  treeRoot(0),
 		  model(Model),
-		  selection(Selection),
-		  currentItem(CurrentItem)
+		  currentItem(CurrentItem),
+		  items(Items),
+		  toBeDeletedFolders(Folders)
 	{
 	}
 };
@@ -177,7 +166,9 @@ specTreeAction::specTreeAction(QObject *parent) :
 
 specUndoCommand *specTreeAction::generateUndoCommand()
 {
-	treeActionThread tat(model,selection,currentItem) ;
+	QList<specModelItem*> items, folders ;
+	expandSelectedFolders(items, folders) ;
+	treeActionThread tat(model,items, folders,currentItem) ;
 	tat.run();
 	return tat.command() ;
 }

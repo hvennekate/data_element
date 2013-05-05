@@ -11,6 +11,11 @@
 specTiltMatrixAction::specTiltMatrixAction(QObject *parent) :
     specRequiresItemAction(parent)
 {
+	setIcon(QIcon("exchangex.png")) ;
+	setToolTip(tr("Exchange x data for descriptive field")) ;
+	setWhatsThis(tr("Generates new items from the selected items' data, simultaneously turning the x-axis data into a description field and exchanging it for a different description field."));
+	setText(tr("Exchange x...")) ;
+	setShortcut(tr("Ctrl+j")) ;
 }
 
 class descriptorPreparationObject
@@ -67,19 +72,9 @@ public:
 
 specUndoCommand* specTiltMatrixAction::generateUndoCommand()
 {
-    QList<specModelItem*> items = model->pointerList(selection), toBeDeletedFolders ;
+    QList<specModelItem*> items, toBeDeletedFolders ;
     Q_ASSERT(!items.isEmpty()) ;
-    // eliminate folders
-    // TODO merge with specTreeAction
-    for (int i = 0 ; i < items.size() ; ++i)
-    {
-        if (items[i]->isFolder())
-        {
-            for (int j = 0 ; j < items[i]->children() ; ++j)
-                items << ((specFolderItem*) (items[i]))->child(j) ;
-            toBeDeletedFolders << items.takeAt(i--) ;
-        }
-    }
+    expandSelectedFolders(items, toBeDeletedFolders);
 
     // bail out if only empty folders were selected
     if (items.isEmpty()) return 0 ;

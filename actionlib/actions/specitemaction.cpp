@@ -52,3 +52,19 @@ void specItemAction::execute()
 	}
 	library->push(command) ;
 }
+
+void specItemAction::expandSelectedFolders(QList<specModelItem *> &items, QList<specModelItem *> &folders)
+{
+	if (!model) return ;
+	folders.clear();
+	items = model->pointerList(selection) ;
+	for (int i = 0 ; i < items.size() ; ++i)
+	{
+	    if (items[i]->isFolder())
+	    {
+		for (int j = 0 ; j < items[i]->children() ; ++j)
+		    items << ((specFolderItem*) (items[i]))->child(j) ;
+		folders << items.takeAt(i--) ;
+	    }
+	}
+}

@@ -19,10 +19,11 @@ protected:
 	void execute();
 	specView* view ;
 	specModel* model ;
-    QModelIndex currentIndex, insertionIndex ;
+	QModelIndex currentIndex, insertionIndex ;
 	QModelIndexList selection ;
 	specModelItem* currentItem ;
-    int insertionRow ;
+	int insertionRow ;
+	void expandSelectedFolders(QList<specModelItem*>& items, QList<specModelItem*>& folders) ;
 protected:
 	virtual specUndoCommand* generateUndoCommand() = 0 ;
 };
