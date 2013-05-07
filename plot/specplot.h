@@ -57,6 +57,7 @@ private:
 private slots:
     void setPlotAxis() ;
     void showLegend(bool) ;
+    void toggleItem(QwtPlotItem*, bool) ;
 protected:
 	specView *view ;
 	specActionLibrary* undoPartner() const ;

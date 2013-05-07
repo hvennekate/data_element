@@ -14,6 +14,7 @@
 #include <QMouseEvent>
 #include <qwt_plot_marker.h>
 #include "specfitcurve.h"
+#include <qwt_plot_layout.h>
 
 // TODO solve the myth of autoscaleaxis...
 
@@ -84,17 +85,31 @@ specPlot::specPlot(QWidget *parent)
     }
     zoom->changeZoomBase(QRectF(-10,-10,20,20));
 
+    // Standard legend
+    insertLegend(new QwtLegend(this)) ;
+    legend()->setItemMode(QwtLegend::CheckableItem) ;
+    connect(this, SIGNAL(legendChecked(QwtPlotItem*,bool)), SLOT(toggleItem(QwtPlotItem*,bool))) ;
+    showLegend(legendAction->isChecked()) ;
 }
 
 void specPlot::showLegend(bool l)
 {
-    if (l == true && ! legend())
-        insertLegend(new QwtLegend(this));
-    else
-    {
-        delete legend() ;
-        replot();
-    }
+	if (!legend()) return ;
+	if (!plotLayout()) return ;
+
+	// Sort of a hack to keep the plot from reenabling visibility
+	if (!l)	plotLayout()->setLegendPosition(QwtPlot::ExternalLegend) ;
+	else plotLayout()->setLegendPosition(QwtPlot::RightLegend) ;
+
+	legend()->setVisible(l) ;
+	replot() ;
+}
+
+void specPlot::toggleItem(QwtPlotItem *item, bool invisible)
+{
+	if (!item) return ;
+	item->setVisible(!invisible) ;
+	replot() ;
 }
 
 void specPlot::setAutoScaling(bool on)
