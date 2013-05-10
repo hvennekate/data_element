@@ -244,7 +244,12 @@ specPEFile::operator specDataItem() const
                 key == "DataSetDataMember")
             continue ;
         QVariant v = data[key] ;
-        if (v.canConvert(QVariant::Double))
+	if (QVariant::Bool == v.type()
+			|| QVariant::Double == v.type()
+			|| QVariant::Int == v.type()
+			|| QVariant::UInt == v.type()
+			|| QVariant::ULongLong == v.type()
+			|| QVariant::LongLong == v.type())
             description[key] = v.toDouble() ;
         else
             description[key] = v.toStringList().join("\n") ;
