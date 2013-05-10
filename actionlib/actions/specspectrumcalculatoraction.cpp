@@ -100,6 +100,8 @@ specUndoCommand* specSpectrumCalculatorAction::generateUndoCommand()
 		// prepare the command
 		if (evaluationOk)
 		{
+			if (specDataItem* dataItem = dynamic_cast<specDataItem*>(item))
+				dataItem->reverseCorrection(newData) ;
 			specExchangeDataCommand *command = new specExchangeDataCommand(parentCommand) ;
 			command->setParentObject(model) ;
 			command->setItem(model->index(item), newData);
