@@ -45,7 +45,7 @@ private:
 	void setConnections() ;
 	void changeFileName(const QString&) ;
 private slots:
-    void modified(bool unmod) ;
+	void unmodified(bool unmod) ;
 	void svgModification(bool) ;
 	void purgeUndo() ;
 protected :

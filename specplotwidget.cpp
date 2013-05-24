@@ -115,8 +115,14 @@ void specPlotWidget::read(QString fileName)
 {
 	// Checking for existence ought to have been done at this point
 	file->close(); // necessary?
-	file->setFileName(fileName) ;
-	if (!file->open(QFile::ReadOnly)) return ; // TODO warning message
+	QString oldFileName(this->fileName()) ;
+	changeFileName(fileName) ;
+	if (!file->open(QFile::ReadOnly))
+	{
+		QMessageBox::critical(0,tr("Read error"), tr("Cannot opten file ") + fileName + tr(" for reading.")) ;
+		changeFileName(oldFileName);
+		return ;
+	}
 	QDataStream in(file) ;
 	// Basic layout of the file:
 	quint64 check ;
@@ -125,7 +131,8 @@ void specPlotWidget::read(QString fileName)
 	{
 		file->close();
 		QMessageBox::critical(0,tr("Error opening"), tr("File ") + fileName + tr("does not seem to have the right format.")) ;
-		return ; // TODO warning
+		changeFileName(oldFileName);
+		return ;
 	}
 	QByteArray fileContent = file->readAll() ;
 	file->close();
@@ -176,13 +183,13 @@ void specPlotWidget::read(QString fileName)
     undoViewWidget->setVisible(visibility & spec::undoVisible) ;
 }
 
-void specPlotWidget::modified(bool unmod)
+void specPlotWidget::unmodified(bool unmod)
 {
 	QString currentTitle = windowTitle() ;
-    if(currentTitle.right(1) != "*" && !unmod)
+	if(currentTitle.right(1) != "*" && !unmod)
 		currentTitle.append(" *") ;
-    if(currentTitle.right(1) == "*" && unmod)
-        currentTitle.remove(currentTitle.size()-2,2) ;
+	if(currentTitle.right(1) == "*" && unmod)
+		currentTitle.remove(currentTitle.size()-2,2) ;
 	setWindowTitle(currentTitle) ;
 	kineticWidget->setWindowTitle(QString("Kinetics of ").append(currentTitle)) ;
 	logWidget->setWindowTitle(QString("Logs of ").append(currentTitle)) ;
@@ -250,7 +257,7 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 		case QMessageBox::Yes :
 			if (! saveFile())
 			{
-                modified(true) ;
+				unmodified(true) ;
 				event->ignore();
 				break ;
 			}
@@ -266,11 +273,21 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 
 bool specPlotWidget::saveFile()
 {
-	changeFileName(file->fileName() == "" || sender() == saveAsAction ?
+	QString filename(file->fileName() == "" || sender() == saveAsAction ?
 			QFileDialog::getSaveFileName(this,"Name?","","spec-Dateien (*.spec)") :
-			file->fileName()) ;
-	if (file->fileName() == "") return false ;
-	if (!file->open(QFile::WriteOnly)) return false ;
+			file->fileName()),
+		oldFileName = this->fileName() ;
+	if (filename == "") return false ;
+	changeFileName(filename) ;
+	if (!file->open(QFile::WriteOnly))
+	{
+		QMessageBox::critical(0, tr("Write error"), tr("Could not open file ")
+				      + file->fileName()
+				      + tr("for writing.")) ;
+		changeFileName(oldFileName) ;
+		unmodified(false);
+		return false ;
+	}
 
 	QDataStream out(file) ;
 	out << quint64(FILECHECKCOMPRESSNUMBER) ;
@@ -329,7 +346,7 @@ void specPlotWidget::setConnections()
 	connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 	connect(items->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),this,SLOT(selectionChanged(const QItemSelection&, const QItemSelection&))) ;
 
-    connect(actions,SIGNAL(stackClean(bool)), this, SLOT(modified(bool))) ; // TODO check
+    connect(actions,SIGNAL(stackClean(bool)), this, SLOT(unmodified(bool))) ; // TODO check
 
 	connect(kineticWidget->internalPlot(),SIGNAL(replotted()),plot,SLOT(replot())) ;
 	connect(kineticWidget->internalPlot(), SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(), SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
