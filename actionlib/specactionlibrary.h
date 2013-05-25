@@ -47,7 +47,9 @@ public:
 public slots:
 	void push(specUndoCommand*) ;
 signals:
-    void stackClean(bool) ;
+	void stackModified(bool) ;
+private slots:
+	void stackClean(const bool&) ;
 private:
 	void writeToStream(QDataStream &out) const;
 	void readFromStream(QDataStream &in) ;

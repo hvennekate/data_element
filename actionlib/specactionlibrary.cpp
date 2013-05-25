@@ -47,7 +47,12 @@ specActionLibrary::specActionLibrary(QObject *parent) :
     progress(0)
 {
     undoStack = new QUndoStack(this) ; // TODO consider making this a plain variable
-    connect(undoStack,SIGNAL(cleanChanged(bool)),this,SIGNAL(stackClean(bool))) ;
+    connect(undoStack,SIGNAL(cleanChanged(bool)),this,SLOT(stackClean(bool))) ;
+}
+
+void specActionLibrary::stackClean(const bool &b) // This is due to the stack being clean
+{ // when the window is UNmodified ... (chiams are bad!)
+	emit stackModified(!b) ;
 }
 
 void specActionLibrary::push(specUndoCommand * cmd)

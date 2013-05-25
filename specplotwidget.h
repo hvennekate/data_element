@@ -32,7 +32,6 @@ private:
 	specSpectrumPlot* plot ;
 	QToolBar* toolbar ;
 	QSplitter* splitter;
-	QFile* file ;
 	QAction *saveAction,
 	*kineticsAction,
 	*saveAsAction,
@@ -45,8 +44,8 @@ private:
 	void createToolbars();
 	void setConnections() ;
 	void changeFileName(const QString&) ;
+	void changeEvent(QEvent *event) ;
 private slots:
-	void unmodified(bool unmod) ;
 	void svgModification(bool) ;
 	void purgeUndo() ;
 protected :
@@ -54,7 +53,6 @@ protected :
 public:
 	specPlotWidget(QWidget *parent = 0);
 	~specPlotWidget();
-    QString fileName() const ;
 
 	void read(QString fileName) ;
 	specView* mainView() ;

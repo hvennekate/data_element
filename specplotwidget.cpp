@@ -37,7 +37,6 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	  plot(new specSpectrumPlot(this)),
 	  toolbar(new QToolBar(tr("File"),this)),
 	  splitter(new specSplitter(Qt::Vertical,this)),
-	  file(new QFile(this)),
 	  saveAction(new QAction(QIcon::fromTheme("document-save"), tr("Save"), this)),
 	  kineticsAction(kineticWidget->toggleViewAction()),
 	  saveAsAction(new QAction(QIcon::fromTheme("document-save-as"), tr("Save as..."), this)),
@@ -111,35 +110,37 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 
 	setWidget(content) ;
 	svgModification(false) ;
+	changeFileName(tr("untitled")) ;
 }
 
 void specPlotWidget::read(QString fileName)
 {
 	// Checking for existence ought to have been done at this point
-	file->close(); // necessary?
-	QString oldFileName(this->fileName()) ;
-	changeFileName(fileName) ;
-	if (!file->open(QFile::ReadOnly))
+	QFile file(fileName) ;
+	if (!file.open(QFile::ReadOnly))
 	{
-		QMessageBox::critical(0,tr("Read error"), tr("Cannot opten file ") + fileName + tr(" for reading.")) ;
-		changeFileName(oldFileName);
+		QMessageBox::critical(0,tr("Error opening"),
+				      tr("Cannot opten file ")
+				      + fileName
+				      + tr(" for reading.")) ;
 		return ;
 	}
-	QDataStream in(file) ;
+
 	// Basic layout of the file:
 	quint64 check ;
-	in >> check ;
+	QDataStream inStream(&file) ;
+	inStream >> check ;
 	if (check != FILECHECKRANDOMNUMBER && check != FILECHECKCOMPRESSNUMBER)
 	{
-		file->close();
-		QMessageBox::critical(0,tr("Error opening"), tr("File ") + fileName + tr("does not seem to have the right format.")) ;
-		changeFileName(oldFileName);
+		QMessageBox::critical(0,tr("File error"),
+				      tr("File ")
+				      + fileName
+				      + tr("does not seem to have the right format.")) ;
 		return ;
 	}
-	QByteArray fileContent = file->readAll() ;
-	file->close();
 
-	QDataStream inStream(fileContent) ;
+	QByteArray fileContent = file.readAll() ;
+	file.close();
 	bzipIODevice *zipDevice = 0 ;
 	QBuffer buffer(&fileContent) ; // does not take ownership of byteArray
 	if (FILECHECKCOMPRESSNUMBER == check)
@@ -148,7 +149,11 @@ void specPlotWidget::read(QString fileName)
 		zipDevice->open(bzipIODevice::ReadOnly) ;
 		inStream.setDevice(zipDevice);
 	}
-//	if (!inStream.device()) inStream.setDevice(&buffer) ;
+	else
+	{
+		buffer.open(QBuffer::ReadOnly) ;
+		inStream.setDevice(&buffer) ;
+	}
 
     QProgressDialog progress ;
     progress.setMaximum(30) ;
@@ -185,19 +190,6 @@ void specPlotWidget::read(QString fileName)
     undoViewWidget->setVisible(visibility & spec::undoVisible) ;
 }
 
-void specPlotWidget::unmodified(bool unmod)
-{
-	QString currentTitle = windowTitle() ;
-	if(currentTitle.right(1) != "*" && !unmod)
-		currentTitle.append(" *") ;
-	if(currentTitle.right(1) == "*" && unmod)
-		currentTitle.remove(currentTitle.size()-2,2) ;
-	setWindowTitle(currentTitle) ;
-	kineticWidget->setWindowTitle(QString("Kinetics of ").append(currentTitle)) ;
-	logWidget->setWindowTitle(QString("Logs of ").append(currentTitle)) ;
-	undoViewWidget->setWindowTitle(QString("History of ").append(currentTitle)) ;
-}
-
 void specPlotWidget::createToolbars()
 {
 	toolbar-> setContentsMargins(0,0,0,0) ;
@@ -229,68 +221,51 @@ void specPlotWidget::purgeUndo()
 
 void specPlotWidget::closeEvent(QCloseEvent* event)
 {
-	int needToSave = QMessageBox::No ;
-	if (windowTitle().right(1) == "*") // Pruefe, ob Aenderungsindikator gesetzt.  Wenn ja, fragen ob speichern.
-	{
-		QMessageBox wantToSave ;
-		wantToSave.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel) ;
-		wantToSave.setDefaultButton(QMessageBox::Cancel) ;
-		wantToSave.setEscapeButton(QMessageBox::Cancel) ;
-		wantToSave.setWindowTitle("Save data?") ;
-		wantToSave.setText(QString("Do you want to save changes made to ").
-				append(windowTitle() != " *" ? windowTitle() : "a new file").
-				append(" ?")) ;
-		wantToSave.setIcon(QMessageBox::Warning) ;
-		needToSave = wantToSave.exec() ;
-	}
-	else
+	if (!isWindowModified()) // Pruefe, ob Aenderungsindikator gesetzt.  Wenn ja, fragen ob speichern.
 	{
 		event->accept() ;
-		delete this ;
+		deleteLater();
 		return ;
 	}
 
-	switch (needToSave)
+	QMessageBox wantToSave ;
+	wantToSave.setStandardButtons(QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel) ;
+	wantToSave.setDefaultButton(QMessageBox::Cancel) ;
+	wantToSave.setEscapeButton(QMessageBox::Cancel) ;
+	wantToSave.setWindowTitle("Save data?") ;
+	wantToSave.setText(QString("Do you want to save changes made to ")
+			   + windowFilePath() + tr("?") ) ;
+	wantToSave.setIcon(QMessageBox::Warning) ;
+	int wantToSaveResult = wantToSave.exec() ;
+
+	event->ignore();
+	if (QMessageBox::No == wantToSaveResult ||
+			(QMessageBox::Yes == wantToSaveResult
+			 && saveFile()))
 	{
-		case QMessageBox::Yes :
-			if (! saveFile())
-			{
-				unmodified(true) ;
-				event->ignore();
-				break ;
-			}
-		case QMessageBox::No :
-			delete(this) ;
-			event->accept() ;
-			break ;
-		default :
-			event->ignore() ;
-			break ;
+		event->accept();
+		deleteLater();
 	}
 }
 
 bool specPlotWidget::saveFile()
 {
-	QString filename(file->fileName() == "" || sender() == saveAsAction ?
+	QFile file(windowFilePath() == tr("untitled") || sender() == saveAsAction ?
 			QFileDialog::getSaveFileName(this,"Name?","","spec-Dateien (*.spec)") :
-			file->fileName()),
-		oldFileName = this->fileName() ;
-	if (filename == "") return false ;
-	changeFileName(filename) ;
-	if (!file->open(QFile::WriteOnly))
+			windowFilePath()) ;
+	if (file.fileName().isEmpty()) return false ;
+	if (!file.open(QFile::WriteOnly))
 	{
 		QMessageBox::critical(0, tr("Write error"), tr("Could not open file ")
-				      + file->fileName()
+				      + file.fileName()
 				      + tr("for writing.")) ;
-		changeFileName(oldFileName) ;
-		unmodified(false);
 		return false ;
 	}
 
-	QDataStream out(file) ;
+	QDataStream out(&file) ;
 	out << quint64(FILECHECKCOMPRESSNUMBER) ;
-//	QBuffer *outBuffer = new QBuffer;
-	bzipIODevice zipDevice(file) ;
+	out.setDevice(0); // safety
+	bzipIODevice zipDevice(&file) ;
 	zipDevice.open(bzipIODevice::WriteOnly) ;
 	QDataStream zipOut(&zipDevice) ;
 
@@ -298,7 +273,7 @@ bool specPlotWidget::saveFile()
     progress.setCancelButton(0);
     progress.setMinimumDuration(300);
     progress.setWindowModality(Qt::WindowModal);
-    progress.setWindowTitle(tr("Saving ") + file->fileName());
+    progress.setWindowTitle(tr("Saving ") + file.fileName());
     progress.setMaximum(30);
     progress.setLabel(new QLabel(tr("Saving plot"))) ;
     progress.setValue(0);
@@ -324,7 +299,8 @@ bool specPlotWidget::saveFile()
     zipOut << (qint8) visibility ;
 	zipDevice.close() ;
     zipDevice.releaseDevice() ;
-    file->close();
+    file.close();
+    changeFileName(file.fileName());
 	return true ;
 }
 
@@ -348,8 +324,8 @@ void specPlotWidget::setConnections()
 	connect(kineticWidget->internalPlot(),SIGNAL(replotted()),plot,SLOT(replot())) ;
 	connect(kineticWidget->internalPlot(), SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(), SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
 	connect(plot, SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(),SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
-
 	connect(plot->svgAction(),SIGNAL(toggled(bool)),this,SLOT(svgModification(bool))) ;
+	connect(actions, SIGNAL(stackModified(bool)), this, SLOT(setWindowModified(bool))) ;
 }
 
 void specPlotWidget::svgModification(bool mod)
@@ -384,8 +360,7 @@ void specPlotWidget::changeFileName(const QString& name)
 	event(new QEvent(QEvent::WindowTitleChange)) ;
 }
 
-QString specPlotWidget::fileName() const
+void specPlotWidget::changeEvent(QEvent *event)
 {
-    if (!file) return "" ;
-    return file->fileName() ;
+	specDockWidget::changeEvent(event) ;
 }
