@@ -27,11 +27,11 @@
 #include <QLabel>
 
 specPlotWidget::specPlotWidget(QWidget *parent)
-	: QDockWidget(tr("untitled"),parent),
+	: specDockWidget(tr("Data"),parent),
 	  items(new specDataView(this)),
 	  logWidget(new specLogWidget(parent)),
-	  undoViewWidget(new QDockWidget("History",parent)),
-	  kineticWidget(new specKineticWidget("Kinetics",parent)),
+	  undoViewWidget(new specDockWidget(tr("History"),parent)),
+	  kineticWidget(new specKineticWidget(parent)),
 	  content(new QWidget(this)),
 	  layout(new QVBoxLayout(content)),
 	  plot(new specSpectrumPlot(this)),
@@ -380,11 +380,8 @@ specView* specPlotWidget::mainView()
 
 void specPlotWidget::changeFileName(const QString& name)
 {
-	file->setFileName(name) ;
-	setWindowTitle(QFileInfo(name).fileName()) ;
-	kineticWidget->setWindowTitle(QString("Kinetics of ").append(QFileInfo(name).fileName())) ;
-	logWidget->setWindowTitle(QString("Logs of ").append(QFileInfo(name).fileName())) ;
-	undoViewWidget->setWindowTitle(QString("History of ").append(QFileInfo(name).fileName()));
+	setWindowFilePath(name);
+	event(new QEvent(QEvent::WindowTitleChange)) ;
 }
 
 QString specPlotWidget::fileName() const

@@ -1,12 +1,12 @@
 #ifndef SPECLOGWIDGET_H
 #define SPECLOGWIDGET_H
 
-#include <QDockWidget>
+#include "specdockwidget.h"
 #include "speclogview.h"
 
 class QVBoxLayout ;
 
-class specLogWidget : public QDockWidget, public specStreamable
+class specLogWidget : public specDockWidget, public specStreamable
 {
 	Q_OBJECT
 private:

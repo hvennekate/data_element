@@ -8,7 +8,7 @@
 
 asciiExporter::asciiExporter(modelType m)
     : modelPointer(0),
-      kineticWidget("")
+      kineticWidget()
 {
     view.setModel(&itemModel) ;
     kineticWidget.view()->assignDataView(&view);

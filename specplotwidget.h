@@ -1,7 +1,7 @@
 #ifndef SPECPLOTWIDGET_H
 #define SPECPLOTWIDGET_H
 
-#include <QDockWidget>
+#include "specdockwidget.h"
 #include <QString>
 
 class specSpectrumPlot ;
@@ -19,13 +19,13 @@ class QItemSelection ;
 
 
 
-class specPlotWidget : public QDockWidget
+class specPlotWidget : public specDockWidget
 {
 	Q_OBJECT
 private:
 	specDataView* items ;
 	specLogWidget *logWidget ;
-	QDockWidget *undoViewWidget ;
+	specDockWidget *undoViewWidget ;
 	specKineticWidget *kineticWidget ;
 	QWidget* content ;
 	QVBoxLayout* layout ;

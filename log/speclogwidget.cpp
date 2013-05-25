@@ -8,7 +8,7 @@
 #include "specactionlibrary.h"
 
 specLogWidget::specLogWidget(QWidget *parent)
-	: QDockWidget("Logs", parent),
+	: specDockWidget(tr("Logs"), parent),
 	  logView(new specLogView(this)),
 	  layout(new QVBoxLayout)
 {

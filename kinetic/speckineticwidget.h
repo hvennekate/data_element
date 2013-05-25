@@ -1,7 +1,7 @@
 #ifndef SPECKINETICWIDGET_H
 #define SPECKINETICWIDGET_H
 
-#include <QDockWidget>
+#include "specdockwidget.h"
 #include <QVBoxLayout>
 #include <QSplitter>
 #include <QToolBar>
@@ -9,8 +9,7 @@
 #include "specmetamodel.h"
 #include "specmetaview.h"
 
-class specKineticWidget;
-class specKineticWidget : public QDockWidget, public specStreamable
+class specKineticWidget : public specDockWidget, public specStreamable
 {
 	Q_OBJECT
 private:
@@ -26,14 +25,11 @@ private slots:
     void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) ;
     void svgModification(bool mod) ;
 public:
-	specKineticWidget ( QString, QWidget *parent = 0 );
+	specKineticWidget (QWidget *parent = 0 );
 	~specKineticWidget();
 	void addToolbar(specActionLibrary*) ;
-
 	specPlot *internalPlot() { return plot ; }
-	
 	specMetaView *view() ;
-	
 };
 
 #endif

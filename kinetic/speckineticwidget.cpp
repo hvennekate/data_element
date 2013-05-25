@@ -6,12 +6,13 @@
 #include "specsplitter.h"
 #include "canvaspicker.h"
 #include "specactionlibrary.h"
+#include <QApplication>
 
 specMetaView* specKineticWidget::view()
 { return items ; }
 
-specKineticWidget::specKineticWidget(QString title, QWidget *parent)
-	: QDockWidget(title, parent)
+specKineticWidget::specKineticWidget(QWidget *parent)
+	: specDockWidget(tr("Meta"), parent)
 {
 	setWhatsThis(tr("Meta dock widget - In this widget, further processing of the primary data can be done (integration, max, min, etc.)"));
 	setFloating(true) ;
