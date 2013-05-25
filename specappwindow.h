@@ -17,7 +17,6 @@ public:
 private slots:
 	void newFile();
 	void openFile();
-	void removeDock() ;
 	void openFile(const QString&) ;
 	
 protected:
@@ -29,7 +28,6 @@ private:
 	void createMenus();
 	void createToolBars() ;
 	void addDock(specPlotWidget*) ;
-    QStringList openFileNames() const ;
 	
 	QMenu *fileMenu;
 	QMenu *helpMenu;
@@ -38,7 +36,6 @@ private:
 	QAction *openAction;
 	QAction *whatsThisAction ;
 	QAction *restoreSessionAction ;
-	QList<specPlotWidget*> docks ;
 private slots:
 	void about() ;
 	void whatsThisMode() ;

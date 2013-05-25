@@ -29,32 +29,21 @@ specAppWindow::~specAppWindow()
 {
 }
 
-QStringList specAppWindow::openFileNames() const
-{
-    QStringList result ;
-    foreach(specPlotWidget* plotWidget, findChildren<specPlotWidget*>())
-        result << plotWidget->fileName() ;
-    result.removeAll(QString()) ;
-    return result ;
-}
-
 void specAppWindow::closeEvent(QCloseEvent* event)
 {
 	event->ignore() ;
-	bool allClosed = true ;
-	while(!docks.isEmpty())
+	QStringList openFileNames ;
+	foreach(specPlotWidget* plotWidget, findChildren<specPlotWidget*>())
 	{
-		if (!docks.first()->close())
-		{
-			return ;
-		}
+		openFileNames << plotWidget->windowFilePath() ;
+		if (!plotWidget->close()) return ;
 	}
 	settings.setValue("mainWindow/previousSessionFiles",
 			  restoreSessionAction->isChecked() ?
 				  openFileNames: QVariant()); // remove empty filenames?
-	event->setAccepted(allClosed) ;
 	settings.setValue("mainWindow/geometry",saveGeometry()) ;
 	settings.setValue("mainWindow/sessionRestoration", restoreSessionAction->isChecked()) ;
+	event->accept();
 }
 
 void specAppWindow::newFile()
@@ -62,17 +51,10 @@ void specAppWindow::newFile()
 	addDock(new specPlotWidget(this)) ;
 }
 
-void specAppWindow::removeDock()
-{
-	docks.removeAll((specPlotWidget*) sender()) ;
-}
-
 void specAppWindow::addDock(specPlotWidget *newDock)
 {
-	docks << newDock ;
-	connect(newDock,SIGNAL(destroyed()),this,SLOT(removeDock())) ;
-    foreach(specPlotWidget* widget, docks)
 	specPlotWidget *inAreaWidget = 0 ;
+	foreach(specPlotWidget* widget, findChildren<specPlotWidget*>())
 		if (dockWidgetArea(widget) == Qt::LeftDockWidgetArea)
 			inAreaWidget = widget ;
 	addDockWidget(Qt::LeftDockWidgetArea, newDock) ;
