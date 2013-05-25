@@ -110,6 +110,8 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 
 	setWidget(content) ;
 	svgModification(false) ;
+
+	subDocks << logWidget << kineticWidget << undoViewWidget ;
 	changeFileName(tr("untitled")) ;
 }
 
@@ -155,39 +157,41 @@ void specPlotWidget::read(QString fileName)
 		inStream.setDevice(&buffer) ;
 	}
 
-    QProgressDialog progress ;
-    progress.setMaximum(30) ;
-    progress.setMinimumDuration(300);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setCancelButton(0);
-    progress.setWindowTitle(tr("Opening ") + file->fileName());
-    progress.setLabel(new QLabel(tr("Reading plot"))) ;
-    progress.setValue(0);
-    inStream >> *plot ;
-    progress.setLabel(new QLabel(tr("Reading data items"))) ;
-    progress.setValue(1);
-    inStream >> *items ;
-    progress.setLabel(new QLabel(tr("Reading log data"))) ;
-    progress.setValue(2);
-    inStream >> *logWidget ;
-    progress.setLabel(new QLabel(tr("Reading meta items"))) ;
-    progress.setValue(3) ;
-    inStream >> *kineticWidget ;
-    progress.setLabel(new QLabel(tr("Reading undo history")));
-    progress.setValue(4);
-    actions->setProgressDialog(&progress);
-    inStream >> *actions ;
-    progress.setValue(5);
-    qint8 vint = 0 ;
-    inStream >> vint ;
-    spec::subDockVisibilityFlags visibility(vint) ;
+	QProgressDialog progress ;
+	progress.setMaximum(30) ;
+	progress.setMinimumDuration(300);
+	progress.setWindowModality(Qt::WindowModal);
+	progress.setCancelButton(0);
+	progress.setWindowTitle(tr("Opening ") + file.fileName());
+	progress.setLabel(new QLabel(tr("Reading plot"))) ;
+	progress.setValue(0);
+	inStream >> *plot ;
+	progress.setLabel(new QLabel(tr("Reading data items"))) ;
+	progress.setValue(1);
+	inStream >> *items ;
+	progress.setLabel(new QLabel(tr("Reading log data"))) ;
+	progress.setValue(2);
+	inStream >> *logWidget ;
+	progress.setLabel(new QLabel(tr("Reading meta items"))) ;
+	progress.setValue(3) ;
+	inStream >> *kineticWidget ;
+	progress.setLabel(new QLabel(tr("Reading undo history")));
+	progress.setValue(4);
+	actions->setProgressDialog(&progress);
+	inStream >> *actions ;
+	progress.setValue(5);
+	qint8 visibility = 0 ;
+	inStream >> visibility ;
 	if (zipDevice) zipDevice->releaseDevice(); // release ownership of buffer
 	delete zipDevice ;
 
 	changeFileName(fileName);
-    logWidget->setVisible(visibility & spec::logVisible);
-    kineticWidget->setVisible(visibility & spec::metaVisible) ;
-    undoViewWidget->setVisible(visibility & spec::undoVisible) ;
+	qint8 i = 1 ;
+	foreach (specDockWidget* subDock, subDocks)
+	{
+		subDock->setVisible(visibility & i);
+		i *= 2 ;
+	}
 }
 
 void specPlotWidget::createToolbars()
@@ -292,11 +296,13 @@ bool specPlotWidget::saveFile()
     actions->setProgressDialog(&progress) ;
     zipOut<< *actions ;
     progress.setValue(progress.maximum());
-    spec::subDockVisibilityFlags visibility = spec::noneVisible ;
-    if (kineticWidget->isVisible()) visibility |= spec::metaVisible ;
-    if (undoViewWidget->isVisible()) visibility |= spec::undoVisible ;
-    if (logWidget->isVisible()) visibility |= spec::logVisible ;
-    zipOut << (qint8) visibility ;
+    qint8 visibility = 0, i = 1 ;
+    foreach(specDockWidget *subDock, subDocks)
+    {
+	    visibility += i * subDock->isVisible() ;
+	    i *= 2 ;
+    }
+    zipOut << visibility ;
 	zipDevice.close() ;
     zipDevice.releaseDevice() ;
     file.close();
@@ -306,12 +312,12 @@ bool specPlotWidget::saveFile()
 
 specPlotWidget::~specPlotWidget()
 {
-	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(kineticWidget) ;
-	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(logWidget) ;
-	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(undoViewWidget) ;
+	foreach (specDockWidget *subDock, subDocks)
+	{
+//		qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(subDock) ;
+		subDock->deleteLater();
+	}
 	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(this) ;
-	logWidget->deleteLater();
-	kineticWidget->deleteLater();
 }
 
 void specPlotWidget::setConnections()
@@ -362,5 +368,16 @@ void specPlotWidget::changeFileName(const QString& name)
 
 void specPlotWidget::changeEvent(QEvent *event)
 {
+	if (event->type() == QEvent::ModifiedChange)
+		foreach(specDockWidget* subDock, subDocks)
+			subDock->setWindowModified(isWindowModified());
+	if (event->type() == QEvent::WindowTitleChange)
+	{
+		foreach(specDockWidget* subDock, subDocks)
+		{
+			subDock->setWindowFilePath(windowFilePath()) ;
+			subDock->setWindowTitle(QString()) ; // just to invoke the event
+		}
+	}
 	specDockWidget::changeEvent(event) ;
 }

@@ -41,6 +41,7 @@ private:
 	*undoViewAction,
 	*purgeUndoAction;
 	specActionLibrary *actions ;
+	QList<specDockWidget*> subDocks ;
 	void createToolbars();
 	void setConnections() ;
 	void changeFileName(const QString&) ;
@@ -53,7 +54,6 @@ protected :
 public:
 	specPlotWidget(QWidget *parent = 0);
 	~specPlotWidget();
-
 	void read(QString fileName) ;
 	specView* mainView() ;
 public slots :
