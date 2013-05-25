@@ -43,14 +43,16 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	  saveAsAction(new QAction(QIcon::fromTheme("document-save-as"), tr("Save as..."), this)),
 	  logAction(logWidget->toggleViewAction()),
 	  undoViewAction(undoViewWidget->toggleViewAction()),
+	  purgeUndoAction(new QAction(QIcon::fromTheme("user-trash"),tr("Clear history"),this)),
 	  actions(new specActionLibrary(this))
 {
+	undoAction = actions->undoAction(this) ;
+	redoAction = actions->redoAction(this) ;
+
 	setWhatsThis(tr("Data Dock Window - This is the main window for managing data.  Right-clicking on it will change the arrangement of its contents from vertical to horizontal and back.\nSince this is a dock window, you may remove it from the application's main window and move it around within the main window.  To do so, \"grab\" it by its title bar and drag it to where you need it to be.\nThere are also a dock window for managing logs and \"meta-data\" (i.e. data based on processing the primary data) associated with this data dock window.  To show these, click the log or meta buttons (to the right of the save as button).\nTo start working, check out the help of the data list at the bottom (or right) of this window or of the list in the log dock window."));
 	saveAsAction->setWhatsThis(tr("Save As... - This button will allow you to save your work asking you for a file name explicitly."));
 	saveAction->setWhatsThis(tr("Save - Clicking this button will save your work and only ask for a file name if none has been specified so far."));
-
-	undoAction = actions->undoAction(this) ;
-	redoAction = actions->redoAction(this) ;
+	purgeUndoAction->setWhatsThis(tr("Deletes the complete undo history -- use with care and don't point this at humans."));
 	undoAction->setToolTip(tr("Undo")) ;
 	redoAction->setToolTip(tr("Redo")) ;
 	undoAction->setWhatsThis(tr("Undo - By clicking this button you can revert changes.  To \"undo the undo\" click the redo button right next door.\nNote that all of your undo history will be saved along with your work and will be available again upon loading your file again."));
@@ -71,7 +73,7 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 
 	new specGenericMimeConverter(items->model()) ;
 	new specLogToDataConverter(items->model()) ;
-    new specMimeFileImporter(items->model()) ;
+	new specMimeFileImporter(items->model()) ;
 	new specTextMimeConverter(items->model()) ;
 
 	actions->addDragDropPartner(items->model()) ;
@@ -210,12 +212,8 @@ void specPlotWidget::createToolbars()
 	toolbar-> addAction(undoAction) ;
 	toolbar-> addAction(redoAction) ;
 	toolbar-> addAction(undoViewAction) ;
-
-	toolbar->addSeparator() ;
-	QAction *purgeUndoStack = new QAction(QIcon::fromTheme("user-trash"),tr("Clear history"),this) ;
-	purgeUndoStack->setWhatsThis(tr("Deletes the complete undo history -- use with care and don't point this at humans."));
-	toolbar-> addAction(purgeUndoStack) ;
-	connect(purgeUndoStack,SIGNAL(triggered()),this,SLOT(purgeUndo())) ;
+	toolbar-> addSeparator() ;
+	toolbar-> addAction(purgeUndoAction) ;
 }
 
 void specPlotWidget::purgeUndo()
@@ -344,10 +342,9 @@ void specPlotWidget::setConnections()
 {
 	connect(saveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 	connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveFile()));
+	connect(purgeUndoAction,SIGNAL(triggered()),this,SLOT(purgeUndo())) ;
 	connect(items->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),this,SLOT(selectionChanged(const QItemSelection&, const QItemSelection&))) ;
-
-    connect(actions,SIGNAL(stackClean(bool)), this, SLOT(unmodified(bool))) ; // TODO check
-
+	connect(actions,SIGNAL(stackClean(bool)), this, SLOT(unmodified(bool))) ; // TODO check
 	connect(kineticWidget->internalPlot(),SIGNAL(replotted()),plot,SLOT(replot())) ;
 	connect(kineticWidget->internalPlot(), SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(), SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
 	connect(plot, SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(),SLOT(rangeModified(specCanvasItem*,int,double,double))) ;

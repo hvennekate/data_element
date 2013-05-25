@@ -39,7 +39,8 @@ private:
 	*logAction,
 	*undoAction,
 	*redoAction,
-	*undoViewAction ;
+	*undoViewAction,
+	*purgeUndoAction;
 	specActionLibrary *actions ;
 	void createToolbars();
 	void setConnections() ;
