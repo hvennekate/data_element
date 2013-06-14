@@ -460,7 +460,7 @@ bool specModel::dropMimeData(const QMimeData *data,
 	{
 		insertItems(newItems,parent,row) ;
 		QModelIndexList newIndexes = indexList(newItems) ;
-		if (dropBuddy)
+		if (dropBuddy && dropSource)
 		{
 			specAddFolderCommand *command = new specAddFolderCommand ;
 			command->setParentObject(this) ;
@@ -476,8 +476,8 @@ bool specModel::dropMimeData(const QMimeData *data,
 specModelItem* specModel::itemPointer(const QVector<int> &indexes) const
 {
 	specModelItem* pointer = root ;
-    for (int i =  indexes.size() - 1 ; i >= 0 && pointer && pointer->isFolder() ; --i)
-        pointer = ((specFolderItem*) pointer)->child(indexes[i]) ;
+	for (int i =  indexes.size() - 1 ; i >= 0 && pointer && pointer->isFolder() ; --i)
+		pointer = ((specFolderItem*) pointer)->child(indexes[i]) ;
 	return pointer ;
 }
 
