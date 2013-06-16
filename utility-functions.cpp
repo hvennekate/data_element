@@ -725,13 +725,13 @@ QList<specModelItem*> readXYFILE(QFile &file)
     // split entries up
     QList<QStringList> entries ;
     foreach(QString line, content.split("\n"))
-        entries << line.split(separator) ;
+	entries << line.split(separator, QString::SkipEmptyParts) ;
 
     // determine if first line can be used as header
     QDoubleValidator validator ;
     int pos = 0 ;
     QStringList headers ;
-    if (validator.validate(entries.first().first(), pos) != QValidator::Acceptable)
+    if (!entries.isEmpty() && !entries.first().isEmpty() && validator.validate(entries.first().first(), pos) != QValidator::Acceptable)
         headers = entries.takeFirst() ;
 
     // determine number of columns

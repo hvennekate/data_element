@@ -18,7 +18,7 @@ QList<specModelItem*> specTextMimeConverter::importData(const QMimeData *data)
 	QVector<specDataPoint> dataPoints ;
 	foreach(QString line, lines)
 	{
-		QStringList values = line.split(QRegExp("\\s+")) ;
+		QStringList values = line.split(QRegExp("\\s+"), QString::SkipEmptyParts) ;
 		if (values.size() < 2) continue ;
 		int pos = 0 ;
 		if (validator.validate(values[0],pos) != QValidator::Acceptable) continue ;
