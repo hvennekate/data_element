@@ -36,6 +36,7 @@
 #include <QProgressDialog>
 #include "spectiltmatrixaction.h"
 #include "specspectrumcalculatoraction.h"
+#include <QMessageBox>
 
 QUndoView* specActionLibrary::undoView()
 {
@@ -221,37 +222,48 @@ void specActionLibrary::readFromStream(QDataStream &in)
 
 	type t ;
 	QVector<qint32> parentIndex(num,0) ;
-    int progressToGo = 0, progressStart = 0 ;
-    if (progress)
-    {
-        progressStart = progress->value() ;
-        progressToGo = progress->maximum() - progressStart ;
+	int progressToGo = 0, progressStart = 0 ;
+	if (progress)
+	{
+		progressStart = progress->value() ;
+		progressToGo = progress->maximum() - progressStart ;
 
-    }
+	}
 
 	for (int i = 0 ; i < num ; ++i)
 	{
-        if (progress) progress->setValue(progressStart + (i*progressToGo)/num);
+		if (progress) progress->setValue(progressStart + (i*progressToGo)/num);
 		in >> t >> parentIndex[i] ;
-        specStreamable *streamable = produceItem(in) ;
-        specUndoCommand *command = dynamic_cast<specUndoCommand*>(streamable) ;
+		specStreamable *streamable = produceItem(in) ;
+		specUndoCommand *command = dynamic_cast<specUndoCommand*>(streamable) ;
 		if (!command)
 		{
-            qDebug() << "Error reading command no." << i << "of type" << t ;
+			qDebug() << "Error reading command no." << i << "of type" << t ;
 			undoStack->clear();
-            parentIndex.clear();
-            delete streamable ;
+			parentIndex.clear();
+			delete streamable ;
 			continue ;
 		}
-        qDebug() << "Reading item:" << i << "total count:" << undoStack->count() << "/" << num ;
-		undoStack->push(command) ;
+		qDebug() << "Reading item:" << i << "total count:" << undoStack->count() << "/" << num ;
+////// For manually discarding corrupted undo commands:
+//		if (QMessageBox::question(0,tr("Really read?"),
+//					  tr("Really read command no. ")
+//					  + QString::number(i)
+//					  + tr("?  Description is:\n")
+//					  + command->text(),
+//					  QMessageBox::Yes | QMessageBox::No,
+//					  QMessageBox::Yes)
+//				== QMessageBox::Yes)
+			undoStack->push(command) ;
+//		else
+//			delete command ;
 	}
 
 	undoStack->setIndex(position) ;
-    for (int i = 0 ; i < undoStack->count() ; ++i)
+	for (int i = 0 ; i < undoStack->count() ; ++i)
 		((specUndoCommand*) undoStack->command(i))->setParentObject(parents[parentIndex[i]]) ;
-    qDebug() << "to be read:" << num << "actually on stack:" << undoStack->count() ;
-    undoStack->setClean();
+	qDebug() << "to be read:" << num << "actually on stack:" << undoStack->count() ;
+	undoStack->setClean();
 }
 
 void specActionLibrary::setLastRequested(const QModelIndexList &list)
