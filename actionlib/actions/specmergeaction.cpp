@@ -159,7 +159,7 @@ public:
 
                                 // perform spectral adaptation
                                 // TODO NAN protection
-                                specMultiCommand *correctionCommand= specSpectrumPlot::generateCorrectionCommand(ranges, QwtPlotItemList() << (QwtPlotItem*) other, reference, model) ;
+				specMultiCommand *correctionCommand= specSpectrumPlot::generateCorrectionCommand(ranges, QwtPlotItemList() << (QwtPlotItem*) other, reference, model, true, true) ;
                                 correctionCommand->redo();
                                 *newItem += *((specDataItem*) other) ;
                                 correctionCommand->undo();

@@ -1,5 +1,9 @@
+unsigned int qHash(const double& d)
+{
+	return *((unsigned int*) (&d)) ;
+}
 #include "specspectrumplot.h"
-
+#include <QVector3D>
 #include <QActionGroup>
 #include <QBuffer>
 #include "qwt_scale_draw.h"
@@ -15,22 +19,57 @@
 #include "specactionlibrary.h"
 #include "specexchangedatacommand.h"
 
+specSpectrumPlot::moveMode specSpectrumPlot::correctionsStatus() const
+{
+	qDebug() << ((offsetAction->isChecked() ? Offset : NoMoveMode)
+		    | (offlineAction->isChecked() ? Slope : NoMoveMode)
+		    | (scaleAction->isChecked() ? Scale : NoMoveMode)) ;
+	qDebug() << (offsetAction->isChecked() ? Offset : NoMoveMode)
+			<< (offlineAction->isChecked() ? Slope : NoMoveMode)
+			<< (scaleAction->isChecked() ? Scale : NoMoveMode) ;
+	return (offsetAction->isChecked() ? Offset : NoMoveMode)
+			| (offlineAction->isChecked() ? Slope : NoMoveMode)
+			| (scaleAction->isChecked() ? Scale : NoMoveMode) ;
+}
+
+void specSpectrumPlot::setCorrectionsStatus(moveMode m)
+{
+	offsetAction->setChecked(m & Offset) ;
+	offlineAction->setChecked(m & Slope) ;
+	scaleAction->setChecked(m & Scale) ;
+}
+
+void specSpectrumPlot::checkReferenceForScaling()
+{
+	if (alignWithReferenceAction->isChecked() && !reference)
+	{
+		scaleAction->setChecked(false) ;
+		scaleAction->setEnabled(false) ;
+	}
+	else
+		scaleAction->setEnabled(true) ;
+}
+
 void specSpectrumPlot::toggleAligning(bool on)
 {
-	foreach(QAction *action, alignmentActions->actions())
-		action->setEnabled(on) ;
-	alignWithReferenceAction->setEnabled(true) ;
+	alignmentActions->setEnabled(on) ;
 	if (on)
 	{
 		alignmentPicker= new CanvasPicker(this) ;
 		alignmentPicker->setOwning() ;
 		connect(alignmentPicker, SIGNAL(pointMoved(specCanvasItem*,int,double,double)), this, SLOT(applyZeroRanges(specCanvasItem*,int,double,double))) ;
+		manualAlignment = correctionsStatus() ;
+		setCorrectionsStatus(rangeAlignment) ;
+		removeRangeAction->setEnabled(false) ;
 	}
 	else
 	{
 		delete alignmentPicker ;
 		alignmentPicker = 0 ;
+		rangeAlignment = correctionsStatus() ;
+		setCorrectionsStatus(manualAlignment);
 	}
+	alignWithReferenceAction->setEnabled(true) ;
 }
 
 void specSpectrumPlot::invalidateReference()
@@ -38,77 +77,69 @@ void specSpectrumPlot::invalidateReference()
 	if (reference) delete reference ;
 	reference = 0 ;
 	setReferenceAction->setToolTip(QString("Momentan keine Referenz."));
-	subInterpolatedAction->setDisabled(true);
 }
 
 specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	specPlot(parent),
 	correctionPicker(0),
 	alignmentPicker(0),
+	manualAlignment(NoMoveMode),
+	rangeAlignment(NoMoveMode),
 	reference(0)
 {
 	correctionActions = new QActionGroup(this) ;
-	correctionActions->setExclusive(false);
+	alignmentActions = new QActionGroup(this) ;
+	alignWithReferenceAction = new QAction(QIcon(":/zeroCorrection.png"),tr("Align"),this) ;
+
 	offsetAction  = new QAction(QIcon(":/offset.png"), tr("Offset"), correctionActions) ;
 	offlineAction = new QAction(QIcon(":/offline.png"), tr("Slope"),correctionActions) ;
 	scaleAction   = new QAction(QIcon(":/scale.png"), tr("Scale"), correctionActions) ;
 	shiftAction   = new QAction(QIcon(":/xshift.png"), tr("Shift x"),correctionActions) ;
+
+	alignWithReferenceAction->setCheckable(true) ;
+	alignWithReferenceAction->setChecked(false) ;
+	addRangeAction = new QAction(QIcon(":/addZeroRange.png"),tr("Add aligning range"),alignmentActions) ;
+	removeRangeAction = new QAction(QIcon(":/deleteZeroRange.png"),tr("Delete aligning range"),alignmentActions) ;
+
+	setReferenceAction = new QAction(QIcon(":/data.png"),tr("Set reference"),this) ;
 	subInterpolatedAction = new QAction(QIcon(":/multiminus.png"), tr("Subtract Reference"),this) ;
 
-	subInterpolatedAction->setWhatsThis(tr("Subtract the reference data from selected data sets (applying interpolation if necessary)."));
-
+	correctionActions->setExclusive(false);
 	correctionActions->addAction(offsetAction) ;
 	correctionActions->addAction(offlineAction) ;
 	correctionActions->addAction(scaleAction) ;
 	correctionActions->addAction(shiftAction) ;
+	foreach(QAction *action, correctionActions->actions())
+		action->setCheckable(true) ;
+
+	alignmentActions->setExclusive(false) ;
+//	alignmentActions->addAction(alignWithReferenceAction) ;
+	alignmentActions->addAction(addRangeAction) ;
+	alignmentActions->addAction(removeRangeAction) ;
+
+	connect(correctionActions, SIGNAL(triggered(QAction*)), this, SLOT(correctionsChanged(QAction*))) ;
+	connect(alignWithReferenceAction, SIGNAL(toggled(bool)), shiftAction, SLOT(setDisabled(bool))) ;
+//	connect(alignWithReferenceAction,SIGNAL(toggled(bool)), this, SLOT(correctionsChanged())) ;
+	connect(alignWithReferenceAction, SIGNAL(toggled(bool)), this, SLOT(toggleAligning(bool))) ;
+	connect(alignmentActions, SIGNAL(triggered(QAction*)), this, SLOT(alignmentChanged(QAction*))) ;
+	connect(subInterpolatedAction, SIGNAL(triggered()), this, SLOT(multipleSubtraction())) ;
+	connect(setReferenceAction,SIGNAL(triggered()),this,SLOT(setReference())) ;
+	connect(alignWithReferenceAction, SIGNAL(toggled(bool)), this, SLOT(checkReferenceForScaling())) ;
+	connect(setReferenceAction, SIGNAL(triggered()), this, SLOT(checkReferenceForScaling())) ;
+
+	toggleAligning(false) ;
+	rangeAlignment = (Offset | Slope) ;
+	invalidateReference();
+
 	offsetAction->setWhatsThis(tr("When this button is enabled, you can correct your data for any offset by individually moving any point of a data curve to where it ought to be."));
 	offlineAction->setWhatsThis(tr("By enabling this button, you enable detrending correction.  Pick any point of a data curve and move it to subtract a trend."));
 	scaleAction->setWhatsThis(tr("This button lets you scale data by moving a data point."));
 	shiftAction->setWhatsThis(tr("This button enables shifting data along the x axis by moving a data point."));
-
-
-	connect(correctionActions,SIGNAL(triggered(QAction*)),this,SLOT(correctionsChanged())) ;
-	foreach(QAction *action, correctionActions->actions())
-		action->setCheckable(true) ;
-
-	alignmentActions = new QActionGroup(this) ;
-	alignmentActions->setExclusive(false) ;
-	setReferenceAction = new QAction(QIcon(":/data.png"),tr("Set Reference"),this) ;
-	alignWithReferenceAction = new QAction(QIcon(":/zeroCorrection.png"),tr("Align"),alignmentActions) ;
-	alignWithReferenceAction->setCheckable(true) ;
-	alignWithReferenceAction->setChecked(false) ;
-	addRangeAction = new QAction(QIcon(":/addZeroRange.png"),tr("Add Aligning Range"),alignmentActions) ;
-	removeRangeAction = new QAction(QIcon(":/deleteZeroRange.png"),tr("Delete Aligning Range"),alignmentActions) ;
-	noSlopeAction = new QAction(QIcon(":/offset.png"),tr("Disable Slope"),alignmentActions) ;
-	noSlopeAction->setCheckable(true) ;
-	noSlopeAction->setChecked(false) ;
-	toggleAligning(false) ;
-	connect(setReferenceAction,SIGNAL(triggered()),this,SLOT(setReference())) ;
-
+	subInterpolatedAction->setWhatsThis(tr("Subtract the reference data from selected data sets (applying interpolation if necessary)."));
 	setReferenceAction->setWhatsThis(tr("Sets the reference for interpolated subtractions and/or for aligning other data sets."));
 	alignWithReferenceAction->setWhatsThis(tr("Enables aligning selected data sets with the reference defined (or with the x axis if no reference has been set).\nFor aligning, a linear function will be subtracted, unless the correction has been limited to subtracting an offset."));
 	addRangeAction->setWhatsThis(tr("Add a range for alignment.  The alignment correction of data sets selected will be calculated based on the points that lie within at least one of those ranges.")) ;
 	removeRangeAction->setWhatsThis(tr("Delete a range for alignment.  The alignment correction of data sets selected will be calculated based on the points that lie within at least one of those ranges."));
-	noSlopeAction->setWhatsThis(tr("Use only an offset for aligning data sets with the reference data."));
-
-
-	QImage image(":/add.png") ;
-	QByteArray byteArray ;
-	QBuffer buffer(&byteArray) ;
-	buffer.open(QIODevice::WriteOnly) ;
-	image.save(&buffer,"PNG") ;
-
-	invalidateReference();
-//	alignmentActions->addAction(setReferenceAction) ;
-	alignmentActions->addAction(alignWithReferenceAction) ;
-	alignmentActions->addAction(addRangeAction) ;
-	alignmentActions->addAction(removeRangeAction) ;
-	alignmentActions->addAction(noSlopeAction) ;
-
-	connect(alignWithReferenceAction,SIGNAL(toggled(bool)),correctionActions,SLOT(setDisabled(bool))) ;
-	connect(alignWithReferenceAction,SIGNAL(toggled(bool)),this,SLOT(correctionsChanged())) ;
-	connect(alignmentActions,SIGNAL(triggered(QAction*)),this,SLOT(alignmentChanged(QAction*))) ;
-		connect(subInterpolatedAction, SIGNAL(triggered()), this, SLOT(multipleSubtraction())) ;
 }
 
 QList<specDataItem*> specSpectrumPlot::folderContent(specModelItem *folder)
@@ -178,7 +209,7 @@ void specSpectrumPlot::setReference()
 	renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, false);
 	renderer.renderTo(&toolTipPlot,plotImage) ;
 
-    QByteArray byteArray ; // TODO extra function (c.f. svgItem)
+	QByteArray byteArray ; // TODO extra function (c.f. svgItem)
 	QBuffer buffer(&byteArray) ;
 	buffer.open(QIODevice::WriteOnly) ;
 	plotImage.save(&buffer,"PNG") ;
@@ -189,11 +220,7 @@ void specSpectrumPlot::setReference()
 
 void specSpectrumPlot::alignmentChanged(QAction *action)
 {
-	if (action == alignWithReferenceAction)
-	{
-		toggleAligning(alignWithReferenceAction->isChecked());
-	}
-	else if (action == addRangeAction)
+	if (action == addRangeAction)
 	{
 		double min = axisScaleDiv(QwtPlot::xBottom)->lowerBound(), max = axisScaleDiv(QwtPlot::xBottom)->upperBound() ;
         specRange *newRange = new specRange(min+.1*(max-min),max-.1*(max-min),
@@ -204,6 +231,7 @@ void specSpectrumPlot::alignmentChanged(QAction *action)
 	}
 	else if (action == removeRangeAction)
 		alignmentPicker->removeSelected();
+	removeRangeAction->setEnabled(alignmentPicker && alignmentPicker->countSelectable());
 }
 
 bool specSpectrumPlot::correctionChecked()
@@ -214,9 +242,14 @@ bool specSpectrumPlot::correctionChecked()
 	return checked ;
 }
 
-void specSpectrumPlot::correctionsChanged()
+void specSpectrumPlot::correctionsChanged(QAction* action)
 {
-	if (correctionChecked() && correctionActions->isEnabled())
+	if (alignWithReferenceAction->isChecked() && !offsetAction->isChecked() && !offlineAction->isChecked())
+	{
+		if (action == offlineAction) offlineAction->setChecked(true) ;
+		else offsetAction->setChecked(true) ;
+	}
+	if (correctionChecked() && !alignWithReferenceAction->isChecked())
 	{
 		if (!correctionPicker)
 		{
@@ -268,12 +301,11 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 	// compute other corrections:
 	// TODO rewrite code for GSL
 
-
 	double scale = 1, offset = 0, offline = 0 ;
 	if (scaleAction->isChecked() || offsetAction->isChecked() || offlineAction->isChecked())
 	{
-		QList<QList<double> > matrix ;
-		for (int i = 0 ; i < selectedPoints.size() ; i++) matrix << QList<double>() ;
+		QVector<QVector<double> > matrix ;
+		for (int i = 0 ; i < selectedPoints.size() ; i++) matrix << QVector<double>() ;
 		if (scaleAction->isChecked())
 			for (int i = 0 ; i < selectedPoints.size(); i++)
 				matrix[i] << item->sample(selectedPoints[i]).y() ;
@@ -285,12 +317,12 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 				matrix[i] << item->sample(selectedPoints[i]).x()+shift ;
 		for (int i = 0 ; i < matrix.size() ; i++) // verringere, wenn noetig, die Spaltenzahl
 			while (matrix.size() < matrix[i].size())
-				matrix[i].takeLast() ;
+				matrix[i].resize(matrix[i].size()-1) ;
 		while(matrix[0].size() < matrix.size()) // verringere, wenn noetig, die Zeilenzahl
-			matrix.takeLast() ;
+			matrix.resize(matrix.size()-1) ;
 
-		QList<double> coeffs ;
-		QList<double> yVals ;
+		QVector<double> coeffs ;
+		QVector<double> yVals ;
 		yVals << y- (scaleAction->isChecked() ? 0. : item->sample(no).y()) ; // TODO verify!
 		for (int i = 1 ; i < selectedPoints.size() && i < matrix.size() ; i++)
 			yVals << (scaleAction->isChecked() ? item->sample(selectedPoints[i]).y() : 0 ) ;
@@ -298,9 +330,10 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 		// do coefficient calculation
 		coeffs = gaussjinv(matrix,yVals) ;
 
-		scale = scaleAction->isChecked() && !coeffs.isEmpty() ? coeffs.takeFirst() : 1. ,
-		offset= offsetAction->isChecked()&& !coeffs.isEmpty() ? coeffs.takeFirst() : 0. ,
-		offline=offlineAction->isChecked()&&!coeffs.isEmpty() ?coeffs.takeFirst() : 0. ;
+		int i = 0 ;
+		scale = scaleAction->isChecked() && !coeffs.isEmpty() ? coeffs[i++] : 1. ,
+				offset= offsetAction->isChecked()&& !coeffs.isEmpty() ? coeffs[i++] : 0. ,
+				offline=offlineAction->isChecked()&&!coeffs.isEmpty() ? coeffs[i++] : 0. ;
 	}
 	specPlotMoveCommand *command = new specPlotMoveCommand ;
 	command->setItem(view->model()->index( (specModelItem*) item)) ; // TODO do dynamic cast first!!
@@ -309,104 +342,175 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 	undoPartner()->push(command) ;
 }
 
-specMultiCommand * specSpectrumPlot::generateCorrectionCommand(
-	const QwtPlotItemList& zeroRanges,
-	const QwtPlotItemList& spectra,
-	const QMap<double, double>& referenceSpectrum,
-	specModel* model,
-	bool noSlope)
+void generatePointsInRange(const QwtPlotItemList& zeroRanges,
+			   const specModelItem* spectrum,
+			   QSet<double>& xValues)
 {
+	if (!spectrum) return ;
+	// extract points that lie in any of the ranges
+	for (size_t j = 0 ; j < spectrum->dataSize() ; ++j)
+	{
+		const QPointF& point = spectrum->sample(j) ;
+		for (int k = 0 ; k < zeroRanges.size() ; ++k)
+		{
+			if (((specRange*) zeroRanges[k])->contains(point.x()))
+			{
+				xValues << point.x() ;
+				break ; // only include each point once
+			}
+		}
+	}
+
+}
+
+void generateReferenceSpectrum(const QMap<double,double>& referenceSpectrum,
+			       const QSet<double>& xValues,
+			       QMap<double, double>& refSpectrum)
+{
+	if (referenceSpectrum.isEmpty())
+		foreach(const double& x, xValues)
+			refSpectrum[x] = 0. ;
+	else
+	{
+		foreach(const double& x, xValues)
+		{
+			if(referenceSpectrum.contains(x))
+				refSpectrum[x] = referenceSpectrum[x] ;
+			else
+			{
+				QMap<double,double>::const_iterator pointAfter = referenceSpectrum.upperBound(x);
+				// no points for lin interpol found -> take point from correction list
+				if (pointAfter == referenceSpectrum.begin() || // no point before to interpolate with
+						pointAfter == referenceSpectrum.end()) // no point after to interpolate with
+					continue ;
+				QMap<double,double>::const_iterator pointBefore  = pointAfter - 1;
+				// subtract linear interpolation
+				refSpectrum[x] = pointBefore.value()
+						+ (pointAfter.value() - pointBefore.value()) /
+						(pointAfter.key()   - pointBefore.key()  ) *
+						(x - pointBefore.key()) ;
+			}
+		}
+	}
+}
+
+// Here come the macros to boost the performance
+#define ACCUMULATE_ONES count += 1 ;
+#define ACCUMULATE_X    x  += p.x() ;
+#define ACCUMULATE_XX   xx += p.x()*p.x() ;
+#define ACCUMULATE_XY   xy += p.x()*p.y() ;
+#define ACCUMULATE_XZ   xz += p.x()*zv ;
+#define ACCUMULATE_Y    y  += p.y() ;
+#define ACCUMULATE_YZ   yz += p.y()*zv ;
+#define ACCUMULATE_YY   yy += p.y()*p.y() ;
+#define ACCUMULATE_Z    z  += zv ;
+#define LOOPPOINTS(LOOPCORE) \
+	for (size_t i = 0 ; i < spectrum->dataSize() ; ++i) { \
+	QPointF p = spectrum->sample(i) ; \
+	if (refSpectrum.contains(p.x())) { \
+	double zv = (refSpectrum[p.x()] - p.y()) ; \
+	LOOPCORE \
+	}}
+#define MATRIX_VECTOR_ASSIGNMENT_TWO(MATRIX_A, MATRIX_B, MATRIX_C, VECTOR_A, VECTOR_B) \
+	QVector<double> vec(2) ; \
+	QVector<QVector<double> > matrix(2, vec) ; \
+	matrix[0][0] = MATRIX_A ; \
+	matrix[1][0] = matrix[0][1] = MATRIX_B ; \
+	matrix[1][1] = MATRIX_C ; \
+	vec[0] = VECTOR_A ; \
+	vec[1] = VECTOR_B ; \
+	QVector<double> correction = gaussjinv(matrix, vec) ;
+
+specMultiCommand * specSpectrumPlot::generateCorrectionCommand(const QwtPlotItemList &zeroRanges,
+							       const QwtPlotItemList &spectra,
+							       const QMap<double, double> &referenceSpectrum,
+							       specModel *model,
+							       bool calcOffset,
+							       bool calcSlope,
+							       bool calcScale)
+{
+	if (!calcOffset && !calcSlope) return 0 ; // Nur scale macht keinen Sinn (Referenz wird skaliert)
 	specMultiCommand *zeroCommand = new specMultiCommand ;
 	zeroCommand->setParentObject(model);
+
+	QSet<double> xValues ;
+
+	// Extract points in range and xValues needed (might be a bit heavy on the memory for storing all points)
 	for (int i = 0 ; i < spectra.size() ; ++i)
+		generatePointsInRange(zeroRanges, dynamic_cast<specModelItem*>(spectra[i]), xValues);
+
+	// Generate correct reference spectrum
+	QMap<double, double> refSpectrum ;
+	generateReferenceSpectrum(referenceSpectrum, xValues, refSpectrum);
+
+	typedef QVector3D refPoint ;
+
+	foreach (QwtPlotItem* s, spectra)
 	{
-		QList<QPointF> pointsInRange ;
-		specModelItem* spectrum = (specModelItem*) spectra[i] ;
-		// extract points that lie in any of the ranges
-		for (size_t j = 0 ; j < spectrum->dataSize() ; ++j)
-		{
-			QPointF point = spectrum->sample(j) ;
-			for (int k = 0 ; k < zeroRanges.size() ; ++k)
-			{
-				specRange* range = (specRange*) zeroRanges[k] ;
-				if (range->contains(point.x()))
-				{
-					pointsInRange << point ;
-					break ; // only include each point once
-				}
-			}
-		}
-		// apply reference
-		if (referenceSpectrum.size() > 1 && !pointsInRange.empty()) // TODO general return condition if pointsInRange is empty
-		{
-			// try to find two bordering points for linear interpolation for each point in range.
-            QList<QPointF>::iterator i = pointsInRange.begin() ;
-            while (i != pointsInRange.end())
-			{
-                double x = i->x() ;
-				// if exact same x value is contained in reference, just take it.
-				if (referenceSpectrum.contains(x))
-					i->setY(i->y()-referenceSpectrum[x]) ;
-                else
-                {
-                    QMap<double,double>::const_iterator pointAfter = referenceSpectrum.upperBound(x);
-                    // no points for lin interpol found -> take point from correction list
-                    if (pointAfter == referenceSpectrum.begin() || // no point before to interpolate with
-                            pointAfter == referenceSpectrum.end()) // no point after to interpolate with
-                    {
-                        i = pointsInRange.erase(i) ;
-                        continue ;
-                    }
-                    QMap<double,double>::const_iterator pointBefore  = pointAfter - 1;
-                    // subtract linear interpolation
-                    i->setY(i->y()
-                        - pointBefore.value()
-                        - (pointAfter.value() - pointBefore.value()) /
-                          (pointAfter.key()   - pointBefore.key()  ) *
-                          (x - pointBefore.key())) ;
-                }
-                ++i ; // move on...
-			}
-		}
-
-		// compute correction
+		specModelItem *spectrum = dynamic_cast<specModelItem*>(s) ;
+		if (!spectrum) continue ;
+		double count = 0, x = 0, xx = 0, y = 0, yy = 0, z = 0, xy = 0, xz = 0, yz = 0 ;
 		double offset = 0, slope = 0 ;
-		if((noSlope && !pointsInRange.isEmpty() )|| pointsInRange.size() == 1)
-		{
-			// offset only
-			for (int j = 0 ; j < pointsInRange.size() ; ++j)
-				offset += pointsInRange[j].y() ;
-			offset /= pointsInRange.size() ;
-		}
-		else if (pointsInRange.size() > 1)
-		{
-			// slope and offset
-			// should really be done using GSL
-			QList<double> vector(QVector<double>(2,0.).toList()) ;
-			QList<QList<double> > matrix(QVector<QList<double> >(2,vector).toList()) ;
-			for (int j = 0 ; j < pointsInRange.size() ; ++j)
-			{
-				double x = pointsInRange[j].x(), y = pointsInRange[j].y() ;
-                if (isnan(y) || isnan(x)) continue ;
-				vector[0] += y ;
-				vector[1] += y*x ;
-				matrix[0][0] += x ;
-				matrix[0][1] ++ ;
-				matrix[1][0] += x*x ;
-				matrix[1][1] += x ;
-			}
 
-			if (matrix[0][1] > 1.)
+		if (calcOffset && !calcSlope && !calcScale)
+		{
+			LOOPPOINTS(ACCUMULATE_ONES ACCUMULATE_Z) ;
+			offset = z / count ;
+		}
+		else if (!calcOffset && calcSlope && !calcScale)
+		{
+			LOOPPOINTS(ACCUMULATE_XX ACCUMULATE_XZ) ;
+			slope = xz/xx;
+		}
+		else if (calcOffset && calcSlope && !calcScale)
+		{
+			LOOPPOINTS(ACCUMULATE_ONES ACCUMULATE_X ACCUMULATE_XX ACCUMULATE_XZ ACCUMULATE_Z) ;
+			MATRIX_VECTOR_ASSIGNMENT_TWO(count, x, xx, z, xz) ;
+			offset = correction[0] ;
+			slope  = correction[1] ;
+		}
+		else if (calcOffset && !calcSlope && calcScale)
+		{
+			LOOPPOINTS(ACCUMULATE_ONES ACCUMULATE_Y ACCUMULATE_YY ACCUMULATE_YZ ACCUMULATE_Z) ;
+			MATRIX_VECTOR_ASSIGNMENT_TWO(count, y, yy, z, yz) ;
+			if (correction[1] != 1.)
+				offset = correction[0]/(1.- correction[1]) ; // TODO check or disable (this is dangerous!)
+		}
+		else if (!calcOffset && calcSlope && calcScale)
+		{
+			LOOPPOINTS(ACCUMULATE_X ACCUMULATE_XY ACCUMULATE_YY ACCUMULATE_XZ ACCUMULATE_YZ)
+			MATRIX_VECTOR_ASSIGNMENT_TWO(x, xy, yy, xz, yz) ;
+			if (correction[1] != 1.)
+				slope = correction[0]/(1.-correction[1]) ; // TODO check or disable (this is dangerous!)
+		}
+		else if (calcOffset && calcSlope && calcScale)
+		{
+			LOOPPOINTS(ACCUMULATE_ONES ACCUMULATE_X  ACCUMULATE_Y  ACCUMULATE_Z
+				   ACCUMULATE_XX   ACCUMULATE_XY ACCUMULATE_YY
+				   ACCUMULATE_XZ   ACCUMULATE_YZ) ;
+			QVector<double> vec(3) ;
+			QVector<QVector<double> > matrix(3, vec) ;
+			matrix[0][0] = count ;
+			matrix[1][1] = xx ;
+			matrix[2][2] = yy ;
+			matrix[0][1] = matrix[1][0] = x ;
+			matrix[0][2] = matrix[2][0] = y ;
+			matrix[1][2] = matrix[2][1] = xy;
+			vec[0] = z ;
+			vec[1] = xz ;
+			vec[2] = yz ;
+			QVector<double> correction = gaussjinv(matrix, vec) ;
+			if (correction[2] != -1.)
 			{
-				QList<double> correction = gaussjinv(matrix,vector) ;
-				offset = correction[1];
-				slope = correction[0] ;
+				offset = correction[0]/(1.+correction[2]) ;
+				slope  = correction[1]/(1.+correction[2]) ;
 			}
 		}
+
 		specPlotMoveCommand *command = new specPlotMoveCommand(zeroCommand) ;
 		if (model)
 			command->setItem(model->index(spectrum));
-		command->setCorrections(0,-offset,-slope,1.) ;
+		command->setCorrections(0, offset, slope, 1.) ;
 		command->setParentObject(model);
 	}
 	return zeroCommand ;
@@ -423,14 +527,20 @@ void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double n
 		for (size_t i = 0 ; i < reference->dataSize() ; ++i)
 			referenceSpectrum[reference->sample(i).x()] = reference->sample(i).y() ;
 
-	specMultiCommand *zeroCommand = generateCorrectionCommand(zeroRanges, spectra, referenceSpectrum, view->model(), noSlopeAction->isChecked()) ;
-    QStringList rangeStrings ;
-    for (QwtPlotItemList::iterator i = zeroRanges.begin() ; i != zeroRanges.end() ; ++i)
-    {
-        specRange* range = (specRange*) (*i) ;
-        rangeStrings << QString::number(range->minValue()) + "--" + QString::number(range->maxValue()) ;
-    }
-    zeroCommand->setText(tr("Apply range correction. Ranges: ") + rangeStrings.join(", "));
+	specMultiCommand *zeroCommand = generateCorrectionCommand(zeroRanges,
+								  spectra,
+								  referenceSpectrum,
+								  view->model(),
+								  offsetAction->isChecked(),
+								  offlineAction->isChecked(),
+								  scaleAction->isChecked()) ;
+	QStringList rangeStrings ;
+	for (QwtPlotItemList::iterator i = zeroRanges.begin() ; i != zeroRanges.end() ; ++i)
+	{
+		specRange* range = (specRange*) (*i) ;
+		rangeStrings << QString::number(range->minValue()) + "--" + QString::number(range->maxValue()) ;
+	}
+	zeroCommand->setText(tr("Apply range correction. Ranges: ") + rangeStrings.join(", "));
 	undoPartner()->push(zeroCommand) ;
 	replot() ;
 }
@@ -490,6 +600,7 @@ QList<QAction*> specSpectrumPlot::actions()
 {
 	return specPlot::actions() << correctionActions->actions()
 				   << setReferenceAction
+				   << alignWithReferenceAction
 				   << alignmentActions->actions()
 				   << subInterpolatedAction ;
 }

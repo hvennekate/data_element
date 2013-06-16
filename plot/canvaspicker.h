@@ -50,6 +50,7 @@ public:
 	void removeSelectable();
 	void setSelectable(const QSet<specCanvasItem*>&) ;
 	void removeSelected() ;
+	int countSelectable() const ;
 	void highlightSelectable(bool) ;
 	QList<specCanvasItem*> items() const ;
 	inline void setOwning(bool Owning =true) { owning = Owning ; } // TODO do this more skilfully.

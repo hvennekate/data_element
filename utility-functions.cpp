@@ -579,21 +579,21 @@ QList<specModelItem*> readPEFile(QFile& file)
 	return specData ;
 }
 
-QList<double> gaussjinv(QList<QList<double> >& A, QList<double>& b)
+QVector<double> gaussjinv(QVector<QVector<double> >& A, QVector<double>& b)
 {
 	QVector<bool> ipiv(A.size(),false) ;
-	QList<QList<QList<double> >::size_type> indxr ;
-	QList<QList<double>::size_type> indxc ;
-	for (QList<QList<double> >::size_type i = 0 ; i < A.size() ; i++)
+	QVector<QVector<QVector<double> >::size_type> indxr ;
+	QVector<QVector<double>::size_type> indxc ;
+	for (QVector<QVector<double> >::size_type i = 0 ; i < A.size() ; i++)
 	{
-		QList<QList<double> >::size_type irow ;
-		QList<double>::size_type icol ;
+		QVector<QVector<double> >::size_type irow ;
+		QVector<double>::size_type icol ;
 		double max = 0 ;
-		for (QList<QList<double> >::size_type j = 0 ; j < A.size() ; j++)
+		for (QVector<QVector<double> >::size_type j = 0 ; j < A.size() ; j++)
 		{
 			if (!ipiv[j])
 			{
-				for(QList<double>::size_type k = 0 ; k < A[j].size() ; k++)
+				for(QVector<double>::size_type k = 0 ; k < A[j].size() ; k++)
 				{
 					if (!ipiv[k] && (max = std::max(fabs(A[j][k]),max)) == fabs(A[j][k]))
 					{
@@ -604,36 +604,36 @@ QList<double> gaussjinv(QList<QList<double> >& A, QList<double>& b)
 		}
 		ipiv[icol] = true ;
 		if (irow != icol)
-			A.swap(irow,icol) ;
+			A[irow].swap(A[icol]) ;
 		indxr << irow ;
 		indxc << icol ;
 		double pivinv = A[icol][icol] ;
 		A[icol][icol] = 1 ;
-		for (QList<double>::size_type j = 0 ; j < A[icol].size() ; j ++)
+		for (QVector<double>::size_type j = 0 ; j < A[icol].size() ; j ++)
 			A[icol][j] /= pivinv ;
-		for (QList<QList<double> >::size_type j = 0 ; j < A.size() ; j++)
+		for (QVector<QVector<double> >::size_type j = 0 ; j < A.size() ; j++)
 		{
 			if (j != icol)
 			{
 				double dummy = A[j][icol] ;
 				A[j][icol] = 0 ;
-				for (QList<double>::size_type k = 0 ; k < A[j].size() ; k++)
+				for (QVector<double>::size_type k = 0 ; k < A[j].size() ; k++)
 					A[j][k] -= A[icol][k]*dummy ;
 			}
 		}
 		
 	}
 // rearranging the matrix ;	
-	for(QList<QList<double>::size_type>::size_type i = indxc.size() -1 ; i >= 0 ; i--)
+	for(QVector<QVector<double>::size_type>::size_type i = indxc.size() -1 ; i >= 0 ; i--)
 		if (indxr[i] != indxc[i])
-			for(QList<QList<double> >::size_type j = 0 ; j < A.size() ; j++)
-				A[j].swap(indxr[i],indxc[i]) ;
+			for(QVector<QVector<double> >::size_type j = 0 ; j < A.size() ; j++)
+				qSwap(A[j][indxr[i]], A[j][indxc[i]]) ;
 // applying the inverted matrix to the vector
-	QList<double> retval ;
-	for (QList<QList<double> >::size_type i = 0 ; i < A.size() ; i++)
+	QVector<double> retval ;
+	for (QVector<QVector<double> >::size_type i = 0 ; i < A.size() ; i++)
 	{
 		double dummy = 0 ;
-		for (QList<double>::size_type j = 0 ; j < A[i].size() ; j++)
+		for (QVector<double>::size_type j = 0 ; j < A[i].size() ; j++)
 			dummy += A[i][j]*b[j] ;
 		retval << dummy ;
 	}

@@ -25,7 +25,7 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 QVector<double> waveNumbers(QTextStream&) ;
 QHash<QString,specDescriptor> fileHeader(QTextStream&) ;
 specFileImportFunction fileFilter(const QString& fileName);
-QList<double> gaussjinv(QList<QList<double> >&,QList<double>&) ;
+QVector<double> gaussjinv(QVector<QVector<double> >&, QVector<double>&) ;
 
 bool comparePoints(const QPointF&, const QPointF&) ;
 

@@ -24,38 +24,54 @@ private:
 		*alignWithReferenceAction,
 		*addRangeAction,
 		*removeRangeAction,
-		*noSlopeAction,
 		*subInterpolatedAction ;
 	QActionGroup *correctionActions, *alignmentActions ;
 	CanvasPicker *correctionPicker, *alignmentPicker ;
+
+public:
+	/*! Enum for specifying the mode of correction for spectra*/
+	enum move { NoMoveMode = 0,
+			Offset = 1,
+			Scale  = 2,
+			Slope  = 4 } ;
+	Q_DECLARE_FLAGS(moveMode,move)
+	moveMode manualAlignment, rangeAlignment ;
+private:
 	QHash<specCanvasItem*, QList<int> > pointHash ;
-	QList<specRange*> zeroRanges ;
 	specDataItem *reference ;
-	void toggleAligning(bool on=true) ;
+
 	void invalidateReference() ;
-
-
 	bool correctionChecked() ;
-
 	QList<specDataItem*> folderContent(specModelItem*) ;
+	moveMode correctionsStatus() const ;
+	void setCorrectionsStatus(moveMode) ;
 
 public:
 	explicit specSpectrumPlot(QWidget *parent = 0);
 	~specSpectrumPlot() ;
 	QList<QAction*> actions() ;
-	static specMultiCommand* generateCorrectionCommand(const QwtPlotItemList& zeroRanges, const QwtPlotItemList& spectra, const QMap<double, double>& referenceSpectrum, specModel*, bool noSlope = false) ;
+	static specMultiCommand* generateCorrectionCommand(const QwtPlotItemList& zeroRanges,
+							   const QwtPlotItemList& spectra,
+							   const QMap<double, double>& referenceSpectrum,
+							   specModel* model,
+							   bool calcOffset = true,
+							   bool calcSlope = true,
+							   bool calcScale = false) ;
 
 	void attachToPicker(specCanvasItem*) ;
 	void detachFromPicker(specCanvasItem*) ;
 signals:
 
 private slots:
-	void correctionsChanged() ;
+	void correctionsChanged(QAction *action = 0) ;
 	void alignmentChanged(QAction*) ;
 	void pointMoved(specCanvasItem*,int point, double x, double y) ;
 	void applyZeroRanges(specCanvasItem* range,int point, double x, double y) ;
 	void multipleSubtraction() ;
 	void setReference() ;
+	void toggleAligning(bool on=true) ;
+	void checkReferenceForScaling() ;
 };
 
+Q_DECLARE_OPERATORS_FOR_FLAGS(specSpectrumPlot::moveMode)
 #endif // SPECSPECTRUMPLOT_H

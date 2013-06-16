@@ -455,6 +455,11 @@ void CanvasPicker::removeSelected()
 		removeSelectable(lastSelected);
 }
 
+int CanvasPicker::countSelectable() const
+{
+	return selectable.size() ;
+}
+
 void CanvasPicker::removeSelectable()
 {
 	removeSelectable(selectable) ;

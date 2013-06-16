@@ -92,9 +92,9 @@ int main(int argc, char *argv[])
             zipDevice = new bzipIODevice(&buffer) ; // takes ownership of buffer
             qDebug() << "opening buffer:" << zipDevice->open(bzipIODevice::ReadOnly) ;
             inStream.setDevice(zipDevice);
-        }
-        exporter.readFromStream(inStream) ;
-        zipDevice->releaseDevice() ;
+	}
+	exporter.readFromStream(inStream) ;
+	zipDevice->releaseDevice() ;
         delete zipDevice ;
         typedef QPair<QVector<int>, QString> itemPair ;
         qDebug() << "Exporting from file " << file->fileName() ;
