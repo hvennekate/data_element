@@ -73,7 +73,6 @@ public:
 specUndoCommand* specTiltMatrixAction::generateUndoCommand()
 {
     QList<specModelItem*> items, toBeDeletedFolders ;
-    Q_ASSERT(!items.isEmpty()) ;
     expandSelectedFolders(items, toBeDeletedFolders);
 
     // bail out if only empty folders were selected
