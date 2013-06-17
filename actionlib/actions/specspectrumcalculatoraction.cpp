@@ -7,6 +7,32 @@
 #include <muParser.h>
 #include <QMessageBox>
 #include "specdataview.h"
+#include <QRegExp>
+
+inline double modulo(double a, double b)
+{
+	return int(a) % int(b) ;
+}
+
+QString specSpectrumCalculatorAction::parameterName(int i)
+{
+	return "p"+QString::number(i) ;
+}
+
+QStringList specSpectrumCalculatorAction::descriptorNames(QString& teststring)
+{
+	QRegExp re("\"([^\"]|\\\\\")*\"") ;
+	QStringList descriptorNames ;
+	int i = 0 ;
+	int index = 0 ;
+	while((index = re.indexIn(teststring)) != -1)
+	{
+		descriptorNames << re.cap().mid(1,re.cap().length()-2) ;
+		teststring.remove(index, re.matchedLength()) ;
+		teststring.insert(index, parameterName(i++)) ;
+	}
+	return descriptorNames ;
+}
 
 specSpectrumCalculatorAction::specSpectrumCalculatorAction(QObject *parent) :
 	specRequiresItemAction(parent)
@@ -41,10 +67,14 @@ specUndoCommand* specSpectrumCalculatorAction::generateUndoCommand()
 
 	// prepare the parsers
 	mu::Parser xParser, yParser ;
+	QString xFormula(dialog.xFormula()), yFormula(dialog.yFormula()) ;
+	QStringList xDescriptors(descriptorNames(xFormula)), yDescriptors(descriptorNames(yFormula)) ;
 	try
 	{
-		xParser.SetExpr(dialog.xFormula().toStdString()) ;
-		yParser.SetExpr(dialog.yFormula().toStdString()) ;
+		xParser.DefineOprt("%", modulo, 6);
+		yParser.DefineOprt("%", modulo, 6);
+		xParser.SetExpr(xFormula.toStdString()) ;
+		yParser.SetExpr(yFormula.toStdString()) ;
 	}
 	catch(...)
 	{
@@ -75,11 +105,17 @@ specUndoCommand* specSpectrumCalculatorAction::generateUndoCommand()
 		{
 			xParser.ClearVar();
 			yParser.ClearVar();
+			xParser.ClearConst();
+			yParser.ClearConst();
 
 			xParser.DefineVar("x", oldX) ;
 			yParser.DefineVar("x", oldX) ;
 			xParser.DefineVar("y", oldY) ;
 			yParser.DefineVar("y", oldY) ;
+			for(int i = 0 ; i < xDescriptors.size() ; ++i)
+				xParser.DefineConst(parameterName(i).toStdString(), item->descriptorValue(xDescriptors[i])) ;
+			for(int i = 0 ; i < yDescriptors.size() ; ++i)
+				yParser.DefineConst(parameterName(i).toStdString(), item->descriptorValue(yDescriptors[i])) ;
 
 			xParser.Eval(newX, count) ;
 			yParser.Eval(newY, count) ;
@@ -119,3 +155,5 @@ specUndoCommand* specSpectrumCalculatorAction::generateUndoCommand()
 			       + dialog.yFormula() + "." );
 	return parentCommand ;
 }
+
+

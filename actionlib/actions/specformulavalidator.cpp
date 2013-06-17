@@ -3,6 +3,7 @@
 #include <map>
 #include <QStringList>
 #include <QDebug>
+#include "specspectrumcalculatoraction.h"
 
 specFormulaValidator::specFormulaValidator(const QRegExp &v, QObject *parent)
 	: QValidator(parent),
@@ -22,9 +23,17 @@ void specFormulaValidator::fixup(QString &s) const
 	if (num > 0) s.append (QString(num, ')')) ;
 }
 
-QValidator::State specFormulaValidator::validate(QString &s, int &pos) const
+double modulo(double a, double b)
+{
+	return int(a) % int(b) ;
+}
+
+QValidator::State specFormulaValidator::validate(QString &expr, int &pos) const
 {
 	Q_UNUSED(pos)
+	QString s(expr) ;
+	specSpectrumCalculatorAction::descriptorNames(s) ;
+
 	// parantheses test
 	if (openCloseDifference(s))
 	{
@@ -34,6 +43,7 @@ QValidator::State specFormulaValidator::validate(QString &s, int &pos) const
 
 	// parser setup test
 	mu::Parser parser ;
+	parser.DefineOprt("%", modulo, 6); // TODO dies ist nicht die feine englische Art!  Subclass mu::Parser and add operator(s) in custom constructor!
 	std::map<mu::string_type, mu::value_type*> usedVariables ;
 	try
 	{

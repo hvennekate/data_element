@@ -10,6 +10,9 @@ public:
 	const std::type_info& possibleParent() ;
 protected:
 	specUndoCommand* generateUndoCommand() ;
+public:
+	static QStringList descriptorNames(QString &expression) ;
+	static QString parameterName(int i) ;
 };
 
 #endif // SPECSPECTRUMCALCULATORACTION_H
