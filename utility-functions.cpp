@@ -340,6 +340,7 @@ QList<specModelItem*> readHVMeasurement(const QString& measurement, QString file
             wavenumbers.last() << (wnsIt++)->toDouble() ;
     }
 
+    int counter = 0 ;
     for (QStringList::iterator it = lines.begin() ; it != lines.end() ; ++it)
     {
         QStringList dataEntries = it->split(QRegExp("[ ()]"),QString::SkipEmptyParts) ;
@@ -362,6 +363,7 @@ QList<specModelItem*> readHVMeasurement(const QString& measurement, QString file
                         (dataPoints.first().nu + dataPoints.last().nu)/2. :
                         ((dataPoints.size() == 1) ? dataPoints.first().nu : NAN) ;
             if (polarisatorMessung) headerItems["Polarisation"] = i % 2 ;
+	    headerItems["Index"] = counter ++ ;
             newItems << new specDataItem(dataPoints, headerItems) ;
         }
     }
