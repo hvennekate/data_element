@@ -8,8 +8,7 @@ spectrumCalculatorDialog::spectrumCalculatorDialog(QWidget *parent) :
 	ui(new Ui::spectrumCalculatorDialog)
 {
 	ui->setupUi(this);
-	QStringList xy ;
-	xy << "x" << "y" ;
+	QRegExp xy("(x|y|p\\d+)") ;
 	specFormulaValidator *xValidator = new specFormulaValidator(xy, ui->formulaX) ;
 	specFormulaValidator *yValidator = new specFormulaValidator(xy, ui->formulaY) ;
 	ui->formulaX->setValidator(xValidator);

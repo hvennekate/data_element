@@ -3,15 +3,16 @@
 
 #include <QValidator>
 #include <QStringList>
+#include <QRegExp>
 
 class specFormulaValidator : public QValidator
 {
 	Q_OBJECT
 private:
-	QStringList variables ;
+	QRegExp variables ;
 	static int openCloseDifference(const QString& s) ;
 public:
-	explicit specFormulaValidator(const QStringList&, QObject *parent = 0);
+	explicit specFormulaValidator(const QRegExp&, QObject *parent = 0);
 	void fixup(QString &) const;
 	State validate(QString &, int &) const ;
 signals:

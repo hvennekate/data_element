@@ -4,7 +4,7 @@
 #include <QStringList>
 #include <QDebug>
 
-specFormulaValidator::specFormulaValidator(const QStringList &v, QObject *parent)
+specFormulaValidator::specFormulaValidator(const QRegExp &v, QObject *parent)
 	: QValidator(parent),
 	  variables(v)
 {
@@ -55,9 +55,9 @@ QValidator::State specFormulaValidator::validate(QString &s, int &pos) const
 	     i = usedVariables.begin() ; i != usedVariables.end() ; ++i)
 	{
 		QString varName(QString::fromStdString(i->first)) ;
-		if (!variables.contains(varName))
+		if (!variables.exactMatch(varName))
 		{
-			emit evaluationError(tr("Variable other than x or y used: ") + varName) ;
+			emit evaluationError(tr("Illegal variable name: ") + varName) ;
 			return Intermediate ;
 		}
 	}
