@@ -77,6 +77,7 @@ void specSpectrumPlot::invalidateReference()
 	if (reference) delete reference ;
 	reference = 0 ;
 	setReferenceAction->setToolTip(QString("Momentan keine Referenz."));
+	subInterpolatedAction->setDisabled(true);
 }
 
 specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
