@@ -6,6 +6,7 @@
 specLogModel::specLogModel(QObject *parent)
 	: specModel(parent)
 {
+	setObjectName("logModel");
 }
 
 QStringList specLogModel::dataTypes() const

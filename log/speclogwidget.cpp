@@ -24,6 +24,7 @@ specLogWidget::specLogWidget(QWidget *parent)
 	content->setLayout(layout);
 	setWidget(content);
 	setWhatsThis(tr("This dock window contains log data."));
+	setObjectName("logWidget");
 }
 
 void specLogWidget::addToolbar(specActionLibrary *actions)

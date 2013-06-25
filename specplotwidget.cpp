@@ -112,6 +112,7 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	svgModification(false) ;
 
 	subDocks << logWidget << kineticWidget << undoViewWidget ;
+	setObjectName("mainWidget");
 	changeFileName(tr("untitled")) ;
 }
 

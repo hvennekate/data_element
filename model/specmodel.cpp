@@ -146,6 +146,7 @@ specModel::specModel(QObject *par)
 	root = new specFolderItem ;
 	Descriptors += "" ;
 	DescriptorProperties += spec::editable ;
+	setObjectName("mainModel");
 }
 
 specModel::~specModel()

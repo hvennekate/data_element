@@ -7,6 +7,7 @@ specMetaModel::specMetaModel(QObject *parent) :
 	dataModel(0)
 {
 	setMetaModel(this) ;
+	setObjectName("metaModel");
 }
 
 specMetaModel::~specMetaModel()

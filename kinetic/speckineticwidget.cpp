@@ -43,8 +43,10 @@ specKineticWidget::specKineticWidget(QWidget *parent)
 
 	connect(items->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),this,SLOT(selectionChanged(const QItemSelection&, const QItemSelection&))) ;
 
-    connect(plot->svgAction(),SIGNAL(toggled(bool)),this,SLOT(svgModification(bool))) ;
-    svgModification(false) ;
+	connect(plot->svgAction(),SIGNAL(toggled(bool)),this,SLOT(svgModification(bool))) ;
+	svgModification(false) ;
+	setObjectName("metaWidget") ;
+	plot->setObjectName("metaPlot");
 }
 
 void specKineticWidget::writeToStream(QDataStream &out) const
@@ -55,10 +57,6 @@ void specKineticWidget::writeToStream(QDataStream &out) const
 void specKineticWidget::readFromStream(QDataStream &in)
 {
 	in >> *plot >> *items ;
-}
-
-specKineticWidget::~specKineticWidget()
-{
 }
 
 void specKineticWidget::selectionChanged(const QItemSelection & selected, const QItemSelection & deselected)

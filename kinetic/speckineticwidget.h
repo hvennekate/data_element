@@ -26,7 +26,6 @@ private slots:
     void svgModification(bool mod) ;
 public:
 	specKineticWidget (QWidget *parent = 0 );
-	~specKineticWidget();
 	void addToolbar(specActionLibrary*) ;
 	specPlot *internalPlot() { return plot ; }
 	specMetaView *view() ;

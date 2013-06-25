@@ -141,6 +141,8 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	alignWithReferenceAction->setWhatsThis(tr("Enables aligning selected data sets with the reference defined (or with the x axis if no reference has been set).\nFor aligning, a linear function will be subtracted, unless the correction has been limited to subtracting an offset."));
 	addRangeAction->setWhatsThis(tr("Add a range for alignment.  The alignment correction of data sets selected will be calculated based on the points that lie within at least one of those ranges.")) ;
 	removeRangeAction->setWhatsThis(tr("Delete a range for alignment.  The alignment correction of data sets selected will be calculated based on the points that lie within at least one of those ranges."));
+
+	setObjectName("mainPlot");
 }
 
 QList<specDataItem*> specSpectrumPlot::folderContent(specModelItem *folder)
