@@ -36,19 +36,42 @@
 #include <QProgressDialog>
 #include "spectiltmatrixaction.h"
 #include "specspectrumcalculatoraction.h"
+#include "specplotwidget.h"
 #include <QMessageBox>
+#include <specdockwidget.h>
 
-QUndoView* specActionLibrary::undoView()
+specDockWidget* specActionLibrary::undoWidget()
 {
-	return new QUndoView(undoStack) ;
+	return dockWidget ;
+}
+
+QList<QWidget*> specHistoryWidget::mainWidgets() const
+{
+	return QList<QWidget*>() << undoView ;
+}
+
+specHistoryWidget::specHistoryWidget(QUndoStack* stack)
+	: specDockWidget(tr("History")),
+	  undoView(new QUndoView(stack, this))
+{
+	setWhatsThis("Undo history.  Click on any command to forward/rewind to that particular state.");
+	toggleViewAction()->setIcon(QIcon(":/undoView.png")) ;
+	toggleViewAction()->setWhatsThis(tr("Shows and hides the undo history."));
+	setupWindow(0);
 }
 
 specActionLibrary::specActionLibrary(QObject *parent) :
     QObject(parent),
-    progress(0)
+    progress(0),
+    purgeUndoAction(new QAction(QIcon::fromTheme("user-trash"),tr("Clear history"),this)),
+    dockWidget(0)
 {
-    undoStack = new QUndoStack(this) ; // TODO consider making this a plain variable
-    connect(undoStack,SIGNAL(cleanChanged(bool)),this,SLOT(stackClean(bool))) ;
+	undoStack = new QUndoStack(this) ; // TODO consider making this a plain variable
+	connect(undoStack,SIGNAL(cleanChanged(bool)),this,SLOT(stackClean(bool))) ;
+	connect(purgeUndoAction,SIGNAL(triggered()),this,SLOT(purgeUndo())) ;
+	purgeUndoAction->setWhatsThis(tr("Deletes the complete undo history -- use with care and don't point this at humans."));
+
+	dockWidget = new specHistoryWidget(undoStack) ;
 }
 
 void specActionLibrary::stackClean(const bool &b) // This is due to the stack being clean
@@ -73,6 +96,8 @@ QAction* specActionLibrary::redoAction(QObject* target)
 {
 	QAction *redoAction = undoStack->createRedoAction(target) ;
 	redoAction->setIcon(QIcon::fromTheme("edit-redo")) ;
+	redoAction->setToolTip(tr("Redo")) ;
+	redoAction->setWhatsThis(tr("Redo - Redoes what has been undone by clicking the undo button.\nNote that all of your undo history (including possible redos) will be saved along with your work and will be available again upon loading your file again."));
 	return redoAction ;
 }
 
@@ -80,95 +105,97 @@ QAction* specActionLibrary::undoAction(QObject* target)
 {
 	QAction *undoAction = undoStack->createUndoAction(target) ;
 	undoAction->setIcon(QIcon::fromTheme("edit-undo"));
+	undoAction->setToolTip(tr("Undo")) ;
+	undoAction->setWhatsThis(tr("Undo - By clicking this button you can revert changes.  To \"undo the undo\" click the redo button right next door.\nNote that all of your undo history will be saved along with your work and will be available again upon loading your file again."));
 	return undoAction ;
 }
 
 QToolBar* specActionLibrary::toolBar(QWidget *target)
 {
-	addParent(target) ;
-	specView* view ;
-	if ((view = dynamic_cast<specView*>(target)) && view->model())
+	QToolBar *bar = new QToolBar(target) ;
+	bar->setContentsMargins(0,0,0,0) ;
+	bar->setIconSize(QSize(20,20)) ;
+
+	specView* view = dynamic_cast<specView*>(target) ;
+	specDataView*   dataView   = dynamic_cast<specDataView*>  (target) ;
+	specMetaView*   metaView   = dynamic_cast<specMetaView*>  (target) ;
+	specLogView*    logView    = dynamic_cast<specLogView*>   (target) ;
+	specPlot*       plot       = dynamic_cast<specPlot*>      (target) ;
+	specPlotWidget* plotWidget = dynamic_cast<specPlotWidget*>(target) ;
+
+	if (view && view->model())
+	{
+		addParent(view) ;
 		addParent(view->model()) ;
-
-	if (typeid(*target)== typeid(specDataView))
-	{
-		QToolBar *bar = new QToolBar(target) ;
-
 		addNewAction(bar, new specAddFolderAction(target)) ;
-		addNewAction(bar, new specAddSVGItemAction(target)) ;
-		specImportSpecAction *importAction = new specImportSpecAction(target) ;
-		addNewAction(bar, importAction) ;
-		bar->addSeparator() ;
-		addNewAction(bar, new specCopyAction(target)) ;
-		addNewAction(bar, new specCutAction(target)) ;
-		addNewAction(bar, new specPasteAction(target)) ;
-		addNewAction(bar, new specDeleteAction(target)) ;
-		bar->addSeparator() ;
-		addNewAction(bar, new specTreeAction(target)) ;
-		addNewAction(bar, new specMergeAction(target)) ;
-		addNewAction(bar, new specTiltMatrixAction(target)) ;
-		addNewAction(bar, new specSpectrumCalculatorAction(target)) ;
-		addNewAction(bar, new specDescriptorEditAction(target)) ;
+		if (metaView)
+			addNewAction(bar, new specNewMetaItemAction(target));
+		else
+		{
+			addNewAction(bar, new specImportSpecAction(target)) ;
+			addNewAction(bar, new specTreeAction(target)) ;
+		}
+		if (dataView || metaView)
+			addNewAction(bar, new specAddSVGItemAction(target)) ;
 		addNewAction(bar,new genericExportAction(target)) ;
 		bar->addSeparator() ;
-		addNewAction(bar, new specRemoveDataAction(target)) ;
-		addNewAction(bar, new specAverageDataAction(target)) ;
-		addNewAction(bar, new changePlotStyleAction(target)) ;
-
-		return bar ;
-	}
-	else if (dynamic_cast<specMetaView*>(target))
-	{
-		QToolBar *bar = new QToolBar(target) ;
-
-		addNewAction(bar, new specAddFolderAction(target)) ;
-		addNewAction(bar, new specNewMetaItemAction(target));
-		addNewAction(bar, new specAddSVGItemAction(target)) ;
-		bar->addSeparator() ;
 		addNewAction(bar, new specCopyAction(target)) ;
 		addNewAction(bar, new specCutAction(target)) ;
 		addNewAction(bar, new specPasteAction(target)) ;
 		addNewAction(bar, new specDeleteAction(target)) ;
 		bar->addSeparator() ;
-		addNewAction(bar, new changePlotStyleAction(target)) ;
-		addNewAction(bar, new specAddConnectionsAction(target)) ;
-		addNewAction(bar, new specSelectConnectedAction(target)) ;
-		addNewAction(bar,new genericExportAction(target)) ;
-
-		return bar ;
-	}
-	else if (dynamic_cast<specLogView*>(target))
-	{
-		QToolBar *bar = new QToolBar(target) ;
-
-		addNewAction(bar, new specAddFolderAction(target)) ;
-		specImportSpecAction *importAction = new specImportSpecAction(target) ;
-		importAction->setFilters(QStringList() << "Log-files (*.log)");
-		addNewAction(bar, importAction) ;
+		if (metaView || logView)
+		{
+			bar->addAction(undoAction(view)) ;
+			bar->addAction(redoAction(view)) ;
+			bar->addSeparator() ;
+		}
+		if (dataView)
+		{
+			addNewAction(bar, new specMergeAction(target)) ;
+			addNewAction(bar, new specTiltMatrixAction(target)) ;
+			addNewAction(bar, new specSpectrumCalculatorAction(target)) ;
+			addNewAction(bar, new specDescriptorEditAction(target)) ;
+			bar->addSeparator() ;
+			addNewAction(bar, new specRemoveDataAction(target)) ;
+			addNewAction(bar, new specAverageDataAction(target)) ;
+		}
+		if (metaView)
+		{
+			addNewAction(bar, new specAddConnectionsAction(target)) ;
+			addNewAction(bar, new specSelectConnectedAction(target)) ;
+		}
+		if (logView)
+			addNewAction(bar, new specDescriptorEditAction(target)) ;
 		bar->addSeparator() ;
-		addNewAction(bar, new specCopyAction(target)) ;
-		addNewAction(bar, new specCutAction(target)) ;
-		addNewAction(bar, new specPasteAction(target)) ;
-		addNewAction(bar, new specDeleteAction(target)) ;
-		bar->addSeparator() ;
-		addNewAction(bar, new specTreeAction(target)) ;
-		addNewAction(bar, new specDescriptorEditAction(target)) ;
-
-
-		return bar ;
+		if (dataView || metaView)
+			addNewAction(bar, new changePlotStyleAction(target)) ;
+		bar->setWindowTitle(tr("Items"));
 	}
-	else if (dynamic_cast<specPlot*>(target))
-	{
-		QToolBar *bar = new QToolBar(target) ;
 
+	if (plot)
+	{
+		addParent(plot);
 		addNewAction(bar, new specTitleAction(target)) ;
 		addNewAction(bar, new specXLabelAction(target)) ;
 		addNewAction(bar, new specYLabelAction(target)) ;
-
-		return bar ;
+		bar->addActions(plot->actions());
+		bar->setWindowTitle(tr("Plot"));
 	}
 
-	return new QToolBar(target) ;
+	if (plotWidget)
+	{
+		delete bar ;
+		bar = plotWidget->createToolbar() ;
+		bar-> addSeparator() ;
+		bar-> addAction(purgeUndoAction) ;
+		bar-> addSeparator() ;
+		bar-> addAction(undoAction(this)) ;
+		bar-> addAction(redoAction(this)) ;
+		bar->setWindowTitle(tr("Main"));
+	}
+
+	return bar ;
 }
 
 void specActionLibrary::addDragDropPartner(specModel* model)
@@ -219,6 +246,9 @@ void specActionLibrary::readFromStream(QDataStream &in)
 {
 	qint32 num, position ;
 	in >> num >> position ; // TODO really rely on num?
+
+	foreach(QObject* parent, parents)
+		qDebug() << "Parent: " << parent->objectName() ;
 
 	type t ;
 	QVector<qint32> parentIndex(num,0) ;
@@ -293,12 +323,19 @@ int specActionLibrary::deleteInternally(specModel* model)
 
 void specActionLibrary::addPlot(specPlot *plot)
 {
-    connect(undoStack,SIGNAL(indexChanged(int)),plot,SLOT(replot())) ;
+	connect(undoStack,SIGNAL(indexChanged(int)),plot,SLOT(replot())) ;
+	plot->setUndoPartner(this) ;
 }
 
 void specActionLibrary::purgeUndo()
 {
-	undoStack->clear();
+	if (QMessageBox::Yes ==
+			QMessageBox::question(0,
+					      tr("Really Clear History?"),
+					      tr("Do you really want to delete all undo and redo actions?  WARNING:  This cannot be undone."),
+					      QMessageBox::Yes | QMessageBox::No,
+					      QMessageBox::No))
+		undoStack->clear();
 }
 
 QMenu *specActionLibrary::contextMenu(QWidget *w)
@@ -329,6 +366,9 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
 		addNewAction(cMenu, new specTiltMatrixAction(w)) ;
 		addNewAction(cMenu, new specSpectrumCalculatorAction(w)) ;
 	}
+
+	if ((dataView && dataView->model()) || (metaView && metaView->model()))
+		addNewAction(cMenu, new changePlotStyleAction(w)) ;
 
 	if (view && view->model())
 	{

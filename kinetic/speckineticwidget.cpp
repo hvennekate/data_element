@@ -16,10 +16,7 @@ specKineticWidget::specKineticWidget(QWidget *parent)
 {
 	setWhatsThis(tr("Meta dock widget - In this widget, further processing of the primary data can be done (integration, max, min, etc.)"));
 	setFloating(true) ;
-	content = new QWidget ;
-	layout = new QVBoxLayout ;
 	plot = new specPlot ;
-	splitter = new specSplitter(Qt::Vertical,this) ;
 	items = new specMetaView(this) ;
 	
 	plot->setMinimumHeight(100) ;
@@ -29,17 +26,6 @@ specKineticWidget::specKineticWidget(QWidget *parent)
 	items->setModel(new specMetaModel(items)) ;
 	new specGenericMimeConverter(items->model());
 	new specMimeTextExporter(items->model()) ;
-
-	
-	splitter->setOrientation(Qt::Vertical) ;
-	splitter->addWidget(plot) ;
-	splitter->addWidget(items) ;
-	
-	layout->addWidget(splitter) ;
-	layout->setContentsMargins(0,0,0,0) ;
-	
-	content->setLayout(layout) ;
-	setWidget(content) ;
 
 	connect(items->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),this,SLOT(selectionChanged(const QItemSelection&, const QItemSelection&))) ;
 
@@ -72,20 +58,6 @@ void specKineticWidget::selectionChanged(const QItemSelection & selected, const 
 }
 
 // TODO crash when another meta item is added after the first has been assigned servers
-
-void specKineticWidget::addToolbar(specActionLibrary* actions)
-{
-	actions->addDragDropPartner(items->model());
-	actions->addPlot(plot) ;
-	plot->setUndoPartner(actions);
-	QToolBar *toolbar = actions->toolBar(items) ;
-	toolbar->addSeparator() ;
-	QToolBar *plotBar = actions->toolBar(plot) ;
-	plotBar->addActions(plot->actions()) ;
-	layout->insertWidget(0,toolbar) ;
-	layout->insertWidget(1,plotBar);
-}
-
 // TODO shift to parent class of kineticWidget and plotWidget
 void specKineticWidget::svgModification(bool mod)
 {
@@ -93,4 +65,9 @@ void specKineticWidget::svgModification(bool mod)
     else disconnect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
 
     plot->svgPicker()->highlightSelectable(mod) ;
+}
+
+QList<QWidget*> specKineticWidget::mainWidgets() const
+{
+	return QList<QWidget*>() << items << plot ;
 }

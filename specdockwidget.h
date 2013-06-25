@@ -5,6 +5,8 @@
 #include <QString>
 #include <QDataStream>
 
+class specActionLibrary ;
+
 class specDockWidget : public QDockWidget
 {
 	Q_OBJECT
@@ -13,7 +15,9 @@ private:
 	bool changingTitle ;
 protected:
 	void changeEvent(QEvent *event) ;
+	virtual QList<QWidget*> mainWidgets() const = 0 ;
 public:
+	void setupWindow(specActionLibrary* actions) ;
 	explicit specDockWidget(QString type, QWidget *parent = 0);
 };
 

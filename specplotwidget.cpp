@@ -1,6 +1,5 @@
 #include "specplotwidget.h"
 
-#include <QVBoxLayout>
 #include <QToolBar>
 #include <QAction>
 #include <QSplitter>
@@ -27,93 +26,43 @@
 #include <QLabel>
 
 specPlotWidget::specPlotWidget(QWidget *parent)
-	: specDockWidget(tr("Data"),parent),
+	: specDockWidget(tr("Data"), parent),
+	  actions(new specActionLibrary(this)),
 	  items(new specDataView(this)),
-	  logWidget(new specLogWidget(parent)),
-	  undoViewWidget(new specDockWidget(tr("History"),parent)),
 	  kineticWidget(new specKineticWidget(parent)),
-	  content(new QWidget(this)),
-	  layout(new QVBoxLayout(content)),
+	  logWidget(new specLogWidget(parent)),
 	  plot(new specSpectrumPlot(this)),
-	  toolbar(new QToolBar(tr("File"),this)),
-	  splitter(new specSplitter(Qt::Vertical,this)),
 	  saveAction(new QAction(QIcon::fromTheme("document-save"), tr("Save"), this)),
 	  kineticsAction(kineticWidget->toggleViewAction()),
 	  saveAsAction(new QAction(QIcon::fromTheme("document-save-as"), tr("Save as..."), this)),
 	  logAction(logWidget->toggleViewAction()),
-	  undoViewAction(undoViewWidget->toggleViewAction()),
-	  purgeUndoAction(new QAction(QIcon::fromTheme("user-trash"),tr("Clear history"),this)),
-	  actions(new specActionLibrary(this))
+	  undoViewWidget(actions->undoWidget())
 {
-	undoAction = actions->undoAction(this) ;
-	redoAction = actions->redoAction(this) ;
-
-	setWhatsThis(tr("Data Dock Window - This is the main window for managing data.  Right-clicking on it will change the arrangement of its contents from vertical to horizontal and back.\nSince this is a dock window, you may remove it from the application's main window and move it around within the main window.  To do so, \"grab\" it by its title bar and drag it to where you need it to be.\nThere are also a dock window for managing logs and \"meta-data\" (i.e. data based on processing the primary data) associated with this data dock window.  To show these, click the log or meta buttons (to the right of the save as button).\nTo start working, check out the help of the data list at the bottom (or right) of this window or of the list in the log dock window."));
-	saveAsAction->setWhatsThis(tr("Save As... - This button will allow you to save your work asking you for a file name explicitly."));
-	saveAction->setWhatsThis(tr("Save - Clicking this button will save your work and only ask for a file name if none has been specified so far."));
-	purgeUndoAction->setWhatsThis(tr("Deletes the complete undo history -- use with care and don't point this at humans."));
-	undoAction->setToolTip(tr("Undo")) ;
-	redoAction->setToolTip(tr("Redo")) ;
-	undoAction->setWhatsThis(tr("Undo - By clicking this button you can revert changes.  To \"undo the undo\" click the redo button right next door.\nNote that all of your undo history will be saved along with your work and will be available again upon loading your file again."));
-	redoAction->setWhatsThis(tr("Redo - Redoes what has been undone by clicking the undo button.\nNote that all of your undo history (including possible redos) will be saved along with your work and will be available again upon loading your file again."));
-
-	undoViewWidget->setWhatsThis("Undo history.  Click on any command to forward/rewind to that particular state.");
-	undoViewWidget->setWidget(actions->undoView()) ;
-	undoViewWidget->setFloating(true) ;
-	undoViewAction->setIcon(QIcon(":/undoView.png")) ;
-	undoViewAction->setWhatsThis(tr("Shows and hides the undo history."));
+	undoViewWidget->setParent(parent) ;
 
 	items->setModel(new specModel(items)); // TODO redundant!  durchschleifen!
-	items->setActionLibrary(actions) ;
-
-	plot->setMinimumSize(100,100) ;
 	plot->setView(items) ;
-	plot->setUndoPartner(actions) ;
 
 	new specGenericMimeConverter(items->model()) ;
 	new specLogToDataConverter(items->model()) ;
 	new specMimeFileImporter(items->model()) ;
 	new specTextMimeConverter(items->model()) ;
 
-	actions->addDragDropPartner(items->model()) ;
-	actions->addPlot(plot) ;
-
 	kineticWidget->view()->assignDataView(items) ;
-	kineticWidget->view()->setActionLibrary(actions) ; // TODO redundant!  durchschleifen!
-	kineticWidget->addToolbar(actions) ;
+
 	kineticsAction->setIcon(QIcon(":/kineticwindow.png"));
-	kineticsAction->setWhatsThis(tr("Shows and hides the meta widget."));
-
-	logWidget->addToolbar(actions) ;
 	logAction->setIcon(QIcon(":/logs.png"));
-	logAction->setWhatsThis(tr("Shows and hides the log widget."));
-	logWidget->view()->setActionLibrary(actions) ;
 
-	createToolbars();
 	setConnections() ;
+	createWhatsThis();
 
-	splitter->addWidget(plot) ;
-	splitter->addWidget(items) ;
-	splitter->setOpaqueResize(false) ;
-
-	layout -> addWidget(toolbar) ;
-	QToolBar *itemToolBar = actions->toolBar(items) ;
-	layout -> addWidget(itemToolBar) ;
-
-	QToolBar *plotToolBar = actions->toolBar(plot) ;
-	plotToolBar->addActions(plot->actions()) ;
-	layout -> addWidget(plotToolBar) ;
-
-	layout -> addWidget(splitter)  ;
-	layout -> setContentsMargins(0,0,0,0) ;
-	layout ->setSpacing(0);
-
-	setWidget(content) ;
+	changeFileName(tr("untitled")) ;
 	svgModification(false) ;
-
+	kineticWidget->setupWindow(actions);
+	logWidget->setupWindow(actions);
+	setupWindow(actions);
 	subDocks << logWidget << kineticWidget << undoViewWidget ;
 	setObjectName("mainWidget");
-	changeFileName(tr("untitled")) ;
 }
 
 void specPlotWidget::read(QString fileName)
@@ -195,33 +144,16 @@ void specPlotWidget::read(QString fileName)
 	}
 }
 
-void specPlotWidget::createToolbars()
+QToolBar* specPlotWidget::createToolbar()
 {
-	toolbar-> setContentsMargins(0,0,0,0) ;
-	toolbar-> setIconSize(QSize(20,20)) ;
-
+	QToolBar *toolbar = new QToolBar(tr("Main"), this) ;
 	toolbar-> addAction(saveAction) ;
 	toolbar-> addAction(saveAsAction) ;
 	toolbar-> addSeparator() ;
 	toolbar-> addAction(logAction) ;
 	toolbar-> addAction(kineticsAction) ;
-	toolbar-> addSeparator() ;
-	toolbar-> addAction(undoAction) ;
-	toolbar-> addAction(redoAction) ;
-	toolbar-> addAction(undoViewAction) ;
-	toolbar-> addSeparator() ;
-	toolbar-> addAction(purgeUndoAction) ;
-}
-
-void specPlotWidget::purgeUndo()
-{
-	if (QMessageBox::Yes ==
-			QMessageBox::question(this,
-					      tr("Really Clear History?"),
-					      tr("Do you really want to delete all undo and redo actions?  WARNING:  This cannot be undone."),
-					      QMessageBox::Yes | QMessageBox::No,
-					      QMessageBox::No))
-		actions->purgeUndo() ;
+	toolbar-> addAction(undoViewWidget->toggleViewAction()) ;
+	return toolbar ;
 }
 
 void specPlotWidget::closeEvent(QCloseEvent* event)
@@ -314,10 +246,7 @@ bool specPlotWidget::saveFile()
 specPlotWidget::~specPlotWidget()
 {
 	foreach (specDockWidget *subDock, subDocks)
-	{
-//		qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(subDock) ;
-		subDock->deleteLater();
-	}
+		delete subDock ; // No deleteLater here, otherwise we get in trouble with the mainPlot autodeleting/detaching metaRanges
 	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(this) ;
 }
 
@@ -325,9 +254,7 @@ void specPlotWidget::setConnections()
 {
 	connect(saveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 	connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveFile()));
-	connect(purgeUndoAction,SIGNAL(triggered()),this,SLOT(purgeUndo())) ;
 	connect(items->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),this,SLOT(selectionChanged(const QItemSelection&, const QItemSelection&))) ;
-	connect(actions,SIGNAL(stackClean(bool)), this, SLOT(unmodified(bool))) ; // TODO check
 	connect(kineticWidget->internalPlot(),SIGNAL(replotted()),plot,SLOT(replot())) ;
 	connect(kineticWidget->internalPlot(), SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(), SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
 	connect(plot, SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(),SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
@@ -381,4 +308,18 @@ void specPlotWidget::changeEvent(QEvent *event)
 		}
 	}
 	specDockWidget::changeEvent(event) ;
+}
+
+QList<QWidget*> specPlotWidget::mainWidgets() const
+{
+	return QList<QWidget*>() << items << plot ;
+}
+
+void specPlotWidget::createWhatsThis()
+{
+	setWhatsThis(tr("Data Dock Window - This is the main window for managing data.  Right-clicking on it will change the arrangement of its contents from vertical to horizontal and back.\nSince this is a dock window, you may remove it from the application's main window and move it around within the main window.  To do so, \"grab\" it by its title bar and drag it to where you need it to be.\nThere are also a dock window for managing logs and \"meta-data\" (i.e. data based on processing the primary data) associated with this data dock window.  To show these, click the log or meta buttons (to the right of the save as button).\nTo start working, check out the help of the data list at the bottom (or right) of this window or of the list in the log dock window."));
+	saveAsAction->setWhatsThis(tr("Save As... - This button will allow you to save your work asking you for a file name explicitly."));
+	saveAction->setWhatsThis(tr("Save - Clicking this button will save your work and only ask for a file name if none has been specified so far."));
+	kineticsAction->setWhatsThis(tr("Shows and hides the meta widget."));
+	logAction->setWhatsThis(tr("Shows and hides the log widget."));
 }

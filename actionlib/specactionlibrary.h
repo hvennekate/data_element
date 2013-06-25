@@ -16,6 +16,7 @@ class specActionLibrary ;
 #include <typeinfo>
 #include "specplot.h"
 #include "speccommandgenerator.h"
+#include "specdockwidget.h"
 
 class specView ;
 class specModel ;
@@ -28,28 +29,28 @@ class specActionLibrary : public QObject, public specStreamable
 	Q_OBJECT
 public:
 	explicit specActionLibrary(QObject *parent = 0);
-    ~specActionLibrary() ;
-//	QMenuBar *menuBar(QObject*) ;
+	~specActionLibrary() ;
+	//	QMenuBar *menuBar(QObject*) ;
 	QToolBar *toolBar(QWidget*) ;
 	QMenu *contextMenu(QWidget*) ; // actionLibrary bekommt Clients in fester Reihenfolge; speichert diese mit den Commands und restauriert so deren Referenz.
 	QObject* parentId(int) ;
 	void addDragDropPartner(specModel*) ;
 	void setLastRequested(const QModelIndexList&) ;
 	int moveInternally(const QModelIndex&, int row, specView*) ;
-    int deleteInternally(specModel*) ;
+	int deleteInternally(specModel*) ;
 	void addPlot(specPlot*) ;
 	QAction* undoAction(QObject*) ;
 	QAction* redoAction(QObject*) ;
-	void purgeUndo() ;
-	QUndoView* undoView() ;
+	specDockWidget* undoWidget() ;
 	specCommandGenerator commandGenerator ;
-    void setProgressDialog(QProgressDialog*) ;
+	void setProgressDialog(QProgressDialog*) ;
 public slots:
 	void push(specUndoCommand*) ;
 signals:
 	void stackModified(bool) ;
 private slots:
 	void stackClean(const bool&) ;
+	void purgeUndo() ;
 private:
 	void writeToStream(QDataStream &out) const;
 	void readFromStream(QDataStream &in) ;
@@ -61,8 +62,19 @@ private:
 	void addParent(QObject*) ;
 	template<class toolMenu>
 	void addNewAction(toolMenu*, specUndoAction*) ;
-    specStreamable* factory(const type &t) const ;
-    QProgressDialog *progress ;
+	specStreamable* factory(const type &t) const ;
+	QProgressDialog *progress ;
+	QAction* purgeUndoAction ;
+	specDockWidget *dockWidget ;
 };
+
+class specHistoryWidget : public specDockWidget
+{
+	Q_OBJECT
+	QList<QWidget*> mainWidgets() const ;
+	QUndoView* undoView ;
+public:
+	explicit specHistoryWidget(QUndoStack* stack = 0) ;
+} ;
 
 #endif // SPECACTIONLIBRARY_H

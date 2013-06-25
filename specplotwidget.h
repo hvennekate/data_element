@@ -4,61 +4,54 @@
 #include "specdockwidget.h"
 #include <QString>
 
+
 class specSpectrumPlot ;
-class QVBoxLayout ;
 class specDataView ;
-class QToolBar ;
 class QAction ;
-class QSplitter ;
 class specKineticWidget ;
 class specActionLibrary ;
 class specLogWidget ;
 class QFile ;
 class specView ;
 class QItemSelection ;
-
-
+class QToolBar ;
 
 class specPlotWidget : public specDockWidget
 {
 	Q_OBJECT
 private:
+	specActionLibrary *actions ;
 	specDataView* items ;
-	specLogWidget *logWidget ;
-	specDockWidget *undoViewWidget ;
 	specKineticWidget *kineticWidget ;
-	QWidget* content ;
-	QVBoxLayout* layout ;
+	specLogWidget *logWidget ;
 	specSpectrumPlot* plot ;
-	QToolBar* toolbar ;
-	QSplitter* splitter;
 	QAction *saveAction,
 	*kineticsAction,
 	*saveAsAction,
 	*logAction,
-	*undoAction,
-	*redoAction,
 	*undoViewAction,
 	*purgeUndoAction;
-	specActionLibrary *actions ;
-	QList<specDockWidget*> subDocks ;
-	void createToolbars();
+	specDockWidget *undoViewWidget ;
+	void createWhatsThis() ;
 	void setConnections() ;
 	void changeFileName(const QString&) ;
 	void changeEvent(QEvent *event) ;
+	QList<specDockWidget*> subDocks ;
 private slots:
 	void svgModification(bool) ;
-	void purgeUndo() ;
 protected :
 	void closeEvent(QCloseEvent*) ;
+	QList<QWidget*> mainWidgets() const ;
 public:
 	specPlotWidget(QWidget *parent = 0);
 	~specPlotWidget();
 	void read(QString fileName) ;
 	specView* mainView() ;
+	QToolBar *createToolbar();
 public slots :
 	void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) ; // TODO consider making these private
 	bool saveFile() ;
 };
+
 
 #endif
