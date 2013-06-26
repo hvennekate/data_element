@@ -124,7 +124,8 @@ SOURCES += main.cpp \
     actionlib/actions/specspectrumcalculatoraction.cpp \
     actionlib/actions/specformulavalidator.cpp \
     actionlib/actions/spectrumcalculatordialog.cpp \
-    specdockwidget.cpp
+    specdockwidget.cpp \
+    actionlib/actions/specflattentreeaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -250,7 +251,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/specspectrumcalculatoraction.h \
     actionlib/actions/specformulavalidator.h \
     actionlib/actions/spectrumcalculatordialog.h \
-    specdockwidget.h
+    specdockwidget.h \
+    actionlib/actions/specflattentreeaction.h
 
 INCLUDEPATH += kinetic \
 	log \

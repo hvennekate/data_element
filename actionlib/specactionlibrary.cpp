@@ -7,6 +7,7 @@
 #include "speccutaction.h"
 #include "changeplotstyleaction.h"
 #include "spectreeaction.h"
+#include "specflattentreeaction.h"
 #include "specmergeaction.h"
 #include "specremovedataaction.h"
 #include "specaveragedataaction.h"
@@ -134,6 +135,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		{
 			addNewAction(bar, new specImportSpecAction(target)) ;
 			addNewAction(bar, new specTreeAction(target)) ;
+			addNewAction(bar, new specFlattenTreeAction(target)) ;
 		}
 		if (dataView || metaView)
 			addNewAction(bar, new specAddSVGItemAction(target)) ;

@@ -7,7 +7,7 @@ class specRequiresItemAction : public specItemAction
 	Q_OBJECT
 public:
 	explicit specRequiresItemAction(QObject *parent = 0);
-private:
+protected:
 	bool requirements() ;
 };
 

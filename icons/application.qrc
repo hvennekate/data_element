@@ -52,5 +52,6 @@
         <file>undoView.png</file>
         <file>moveIndicator.png</file>
         <file>legend.png</file>
+        <file>notree.png</file>
     </qresource>
 </RCC>
