@@ -25,8 +25,8 @@ QString specMetaVariable::extract(QString & source, const QRegExp& expression)
 
 specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 {
-    const QRegExp rangeExp("(\\[[0-9]*(:([0-9]*)?(:([0-9]*)?)?)?\\])"),
-            descriptorExp("(\\\"[^\\\"]*\\\"|" "(x|y|i|u|l|p|P))"),
+	const QRegExp rangeExp("(\\[[0-9]*(:([0-9]*)?(:([0-9]*)?)?)?\\])"),
+			descriptorExp("(\\\"[^\\\"]*\\\"|" "(x|y|i|u|l|p|P))"),
 			number("[+\\-]?([0-9]+|[0-9]*\\.[0-9]+)([eE][+-]?[0-9]+)?");
 	QString range = extract(init, rangeExp) ;
 	QString descString = extract(init, descriptorExp) ;
@@ -46,19 +46,19 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 	if (descString[0] == 'l') product = new specMinVariable ;
 	if (descString[0] == 'x') product = new specXVariable ;
 	if (descString[0] == 'y') product = new specYVariable;
-    if (descString[0] == 'p') product = new specMinPosVariable ;
-    if (descString[0] == 'P') product = new specMaxPosVariable ;
+	if (descString[0] == 'p') product = new specMinPosVariable ;
+	if (descString[0] == 'P') product = new specMaxPosVariable ;
 
-    if (!product) return 0 ;
+	if (!product) return 0 ;
 
 	if (!range.isEmpty())
 	{
 		//interpret the range
 		QStringList indexes = range.remove("[").remove("]").split(':') ;
-        product->limits.begin = qMax(0, indexes[0] == "" ? 0 : indexes[0].toInt()) ;
-        product->limits.end   = qMax(product->limits.begin, indexes.size()==1 ? product->limits.begin + 1
-								:(indexes[1] == "" ? int(INFINITY) : indexes[1].toInt())) ;
-        product->limits.increment  = qBound(1, indexes.size() > 2 && indexes[2] != "" ? indexes[2].toInt() : 1, product->limits.end - product->limits.begin) ;
+		product->limits.begin = qMax(0, indexes[0] == "" ? 0 : indexes[0].toInt()) ;
+		product->limits.end   = qMax(product->limits.begin, indexes.size()==1 ? product->limits.begin + 1
+										      :(indexes[1] == "" ? int(INFINITY) : indexes[1].toInt())) ;
+		product->limits.increment  = qBound(1, indexes.size() > 2 && indexes[2] != "" ? indexes[2].toInt() : 1, product->limits.end - product->limits.begin) ;
 		range = "[" + range + "]" ;
 	}
 
@@ -70,8 +70,8 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 		product->setBorderFlags(QwtInterval::IncludeBorders);
 	}
 
-    product->parent = par ;
-    product->code = range + descString ;
+	product->parent = par ;
+	product->code = range + descString ;
 	return product ;
 }
 
@@ -81,18 +81,18 @@ specMetaVariable::specMetaVariable(specMetaParser *p)
 	  parent(p),
 	  descriptor("")
 {
-    limits.begin = 0 ;
-    limits.end = int(INFINITY) ;
-    limits.increment = 1 ;
+	limits.begin = 0 ;
+	limits.end = int(INFINITY) ;
+	limits.increment = 1 ;
 }
 
 specMetaVariable::indexLimit specMetaVariable::indexRange(int max) const
 {
-    indexLimit l ;
-    l.begin = qBound(0,limits.begin, max) ;
-    l.end = qBound(l.begin,limits.end, max) ;
-    l.increment = qBound(1, limits.increment, l.end-l.begin) ;
-    return l ;
+	indexLimit l ;
+	l.begin = qBound(0,limits.begin, max) ;
+	l.end = qBound(l.begin,limits.end, max) ;
+	l.increment = qBound(1, limits.increment, l.end-l.begin) ;
+	return l ;
 }
 
 bool specMetaVariable::xValues(specModelItem *item, QVector<double> & xvals) const // false if vector was empty
@@ -141,7 +141,7 @@ bool specMetaVariable::extractXs(specModelItem *item, QVector<double> &xvals) co
 			}
 		}
 	}
-    xvals.swap(newXVals) ;
+	xvals.swap(newXVals) ;
 	return true ;
 }
 
@@ -158,10 +158,10 @@ void specMetaVariable::produceRanges(QSet<specPlot *> plots, QColor color)
 	if (plots.size() != ranges.size())
 	{
 		clearRanges(); // TODO : consider replotting
-        foreach(specPlot* plot, plots)
-            ranges << new specMetaRange(minValue(),maxValue(),
-                                          (plot->axisScaleDiv(QwtPlot::yLeft)->lowerBound()+
-                                           plot->axisScaleDiv(QwtPlot::yLeft)->upperBound())/2.,this) ;
+		foreach(specPlot* plot, plots)
+			ranges << new specMetaRange(minValue(),maxValue(),
+						    (plot->axisScaleDiv(QwtPlot::yLeft)->lowerBound()+
+						     plot->axisScaleDiv(QwtPlot::yLeft)->upperBound())/2.,this) ;
 	}
 	int i = 0 ;
 	foreach(specPlot* plot, plots)

@@ -61,7 +61,7 @@ inline T average(forwardIterator& begin,const forwardIterator& end, binaryPredic
 
 template<class forwardIterator, class outputIterator, typename binaryPredicate>
 inline void averageToNew(forwardIterator begin, forwardIterator end,
-		  binaryPredicate equal, outputIterator target)
+			 binaryPredicate equal, outputIterator target)
 {
 	while (begin != end)
 		*target++ = average(begin, end, equal, *begin) ;

@@ -12,7 +12,7 @@ namespace spec{
 	Q_DECLARE_OPERATORS_FOR_FLAGS(descriptorFlags)
 
 	// originial dataItem enum value: 0
-	
+
 	/*! Enums for export formats */
 	enum separator{ nosep=0, space=1, tab=2, newline=3 } ;
 	enum value{ wavenumber=0, signal=1, maxInt=2 } ;

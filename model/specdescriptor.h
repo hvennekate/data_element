@@ -25,9 +25,9 @@ public:
 	bool isNumeric() const;
 	bool isEditable() const;
 	spec::descriptorFlags flags() const ;
-    void setFlags(spec::descriptorFlags) ;
+	void setFlags(spec::descriptorFlags) ;
 	int activeLine() const ;
-	
+
 	specDescriptor& operator=(const double&) ;
 	specDescriptor& operator=(const QString&) ;
 

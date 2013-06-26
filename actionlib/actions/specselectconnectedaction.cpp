@@ -4,7 +4,7 @@
 #include "specviewstate.h"
 
 specSelectConnectedAction::specSelectConnectedAction(QObject *parent) :
-    specItemAction(parent)
+	specItemAction(parent)
 {
 	setIcon(QIcon(":/fromKinetic.png"));
 	setText(tr("Select connected items"));

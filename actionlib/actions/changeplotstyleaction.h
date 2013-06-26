@@ -16,21 +16,21 @@ public:
 private:
 	specUndoCommand* generateUndoCommand() ;
 	QMenu *lineColorMenu,
-		*symbolMenu,
-		*symbolInnerColorMenu,
-		*symbolOuterColorMenu,
-		*symbolSizeMenu,
-		*lineWidthMenu,
-		*penStyleMenu ;
+	*symbolMenu,
+	*symbolInnerColorMenu,
+	*symbolOuterColorMenu,
+	*symbolSizeMenu,
+	*lineWidthMenu,
+	*penStyleMenu ;
 	QVector<Qt::GlobalColor> colors ;
 	QVector<double> sizes ;
 	QVector<QAction*> symbolActions,
-		lineWidthActions,
-		lineColorActions,
-		symbolInnerColorActions,
-		symbolOuterColorActions,
-		symbolSizeActions,
-		penStyleActions ;
+	lineWidthActions,
+	lineColorActions,
+	symbolInnerColorActions,
+	symbolOuterColorActions,
+	symbolSizeActions,
+	penStyleActions ;
 	QColor getColor(int index) ;
 	double getSize(int index, bool& ok) ;
 	QObject *currentTrigger ;

@@ -5,7 +5,7 @@
 
 class specDelegate : public QItemDelegate
 {
-Q_OBJECT
+	Q_OBJECT
 public:
 	specDelegate(QObject *parent = 0);
 	QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;

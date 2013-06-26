@@ -6,8 +6,8 @@ specItemAction::specItemAction(QObject *parent)
 	: specUndoAction(parent),
 	  view(),
 	  model(0),
-      currentItem(0),
-      insertionRow(0)
+	  currentItem(0),
+	  insertionRow(0)
 {
 }
 
@@ -24,26 +24,26 @@ void specItemAction::execute()
 	selection = view->getSelection() ;
 	currentItem = model->itemPointer(currentIndex) ;
 
-    if (currentItem && !currentItem->isFolder())
-    {
-        insertionRow = currentIndex.row()+1 ;
-        insertionIndex = currentIndex.parent() ;
+	if (currentItem && !currentItem->isFolder())
+	{
+		insertionRow = currentIndex.row()+1 ;
+		insertionIndex = currentIndex.parent() ;
 
-    }
-    else
-    {
-        insertionRow = 0 ;
-        insertionIndex = currentIndex ;
-    }
+	}
+	else
+	{
+		insertionRow = 0 ;
+		insertionIndex = currentIndex ;
+	}
 
 	if (!requirements()) return ;
 	specUndoCommand* command = generateUndoCommand();
 	if (!command) return ;
-//	if (!command->ok())
-//	{
-//		delete command;
-//		return ;
-//	}
+	//	if (!command->ok())
+	//	{
+	//		delete command;
+	//		return ;
+	//	}
 	if (!library)
 	{
 		command->redo();
@@ -60,11 +60,11 @@ void specItemAction::expandSelectedFolders(QList<specModelItem *> &items, QList<
 	items = model->pointerList(selection) ;
 	for (int i = 0 ; i < items.size() ; ++i)
 	{
-	    if (items[i]->isFolder())
-	    {
-		for (int j = 0 ; j < items[i]->children() ; ++j)
-		    items << ((specFolderItem*) (items[i]))->child(j) ;
-		folders << items.takeAt(i--) ;
-	    }
+		if (items[i]->isFolder())
+		{
+			for (int j = 0 ; j < items[i]->children() ; ++j)
+				items << ((specFolderItem*) (items[i]))->child(j) ;
+			folders << items.takeAt(i--) ;
+		}
 	}
 }

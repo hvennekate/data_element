@@ -4,13 +4,13 @@
 
 //  TODO:  Bug: Formatting gets copied after selecting a different part of the text.
 specSimpleTextEdit::specSimpleTextEdit(QWidget *parent) :
-    QWidget(parent),
-    content(new QTextEdit),
-    toolBar(new QToolBar),
-    bold(new QAction(QIcon::fromTheme("format-text-bold"),tr("Fett"),this)),
-    italic(new QAction(QIcon::fromTheme("format-text-italic"),tr("Kursiv"),this)),
-    font(new QFontComboBox(this)),
-    size(new QDoubleSpinBox(this))
+	QWidget(parent),
+	content(new QTextEdit),
+	toolBar(new QToolBar),
+	bold(new QAction(QIcon::fromTheme("format-text-bold"),tr("Fett"),this)),
+	italic(new QAction(QIcon::fromTheme("format-text-italic"),tr("Kursiv"),this)),
+	font(new QFontComboBox(this)),
+	size(new QDoubleSpinBox(this))
 {
 	setLayout(new QVBoxLayout) ;
 

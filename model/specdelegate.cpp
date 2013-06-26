@@ -5,7 +5,7 @@
 #include "names.h"
 
 specDelegate::specDelegate(QObject *parent)
- : QItemDelegate(parent)
+	: QItemDelegate(parent)
 {
 }
 
@@ -17,8 +17,8 @@ bool specDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const Q
 QWidget* specDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
 	Q_UNUSED(option)
-    Q_UNUSED(index)
-    QTextEdit *editor = new QTextEdit(parent) ;
+	Q_UNUSED(index)
+	QTextEdit *editor = new QTextEdit(parent) ;
 	QPalette palette = editor->palette() ;
 	palette.setColor(QPalette::Base,palette.toolTipBase().color());
 	palette.setColor(QPalette::Text,palette.toolTipText().color());
@@ -35,9 +35,9 @@ QWidget* specDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 
 void specDelegate::setEditorData(QWidget *e, const QModelIndex &index) const
 {
-    QTextEdit *editor = qobject_cast<QTextEdit*>(e) ;
-    if (!editor) return ;
-    editor->setText(index.model()->data(index, Qt::EditRole).toString()) ;
+	QTextEdit *editor = qobject_cast<QTextEdit*>(e) ;
+	if (!editor) return ;
+	editor->setText(index.model()->data(index, Qt::EditRole).toString()) ;
 }
 
 void specDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const

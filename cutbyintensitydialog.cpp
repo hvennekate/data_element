@@ -3,7 +3,7 @@
 #include "canvaspicker.h"
 
 cutByIntensityDialog::cutByIntensityDialog(QWidget *parent) :
-    QDialog(parent), huevalue(0)
+	QDialog(parent), huevalue(0)
 {
 	setWindowTitle(tr("Delete data by range")) ;
 	layout = new QVBoxLayout(this) ;
@@ -57,19 +57,19 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 			dataCurve->attach(plot) ;
 			intensity->attach(plot) ;
 
-        }
+		}
 	}
 
-//    QRectF boundaries ;
-//    foreach(specModelItem* item, items)
-//        boundaries |= item->boundingRect() ;
-//    QSizeF size = boundaries.size() ;
-//    boundaries.translate(-.05*size.width(), -.05*size.height()) ;
-//    boundaries.setSize(1.1*size);
+	//    QRectF boundaries ;
+	//    foreach(specModelItem* item, items)
+	//        boundaries |= item->boundingRect() ;
+	//    QSizeF size = boundaries.size() ;
+	//    boundaries.translate(-.05*size.width(), -.05*size.height()) ;
+	//    boundaries.setSize(1.1*size);
 
-//    plot->setAxisScale(QwtPlot::yLeft,boundaries.top(),boundaries.bottom()) ;
-//    plot->setAxisScale(QwtPlot::xBottom,boundaries.left(), boundaries.right());
-//    plot->setAutoScaling(false) ; // false
+	//    plot->setAxisScale(QwtPlot::yLeft,boundaries.top(),boundaries.bottom()) ;
+	//    plot->setAxisScale(QwtPlot::xBottom,boundaries.left(), boundaries.right());
+	//    plot->setAutoScaling(false) ; // false
 	plot->replot() ;
 }
 
@@ -85,9 +85,9 @@ QList<specRange*> cutByIntensityDialog::ranges() // TODO create access function 
 void cutByIntensityDialog::addRange()
 {
 	double min = plot->axisScaleDiv(QwtPlot::xBottom)->lowerBound(), max = plot->axisScaleDiv(QwtPlot::xBottom)->upperBound() ;
-    specRange* range = new specRange(min+.1*(max-min),max-.1*(max-min),
-                                           (plot->axisScaleDiv(QwtPlot::yLeft)->lowerBound() +
-                                            plot->axisScaleDiv(QwtPlot::yLeft)->upperBound())/2.) ;
+	specRange* range = new specRange(min+.1*(max-min),max-.1*(max-min),
+					 (plot->axisScaleDiv(QwtPlot::yLeft)->lowerBound() +
+					  plot->axisScaleDiv(QwtPlot::yLeft)->upperBound())/2.) ;
 	range->attach(plot) ;
 	picker->addSelectable(range) ;
 }

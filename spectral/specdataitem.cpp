@@ -9,7 +9,7 @@
 void specDataItem::applyCorrection(specDataPoint& point) const
 {
 	point.nu += xshift ;
-    point.sig = zeroMultiplications ? 0 : point.sig*factor+offset+slope*point.nu ;
+	point.sig = zeroMultiplications ? 0 : point.sig*factor+offset+slope*point.nu ;
 }
 
 void specDataItem::reverseCorrection(specDataPoint& point) const
@@ -65,7 +65,7 @@ QVector<double> specDataItem::ints() const
 }
 
 specDataItem::specDataItem(const QVector<specDataPoint>& dat, const QHash<QString,specDescriptor>& desc, specFolderItem* par, QString description)
-    : specLogEntryItem(desc, par, description),
+	: specLogEntryItem(desc, par, description),
 	  offset(0),
 	  slope(0),
 	  factor(1),
@@ -76,7 +76,7 @@ specDataItem::specDataItem(const QVector<specDataPoint>& dat, const QHash<QStrin
 }
 
 specDataItem::specDataItem()
-    : specLogEntryItem(),
+	: specLogEntryItem(),
 	  offset(0),
 	  slope(0),
 	  factor(1),
@@ -96,8 +96,8 @@ QIcon specDataItem::decoration() const { return QIcon(":/data.png") ; }
 
 void specDataItem::readFromStream(QDataStream &in)
 {
-    specLogEntryItem::readFromStream(in) ;
-    in >> data
+	specLogEntryItem::readFromStream(in) ;
+	in >> data
 	   >> offset
 	   >> slope
 	   >> factor
@@ -107,8 +107,8 @@ void specDataItem::readFromStream(QDataStream &in)
 
 void specDataItem::writeToStream(QDataStream & out) const
 {
-    specLogEntryItem::writeToStream(out) ;
-    out << data
+	specLogEntryItem::writeToStream(out) ;
+	out << data
 	    << offset
 	    << slope
 	    << factor
@@ -119,16 +119,16 @@ void specDataItem::writeToStream(QDataStream & out) const
 specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 {
 	// merging descriptors
-    foreach(QString key, toAdd.description.keys())
+	foreach(QString key, toAdd.description.keys())
 	{
-        if (description.keys().contains(key))
+		if (description.keys().contains(key))
 		{
-            if (description[key].isNumeric())
+			if (description[key].isNumeric())
 			{
 				double total = data.size() + toAdd.data.size() ;
 				description[key] = description[key].numericValue()*data.size()/total + toAdd.description[key].numericValue()*toAdd.data.size()/total ;
 			}
-            else if (!descriptor(key, true).contains(toAdd.descriptor(key, true)))
+			else if (!descriptor(key, true).contains(toAdd.descriptor(key, true)))
 				description[key] = descriptor(key).append(", ").append(toAdd.descriptor(key)) ;
 		}
 		else
@@ -144,18 +144,18 @@ specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 		reverseCorrection(point) ;
 		data << point ;
 	}
-    invalidate() ;
+	invalidate() ;
 	return (*this) ;
 }
 
 bool compareDataPoints(const specDataPoint& a, const specDataPoint& b)
 {
-    // this is an evil hack to overcome double precision's limitations...
+	// this is an evil hack to overcome double precision's limitations...
 #ifdef DOUBLEDEVIATIONCORRECTION
-    return fabs(a.nu - b.nu) <=
-            (1./(1L << (NUMBEROFFRACTIONBITSINDOUBLE-ilogb(a.nu)))) ;
+	return fabs(a.nu - b.nu) <=
+			(1./(1L << (NUMBEROFFRACTIONBITSINDOUBLE-ilogb(a.nu)))) ;
 #else
-    return a == b ;
+	return a == b ;
 #endif
 }
 
@@ -163,25 +163,25 @@ void specDataItem::flatten()
 {
 	qSort(data) ;
 	QVector<specDataPoint> newData ;
-    averageToNew(data.begin(), data.end(), compareDataPoints, std::back_inserter(newData)) ;
+	averageToNew(data.begin(), data.end(), compareDataPoints, std::back_inserter(newData)) ;
 
-    data.swap(newData) ;
+	data.swap(newData) ;
 	invalidate() ;
 }
 
 void specDataItem::scaleBy(const double& mul)
 {
-    if (0 == mul)
-        zeroMultiplications ++ ;
-    else if (INFINITY == mul)
-        zeroMultiplications = 0 ;
-    else if (isnan(mul)) return ;
-    else
-    {
-        slope  *= mul ;
-        factor *= mul ;
-        offset *= mul ;
-    }
+	if (0 == mul)
+		zeroMultiplications ++ ;
+	else if (INFINITY == mul)
+		zeroMultiplications = 0 ;
+	else if (isnan(mul)) return ;
+	else
+	{
+		slope  *= mul ;
+		factor *= mul ;
+		offset *= mul ;
+	}
 	invalidate();
 }
 
@@ -206,8 +206,8 @@ void specDataItem::moveXBy(const double & value)
 void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out) // TODO split into two
 {
 	revalidate();
-    QVector<double> w = wnums(), s = ints(), m = intensityData() ;
-	
+	QVector<double> w = wnums(), s = ints(), m = intensityData() ;
+
 	for (int i = 0 ; i < headerFormat.size() ; i++)
 		out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
 	out << endl ;
@@ -217,9 +217,9 @@ void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, c
 		{
 			switch(dataFormat[i].first)
 			{
-                case spec::wavenumber: out << w[j] ; break ;
-				case spec::signal: out << s[j] ; break ;
-				case spec::maxInt: out << m[j] ; break ;
+			case spec::wavenumber: out << w[j] ; break ;
+			case spec::signal: out << s[j] ; break ;
+			case spec::maxInt: out << m[j] ; break ;
 			}
 			out << dataFormat[i].second ;
 		}
@@ -240,7 +240,7 @@ int specDataItem::removeData(QList<specRange *> *listpointer)
 		newData << data[i] ;
 	}
 	int diff = data.size() - newData.size() ;
-    data.swap(newData) ;
+	data.swap(newData) ;
 	invalidate() ;
 	return diff ;
 }
@@ -281,19 +281,19 @@ void specDataItem::reverseCorrection(QVector<specDataPoint> &newData) const
 
 void specDataItem::swapData(QVector<specDataPoint> &newData)
 {
-    data.swap(newData) ;
-    qSort(data) ;
-    invalidate() ;
+	data.swap(newData) ;
+	qSort(data) ;
+	invalidate() ;
 }
 
 specDataItem::specDataItem(const specDataItem &other)
-    : specLogEntryItem(other),
+	: specLogEntryItem(other),
 	  offset(other.offset),
 	  slope(other.slope),
 	  factor(other.factor),
 	  xshift(other.xshift),
-      zeroMultiplications(other.zeroMultiplications),
-      data(other.data)
+	  zeroMultiplications(other.zeroMultiplications),
+	  data(other.data)
 {
 }
 
@@ -322,21 +322,21 @@ void specDataItem::detach()
 }
 
 specLegacyDataItem::specLegacyDataItem()
-    : specDataItem(),
-      myType(legacyDataItem)
+	: specDataItem(),
+	  myType(legacyDataItem)
 {}
 
 void specLegacyDataItem::readFromStream(QDataStream &in)
 {
-    myType = dataItem ;
-    specLogEntryItem::readFromStream(in) ;
-    QVector<legacyDatapoint>  legacyData ;
-    in >> legacyData
-       >> offset
-       >> slope
-       >> factor
-       >> xshift
-       >> zeroMultiplications ;
-    foreach(legacyDatapoint point, legacyData)
-        data << point ;
+	myType = dataItem ;
+	specLogEntryItem::readFromStream(in) ;
+	QVector<legacyDatapoint>  legacyData ;
+	in >> legacyData
+	   >> offset
+	   >> slope
+	   >> factor
+	   >> xshift
+	   >> zeroMultiplications ;
+	foreach(legacyDatapoint point, legacyData)
+		data << point ;
 }

@@ -14,8 +14,8 @@ class specProfiler : public QTime
 private:
 	QString description ;
 public:
-    specProfiler(const QString&) ;
-    ~specProfiler() ;
+	specProfiler(const QString&) ;
+	~specProfiler() ;
 };
 
 #endif // SPECPROFILER_H

@@ -1,7 +1,7 @@
 #include "specitempropertiesaction.h"
 
 specItemPropertiesAction::specItemPropertiesAction(QObject *parent) :
-    specItemAction(parent)
+	specItemAction(parent)
 {
 	setIcon(QIcon::fromTheme("document-properties")) ;
 	setToolTip(tr("Edit item properties")) ;

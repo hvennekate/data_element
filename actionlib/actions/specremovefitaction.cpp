@@ -4,7 +4,7 @@
 #include "specexchangefitcurvecommand.h"
 
 specRemoveFitAction::specRemoveFitAction(QObject *parent) :
-    specItemAction(parent)
+	specItemAction(parent)
 {
 	setIcon(QIcon(":/removeFit.png")) ;
 	setToolTip(tr("Remove fit")) ;

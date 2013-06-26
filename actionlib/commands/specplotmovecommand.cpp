@@ -37,11 +37,11 @@ void specPlotMoveCommand::undoIt()
 
 bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
 {
-    if (!parentObject()) return false ;
+	if (!parentObject()) return false ;
 	const specPlotMoveCommand *other = (const specPlotMoveCommand*) ot ;
 	if (! (this->items && other->items)) return false ;
 	if (*(other->items) != *(this->items)) return false ;
-    if (isnan(other->scale) || isnan(scale)) return false ;
+	if (isnan(other->scale) || isnan(scale)) return false ;
 	slope += other->slope * scale ;
 	offset+= other->offset * scale - other->slope * scale * shift ;
 	scale *= other->scale ;
@@ -91,7 +91,7 @@ void specPlotMoveCommand::generateDescription()
 	if (shift) modificationDescriptions << QObject::tr("shifted x by ") + QString::number(shift) ;
 	if (modificationDescriptions.size() > 1) modificationDescriptions.last().prepend(QObject::tr("and "));
 	setText(QObject::tr("Modify data: ") +
-			 modificationDescriptions.join(modificationDescriptions.size() > 2 ? ", " : " "));
+		modificationDescriptions.join(modificationDescriptions.size() > 2 ? ", " : " "));
 }
 
 QString specPlotMoveCommand::description() const

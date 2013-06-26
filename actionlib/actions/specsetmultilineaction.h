@@ -5,11 +5,11 @@
 
 class specSetMultilineAction : public specItemAction
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit specSetMultilineAction(QObject *parent = 0);
+	explicit specSetMultilineAction(QObject *parent = 0);
 private:
-    specUndoCommand *generateUndoCommand() ;
+	specUndoCommand *generateUndoCommand() ;
 };
 
 #endif // SPECSETMULTILINEACTION_H

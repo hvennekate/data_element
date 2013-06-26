@@ -9,19 +9,19 @@ exportLayoutItem::exportLayoutItem (QStringList& descriptors, QWidget *parent )
 	freeText = new QLineEdit() ;
 	removeButton = new QPushButton(QIcon(":/remove.png"),"") ;
 	layout = new QHBoxLayout() ;
-	
+
 	connect(isFreeForm,SIGNAL(stateChanged(int)),this,SLOT(freeFormMode(int))) ;
-	
+
 	descriptor->addItems(descriptors) ;
-	
+
 	layout->addWidget(descriptor) ;
 	layout->addWidget(freeText) ;
 	layout->addWidget(isFreeForm) ;
 	layout->addWidget(removeButton) ;
 	layout->setContentsMargins(0,0,0,0) ;
 	setLayout(layout) ;
-	
-// 	isFreeForm->resize() ;
+
+	// 	isFreeForm->resize() ;
 	isFreeForm->setFixedSize(isFreeForm->sizeHint()) ;
 	descriptor->setFixedHeight(descriptor->sizeHint().height()) ;
 	descriptor->setMaximumWidth(QWIDGETSIZE_MAX) ;
@@ -29,11 +29,11 @@ exportLayoutItem::exportLayoutItem (QStringList& descriptors, QWidget *parent )
 	freeText->setMaximumWidth(QWIDGETSIZE_MAX) ;
 	removeButton->setFixedHeight(16) ; //removeButton->sizeHint().height()) ;
 	removeButton->setFixedWidth(16) ; //removeButton->sizeHint().height()) ;
-	
+
 	removeButton->setFlat(true) ;
-	
+
 	freeFormMode(Qt::Unchecked) ;
-	
+
 	connect(removeButton,SIGNAL(clicked()),this,SLOT(remove())) ;
 }
 

@@ -10,7 +10,7 @@
 
 class cutByIntensityDialog : public QDialog
 {
-Q_OBJECT
+	Q_OBJECT
 private:
 	QVBoxLayout *layout ;
 	specPlot *plot ;

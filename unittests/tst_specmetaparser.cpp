@@ -39,7 +39,7 @@ void tst_specMetaParser::evaluate()
 	QwtPointSeriesData reference(result) ;
 	QCOMPARE(data->size(),reference.size()) ;
 	for (int i = 0 ; i < data->size() && i < reference.size() ; ++i)
-		QCOMPARE(data->sample(i),reference.sample(i)) ;	
+		QCOMPARE(data->sample(i),reference.sample(i)) ;
 	delete data ;
 }
 void tst_specMetaParser::evaluate_data()
@@ -58,7 +58,7 @@ void tst_specMetaParser::evaluate_data()
 				    << QPointF(1650,integral)
 				    << QPointF(1680,integral));
 	QTest::newRow("Descriptors") << "x = \"Zeit\"\ny = \"Zeit\"" << "x" << "y" <<
-				   QVector<QPointF>(2,QPointF(42,42));
+					QVector<QPointF>(2,QPointF(42,42));
 }
 
 void tst_specMetaParser::ok()

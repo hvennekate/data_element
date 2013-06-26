@@ -28,7 +28,7 @@ CanvasPicker::CanvasPicker ( specPlot *plot )
 	  d_selectedCurve ( NULL ),
 	  d_selectedPoint ( -1 ),
 	  highlighting(true)
-//     mode(spec::none)
+	//     mode(spec::none)
 {
 	QwtPlotCanvas *canvas = plot->canvas();
 
@@ -52,11 +52,11 @@ CanvasPicker::CanvasPicker ( specPlot *plot )
 	canvas->setFocus();
 
 	const char *text =
-	    "Points in this plot may be moved by dragging (if indicated) or positioned precisely by "
-	    "double clicking on them.  If zooming is enabled, step-wise zoom may be performed using "
-	    "the middle mouse button (click and drag the zoom region).  Clicking the right mouse "
-	    "button will go back one zoom step, while clicking the middle mouse button while holding "
-	    "the Ctrl key will go back to the unzoomed view.";
+			"Points in this plot may be moved by dragging (if indicated) or positioned precisely by "
+			"double clicking on them.  If zooming is enabled, step-wise zoom may be performed using "
+			"the middle mouse button (click and drag the zoom region).  Clicking the right mouse "
+			"button will go back one zoom step, while clicking the middle mouse button while holding "
+			"the Ctrl key will go back to the unzoomed view.";
 #if QT_VERSION >= 0x040000
 	canvas->setWhatsThis ( text );
 #else
@@ -68,7 +68,7 @@ CanvasPicker::CanvasPicker ( specPlot *plot )
 void CanvasPicker::setSelectable(const QSet<specCanvasItem *> &toSet)
 {
 	QSet<specCanvasItem*> toRemove(selectable - toSet),
-						  toAdd(toSet - selectable) ;
+			toAdd(toSet - selectable) ;
 	removeSelectable(toRemove) ;
 	addSelectable(toAdd) ;
 }
@@ -87,121 +87,121 @@ bool CanvasPicker::eventFilter ( QObject *object, QEvent *e )
 {
 	if ( object != ( QObject * ) plot()->canvas() )
 		return false;
-	
+
 	QMenu *contextMenu ;
 	switch ( e->type() )
 	{
-		case QEvent::FocusIn:
-			showCursor ( true );
-		case QEvent::FocusOut:
-			showCursor ( false );
+	case QEvent::FocusIn:
+		showCursor ( true );
+	case QEvent::FocusOut:
+		showCursor ( false );
 
-		case QEvent::Paint:
+	case QEvent::Paint:
+	{
+		QApplication::postEvent ( this, new QEvent ( QEvent::User ) );
+		break;
+	}
+	case QEvent::MouseButtonDblClick:
+	{
+		select ( ( ( QMouseEvent* ) e )->pos() );
+		if(d_selectedCurve)
 		{
-			QApplication::postEvent ( this, new QEvent ( QEvent::User ) );
+			movePointExplicitly() ;
+			return true;
+		}
+		return false ;
+	}
+	case QEvent::MouseButtonPress:
+	{
+		select ( ( ( QMouseEvent * ) e )->pos() );
+		if(((QMouseEvent*)e)->button() == Qt::RightButton && d_selectedCurve)
+		{
+			contextMenu = d_selectedCurve->contextMenu() ;
+			if (contextMenu)
+			{
+				contextMenu->exec(( ( QMouseEvent * ) e )->globalPos()) ;
+				delete contextMenu ;
+				contextMenu = 0 ;
+			}
+			d_selectedCurve = NULL ;
+			d_selectedPoint = -1 ;
+			return true ;
+		}
+		return d_selectedCurve ;
+	}
+	case QEvent::MouseMove:
+	{
+		move ( ( ( QMouseEvent * ) e )->pos() );
+		return d_selectedCurve ;
+	}
+	case QEvent::MouseButtonRelease:
+	{
+		showCursor ( false );
+		d_selectedCurve = NULL;
+		d_selectedPoint = -1;
+	}
+	case QEvent::KeyPress:
+	{
+		const int delta = 1; // TODO to settings
+		switch ( ( ( const QKeyEvent * ) e )->key() )
+		{
+		case Qt::Key_Up:
+			shiftCurveCursor ( true );
+			return true;
+
+		case Qt::Key_Down:
+			shiftCurveCursor ( false );
+			return true;
+
+		case Qt::Key_Right:
+		case Qt::Key_Plus:
+			if ( d_selectedCurve )
+				shiftPointCursor ( true );
+			else
+				shiftCurveCursor ( true );
+			return true;
+
+		case Qt::Key_Left:
+		case Qt::Key_Minus:
+			if ( d_selectedCurve )
+				shiftPointCursor ( false );
+			else
+				shiftCurveCursor ( true );
+			return true;
+
+			// The following keys represent a direction, they are
+			// organized on the keyboard.
+
+		case Qt::Key_1:
+			moveBy ( -delta, delta );
 			break;
-		}
-		case QEvent::MouseButtonDblClick:
-		{
-			select ( ( ( QMouseEvent* ) e )->pos() );
-			if(d_selectedCurve)
-			{
-				movePointExplicitly() ;
-				return true;
-			}
-			return false ;
-		}
-		case QEvent::MouseButtonPress:
-		{
-			select ( ( ( QMouseEvent * ) e )->pos() );
-			if(((QMouseEvent*)e)->button() == Qt::RightButton && d_selectedCurve)
-			{
-				contextMenu = d_selectedCurve->contextMenu() ;
-				if (contextMenu)
-				{
-					contextMenu->exec(( ( QMouseEvent * ) e )->globalPos()) ;
-					delete contextMenu ;
-					contextMenu = 0 ;
-				}
-				d_selectedCurve = NULL ;
-				d_selectedPoint = -1 ;
-				return true ;
-			}
-			return d_selectedCurve ;
-		}
-		case QEvent::MouseMove:
-		{
-			move ( ( ( QMouseEvent * ) e )->pos() );
-			return d_selectedCurve ;
-		}
-		case QEvent::MouseButtonRelease:
-		{
-			showCursor ( false );
-			d_selectedCurve = NULL;
-			d_selectedPoint = -1;
-		}
-		case QEvent::KeyPress:
-		{
-			const int delta = 1; // TODO to settings
-			switch ( ( ( const QKeyEvent * ) e )->key() )
-			{
-				case Qt::Key_Up:
-					shiftCurveCursor ( true );
-					return true;
-
-				case Qt::Key_Down:
-					shiftCurveCursor ( false );
-					return true;
-
-				case Qt::Key_Right:
-				case Qt::Key_Plus:
-					if ( d_selectedCurve )
-						shiftPointCursor ( true );
-					else
-						shiftCurveCursor ( true );
-					return true;
-
-				case Qt::Key_Left:
-				case Qt::Key_Minus:
-					if ( d_selectedCurve )
-						shiftPointCursor ( false );
-					else
-						shiftCurveCursor ( true );
-					return true;
-
-					// The following keys represent a direction, they are
-					// organized on the keyboard.
-
-				case Qt::Key_1:
-					moveBy ( -delta, delta );
-					break;
-				case Qt::Key_2:
-					moveBy ( 0, delta );
-					break;
-				case Qt::Key_3:
-					moveBy ( delta, delta );
-					break;
-				case Qt::Key_4:
-					moveBy ( -delta, 0 );
-					break;
-				case Qt::Key_6:
-					moveBy ( delta, 0 );
-					break;
-				case Qt::Key_7:
-					moveBy ( -delta, -delta );
-					break;
-				case Qt::Key_8:
-					moveBy ( 0, -delta );
-					break;
-				case Qt::Key_9:
-					moveBy ( delta, -delta );
-					break;
-				default:
-					break;
-			}
-		}
+		case Qt::Key_2:
+			moveBy ( 0, delta );
+			break;
+		case Qt::Key_3:
+			moveBy ( delta, delta );
+			break;
+		case Qt::Key_4:
+			moveBy ( -delta, 0 );
+			break;
+		case Qt::Key_6:
+			moveBy ( delta, 0 );
+			break;
+		case Qt::Key_7:
+			moveBy ( -delta, -delta );
+			break;
+		case Qt::Key_8:
+			moveBy ( 0, -delta );
+			break;
+		case Qt::Key_9:
+			moveBy ( delta, -delta );
+			break;
 		default:
 			break;
+		}
+	}
+	default:
+		break;
 	}
 	return QObject::eventFilter ( object, e );
 }
@@ -276,28 +276,28 @@ void CanvasPicker::move ( const QPoint &pos )
 // Hightlight the selected point
 void CanvasPicker::showCursor ( bool showIt )
 {
-Q_UNUSED(showIt)
-// TODO this seems to be buggy in Qwt 6.0.1 and 6.0.0:  Ther is always a trace behind the cursor.  Reimplement!
+	Q_UNUSED(showIt)
+	// TODO this seems to be buggy in Qwt 6.0.1 and 6.0.0:  Ther is always a trace behind the cursor.  Reimplement!
 
-//	QwtSymbol *symbol = new QwtSymbol(*(d_selectedCurve->symbol()));
+	//	QwtSymbol *symbol = new QwtSymbol(*(d_selectedCurve->symbol()));
 
-//	QwtSymbol *newSymbol = new QwtSymbol(*symbol) ;
-//	if ( showIt )
-//		newSymbol->setBrush ( QColor ( 255-symbol->brush().color().red(),
-//					      255-symbol->brush().color().green(),
-//					      255-symbol->brush().color().blue() ) ) ;
+	//	QwtSymbol *newSymbol = new QwtSymbol(*symbol) ;
+	//	if ( showIt )
+	//		newSymbol->setBrush ( QColor ( 255-symbol->brush().color().red(),
+	//					      255-symbol->brush().color().green(),
+	//					      255-symbol->brush().color().blue() ) ) ;
 
-//	const bool doReplot = plot()->autoReplot();
+	//	const bool doReplot = plot()->autoReplot();
 
-//	plot()->setAutoReplot ( false );
-//	d_selectedCurve->setSymbol ( newSymbol );
+	//	plot()->setAutoReplot ( false );
+	//	d_selectedCurve->setSymbol ( newSymbol );
 
-////	d_selectedCurve->draw ( d_selectedPoint, d_selectedPoint );
-//	QwtPlotDirectPainter directPainter;
-//	directPainter.drawSeries(d_selectedCurve, d_selectedPoint, d_selectedPoint);
+	////	d_selectedCurve->draw ( d_selectedPoint, d_selectedPoint );
+	//	QwtPlotDirectPainter directPainter;
+	//	directPainter.drawSeries(d_selectedCurve, d_selectedPoint, d_selectedPoint);
 
-//	d_selectedCurve->setSymbol ( symbol );
-//	plot()->setAutoReplot ( doReplot );
+	//	d_selectedCurve->setSymbol ( symbol );
+	//	plot()->setAutoReplot ( doReplot );
 }
 
 // Select the next/previous curve
@@ -337,8 +337,8 @@ void CanvasPicker::shiftCurveCursor ( bool up )
 	showCursor ( false );
 	d_selectedPoint = 0;
 	d_selectedCurve = ( specCanvasItem* ) *it;
-// 	if ( mode == spec::newZero )
-// 		selectedRange = ranges.indexOf ( ( specRange* ) *it ) ;
+	// 	if ( mode == spec::newZero )
+	// 		selectedRange = ranges.indexOf ( ( specRange* ) *it ) ;
 	showCursor ( true );
 }
 
@@ -369,10 +369,10 @@ void CanvasPicker::movePointExplicitly()
 	query->setWindowTitle ( "Move point to value" ) ;
 	QGridLayout *layout = new QGridLayout ;
 	QLineEdit *xBox = new QLineEdit ( QString("%1").arg(curve->sample (point).x() )),
-	*yBox = new QLineEdit ( QString("%1").arg(curve->sample (point).y() )) ;
+			*yBox = new QLineEdit ( QString("%1").arg(curve->sample (point).y() )) ;
 	xBox->setValidator(new QDoubleValidator(xBox)) ;
 	yBox->setValidator(new QDoubleValidator(yBox)) ;
-	
+
 	QLabel *xLabel = new QLabel ( "x:" ), *yLabel = new QLabel ( "y:" ) ;
 	QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel) ;
 	connect(buttons,SIGNAL(accepted()),query,SLOT(accept())) ;

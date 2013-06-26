@@ -54,7 +54,7 @@ specPlot::specPlot(QWidget *parent)
 	fixYAxisAction->setIcon(QIcon(":/fixYAxis.png")) ;
 	fixYAxisAction->setCheckable(true) ;
 	fixYAxisAction->setChecked(false) ;
-	
+
 	fixXAxisAction = new QAction(QIcon(":/fixxaxis.png"), tr("fixate &x axis"), this);
 	fixXAxisAction->setShortcut(tr("Ctrl+Shift+x"));
 	fixXAxisAction->setWhatsThis(tr("Disables auto scaling for the y axis and fixates the current axis range.")) ;
@@ -140,7 +140,7 @@ void specPlot::replot()
 		replotting = false ;
 		return ;
 	}
-	
+
 	autoScale(allItems) ;
 
 	QwtPlot::replot() ; // TODO optimize

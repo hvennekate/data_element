@@ -8,7 +8,7 @@ typedef QPair<QString,double>  stringDoublePair ;
 
 class specMergeAction : public specItemAction
 {
-    Q_OBJECT
+	Q_OBJECT
 private:
 	bool getMergeCriteria(QList<stringDoublePair>& toCompare, const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties, bool &spectralAdaptation) ;
 	QModelIndexList allChildren(const QModelIndex& parent) const ;

@@ -11,10 +11,10 @@ specLogModel::specLogModel(QObject *parent)
 
 QStringList specLogModel::dataTypes() const
 {
-    return QStringList() ;
+	return QStringList() ;
 }
 
 QList<specFileImportFunction> specLogModel::acceptableImportFunctions() const
 {
-    return QList<specFileImportFunction>() << readLogFile ;
+	return QList<specFileImportFunction>() << readLogFile ;
 }

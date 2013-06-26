@@ -14,7 +14,7 @@
 #include <QRadioButton>
 
 specAverageDataAction::specAverageDataAction(QObject *parent) :
-    specRequiresItemAction(parent)
+	specRequiresItemAction(parent)
 {
 	setIcon(QIcon(":/ave.png")) ;
 	setToolTip(tr("Average Data")) ;
@@ -25,19 +25,19 @@ specAverageDataAction::specAverageDataAction(QObject *parent) :
 
 const std::type_info& specAverageDataAction::possibleParent()
 {
-    return typeid(specDataView) ;
+	return typeid(specDataView) ;
 }
 
 class tolerantComparison
 {
 private:
-    double tolerance ;
+	double tolerance ;
 public:
-    tolerantComparison(double d) : tolerance(d) {}
-    bool operator()(const specDataPoint& a, const specDataPoint& b)
-    {
-        return fabs(a.nu - b.nu) <= tolerance ;
-    }
+	tolerantComparison(double d) : tolerance(d) {}
+	bool operator()(const specDataPoint& a, const specDataPoint& b)
+	{
+		return fabs(a.nu - b.nu) <= tolerance ;
+	}
 };
 
 specUndoCommand* specAverageDataAction::generateUndoCommand()
@@ -48,9 +48,9 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 	dialog.setWindowTitle(tr("Average")) ;
 	dialog.setLayout(new QVBoxLayout(&dialog)) ;
 
-    QRadioButton *byPointNumber = new QRadioButton(tr("Average by point"), &dialog) ;
-    dialog.layout()->addWidget(byPointNumber);
-    byPointNumber->setChecked(true) ;
+	QRadioButton *byPointNumber = new QRadioButton(tr("Average by point"), &dialog) ;
+	dialog.layout()->addWidget(byPointNumber);
+	byPointNumber->setChecked(true) ;
 
 	QSpinBox *number = new QSpinBox(&dialog) ;
 	number->setMinimum(1) ;
@@ -64,18 +64,18 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 	dialog.layout()->addWidget(running) ;
 	connect(running,SIGNAL(toggled(bool)),runningLabel,SLOT(setVisible(bool))) ;
 
-    QRadioButton *byTolerance = new QRadioButton(tr("Average by x value"), &dialog) ;
-    dialog.layout()->addWidget(byTolerance);
+	QRadioButton *byTolerance = new QRadioButton(tr("Average by x value"), &dialog) ;
+	dialog.layout()->addWidget(byTolerance);
 
-    QLineEdit *toleranceEdit = new QLineEdit("0",&dialog) ;
-    toleranceEdit->setValidator(new QDoubleValidator(0, INFINITY, 2, toleranceEdit)) ;
-    QHBoxLayout *toleranceLayout = new QHBoxLayout ;
-    toleranceLayout->addWidget(new QLabel(tr("Tolerance:"), &dialog)) ;
-    toleranceLayout->addWidget(toleranceEdit) ;
-    dialog.layout()->addItem(toleranceLayout) ;
+	QLineEdit *toleranceEdit = new QLineEdit("0",&dialog) ;
+	toleranceEdit->setValidator(new QDoubleValidator(0, INFINITY, 2, toleranceEdit)) ;
+	QHBoxLayout *toleranceLayout = new QHBoxLayout ;
+	toleranceLayout->addWidget(new QLabel(tr("Tolerance:"), &dialog)) ;
+	toleranceLayout->addWidget(toleranceEdit) ;
+	dialog.layout()->addItem(toleranceLayout) ;
 
-    QCheckBox *rightToLeft = new QCheckBox(tr("Invert direction (start from larger x values)"),&dialog) ;
-    dialog.layout()->addWidget(rightToLeft) ;
+	QCheckBox *rightToLeft = new QCheckBox(tr("Invert direction (start from larger x values)"),&dialog) ;
+	dialog.layout()->addWidget(rightToLeft) ;
 
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel,Qt::Horizontal,&dialog) ;
 	dialog.layout()->addWidget(buttonBox);
@@ -86,82 +86,82 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 		return 0 ;
 
 	int numAverages = number->value() ;
-    if (byPointNumber->isChecked() && numAverages == 1 && !running->isChecked()) return 0 ;
+	if (byPointNumber->isChecked() && numAverages == 1 && !running->isChecked()) return 0 ;
 	specMultiCommand *groupCommand = new specMultiCommand ;
-    groupCommand->setParentObject(model) ;
-    groupCommand->setMergeable(false) ;
+	groupCommand->setParentObject(model) ;
+	groupCommand->setMergeable(false) ;
 
-    if (byPointNumber->isChecked())
-    {
-        foreach(QModelIndex index, selection)
-        {
-            specDataItem *item = dynamic_cast<specDataItem*>(view->model()->itemPointer(index)) ;
-            if (!item) continue ;
-            QVector<specDataPoint> oldData(item->allData()), newData ;
-            item->applyCorrection(oldData);
-            if (running->isChecked())
-            {
-    //			newData.resize(oldData.size());
-                for (int i = 0 ; i < oldData.size() ; ++i)
-                {
-                    int limit = qMin(i+numAverages+1, oldData.size()) ;
-                    specDataPoint dataPoint ; //= newData[i];
-                    for (int j = qMax(0,i-numAverages) ; j < limit ; ++j)
-                        dataPoint += oldData[j] ;
-                    dataPoint /= limit - qMax(0,i-numAverages) ;
-                    newData << dataPoint ;
-                }
-            }
-            else
-            {
-    //			newData.resize(oldData.size()/numAverages+1) ;
-                int avs = std::ceil(double(oldData.size())/numAverages) ;
-                for (int i = 0 ; i < avs ; ++i)
-                {
-                    specDataPoint dataPoint ; //= newData[i] ;
-                    int limit = qMin(oldData.size(), (i+1)*numAverages) ;
-                    for (int j = i*numAverages ; j < limit ; ++ j)
-                        dataPoint += oldData[j] ;
-                    dataPoint /= limit - i*numAverages ;
-                    newData << dataPoint ;
-                }
-            }
-            item->reverseCorrection(newData);
-            specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
-            command->setParentObject(view->model()) ;
-            command->setItem(index,newData);
-        }
-        groupCommand->setText(tr("Average data (") + QString::number(number->value()) + tr(" points") +  (running->isChecked() ? tr(", running)") : tr(")"))) ;
-    }
-    else if (byTolerance->isChecked())
-    {
-        groupCommand->setText(tr("Averaged data with a tolerance of ") + toleranceEdit->text() + tr(".")) ;
+	if (byPointNumber->isChecked())
+	{
+		foreach(QModelIndex index, selection)
+		{
+			specDataItem *item = dynamic_cast<specDataItem*>(view->model()->itemPointer(index)) ;
+			if (!item) continue ;
+			QVector<specDataPoint> oldData(item->allData()), newData ;
+			item->applyCorrection(oldData);
+			if (running->isChecked())
+			{
+				//			newData.resize(oldData.size());
+				for (int i = 0 ; i < oldData.size() ; ++i)
+				{
+					int limit = qMin(i+numAverages+1, oldData.size()) ;
+					specDataPoint dataPoint ; //= newData[i];
+					for (int j = qMax(0,i-numAverages) ; j < limit ; ++j)
+						dataPoint += oldData[j] ;
+					dataPoint /= limit - qMax(0,i-numAverages) ;
+					newData << dataPoint ;
+				}
+			}
+			else
+			{
+				//			newData.resize(oldData.size()/numAverages+1) ;
+				int avs = std::ceil(double(oldData.size())/numAverages) ;
+				for (int i = 0 ; i < avs ; ++i)
+				{
+					specDataPoint dataPoint ; //= newData[i] ;
+					int limit = qMin(oldData.size(), (i+1)*numAverages) ;
+					for (int j = i*numAverages ; j < limit ; ++ j)
+						dataPoint += oldData[j] ;
+					dataPoint /= limit - i*numAverages ;
+					newData << dataPoint ;
+				}
+			}
+			item->reverseCorrection(newData);
+			specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
+			command->setParentObject(view->model()) ;
+			command->setItem(index,newData);
+		}
+		groupCommand->setText(tr("Average data (") + QString::number(number->value()) + tr(" points") +  (running->isChecked() ? tr(", running)") : tr(")"))) ;
+	}
+	else if (byTolerance->isChecked())
+	{
+		groupCommand->setText(tr("Averaged data with a tolerance of ") + toleranceEdit->text() + tr(".")) ;
 
-        tolerantComparison comp(toleranceEdit->text().toDouble()) ;
-        foreach(QModelIndex index, selection)
-        {
-            specDataItem *item = dynamic_cast<specDataItem*>(model->itemPointer(index)) ;
-            if (!item) continue ;
-            specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
-            command->setParentObject(model) ;
-            QVector<specDataPoint> newData, oldData(item->allData()) ;
-            if (rightToLeft->isChecked())
-            {
-                newData.reserve(oldData.size());
-                std::reverse_copy(oldData.begin(), oldData.end(), std::back_inserter(newData)) ;
-                oldData.clear();
-                oldData.swap(newData) ;
-            }
-            averageToNew(oldData.begin(), oldData.end(), comp, std::back_inserter(newData)) ;
-            command->setItem(index, newData) ;
-        }
-    }
+		tolerantComparison comp(toleranceEdit->text().toDouble()) ;
+		foreach(QModelIndex index, selection)
+		{
+			specDataItem *item = dynamic_cast<specDataItem*>(model->itemPointer(index)) ;
+			if (!item) continue ;
+			specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
+			command->setParentObject(model) ;
+			QVector<specDataPoint> newData, oldData(item->allData()) ;
+			if (rightToLeft->isChecked())
+			{
+				newData.reserve(oldData.size());
+				std::reverse_copy(oldData.begin(), oldData.end(), std::back_inserter(newData)) ;
+				oldData.clear();
+				oldData.swap(newData) ;
+			}
+			averageToNew(oldData.begin(), oldData.end(), comp, std::back_inserter(newData)) ;
+			command->setItem(index, newData) ;
+		}
+	}
 
-    if (!groupCommand->childCount())
-    {
-        delete groupCommand ;
-        return 0 ;
-    }
+	if (!groupCommand->childCount())
+	{
+		delete groupCommand ;
+		return 0 ;
+	}
 
 	return groupCommand ;
 }

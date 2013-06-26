@@ -45,14 +45,14 @@ public:
 	QSet<specMetaItem*> clientList() const { return clients ; }
 	/*! Merge/sort plot data when rebuilding it.  Mainly applies to both specFolderItem and specDataItem.  Both are enabled by default. */
 	bool mergePlotData, sortPlotData ;
-	
+
 	/*! Standard constructor.  Expects pointer to parent (zero for root item) and possibly an initial value for the descriptive tag (default: empty string). */
 	specModelItem(specFolderItem* par=0, QString description="");
-    specModelItem(const specModelItem&) ;
+	specModelItem(const specModelItem&) ;
 	/*! Standard destructor.*/
 	virtual ~specModelItem();
 	/*! Returns a collection of data points (normally empty, needs to be reimplemented in subclasses). The format is time, signal.*/
-	
+
 	/*! Assign parent. */
 	void setParent(specFolderItem*) ; // TODO make private and friend of folder class
 	/*! Returns pointer to currently assigned parent. */
@@ -63,10 +63,10 @@ public:
 	virtual bool isFolder() const ;
 	/*! Return value of descriptor \a key */
 	virtual QString descriptor(const QString &key, bool full=false) const ;
-    virtual double descriptorValue(const QString& key) const { Q_UNUSED(key) ; return NAN ; }
+	virtual double descriptorValue(const QString& key) const { Q_UNUSED(key) ; return NAN ; }
 	/*! Is the descriptor \a key editable?*/
-    virtual bool isEditable(QString key) const ;
-    virtual bool isNumeric(const QString& key) const ;
+	virtual bool isEditable(QString key) const ;
+	virtual bool isNumeric(const QString& key) const ;
 	/*! Set descriptor \a key 's value to  \a value. */
 	virtual bool changeDescriptor(QString key, QString value) ; // TODO add changeDescriptor(key,specDescriptor)
 	virtual bool setActiveLine(const QString&, int) ;
@@ -80,19 +80,19 @@ public:
 	virtual bool addChildren(QList<specModelItem*> list, QList<specModelItem*>::size_type position) ;
 	virtual QStringList descriptorKeys() const ;
 	virtual spec::descriptorFlags descriptorProperties(const QString& key) const ;
-    virtual void setDescriptorProperties(const QString& key, spec::descriptorFlags f) ;
-    virtual void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
+	virtual void setDescriptorProperties(const QString& key, spec::descriptorFlags f) ;
+	virtual void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
 	virtual QVector<double> intensityData() const ;
 	virtual int removeData(QList<specRange*>*) { refreshPlotData() ; return 0 ; }
 	virtual void movingAverage(int) {}
 	virtual void average(int) {}
 	virtual void subMap(const QMap<double,double>&) {}
-    virtual QString toolTip(const QString &column) const ;
-    virtual void renameDescriptors(const QMap<QString, QString>& map) ;
-    virtual void deleteDescriptor(const QString& key) ;
-    virtual void dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const ;
-    virtual void restoreDescriptor(QListIterator<specDescriptor>& origin, const QString& key) ;
-    virtual QString editDescriptor(const QString& key) const ;
+	virtual QString toolTip(const QString &column) const ;
+	virtual void renameDescriptors(const QMap<QString, QString>& map) ;
+	virtual void deleteDescriptor(const QString& key) ;
+	virtual void dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const ;
+	virtual void restoreDescriptor(QListIterator<specDescriptor>& origin, const QString& key) ;
+	virtual QString editDescriptor(const QString& key) const ;
 
 	int rtti() const { return spec::spectrum ; }
 	void attach(QwtPlot *plot) ;

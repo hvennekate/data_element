@@ -50,11 +50,11 @@ dataItemProperties::dataItemProperties(specDataItem *i, QWidget *parent) :
 	for (int i = 0 ; i < item.data.size() ; ++i)
 	{
 		ui->dataWidget->
-		      setItem(i,0, new QTableWidgetItem(QString::number(item.data[i].nu)));
+				setItem(i,0, new QTableWidgetItem(QString::number(item.data[i].nu)));
 		ui->dataWidget->
-		      setItem(i,1, new QTableWidgetItem(QString::number(item.data[i].sig)));
+				setItem(i,1, new QTableWidgetItem(QString::number(item.data[i].sig)));
 		ui->dataWidget->
-		      setItem(i,2, new QTableWidgetItem(QString::number(item.data[i].mint)));
+				setItem(i,2, new QTableWidgetItem(QString::number(item.data[i].mint)));
 	}
 
 	setupComplete = true ;
@@ -103,7 +103,7 @@ specUndoCommand* dataItemProperties::changeCommands(QObject* parent)
 	if (item.data.size() == originalItem->data.size())
 		for (size_t i = 0 ; i < item.dataSize() ; ++i)
 			dataUnchanged = dataUnchanged &&
-				    item.data[i].exactlyEqual(originalItem->data[i]) ;
+					item.data[i].exactlyEqual(originalItem->data[i]) ;
 	else dataUnchanged = false ;
 
 	correctionUnchanged = (item.slope == originalItem->slope &&
@@ -111,7 +111,7 @@ specUndoCommand* dataItemProperties::changeCommands(QObject* parent)
 			       item.xshift == originalItem->xshift &&
 			       item.factor == originalItem->factor) ;
 
-    if (correctionUnchanged && dataUnchanged) return 0 ;
+	if (correctionUnchanged && dataUnchanged) return 0 ;
 
 	specUndoCommand *parentMulti = 0 ;
 	if (!dataUnchanged && !correctionUnchanged)

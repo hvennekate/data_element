@@ -11,45 +11,45 @@
 #include "specrenamedescriptorcommand.h"
 
 stringListEntryValidator::stringListEntryValidator(QList<stringListEntryWidget *> aW, stringListEntryWidget *parent)
-    : stringListValidator(parent),
+	: stringListValidator(parent),
 	  allWidgets(aW)
 {}
 
 stringListValidator::stringListValidator(QWidget *parent)
-    : QValidator(parent),
-      forbiddenList(new QStringList)
+	: QValidator(parent),
+	  forbiddenList(new QStringList)
 {}
 
 stringListValidator::~stringListValidator()
 {
-    delete forbiddenList ;
+	delete forbiddenList ;
 }
 
 QValidator::State stringListValidator::validate(QString &s, int &pos) const
 {
-    Q_UNUSED(pos)
-    return forbiddenList->contains(s) ? Intermediate : Acceptable ;
+	Q_UNUSED(pos)
+	return forbiddenList->contains(s) ? Intermediate : Acceptable ;
 }
 
 void stringListValidator::setForbidden(const QStringList &fl) const
 {
-    *forbiddenList = fl ;
+	*forbiddenList = fl ;
 }
 
 QValidator::State stringListEntryValidator::validate(QString &s, int &pos) const
 {
 	Q_UNUSED(pos)
-    stringListEntryWidget* parentPointer = qobject_cast<stringListEntryWidget*>(parent()) ;
-    if (!parentPointer || !parentPointer->active()) return Acceptable ;
+	stringListEntryWidget* parentPointer = qobject_cast<stringListEntryWidget*>(parent()) ;
+	if (!parentPointer || !parentPointer->active()) return Acceptable ;
 
-    QStringList forbiddenStrings ;
-    forbiddenStrings << QString() ;
-    foreach(stringListEntryWidget* widget, allWidgets)
-        if (widget != parentPointer &&
-                widget->active())
-            forbiddenStrings << widget->content() ;
-    setForbidden(forbiddenStrings);
-    return stringListValidator::validate(s, pos) ;
+	QStringList forbiddenStrings ;
+	forbiddenStrings << QString() ;
+	foreach(stringListEntryWidget* widget, allWidgets)
+		if (widget != parentPointer &&
+				widget->active())
+			forbiddenStrings << widget->content() ;
+	setForbidden(forbiddenStrings);
+	return stringListValidator::validate(s, pos) ;
 }
 
 void stringListValidator::fixup(QString &s) const
@@ -154,52 +154,52 @@ QMap<QString, QString> stringListChangeDialog::active() const
 }
 
 specDescriptorEditAction::specDescriptorEditAction(QObject *parent)
-    : specUndoAction(parent)
+	: specUndoAction(parent)
 {
-    setIcon(QIcon::fromTheme("document-properties")) ;
-    setToolTip(tr("Edit columns")) ;
-    setWhatsThis(tr("Use this action to edit/delete column headers."));
-    setText(tr("Edit columns")) ;
+	setIcon(QIcon::fromTheme("document-properties")) ;
+	setToolTip(tr("Edit columns")) ;
+	setWhatsThis(tr("Use this action to edit/delete column headers."));
+	setText(tr("Edit columns")) ;
 
 }
 
 void specDescriptorEditAction::execute()
 {
-    specView *view = qobject_cast<specView*>(parent()) ;
-    if (!view) return ;
-    specModel *model = view->model() ;
-    if (!model) return ;
-    QStringList descriptors = model->descriptors() ;
-    descriptors.removeAll("") ;
-    stringListChangeDialog dialog(descriptors) ;
-    dialog.exec() ;
-    if (dialog.result() != QDialog::Accepted) return ;
-    QStringList toDelete = dialog.inactive() ;
-    QMap<QString, QString> toExchange = dialog.active() ;
-    foreach(const QString& key, toExchange.keys())
-	    if (toExchange[key] == key)
-		    toExchange.remove(key) ;
+	specView *view = qobject_cast<specView*>(parent()) ;
+	if (!view) return ;
+	specModel *model = view->model() ;
+	if (!model) return ;
+	QStringList descriptors = model->descriptors() ;
+	descriptors.removeAll("") ;
+	stringListChangeDialog dialog(descriptors) ;
+	dialog.exec() ;
+	if (dialog.result() != QDialog::Accepted) return ;
+	QStringList toDelete = dialog.inactive() ;
+	QMap<QString, QString> toExchange = dialog.active() ;
+	foreach(const QString& key, toExchange.keys())
+		if (toExchange[key] == key)
+			toExchange.remove(key) ;
 
-    // TODO check for actual changes
+	// TODO check for actual changes
 
-    specMultiCommand *command = new specMultiCommand ;
-    command->setText(tr("Modify column heads")) ;
-    foreach(const QString& key, toDelete)
-    {
-        specDeleteDescriptorCommand *deleteCommand = new specDeleteDescriptorCommand(command,key) ;
-        deleteCommand->setParentObject(model) ;
-    }
-    specRenameDescriptorCommand *renameCommand = new specRenameDescriptorCommand(command) ;
-    renameCommand->setRenamingMap(toExchange) ;
-    renameCommand->setParentObject(model) ;
-    command->setParentObject(model);
-    if (!library)
-    {
-	    command->redo();
-	    delete command ;
-    }
-    else
-	    library->push(command) ;
+	specMultiCommand *command = new specMultiCommand ;
+	command->setText(tr("Modify column heads")) ;
+	foreach(const QString& key, toDelete)
+	{
+		specDeleteDescriptorCommand *deleteCommand = new specDeleteDescriptorCommand(command,key) ;
+		deleteCommand->setParentObject(model) ;
+	}
+	specRenameDescriptorCommand *renameCommand = new specRenameDescriptorCommand(command) ;
+	renameCommand->setRenamingMap(toExchange) ;
+	renameCommand->setParentObject(model) ;
+	command->setParentObject(model);
+	if (!library)
+	{
+		command->redo();
+		delete command ;
+	}
+	else
+		library->push(command) ;
 }
 
 const std::type_info& specDescriptorEditAction::possibleParent()

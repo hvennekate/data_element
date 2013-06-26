@@ -4,9 +4,9 @@
 
 class specRequiresItemAction : public specItemAction
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit specRequiresItemAction(QObject *parent = 0);
+	explicit specRequiresItemAction(QObject *parent = 0);
 private:
 	bool requirements() ;
 };

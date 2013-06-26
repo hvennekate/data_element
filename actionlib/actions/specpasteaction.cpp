@@ -7,7 +7,7 @@
 #include <QClipboard>
 
 specPasteAction::specPasteAction(QObject *parent) :
-    specItemAction(parent)
+	specItemAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("edit-paste")) ;
 	setToolTip(tr("Paste")) ;

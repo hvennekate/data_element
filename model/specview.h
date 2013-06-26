@@ -12,7 +12,7 @@ class specUndoCommand ;
 
 class specView : public QTreeView, public specStreamable
 { // TODO turn into abstract class (add purely virtual function)
-Q_OBJECT
+	Q_OBJECT
 private:
 	specViewState *state ;
 
@@ -21,9 +21,9 @@ private:
 	bool setAllSelected(const QVariant&, int role = Qt::EditRole) ;
 	type typeId() const { return specStreamable::mainView ; }
 	bool acceptData(const QMimeData*) ;
-    void dragMoveEvent(QDragMoveEvent *event) ;
-    void dragEnterEvent(QDragEnterEvent *event) ;
-    void handleDropEventAction(QDropEvent* event) ;
+	void dragMoveEvent(QDragMoveEvent *event) ;
+	void dragEnterEvent(QDragEnterEvent *event) ;
+	void handleDropEventAction(QDropEvent* event) ;
 private slots:
 	void columnsInserted(const QModelIndex& parent, int start, int end) ;
 protected:
@@ -37,10 +37,10 @@ protected slots:
 public:
 	specView(QWidget* parent=0);
 	virtual ~specView();
-	
+
 	specModel* model () const ;
 	void setModel(specModel*) ; // TODO make virtual or find better solution!
-//	QList<specModelItem*> currentlySelected() ;
+	//	QList<specModelItem*> currentlySelected() ;
 	QModelIndexList getSelection() ;
 	void setActionLibrary(specActionLibrary*) ;
 

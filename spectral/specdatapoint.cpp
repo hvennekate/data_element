@@ -17,7 +17,7 @@ bool specDataPoint::operator<(const specDataPoint& toCompare) const
 
 bool specDataPoint::operator==(const specDataPoint& toCompare) const
 {
-    return toCompare.nu == nu ;
+	return toCompare.nu == nu ;
 }
 
 bool specDataPoint::operator!=(const specDataPoint& toCompare) const
@@ -25,13 +25,13 @@ bool specDataPoint::operator!=(const specDataPoint& toCompare) const
 
 specDataPoint& specDataPoint::operator+=(const specDataPoint& toAdd)
 {
-    nu += toAdd.nu ; sig += toAdd.sig ; mint = std::max(toAdd.mint,mint) ;
+	nu += toAdd.nu ; sig += toAdd.sig ; mint = std::max(toAdd.mint,mint) ;
 	return (*this) ;
 }
 
 specDataPoint& specDataPoint::operator/=(const double& toDiv)
 {
-    nu /= toDiv ; sig /= toDiv ;
+	nu /= toDiv ; sig /= toDiv ;
 	return (*this) ;
 }
 
@@ -43,11 +43,11 @@ specDataPoint& specDataPoint::operator/(const double& toDiv)
 
 bool specDataPoint::exactlyEqual(const specDataPoint &o) const
 {
-    return nu == o.nu && sig == o.sig && mint == o.mint ;
+	return nu == o.nu && sig == o.sig && mint == o.mint ;
 }
 
 QDataStream& operator>>(QDataStream &in, legacyDatapoint& d)
 {
-    double t ;
-    return in >> t >> d.nu >> d.sig >> d.mint ;
+	double t ;
+	return in >> t >> d.nu >> d.sig >> d.mint ;
 }

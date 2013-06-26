@@ -37,7 +37,7 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 	//  Jedes symbol ist ein Array aus den beteiligten items und wird ausgewertet nach
 	//   - index ([i], [i:j], [:j], [:],[::inc] etc) -> nur diese items heranziehen
 	//   - "string" -> diesen Deskriptor verwenden
-    //   - x,y,i,u,l,p,P -> x, y, integral, upper, lower mit optionaler range/punkt, lower/upper x value
+	//   - x,y,i,u,l,p,P -> x, y, integral, upper, lower mit optionaler range/punkt, lower/upper x value
 	//  Bei jeder Auswertung fuer ein item werden die Ergebnisarrays an das
 	//  master-array fuer das jeweilige Symbol angefuegt.  Padding, wenn ein
 	//  symbol-array mehr als ein neues Element bekommt.  Wenn mehrere mehr als ein Element:
@@ -46,7 +46,7 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 	//  Dann x, y auswerten.
 	const QRegExp acceptable("(\\[[0-9]*(:[0-9]*(:[0-9]*)?)?\\])?"
 				 "(\"[^\"]*\"|"
-                 "((x|y|i|u|l|p|P)"
+				 "((x|y|i|u|l|p|P)"
 				 "("
 				 "(([+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?"
 				 "(:[+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?)|"
@@ -79,7 +79,7 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 		symbols << symbol ;
 		evaluators << specMetaVariable::factory(value,this) ;
 	}
-    evaluators.removeAll(0) ;
+	evaluators.removeAll(0) ;
 	valueVector.resize(symbols.size());
 	x = prepare(xExpression) ;
 	y = prepare(yExpression) ;
@@ -89,91 +89,91 @@ void specMetaParser::setAssignments(const QString &expressionList, const QString
 }
 
 void specMetaParser::itemsToQuery(const QVector<specModelItem*>& items,
-                                  QVector<QVector<specModelItem*> >& itemsPerPoint)
+				  QVector<QVector<specModelItem*> >& itemsPerPoint)
 {
-    if (evaluators.isEmpty() || items.isEmpty()) return ;
-    typedef specMetaVariable::indexLimit trackingIndex ;
-    typedef QVector<trackingIndex> trackingIndexes ;
-    trackingIndexes indexes ;
-    foreach(specMetaVariable* variable, evaluators)
-        indexes << variable->indexRange(items.size()) ; // TODO functionality envy.
-    // get the items per point
-    while(true)
-    {
-        QVector<specModelItem*> itemsForThisPoint ;
-        for (trackingIndexes::iterator i = indexes.begin() ; i != indexes.end() ; ++i)
-        {
-            if (i->begin < i->end)
-                itemsForThisPoint << items[i->begin] ;
-            i->begin += i->increment ;
-        }
-        if (itemsForThisPoint.size() < evaluators.size()) break ; // some index(es) reached its(their) limit(s)
-        itemsPerPoint << itemsForThisPoint ;
-    }
+	if (evaluators.isEmpty() || items.isEmpty()) return ;
+	typedef specMetaVariable::indexLimit trackingIndex ;
+	typedef QVector<trackingIndex> trackingIndexes ;
+	trackingIndexes indexes ;
+	foreach(specMetaVariable* variable, evaluators)
+		indexes << variable->indexRange(items.size()) ; // TODO functionality envy.
+	// get the items per point
+	while(true)
+	{
+		QVector<specModelItem*> itemsForThisPoint ;
+		for (trackingIndexes::iterator i = indexes.begin() ; i != indexes.end() ; ++i)
+		{
+			if (i->begin < i->end)
+				itemsForThisPoint << items[i->begin] ;
+			i->begin += i->increment ;
+		}
+		if (itemsForThisPoint.size() < evaluators.size()) break ; // some index(es) reached its(their) limit(s)
+		itemsPerPoint << itemsForThisPoint ;
+	}
 }
 
 void specMetaParser::getVariableValues(const QVector<specModelItem*>& itemsToUse,
-                                       QVector<QVector<double> >& variableValues)
+				       QVector<QVector<double> >& variableValues)
 {
-    if (itemsToUse.size() != evaluators.size()) return ;
+	if (itemsToUse.size() != evaluators.size()) return ;
 
-    // Build xValues
-    QVector<double>  xValues(1,NAN) ;
-    for (int i = 0 ; i < evaluators.size() ; ++i)
-        evaluators[i]->xValues(itemsToUse[i], xValues) ;
+	// Build xValues
+	QVector<double>  xValues(1,NAN) ;
+	for (int i = 0 ; i < evaluators.size() ; ++i)
+		evaluators[i]->xValues(itemsToUse[i], xValues) ;
 
-    // Build results
-        // get values
-    QVector<QVector<double> > values ;
-    for (int i = 0 ; i < evaluators.size() ; ++i)
-        values << evaluators[i]->values(itemsToUse[i], xValues) ;
+	// Build results
+	// get values
+	QVector<QVector<double> > values ;
+	for (int i = 0 ; i < evaluators.size() ; ++i)
+		values << evaluators[i]->values(itemsToUse[i], xValues) ;
 
-        // flip matrix
-    for (int i = 0 ; i < xValues.size() ; ++i)
-    {
-        QVector<double> row ;
-        for (int j = 0 ; j < evaluators.size() ; ++j) // TODO additional condition:  enough values
-            row << values[j][i] ;
-        variableValues << row ;
-    }
+	// flip matrix
+	for (int i = 0 ; i < xValues.size() ; ++i)
+	{
+		QVector<double> row ;
+		for (int j = 0 ; j < evaluators.size() ; ++j) // TODO additional condition:  enough values
+			row << values[j][i] ;
+		variableValues << row ;
+	}
 }
 
 void specMetaParser::getPoints(const QVector<QVector<double> >& variableValues,
-                               QVector<QPointF>& result)
+			       QVector<QPointF>& result)
 {
-    if (variableValues.isEmpty()) return ;
-    if (variableValues.first().isEmpty()) return ;
-    for (int i = 0 ; i < variableValues.size() ; ++i)
-    {
-        if(containsNan(variableValues[i]))
-        {
-            result << QPointF(NAN, NAN) ;
-            continue ;
-        }
-        for (int j = 0 ; j < valueVector.size() ; ++j)
-            valueVector[j] = variableValues[i][j] ;
-        try
-        {
-            result << QPointF(x.Eval(), y.Eval()) ;
-        }
-        catch(mu::Parser::exception_type &p)
-        {
-            errors << QObject::tr("Evaluation of muParser-Expression failed\nReason: ") + p.GetMsg().c_str() ;
-            valid = false ;
-        }
-    }
+	if (variableValues.isEmpty()) return ;
+	if (variableValues.first().isEmpty()) return ;
+	for (int i = 0 ; i < variableValues.size() ; ++i)
+	{
+		if(containsNan(variableValues[i]))
+		{
+			result << QPointF(NAN, NAN) ;
+			continue ;
+		}
+		for (int j = 0 ; j < valueVector.size() ; ++j)
+			valueVector[j] = variableValues[i][j] ;
+		try
+		{
+			result << QPointF(x.Eval(), y.Eval()) ;
+		}
+		catch(mu::Parser::exception_type &p)
+		{
+			errors << QObject::tr("Evaluation of muParser-Expression failed\nReason: ") + p.GetMsg().c_str() ;
+			valid = false ;
+		}
+	}
 }
 
 QwtSeriesData<QPointF>* specMetaParser::evaluate(const QVector<specModelItem*>& items)
 {
-    QVector<QVector<specModelItem*> > itemsPerPoint ;
-    QVector<QVector<double> > variableValues ;
-    QVector<QPointF> data ;
-    itemsToQuery(items, itemsPerPoint) ;
-    for (QVector<QVector<specModelItem*> >::Iterator i = itemsPerPoint.begin() ; i != itemsPerPoint.end() ; ++i)
-        getVariableValues(*i, variableValues) ;
-    getPoints(variableValues, data) ;
-    return new QwtPointSeriesData(data) ;
+	QVector<QVector<specModelItem*> > itemsPerPoint ;
+	QVector<QVector<double> > variableValues ;
+	QVector<QPointF> data ;
+	itemsToQuery(items, itemsPerPoint) ;
+	for (QVector<QVector<specModelItem*> >::Iterator i = itemsPerPoint.begin() ; i != itemsPerPoint.end() ; ++i)
+		getVariableValues(*i, variableValues) ;
+	getPoints(variableValues, data) ;
+	return new QwtPointSeriesData(data) ;
 }
 
 
@@ -183,7 +183,7 @@ QwtSeriesData<QPointF>* specMetaParser::evaluate(const QVector<specModelItem*>& 
 	QVector<QPointF> data ;
 	QVector<QVector<int> > indexes(evaluators.size(),QVector<int>(3));
 	for (int i = 0 ; i < evaluators.size() ; ++i)
-        evaluators[i]->indexRange(indexes[i][0], indexes[i][1], indexes[i][2], items.size()) ; // TODO do it over
+	evaluators[i]->indexRange(indexes[i][0], indexes[i][1], indexes[i][2], items.size()) ; // TODO do it over
 	int j = 0 ;
 	while (true)
 	{
@@ -199,14 +199,14 @@ QwtSeriesData<QPointF>* specMetaParser::evaluate(const QVector<specModelItem*>& 
 			int index = indexes[i][0]+indexes[i][2]*j ;
 			if (!(index < indexes[i][1])) break ;
 			currentItems << items[index] ;
-            evaluators[i]->xValues(items[index],xValues) ;
+	    evaluators[i]->xValues(items[index],xValues) ;
 		}
 		if (currentItems.size() != indexes.size()) break ; // termination for while loop
 
 		QVector<QVector<double> > substitutions(xValues.size(),QVector<double>(evaluators.size())) ;
 		for(int i = 0 ; i < evaluators.size() ; ++i)
 		{
-            QVector<double> values = evaluators[i]->values(currentItems[i],xValues) ;
+	    QVector<double> values = evaluators[i]->values(currentItems[i],xValues) ;
 			for (int k = 0 ; k < values.size() ; ++k)
 				substitutions[k][i] = values[k] ; // Matrix kippen...
 		}
@@ -229,7 +229,7 @@ QwtSeriesData<QPointF>* specMetaParser::evaluate(const QVector<specModelItem*>& 
 			}
 			catch(mu::Parser::exception_type &p)
 			{
-                errors << tr("Evaluation of muParser-Expression failed\nReason: %1").arg(p.GetMsg().c_str()) ;
+		errors << tr("Evaluation of muParser-Expression failed\nReason: %1").arg(p.GetMsg().c_str()) ;
 				valid = false ;
 			}
 		}
@@ -277,10 +277,10 @@ bool specMetaParser::containsNan(const QVector<double> &vector)
 
 bool specMetaParser::containsNan(const QVector<QVector<double> >& matrix, int column)
 {
-    for (int i = 0 ; i < matrix.size() ; ++i)
-        if (matrix[i].size() <= column || std::isnan(matrix[i][column]))
-            return true ;
-    return false ;
+	for (int i = 0 ; i < matrix.size() ; ++i)
+		if (matrix[i].size() <= column || std::isnan(matrix[i][column]))
+			return true ;
+	return false ;
 }
 
 void specMetaParser::attachRanges(QSet<specPlot *> plots, QColor color)
@@ -320,7 +320,7 @@ void specMetaParser::setRange(int variableNo, int rangeNo, int pointNo, double n
 		QStringList descriptor;
 		QStringList::const_iterator j = symbols.begin() ;
 		for (QList<specMetaVariable*>::const_iterator i = evaluators.begin() ;
-			 i < evaluators.end() && j != symbols.end() ; ++i, ++j)
+		     i < evaluators.end() && j != symbols.end() ; ++i, ++j)
 			descriptor += *j + " = " + (*i)->codeValue() ; // TODO this is a pain...
 		parent->changeDescriptor("variables", descriptor.join("\n")) ;
 		parent->setActiveLine("variables",variableNo) ;

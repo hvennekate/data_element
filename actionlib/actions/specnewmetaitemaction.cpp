@@ -5,7 +5,7 @@
 #include "specmetaitem.h"
 
 specNewMetaItemAction::specNewMetaItemAction(QObject *parent) :
-    specItemAction(parent)
+	specItemAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("document-new")) ;
 	setToolTip(tr("New item"));

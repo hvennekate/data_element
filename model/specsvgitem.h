@@ -12,16 +12,16 @@ class specSVGItem : public specModelItem
 public:
 	typedef QPair<qint8,qreal> dimension ;
 	enum SVGCornerPoint { undefined = -1,
-		center      = 0,
-		left        = 1,
-		right       = 2,
-		top         = 3,
-		bottom      = 4,
-		topLeft     = 5,
-		bottomLeft  = 6,
-		topRight    = 7,
-		bottomRight = 8,
-		size        = 9 } ;
+			      center      = 0,
+			      left        = 1,
+			      right       = 2,
+			      top         = 3,
+			      bottom      = 4,
+			      topLeft     = 5,
+			      bottomLeft  = 6,
+			      topRight    = 7,
+			      bottomRight = 8,
+			      size        = 9 } ;
 private:
 	QwtPlotSvgItem image ;
 	QByteArray data ;
@@ -57,7 +57,7 @@ public:
 	SVGCornerPoint setAnchor(const SVGCornerPoint&) ;
 	QIcon decoration() const ;
 	specUndoCommand *itemPropertiesAction(QObject *parentObject) ;
-    QString toolTip(const QString &column) const ;
+	QString toolTip(const QString &column) const ;
 private:
 	bounds ownBounds ;
 };

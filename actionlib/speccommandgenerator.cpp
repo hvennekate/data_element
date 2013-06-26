@@ -64,13 +64,13 @@ specUndoCommand *specCommandGenerator::commandById(int id) const
 	case specStreamable::plotTitleCommandId:
 	case specStreamable::plotYLabelCommandId:
 	case specStreamable::plotXLabelCommandId:
-        return generatePlotLabelCommand(id,parent) ;
-    case specStreamable::descriptorFlagsCommand:
-        return new specDescriptorFlagsCommand(parent) ;
-    case specStreamable::deleteDescriptorCommandId:
-        return new specDeleteDescriptorCommand(parent) ;
-    case specStreamable::renameDescriptorCommandId:
-        return new specRenameDescriptorCommand(parent) ;
+		return generatePlotLabelCommand(id,parent) ;
+	case specStreamable::descriptorFlagsCommand:
+		return new specDescriptorFlagsCommand(parent) ;
+	case specStreamable::deleteDescriptorCommandId:
+		return new specDeleteDescriptorCommand(parent) ;
+	case specStreamable::renameDescriptorCommandId:
+		return new specRenameDescriptorCommand(parent) ;
 	default:
 		return 0 ;
 	}

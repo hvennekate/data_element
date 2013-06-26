@@ -187,8 +187,8 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 bool specPlotWidget::saveFile()
 {
 	QFile file(windowFilePath() == tr("untitled") || sender() == saveAsAction ?
-			QFileDialog::getSaveFileName(this,"Name?","","spec-Dateien (*.spec)") :
-			windowFilePath()) ;
+			   QFileDialog::getSaveFileName(this,"Name?","","spec-Dateien (*.spec)") :
+			   windowFilePath()) ;
 	if (file.fileName().isEmpty()) return false ;
 	if (!file.open(QFile::WriteOnly))
 	{
@@ -205,40 +205,40 @@ bool specPlotWidget::saveFile()
 	zipDevice.open(bzipIODevice::WriteOnly) ;
 	QDataStream zipOut(&zipDevice) ;
 
-    QProgressDialog progress ;
-    progress.setCancelButton(0);
-    progress.setMinimumDuration(300);
-    progress.setWindowModality(Qt::WindowModal);
-    progress.setWindowTitle(tr("Saving ") + file.fileName());
-    progress.setMaximum(30);
-    progress.setLabel(new QLabel(tr("Saving plot"))) ;
-    progress.setValue(0);
-    zipOut << *plot ;
-    progress.setLabel(new QLabel(tr("Saving data items"))) ;
-    progress.setValue(1);
-    zipOut<< *items ;
-    progress.setLabel(new QLabel(tr("Saving log data"))) ;
-    progress.setValue(2);
-    zipOut<< *logWidget ;
-    progress.setLabel(new QLabel(tr("Saving meta data"))) ;
-    progress.setValue(3) ;
-    zipOut << *kineticWidget ;
-    progress.setLabel(new QLabel(tr("Saving undo history"))) ;
-    progress.setValue(4);
-    actions->setProgressDialog(&progress) ;
-    zipOut<< *actions ;
-    progress.setValue(progress.maximum());
-    qint8 visibility = 0, i = 1 ;
-    foreach(specDockWidget *subDock, subDocks)
-    {
-	    visibility += i * subDock->isVisible() ;
-	    i *= 2 ;
-    }
-    zipOut << visibility ;
+	QProgressDialog progress ;
+	progress.setCancelButton(0);
+	progress.setMinimumDuration(300);
+	progress.setWindowModality(Qt::WindowModal);
+	progress.setWindowTitle(tr("Saving ") + file.fileName());
+	progress.setMaximum(30);
+	progress.setLabel(new QLabel(tr("Saving plot"))) ;
+	progress.setValue(0);
+	zipOut << *plot ;
+	progress.setLabel(new QLabel(tr("Saving data items"))) ;
+	progress.setValue(1);
+	zipOut<< *items ;
+	progress.setLabel(new QLabel(tr("Saving log data"))) ;
+	progress.setValue(2);
+	zipOut<< *logWidget ;
+	progress.setLabel(new QLabel(tr("Saving meta data"))) ;
+	progress.setValue(3) ;
+	zipOut << *kineticWidget ;
+	progress.setLabel(new QLabel(tr("Saving undo history"))) ;
+	progress.setValue(4);
+	actions->setProgressDialog(&progress) ;
+	zipOut<< *actions ;
+	progress.setValue(progress.maximum());
+	qint8 visibility = 0, i = 1 ;
+	foreach(specDockWidget *subDock, subDocks)
+	{
+		visibility += i * subDock->isVisible() ;
+		i *= 2 ;
+	}
+	zipOut << visibility ;
 	zipDevice.close() ;
-    zipDevice.releaseDevice() ;
-    file.close();
-    changeFileName(file.fileName());
+	zipDevice.releaseDevice() ;
+	file.close();
+	changeFileName(file.fileName());
 	return true ;
 }
 
@@ -274,11 +274,11 @@ void specPlotWidget::selectionChanged(const QItemSelection & selected, const QIt
 	foreach(QModelIndex index, deselected.indexes())
 		if (!index.column() && index.isValid())
 			((specModelItem*) index.internalPointer())->detach() ;
-	
+
 	foreach(QModelIndex index, selected.indexes())
 		if (!index.column())
 			((specModelItem*) index.internalPointer())->attach(plot) ;
-	
+
 	plot->replot() ;
 }
 

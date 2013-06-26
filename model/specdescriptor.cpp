@@ -105,5 +105,5 @@ specDescriptor& specDescriptor::operator=(const QString& val)
 
 void specDescriptor::setFlags(spec::descriptorFlags f)
 {
-    properties = f ;
+	properties = f ;
 }

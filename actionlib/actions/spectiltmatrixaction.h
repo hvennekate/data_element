@@ -5,11 +5,11 @@
 
 class specTiltMatrixAction : public specRequiresItemAction
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit specTiltMatrixAction(QObject *parent = 0);
+	explicit specTiltMatrixAction(QObject *parent = 0);
 protected:
-    specUndoCommand* generateUndoCommand() ;
+	specUndoCommand* generateUndoCommand() ;
 };
 
 #endif // SPECTILTMATRIXACTION_H

@@ -18,7 +18,7 @@ svgItemProperties::svgItemProperties(specSVGItem* i, QWidget *parent) :
 	originalAspectRatio = (double) svgSize.width()/svgSize.height() ;
 	svgSize.scale(300,300,Qt::KeepAspectRatio);
 	ui->itemPreview->setFixedSize(svgSize) ;
-//	ui->itemPreview
+	//	ui->itemPreview
 
 	ui->anchorRadioButtons->setId(ui->topLeftRadio,     specSVGItem::topLeft);
 	ui->anchorRadioButtons->setId(ui->topRadio,         specSVGItem::top);
@@ -59,19 +59,19 @@ specUndoCommand* svgItemProperties::generateCommand(QObject *parent)
 			(specSVGItem::SVGCornerPoint) ui->anchorRadioButtons->checkedId() ;
 	specSVGItem::SVGCornerPoint oldAnchor = item->setAnchor(newAnchor) ;
 	specSVGItem::bounds newBounds =
-		{ specSVGItem::dimension(ui->xPixelsButton->isChecked() ?
-				QwtPlot::xBottom : QwtPlot::axisCnt,
-			ui->xValue->value()),
-		  specSVGItem::dimension(ui->yPixelsButton->isChecked() ?
-				QwtPlot::yLeft   : QwtPlot::axisCnt,
-			ui->yValue->value()),
-		  specSVGItem::dimension(ui->widthPixelsButton->isChecked()?
-				QwtPlot::xBottom : QwtPlot::axisCnt,
-			ui->widthValue->value()),
-		  specSVGItem::dimension(ui->heightPixelsButton->isChecked()?
-				QwtPlot::yLeft   : QwtPlot::axisCnt,
-			ui->heightValue->value())
-		},
+	{ specSVGItem::dimension(ui->xPixelsButton->isChecked() ?
+	  QwtPlot::xBottom : QwtPlot::axisCnt,
+	  ui->xValue->value()),
+	  specSVGItem::dimension(ui->yPixelsButton->isChecked() ?
+	  QwtPlot::yLeft   : QwtPlot::axisCnt,
+	  ui->yValue->value()),
+	  specSVGItem::dimension(ui->widthPixelsButton->isChecked()?
+	  QwtPlot::xBottom : QwtPlot::axisCnt,
+	  ui->widthValue->value()),
+	  specSVGItem::dimension(ui->heightPixelsButton->isChecked()?
+	  QwtPlot::yLeft   : QwtPlot::axisCnt,
+	  ui->heightValue->value())
+	},
 			oldBounds = item->getBounds() ;
 	if (newAnchor == oldAnchor && newBounds == oldBounds) return 0 ;
 
@@ -79,7 +79,7 @@ specUndoCommand* svgItemProperties::generateCommand(QObject *parent)
 	command->setParentObject(parent) ;
 	item->setBounds(newBounds) ;
 	command->setItem(((specModel*) parent)->index(item),oldBounds,oldAnchor) ;
-    command->setText(tr("Modify SVG item"));
+	command->setText(tr("Modify SVG item"));
 	return command ;
 }
 

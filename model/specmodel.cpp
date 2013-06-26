@@ -30,30 +30,30 @@ bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QLi
 		if (DescriptorProperties[descriptor] & spec::numeric)
 		{
 			double a = itemPointer(first)->descriptor(Descriptors[descriptor]).toDouble(),
-				b = itemPointer(second)->descriptor(Descriptors[descriptor]).toDouble() ;
+					b = itemPointer(second)->descriptor(Descriptors[descriptor]).toDouble() ;
 			equal &= b-tolerance <= a && a <= b+tolerance ;
 		}
 		else
 			equal &= itemPointer(first)->descriptor(Descriptors[descriptor]) ==
-				itemPointer(second)->descriptor(Descriptors[descriptor]) ;
+					itemPointer(second)->descriptor(Descriptors[descriptor]) ;
 	}
 	return equal ;
 }
 
 QStringList specModel::dataTypes() const
 {
-    return QStringList() << "wavenumber" << "signal" << "maximum intensity" ;
+	return QStringList() << "wavenumber" << "signal" << "maximum intensity" ;
 }
 
 bool specModel::exportData(QModelIndexList& list)
 {
 	QFile *exportFile = new QFile(QFileDialog::getSaveFileName(0,"File name","","ASCII files (*.asc)")) ;
-    exportDialog *exportFormat = new exportDialog(&Descriptors, dataTypes()) ;
-    if ( exportFile->fileName() == "" || ! exportFormat->exec() )
-    {
-        delete exportFormat ;
-        return false ;
-    }
+	exportDialog *exportFormat = new exportDialog(&Descriptors, dataTypes()) ;
+	if ( exportFile->fileName() == "" || ! exportFormat->exec() )
+	{
+		delete exportFormat ;
+		return false ;
+	}
 	exportFile->open(QIODevice::WriteOnly | QIODevice::Text) ;
 	QTextStream out(exportFile) ;
 	QList<QPair<bool,QString> > headerFormat = exportFormat->headerFormat() ;
@@ -65,7 +65,7 @@ bool specModel::exportData(QModelIndexList& list)
 		for (int i = 0 ; i < list.size() ; i++)
 			itemPointer(list[i])->exportData(headerFormat, dataFormat, out) ;
 	exportFile->close() ;
-    delete exportFormat ;
+	delete exportFormat ;
 	return true ;
 }
 
@@ -79,10 +79,10 @@ bool lessThanIndex(const QModelIndex& one, const QModelIndex& two)
 	int levelOne = ancestry(one).size(), levelTwo = ancestry(two).size() ;
 	if (levelOne == levelTwo)
 		return lessThanIndex(one.parent(), two.parent()) ;
-// old version:
+	// old version:
 	return levelOne < levelTwo ? lessThanIndex(one,two.parent()) :
-			lessThanIndex(one.parent(),two) ;
-// 	return levelOne < levelTwo ;
+				     lessThanIndex(one.parent(),two) ;
+	// 	return levelOne < levelTwo ;
 }
 
 QModelIndexList specModel::allChildren(const QModelIndex& parent) const
@@ -164,8 +164,8 @@ bool specModel::setHeaderData (int section,Qt::Orientation orientation,const QVa
 		emit headerDataChanged(Qt::Vertical  ,section,section) ;
 		return true ;
 	}
-	
-    if (role == spec::descriptorPropertyRole) // TODO introduce in names.h
+
+	if (role == spec::descriptorPropertyRole) // TODO introduce in names.h
 	{
 		DescriptorProperties[section] = (spec::descriptorFlags) value.toInt() ;
 		return true ;
@@ -208,7 +208,7 @@ void specModel::checkForNewDescriptors(const QList<specModelItem*>& list, const 
 			{
 				insertColumns(columnCount(parent),1,parent) ;
 				setHeaderData(columnCount(parent)-1,Qt::Horizontal,descriptor) ;
-                setHeaderData(columnCount(parent)-1,Qt::Horizontal,(int) pointer->descriptorProperties(descriptor), spec::descriptorPropertyRole) ;
+				setHeaderData(columnCount(parent)-1,Qt::Horizontal,(int) pointer->descriptorProperties(descriptor), spec::descriptorPropertyRole) ;
 			}
 		}
 	}
@@ -218,7 +218,7 @@ bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int 
 {
 	checkForNewDescriptors(list,parent) ;
 	row = row < rowCount(parent) ? row : rowCount(parent) ;
-	
+
 	emit layoutAboutToBeChanged() ;
 	beginInsertRows(parent, row, row+list.size()-1);
 	if (itemPointer(parent)->isFolder())
@@ -226,7 +226,7 @@ bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int 
 	bool retVal = itemPointer(parent)->addChildren(list,row) ;
 	endInsertRows();
 	emit layoutChanged() ;
-	
+
 	if (itemPointer(parent)->isFolder())
 		((specFolderItem*) itemPointer(parent))->haltRefreshes(false) ;
 	return retVal ;
@@ -254,7 +254,7 @@ QModelIndex specModel::parent(const QModelIndex & index) const
 QModelIndex specModel::index(int row, int column, const QModelIndex & parent) const
 {
 	specModelItem* pointer = itemPointer(parent)->isFolder() ?
-			((specFolderItem*) itemPointer(parent))->child(row) : 0 ;
+				((specFolderItem*) itemPointer(parent))->child(row) : 0 ;
 	return pointer ? createIndex(row,column,pointer) : QModelIndex() ;
 }
 
@@ -262,7 +262,7 @@ Qt::ItemFlags specModel::flags(const QModelIndex &index) const
 {
 	if(!index.isValid())
 		return Qt::ItemIsEnabled | Qt::ItemIsDropEnabled ;
-	
+
 	Qt::ItemFlags defaultFlags = QAbstractItemModel::flags(index) | ( itemPointer(index)->isFolder() ? Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled : Qt::ItemIsDragEnabled);
 	if (itemPointer(index)->isEditable(Descriptors[index.column()]))
 		return  defaultFlags | Qt::ItemIsEditable ;
@@ -275,9 +275,9 @@ QVariant specModel::data(const QModelIndex &index, int role) const
 {
 	if (!index.isValid() || index.row() >= rowCount(parent(index)))
 		return QVariant();
-	
+
 	specModelItem* pointer = itemPointer(index) ;
-	
+
 	switch(role)
 	{
 	case Qt::DecorationRole :
@@ -290,8 +290,8 @@ QVariant specModel::data(const QModelIndex &index, int role) const
 		return pointer->pen().color() ;
 	case spec::fullContentRole :
 		return pointer->descriptor(Descriptors[index.column()],true) ;
-    case Qt::EditRole :
-        return pointer->editDescriptor(Descriptors[index.column()]) ;
+	case Qt::EditRole :
+		return pointer->editDescriptor(Descriptors[index.column()]) ;
 	case Qt::ToolTipRole :
 		return pointer->toolTip(Descriptors[index.column()]) ;
 	}
@@ -352,23 +352,23 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 }
 
 QVariant specModel::headerData(int section, Qt::Orientation orientation,
-		    int role) const
+			       int role) const
 {
 	Q_UNUSED(orientation)
-    if (role == Qt::DisplayRole)
-        return Descriptors[section] ;
-    if (role == spec::descriptorPropertyRole)
-        return (int) DescriptorProperties[section] ;
-    return QVariant();
+	if (role == Qt::DisplayRole)
+		return Descriptors[section] ;
+	if (role == spec::descriptorPropertyRole)
+		return (int) DescriptorProperties[section] ;
+	return QVariant();
 
 }
 
-bool specModel::removeRows(int position, int rows, const QModelIndex &parent) 
+bool specModel::removeRows(int position, int rows, const QModelIndex &parent)
 { // TODO check if index is valid?
-// 	if(!(position+rows <= rowCount(index))) return false ; maybe necessary...
-    Q_UNUSED(position)
-    Q_UNUSED(rows)
-    Q_UNUSED(parent)
+	// 	if(!(position+rows <= rowCount(index))) return false ; maybe necessary...
+	Q_UNUSED(position)
+	Q_UNUSED(rows)
+	Q_UNUSED(parent)
 	if (position < 0 || rows < 1) return false ;
 	if (dontDelete)
 	{
@@ -376,8 +376,8 @@ bool specModel::removeRows(int position, int rows, const QModelIndex &parent)
 		return true ;
 	}
 
-    if (dropBuddy) dropBuddy->deleteInternally(this) ;
-    return true ;
+	if (dropBuddy) dropBuddy->deleteInternally(this) ;
+	return true ;
 }
 
 void specModel::setInternalDrop(bool val)
@@ -431,7 +431,7 @@ bool specModel::mimeAcceptable(const QMimeData *data) const
 }
 
 bool specModel::dropMimeData(const QMimeData *data,
-     Qt::DropAction action, int row, int column, const QModelIndex &parent)
+			     Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
 	Q_UNUSED(column)
 	if (action == Qt::IgnoreAction)
@@ -607,41 +607,41 @@ void specModel::signalChanged(const QModelIndex &i)
 
 	QModelIndex begin = index(i.row(),0,i.parent()),
 			end = index(i.row(),columnCount(i)-1,i.parent()) ;
-    signalChanged(begin, end) ;
-    specModelItem *item = itemPointer(i) ;
+	signalChanged(begin, end) ;
+	specModelItem *item = itemPointer(i) ;
 	checkForNewDescriptors(QList<specModelItem*>() << item, i.parent());
 	emit dataChanged(begin,end) ;
 }
 
 void specModel::signalChanged(QModelIndex begin, QModelIndex end)
 {
-    while (begin.parent() != end.parent())
-    {
-        if (begin.isValid())
-            begin = begin.parent() ;
-        else
-            end = QModelIndex() ;
-    }
+	while (begin.parent() != end.parent())
+	{
+		if (begin.isValid())
+			begin = begin.parent() ;
+		else
+			end = QModelIndex() ;
+	}
 
-    QModelIndex i(begin) ;
-    QList<specModelItem*> items ;
+	QModelIndex i(begin) ;
+	QList<specModelItem*> items ;
 
-    do
-    {
-        specModelItem* pointer = itemPointer(i) ;
-        items << pointer;
-        if (pointer->children())
-        {
-            QModelIndex firstChild = index(0,0,i),
-                    lastChild = index(pointer->children()-1, 0, i) ;
-            signalChanged(firstChild, lastChild) ;
-        }
-        i = i.sibling(i.row()+1, 0) ;
+	do
+	{
+		specModelItem* pointer = itemPointer(i) ;
+		items << pointer;
+		if (pointer->children())
+		{
+			QModelIndex firstChild = index(0,0,i),
+					lastChild = index(pointer->children()-1, 0, i) ;
+			signalChanged(firstChild, lastChild) ;
+		}
+		i = i.sibling(i.row()+1, 0) ;
 
-    } while (i != end && i.isValid()) ;
+	} while (i != end && i.isValid()) ;
 
-    checkForNewDescriptors(items, begin.parent()) ;
-    emit dataChanged(begin, index(end.row(), Descriptors.count(), end.parent())) ;
+	checkForNewDescriptors(items, begin.parent()) ;
+	emit dataChanged(begin, index(end.row(), Descriptors.count(), end.parent())) ;
 }
 
 void specModel::expandFolders(QModelIndexList &list) const
@@ -662,71 +662,71 @@ void specModel::expandFolders(QModelIndexList &list) const
 
 QStringList specModel::mimeTypes() const
 {
-    QStringList types ;
-    foreach(specMimeConverter* converter, mimeConverters())
-        types << converter->importableTypes() ;
-    return types ;
+	QStringList types ;
+	foreach(specMimeConverter* converter, mimeConverters())
+		types << converter->importableTypes() ;
+	return types ;
 }
 
 void specModel::setDescriptorProperties(spec::descriptorFlags flags, const QString& key)
 {
-    if(Descriptors.contains(key))
-        DescriptorProperties[Descriptors.indexOf(key)] = flags ;
-    else
-    {
-        Descriptors << key ;
-        DescriptorProperties << flags ;
-    }
+	if(Descriptors.contains(key))
+		DescriptorProperties[Descriptors.indexOf(key)] = flags ;
+	else
+	{
+		Descriptors << key ;
+		DescriptorProperties << flags ;
+	}
 }
 
 void specModel::deleteDescriptor(const QString &key)
 {
-    int i = Descriptors.indexOf(key) ;
-    if (i < Descriptors.size() && i < DescriptorProperties.size())
-    {
-        Descriptors.takeAt(i) ;
-        DescriptorProperties.takeAt(i) ;
-    }
-    root->deleteDescriptor(key) ;
+	int i = Descriptors.indexOf(key) ;
+	if (i < Descriptors.size() && i < DescriptorProperties.size())
+	{
+		Descriptors.takeAt(i) ;
+		DescriptorProperties.takeAt(i) ;
+	}
+	root->deleteDescriptor(key) ;
 }
 
 void specModel::renameDescriptors(const QMap<QString, QString> &map)
 {
-    for (QStringList::iterator i = Descriptors.begin() ; i != Descriptors.end() ; ++i)
-        if (map.contains(*i))
-            *i = map[*i] ;
-    root->renameDescriptors(map) ;
+	for (QStringList::iterator i = Descriptors.begin() ; i != Descriptors.end() ; ++i)
+		if (map.contains(*i))
+			*i = map[*i] ;
+	root->renameDescriptors(map) ;
 }
 
 void specModel::dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const
 {
-    root->dumpDescriptor(destination, key) ;
+	root->dumpDescriptor(destination, key) ;
 }
 
 void specModel::restoreDescriptor(qint16 position, spec::descriptorFlags flags, QListIterator<specDescriptor> &origin, const QString &key)
 {
-    if (!Descriptors.contains(key))
-    {
-	Descriptors.insert(position, key) ;
-	DescriptorProperties.insert(position, flags) ;
-    }
-    root->restoreDescriptor(origin, key) ;
+	if (!Descriptors.contains(key))
+	{
+		Descriptors.insert(position, key) ;
+		DescriptorProperties.insert(position, flags) ;
+	}
+	root->restoreDescriptor(origin, key) ;
 }
 
 QList<specFileImportFunction> specModel::acceptableImportFunctions() const
 {
-    return QList<specFileImportFunction>()
-            << readHVFile
-            << readPEFile
-            << readPEBinary
-            << readJCAMPFile
-            << readSKHIFile
-            << readXYFILE ;
+	return QList<specFileImportFunction>()
+			<< readHVFile
+			<< readPEFile
+			<< readPEBinary
+			<< readJCAMPFile
+			<< readSKHIFile
+			<< readXYFILE ;
 }
 
 QValidator* specModel::createValidator(const QModelIndex &i) const
 {
-    if (itemPointer(i)->isNumeric(Descriptors[i.column()]))
-        return new QDoubleValidator ;
-    return 0 ;
+	if (itemPointer(i)->isNumeric(Descriptors[i.column()]))
+		return new QDoubleValidator ;
+	return 0 ;
 }

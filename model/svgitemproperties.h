@@ -7,7 +7,7 @@ class specSVGItem ;
 class specUndoCommand ;
 
 namespace Ui {
-class svgItemProperties;
+	class svgItemProperties;
 }
 
 class svgItemProperties : public QDialog

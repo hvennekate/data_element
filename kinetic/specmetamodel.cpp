@@ -43,10 +43,10 @@ void specMetaModel::setModels(specModelItem *item)
 
 QStringList specMetaModel::dataTypes() const
 {
-    return QStringList() << "x" << "y" << "fit" ;
+	return QStringList() << "x" << "y" << "fit" ;
 }
 
 QList<specFileImportFunction> specMetaModel::acceptableImportFunctions() const
 {
-    return QList<specFileImportFunction>() ;
+	return QList<specFileImportFunction>() ;
 }

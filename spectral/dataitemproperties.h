@@ -5,7 +5,7 @@
 #include "specdataitem.h"
 
 namespace Ui {
-class dataItemProperties;
+	class dataItemProperties;
 }
 
 class dataItemProperties : public QDialog

@@ -5,9 +5,9 @@
 
 class specCutAction : public specDeleteAction
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit specCutAction(QObject *parent = 0);
+	explicit specCutAction(QObject *parent = 0);
 protected:
 	specUndoCommand* generateUndoCommand() ;
 

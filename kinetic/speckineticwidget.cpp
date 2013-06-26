@@ -17,11 +17,11 @@ specKineticWidget::specKineticWidget(QWidget *parent)
 	setWhatsThis(tr("Meta dock widget - In this widget, further processing of the primary data can be done (integration, max, min, etc.)"));
 	plot = new specPlot ;
 	items = new specMetaView(this) ;
-	
+
 	plot->setMinimumHeight(100) ;
-//	plot->setAxisTitle(QwtPlot::yLeft,"cm<sup>-1</sup> <font face=\"Symbol\">D</font>mOD") ;
-//	plot->setAxisTitle(QwtPlot::xBottom,"ps") ;
-	
+	//	plot->setAxisTitle(QwtPlot::yLeft,"cm<sup>-1</sup> <font face=\"Symbol\">D</font>mOD") ;
+	//	plot->setAxisTitle(QwtPlot::xBottom,"ps") ;
+
 	items->setModel(new specMetaModel(items)) ;
 	new specGenericMimeConverter(items->model());
 	new specMimeTextExporter(items->model()) ;
@@ -49,7 +49,7 @@ void specKineticWidget::selectionChanged(const QItemSelection & selected, const 
 	foreach(QModelIndex index, deselected.indexes())
 		if (!index.column() && index.isValid() && !((specModelItem*) index.internalPointer())->isFolder())
 			((specCanvasItem*) index.internalPointer())->detach() ; // TODO create kinetic folder or extend specFolderItem
-	
+
 	foreach(QModelIndex index, selected.indexes())
 		if (!index.column() && !((specModelItem*) index.internalPointer())->isFolder())
 			((specCanvasItem*) index.internalPointer())->attach(plot) ;
@@ -60,10 +60,10 @@ void specKineticWidget::selectionChanged(const QItemSelection & selected, const 
 // TODO shift to parent class of kineticWidget and plotWidget
 void specKineticWidget::svgModification(bool mod)
 {
-    if (mod) connect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
-    else disconnect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
+	if (mod) connect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
+	else disconnect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
 
-    plot->svgPicker()->highlightSelectable(mod) ;
+	plot->svgPicker()->highlightSelectable(mod) ;
 }
 
 QList<QWidget*> specKineticWidget::mainWidgets() const

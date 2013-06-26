@@ -2,18 +2,18 @@
 #include <QLabel>
 
 exportFormatItem::exportFormatItem ( const QStringList& values, QWidget *parent )
-    : QWidget ( parent )
+	: QWidget ( parent )
 {
 	Value = new QComboBox() ;
 	Separator = new QComboBox() ;
 	removeButton = new QPushButton(QIcon(":/remove.png"),"") ;
 	layout = new QHBoxLayout() ;
-	
-    QStringList separators ;
+
+	QStringList separators ;
 	separators << "none" << "space" << "tab" << "new line" ;
 	Value->addItems(values) ;
 	Separator->addItems(separators) ;
-	
+
 	layout->addWidget(new QLabel("value:")) ;
 	layout->addWidget(Value) ;
 	layout->addWidget(new QLabel("separator:")) ;
@@ -22,11 +22,11 @@ exportFormatItem::exportFormatItem ( const QStringList& values, QWidget *parent 
 	layout->addWidget(removeButton) ;
 	layout->setContentsMargins(0,0,0,0) ;
 	setLayout(layout) ;
-	
+
 	removeButton->setFixedHeight(16) ;
 	removeButton->setFixedWidth(16) ;
 	removeButton->setFlat(true) ;
-	
+
 	connect(removeButton,SIGNAL(clicked()),this,SLOT(remove())) ;
 
 }
@@ -65,10 +65,10 @@ spec::value exportFormatItem::value()
 
 void exportFormatItem::setValue(spec::value v)
 {
-    Value->setCurrentIndex(v) ;
+	Value->setCurrentIndex(v) ;
 }
 
 void exportFormatItem::setSeparator(spec::separator s)
 {
-    Separator->setCurrentIndex(s) ;
+	Separator->setCurrentIndex(s) ;
 }

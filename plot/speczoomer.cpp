@@ -2,15 +2,15 @@
 #include <QTextStream>
 
 specZoomer::specZoomer(QwtPlotCanvas *canvas)
- : QwtPlotZoomer(canvas,false)
+	: QwtPlotZoomer(canvas,false)
 {
 	setTrackerMode(AlwaysOn);
-	
+
 	setMousePattern(QwtEventPattern::MouseSelect1, Qt::MidButton) ;
 	setMousePattern(QwtEventPattern::MouseSelect4, Qt::MidButton) ;
 	setMousePattern(QwtEventPattern::MouseSelect2, Qt::MidButton, Qt::ControlModifier);
 	setMousePattern(QwtEventPattern::MouseSelect3, Qt::RightButton);
-	
+
 	setRubberBandPen(QColor(Qt::darkBlue)) ;
 	setTrackerPen(QColor(Qt::darkBlue)) ;
 }

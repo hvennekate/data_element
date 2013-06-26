@@ -11,9 +11,9 @@
 specPlotStyle::specPlotStyle()
 	: PLOTSTYLEINITIALIZER
 {
-}
+		  }
 
-specPlotStyle::specPlotStyle(QDataStream& in)
+	specPlotStyle::specPlotStyle(QDataStream& in)
 	: PLOTSTYLEINITIALIZER
 
 {
@@ -23,7 +23,7 @@ specPlotStyle::specPlotStyle(QDataStream& in)
 specPlotStyle::specPlotStyle(const specCanvasItem *c)
 	: PLOTSTYLEINITIALIZER
 {
-	initialize(c) ;
+		  initialize(c) ;
 }
 
 void specPlotStyle::initialize(const specCanvasItem *curve)
@@ -60,8 +60,8 @@ void specPlotStyle::readFromStream(QDataStream &in)
 	   >> penStyle ;
 	if (symbolStyle != noSymbol)
 		in >> symbolSize
-		    >> symbolPenColor
-		    >> symbolBrushColor ;
+		   >> symbolPenColor
+		   >> symbolBrushColor ;
 }
 
 void specPlotStyle::apply(specCanvasItem *c) const

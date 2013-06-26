@@ -13,18 +13,18 @@ class QMimeData ;
 class asciiExporter
 {
 public:
-    enum modelType { log, data, meta } ;
-    asciiExporter(modelType model);
-    QString content(QVector<int> ) const ;
-    ~asciiExporter() ;
-    void readFromStream(QDataStream &in) ;
+	enum modelType { log, data, meta } ;
+	asciiExporter(modelType model);
+	QString content(QVector<int> ) const ;
+	~asciiExporter() ;
+	void readFromStream(QDataStream &in) ;
 private:
-    specModel* modelPointer ;
-    specSpectrumPlot plot ;
-    specDataView view ;
-    specModel itemModel ;
-    specLogWidget logWidget ;
-    specKineticWidget kineticWidget ;
+	specModel* modelPointer ;
+	specSpectrumPlot plot ;
+	specDataView view ;
+	specModel itemModel ;
+	specLogWidget logWidget ;
+	specKineticWidget kineticWidget ;
 };
 
 #endif // ASCIIEXPORTER_H

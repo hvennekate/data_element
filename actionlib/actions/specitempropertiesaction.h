@@ -5,9 +5,9 @@
 
 class specItemPropertiesAction : public specItemAction
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    explicit specItemPropertiesAction(QObject *parent = 0);
+	explicit specItemPropertiesAction(QObject *parent = 0);
 
 private:
 	specUndoCommand* generateUndoCommand() ;

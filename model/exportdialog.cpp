@@ -5,44 +5,44 @@
 #include <QLabel>
 
 exportDialog::exportDialog (QStringList* Descriptors, const QStringList &DataTypes, QWidget *parent )
-    : QDialog ( parent ),
-      descriptors(Descriptors),
-      dataTypes(DataTypes),
-      scrollData(0)
+	: QDialog ( parent ),
+	  descriptors(Descriptors),
+	  dataTypes(DataTypes),
+	  scrollData(0)
 {
 	setWindowTitle(tr("Output format")) ;
 	setMinimumWidth(400) ;
-	
+
 	layout = new QVBoxLayout(this) ;
 	setLayout(layout) ;
 	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok
-			| QDialogButtonBox::Cancel);
+							   | QDialogButtonBox::Cancel);
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept()));
 	connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject()));
-	
+
 	prepareHeader() ;
 	prepareData() ;
 	layout->addWidget(new QLabel("Item description format")) ;
 	layout->addWidget(scrollHeader) ;
-    if (scrollData)
-    {
-        layout->addWidget(new QLabel("Individual data point output format")) ;
-        layout->addWidget(scrollData) ;
-    }
+	if (scrollData)
+	{
+		layout->addWidget(new QLabel("Individual data point output format")) ;
+		layout->addWidget(scrollData) ;
+	}
 	layout->addWidget(buttonBox) ;
 }
 
 void exportDialog::prepareHeader()
 {
 	scrollHeader = new QScrollArea() ;
-	
+
 	//set up scroll widget
 	QWidget *scrollWidget = new QWidget() ;
 	inLayout = new QVBoxLayout(scrollWidget) ;
 	scrollWidget->setLayout(inLayout) ;
 	scrollHeader->setWidget(scrollWidget) ;
 	scrollHeader->setWidgetResizable(true) ;
-	
+
 	// prepare add button
 	QWidget *add = new QWidget() ;
 	QHBoxLayout *addButtonLayout = new QHBoxLayout() ;
@@ -56,7 +56,7 @@ void exportDialog::prepareHeader()
 	add->setLayout(addButtonLayout) ;
 	inLayout->addWidget(add) ;
 	connect(addButton,SIGNAL(clicked()),this,SLOT(addHeaderItem())) ;
-	
+
 	// styling layout of scroll area
 	inLayout->addStretch() ;
 	inLayout->setSpacing(0) ;
@@ -65,16 +65,16 @@ void exportDialog::prepareHeader()
 
 void exportDialog::prepareData()
 {
-    if (dataTypes.isEmpty()) return ;
+	if (dataTypes.isEmpty()) return ;
 	scrollData = new QScrollArea() ;
-	
+
 	//set up scroll widget
 	QWidget *scrollWidget = new QWidget() ;
 	dataLayout = new QVBoxLayout(scrollWidget) ;
 	scrollWidget->setLayout(dataLayout) ;
 	scrollData->setWidget(scrollWidget) ;
 	scrollData->setWidgetResizable(true) ;
-	
+
 	// prepare add button
 	QWidget *add = new QWidget() ;
 	QHBoxLayout *addButtonLayout = new QHBoxLayout() ;
@@ -88,41 +88,41 @@ void exportDialog::prepareData()
 	add->setLayout(addButtonLayout) ;
 	dataLayout->addWidget(add) ;
 	connect(addDataButton,SIGNAL(clicked()),this,SLOT(addDataItem())) ;
-	
+
 	// styling layout of scroll area
 	dataLayout->addStretch() ;
 	dataLayout->setSpacing(0) ;
 	dataLayout->setContentsMargins(0,0,0,0) ;
 
-    exportFormatItem* pointer ;
-    for (int i = 0 ; i < dataTypes.size() ; ++i)
-    {
-        addDataItem();
-        if (dataLayout->itemAt(i) &&
-                (pointer =
-                 dynamic_cast<exportFormatItem*>(dataLayout->itemAt(i)->widget())))
-        {
-            pointer->setValue((spec::value) i) ;
-            pointer->setSeparator(spec::space) ;
-        }
-    }
+	exportFormatItem* pointer ;
+	for (int i = 0 ; i < dataTypes.size() ; ++i)
+	{
+		addDataItem();
+		if (dataLayout->itemAt(i) &&
+				(pointer =
+				 dynamic_cast<exportFormatItem*>(dataLayout->itemAt(i)->widget())))
+		{
+			pointer->setValue((spec::value) i) ;
+			pointer->setSeparator(spec::space) ;
+		}
+	}
 
-    if (!dataTypes.isEmpty() &&
-            dataLayout->itemAt(dataTypes.size()-1) &&
-            (pointer =
-             dynamic_cast<exportFormatItem*>(dataLayout->itemAt(dataTypes.size()-1)->widget())))
-        pointer->setSeparator(spec::newline) ;
+	if (!dataTypes.isEmpty() &&
+			dataLayout->itemAt(dataTypes.size()-1) &&
+			(pointer =
+			 dynamic_cast<exportFormatItem*>(dataLayout->itemAt(dataTypes.size()-1)->widget())))
+		pointer->setSeparator(spec::newline) ;
 }
 
 void exportDialog::addHeaderItem()
 {
-    inLayout->insertWidget(inLayout->count()-2,new exportLayoutItem(*descriptors, this)) ;
+	inLayout->insertWidget(inLayout->count()-2,new exportLayoutItem(*descriptors, this)) ;
 }
 
 void exportDialog::addDataItem()
 {
-    if (dataTypes.isEmpty()) return ;
-    dataLayout->insertWidget(dataLayout->count()-2,new exportFormatItem(dataTypes, this)) ;
+	if (dataTypes.isEmpty()) return ;
+	dataLayout->insertWidget(dataLayout->count()-2,new exportFormatItem(dataTypes, this)) ;
 }
 
 QList<QPair<spec::value,QString> > exportDialog::dataFormat()
@@ -131,7 +131,7 @@ QList<QPair<spec::value,QString> > exportDialog::dataFormat()
 	for (int i = 0 ; i < dataLayout->count()-1 ; i++)
 	{
 		exportFormatItem* pointer ;
-        if (dataLayout->itemAt(i) && (pointer = dynamic_cast<exportFormatItem*>(dataLayout->itemAt(i)->widget())))
+		if (dataLayout->itemAt(i) && (pointer = dynamic_cast<exportFormatItem*>(dataLayout->itemAt(i)->widget())))
 			returnData << QPair<spec::value, QString>(pointer->value(), pointer->separator()) ;
 	}
 	return returnData ;

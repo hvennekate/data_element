@@ -23,22 +23,22 @@
 class sortItemsByDescriptionFunctor
 {
 private:
-    const QStringList *comparisons ;
+	const QStringList *comparisons ;
 public:
-    sortItemsByDescriptionFunctor(const QStringList *c) : comparisons(c) {}
-    bool operator() (specModelItem const* a, specModelItem const* b)
-    {
-        foreach(QString value, *comparisons)
-        {
-            if (a->descriptor(value, true) == b->descriptor(value, true)) continue ;
-            if (a->descriptorProperties(value) & spec::numeric)
-                return a->descriptor(value).toDouble() <b->descriptor(value).toDouble() ;
-            return a->descriptor(value, true) < b->descriptor(value, true) ;
-        }
-        if (!b->dataSize()) return false ;
-        if (!a->dataSize()) return true ;
-        return a->sample(0).x() < b->sample(0).x() ;
-    }
+	sortItemsByDescriptionFunctor(const QStringList *c) : comparisons(c) {}
+	bool operator() (specModelItem const* a, specModelItem const* b)
+	{
+		foreach(QString value, *comparisons)
+		{
+			if (a->descriptor(value, true) == b->descriptor(value, true)) continue ;
+			if (a->descriptorProperties(value) & spec::numeric)
+				return a->descriptor(value).toDouble() <b->descriptor(value).toDouble() ;
+			return a->descriptor(value, true) < b->descriptor(value, true) ;
+		}
+		if (!b->dataSize()) return false ;
+		if (!a->dataSize()) return true ;
+		return a->sample(0).x() < b->sample(0).x() ;
+	}
 };
 
 class mergeActionThread : public specWorkerThread
@@ -95,10 +95,10 @@ public:
 
 		// Create and insert new merged items
 		int total = items.size() ;
-        QStringList comparisons ;
-        foreach(stringDoublePair pair, criteria)
-            comparisons << pair.first ;
-        sortItemsByDescriptionFunctor sorter(&comparisons) ;
+		QStringList comparisons ;
+		foreach(stringDoublePair pair, criteria)
+			comparisons << pair.first ;
+		sortItemsByDescriptionFunctor sorter(&comparisons) ;
 		while (!items.isEmpty())
 		{
 			int progress = total-items.size() ;
@@ -112,7 +112,7 @@ public:
 
 			QVector<specModelItem*> toInsert ;
 			int chunkSize =chunk.size() ;
-            qSort(chunk.begin(), chunk.end(), sorter) ;
+			qSort(chunk.begin(), chunk.end(), sorter) ;
 			while (!chunk.isEmpty())
 			{
 				emit progressValue(progress+chunkSize-chunk.size()) ;
@@ -120,8 +120,8 @@ public:
 				specDataItem *newItem = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
 				QList<specDataItem*> toMergeWith ;
 				// look for items to merge with
-                do toMergeWith << chunk.takeFirst() ;
-                while (!chunk.isEmpty() && itemsAreEqual(toMergeWith.first(), chunk.first(), criteria)) ;
+				do toMergeWith << chunk.takeFirst() ;
+				while (!chunk.isEmpty() && itemsAreEqual(toMergeWith.first(), chunk.first(), criteria)) ;
 
 				toBeDeleted << toMergeWith.toVector() ;
 				// if there are others, do the merge
@@ -134,40 +134,40 @@ public:
 							// generate reference spectrum
 							QMap<double,double> reference ;
 							newItem->revalidate();
-                            for (size_t i = 0 ; i < newItem->dataSize() ; ++i)
+							for (size_t i = 0 ; i < newItem->dataSize() ; ++i)
 							{
-                                const QPointF point = newItem->sample(i) ;
+								const QPointF point = newItem->sample(i) ;
 								reference[point.x()] = point.y() ;
 							}
 
 							// define spectral ranges
-                            specRange *range = new specRange(reference.begin().key(), (reference.end() -1).key()) ;
-                            QwtPlotItemList ranges ;
-                            ranges << range ; // DANGER
-                            // protection against nan values (make sure spectra do indeed overlap)
-                            int overlappingCount = 0 ;
-                            for(size_t i = 0 ; i < other->dataSize() ; ++i)
-                            {
-                                overlappingCount += range->contains(other->sample(i).x()) ;
-                                if (overlappingCount == 2) break ;
-                            }
-                            if (overlappingCount == 2)
-                            {
-                                QwtPlotItemList spectra ;
-                                for (QList<specDataItem*>::iterator i = toMergeWith.begin() ; i != toMergeWith.end() ; ++i)
-                                    spectra << (QwtPlotItem*) *i ;
+							specRange *range = new specRange(reference.begin().key(), (reference.end() -1).key()) ;
+							QwtPlotItemList ranges ;
+							ranges << range ; // DANGER
+							// protection against nan values (make sure spectra do indeed overlap)
+							int overlappingCount = 0 ;
+							for(size_t i = 0 ; i < other->dataSize() ; ++i)
+							{
+								overlappingCount += range->contains(other->sample(i).x()) ;
+								if (overlappingCount == 2) break ;
+							}
+							if (overlappingCount == 2)
+							{
+								QwtPlotItemList spectra ;
+								for (QList<specDataItem*>::iterator i = toMergeWith.begin() ; i != toMergeWith.end() ; ++i)
+									spectra << (QwtPlotItem*) *i ;
 
-                                // perform spectral adaptation
-                                // TODO NAN protection
-				specMultiCommand *correctionCommand= specSpectrumPlot::generateCorrectionCommand(ranges, QwtPlotItemList() << (QwtPlotItem*) other, reference, model, true, true) ;
-                                correctionCommand->redo();
-                                *newItem += *((specDataItem*) other) ;
-                                correctionCommand->undo();
-                                delete correctionCommand ;
-                            }
-                            else
-                                *newItem += *((specDataItem*) other) ;
-                            delete range ;
+								// perform spectral adaptation
+								// TODO NAN protection
+								specMultiCommand *correctionCommand= specSpectrumPlot::generateCorrectionCommand(ranges, QwtPlotItemList() << (QwtPlotItem*) other, reference, model, true, true) ;
+								correctionCommand->redo();
+								*newItem += *((specDataItem*) other) ;
+								correctionCommand->undo();
+								delete correctionCommand ;
+							}
+							else
+								*newItem += *((specDataItem*) other) ;
+							delete range ;
 						}
 					}
 					else
@@ -235,7 +235,7 @@ specUndoCommand* specMergeAction::generateUndoCommand()
 	if (selection.size() < 2) return 0 ;
 	QList<specDataItem*> items ;
 	foreach(QModelIndex index, selection)
-		 items << dynamic_cast<specDataItem*>(model->itemPointer(index)) ;
+		items << dynamic_cast<specDataItem*>(model->itemPointer(index)) ;
 	items.removeAll(0) ;
 	if (items.isEmpty()) return 0 ;
 
@@ -284,7 +284,7 @@ bool specMergeAction::getMergeCriteria(QList<stringDoublePair>& toCompare, const
 		descriptorLayout->addWidget(new QLabel("Numerical tolerance",descriptorMatch),0,1);
 	QScrollArea *scrollArea = new QScrollArea ;
 	QWidget *areaWidget = new QWidget ;
-    QCheckBox *spectralAdaptation = new QCheckBox(tr("Try to align merged data sets using offset/slope correction"),descriptorMatch) ;
+	QCheckBox *spectralAdaptation = new QCheckBox(tr("Try to align merged data sets using offset/slope correction"),descriptorMatch) ;
 	areaWidget->setLayout(descriptorLayout) ;
 	scrollArea->setWidget(areaWidget) ;
 	dialogLayout->addWidget(scrollArea) ;
@@ -314,7 +314,7 @@ bool mergeActionThread::itemsAreEqual(specModelItem* first, specModelItem* secon
 		if (tolerance != -1)
 		{
 			double a = first->descriptor(criterion.first).toDouble(),
-				b = second->descriptor(criterion.first).toDouble() ;
+					b = second->descriptor(criterion.first).toDouble() ;
 			if (!(b-tolerance <= a && a <= b+tolerance)) return false ;
 		}
 		else if (first->descriptor(criterion.first,true) != second->descriptor(criterion.first,true))

@@ -6,26 +6,26 @@
 class stringListValidator ;
 
 namespace Ui {
-class specExchangeDescriptorXDialog;
+	class specExchangeDescriptorXDialog;
 }
 
 class specExchangeDescriptorXDialog : public QDialog
 {
-    Q_OBJECT
-    
+	Q_OBJECT
+
 public:
-    explicit specExchangeDescriptorXDialog(const QStringList& items, QWidget *parent = 0);
-    QString descriptorToConvert() const ;
-    QString newDescriptor() const ;
-    ~specExchangeDescriptorXDialog();
-    
+	explicit specExchangeDescriptorXDialog(const QStringList& items, QWidget *parent = 0);
+	QString descriptorToConvert() const ;
+	QString newDescriptor() const ;
+	~specExchangeDescriptorXDialog();
+
 private slots:
-    void on_columnToConvert_currentIndexChanged(const QString &arg1) ;
+	void on_columnToConvert_currentIndexChanged(const QString &arg1) ;
 
 private:
-    Ui::specExchangeDescriptorXDialog *ui;
-    QStringList entries ;
-    stringListValidator *validator ;
+	Ui::specExchangeDescriptorXDialog *ui;
+	QStringList entries ;
+	stringListValidator *validator ;
 };
 
 #endif // SPECEXCHANGEDESCRIPTORXDIALOG_H

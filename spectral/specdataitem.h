@@ -13,14 +13,14 @@
 class specDataItem : public specLogEntryItem
 {
 	friend class dataItemProperties ;
-    friend class specLegacyDataItem ;
+	friend class specLegacyDataItem ;
 private:
 	double offset, slope, factor, xshift ;
 	int zeroMultiplications ;
 	QVector<specDataPoint> data ;
 	QVector<double> wnums() const ;
 	QVector<double> ints() const ;
-    void applyCorrection(specDataPoint&) const ;  /*!< Korrektur anwenden. */
+	void applyCorrection(specDataPoint&) const ;  /*!< Korrektur anwenden. */
 	void reverseCorrection(specDataPoint&) const; /*!< Korrektur rueckhaengig machen. */
 	void readFromStream(QDataStream &) ;
 	void writeToStream(QDataStream &) const ;
@@ -33,12 +33,12 @@ public:
 	specDataItem(const specDataItem&) ;
 	specDataItem() ;
 	/*! Copy constructor necessary because it is disabled in QwtPlotItem */
-//	specDataItem(const specDataItem&) ;
+	//	specDataItem(const specDataItem&) ;
 
 	/* For undo commands managing raw data */
 	const QVector<specDataPoint>& allData() const { return data ; }
 	void setData(const QVector<specDataPoint>&) ;
-    void swapData(QVector<specDataPoint>&) ;
+	void swapData(QVector<specDataPoint>&) ;
 	QVector<specDataPoint> getDataExcept(const QList<specRange*>& ranges) ;
 	void applyCorrection(QVector<specDataPoint>&) const ;
 	void reverseCorrection(QVector<specDataPoint>&) const ;
@@ -48,7 +48,7 @@ public:
 
 	/* Data operations */
 	specDataItem& operator+=(const specDataItem& toAdd) ;
-    void flatten() ;
+	void flatten() ;
 	void scaleBy(const double&) ;
 	void addToSlope(const double&) ;
 	void moveYBy(const double&) ;
@@ -72,11 +72,11 @@ public:
 class specLegacyDataItem : public specDataItem
 {
 private:
-    type myType ;
-    type typeId() const { return myType; }
-    void readFromStream(QDataStream & in) ;
+	type myType ;
+	type typeId() const { return myType; }
+	void readFromStream(QDataStream & in) ;
 public:
-    specLegacyDataItem() ;
+	specLegacyDataItem() ;
 };
 
 #endif

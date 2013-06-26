@@ -1,7 +1,7 @@
 #include "genericexportaction.h"
 
 genericExportAction::genericExportAction(QObject *parent) :
-    specRequiresItemAction(parent)
+	specRequiresItemAction(parent)
 {
 	setIcon(QIcon(":/export.png")) ;
 	setToolTip(tr("Export to ASCII")) ;

@@ -28,9 +28,9 @@ void specManageConnectionsCommand::setItems(const QModelIndex &client, QModelInd
 	// TODO check if client is metaItem
 	clear() ;
 	target = new specGenealogy(client) ;
-//	((specModel*) servers.first().model())->eliminateChildren(servers); // TODO does this need to be?
+	//	((specModel*) servers.first().model())->eliminateChildren(servers); // TODO does this need to be?
 	// this previous line prevents deleting connections when deleting items from working.
-//	qSort(servers) ;
+	//	qSort(servers) ;
 	while(!servers.isEmpty())
 		items << new specGenealogy(servers) ;
 }

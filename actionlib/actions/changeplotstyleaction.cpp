@@ -41,7 +41,7 @@ changePlotStyleAction::changePlotStyleAction(QObject *parent) :
 	QSize iconSize(16,16) ;
 	QPixmap icon(iconSize) ;
 	QPainter painter(&icon) ;
-//	QPen pen ;
+	//	QPen pen ;
 	QwtSymbol symbol ;
 	symbol.setSize(iconSize) ;
 
@@ -175,11 +175,11 @@ specUndoCommand* changePlotStyleAction::generateUndoCommand()
 	if (currentTrigger == symbolMenu)
 	{
 		newCommand = generateStyleCommand(specStreamable::symbolStyleCommandId) ;
-        int symbolStyle = symbolActions.indexOf(currentAction) - 1 ;
-//        if (symbolStyle < 0)
-//            item.setSymbolStyle(specPlotStyle::noSymbol);
-//        else
-            item.setSymbolStyle(symbolStyle);
+		int symbolStyle = symbolActions.indexOf(currentAction) - 1 ;
+		//        if (symbolStyle < 0)
+		//            item.setSymbolStyle(specPlotStyle::noSymbol);
+		//        else
+		item.setSymbolStyle(symbolStyle);
 		newCommand->setText(tr("Change symbol type"));
 	}
 

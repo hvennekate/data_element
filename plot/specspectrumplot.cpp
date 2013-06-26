@@ -22,11 +22,11 @@ unsigned int qHash(const double& d)
 specSpectrumPlot::moveMode specSpectrumPlot::correctionsStatus() const
 {
 	qDebug() << ((offsetAction->isChecked() ? Offset : NoMoveMode)
-		    | (offlineAction->isChecked() ? Slope : NoMoveMode)
-		    | (scaleAction->isChecked() ? Scale : NoMoveMode)) ;
+		     | (offlineAction->isChecked() ? Slope : NoMoveMode)
+		     | (scaleAction->isChecked() ? Scale : NoMoveMode)) ;
 	qDebug() << (offsetAction->isChecked() ? Offset : NoMoveMode)
-			<< (offlineAction->isChecked() ? Slope : NoMoveMode)
-			<< (scaleAction->isChecked() ? Scale : NoMoveMode) ;
+		 << (offlineAction->isChecked() ? Slope : NoMoveMode)
+		 << (scaleAction->isChecked() ? Scale : NoMoveMode) ;
 	return (offsetAction->isChecked() ? Offset : NoMoveMode)
 			| (offlineAction->isChecked() ? Slope : NoMoveMode)
 			| (scaleAction->isChecked() ? Scale : NoMoveMode) ;
@@ -114,13 +114,13 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 		action->setCheckable(true) ;
 
 	alignmentActions->setExclusive(false) ;
-//	alignmentActions->addAction(alignWithReferenceAction) ;
+	//	alignmentActions->addAction(alignWithReferenceAction) ;
 	alignmentActions->addAction(addRangeAction) ;
 	alignmentActions->addAction(removeRangeAction) ;
 
 	connect(correctionActions, SIGNAL(triggered(QAction*)), this, SLOT(correctionsChanged(QAction*))) ;
 	connect(alignWithReferenceAction, SIGNAL(toggled(bool)), shiftAction, SLOT(setDisabled(bool))) ;
-//	connect(alignWithReferenceAction,SIGNAL(toggled(bool)), this, SLOT(correctionsChanged())) ;
+	//	connect(alignWithReferenceAction,SIGNAL(toggled(bool)), this, SLOT(correctionsChanged())) ;
 	connect(alignWithReferenceAction, SIGNAL(toggled(bool)), this, SLOT(toggleAligning(bool))) ;
 	connect(alignmentActions, SIGNAL(triggered(QAction*)), this, SLOT(alignmentChanged(QAction*))) ;
 	connect(subInterpolatedAction, SIGNAL(triggered()), this, SLOT(multipleSubtraction())) ;
@@ -226,9 +226,9 @@ void specSpectrumPlot::alignmentChanged(QAction *action)
 	if (action == addRangeAction)
 	{
 		double min = axisScaleDiv(QwtPlot::xBottom)->lowerBound(), max = axisScaleDiv(QwtPlot::xBottom)->upperBound() ;
-        specRange *newRange = new specRange(min+.1*(max-min),max-.1*(max-min),
-                                            (axisScaleDiv(QwtPlot::yLeft)->lowerBound()+
-                                             axisScaleDiv(QwtPlot::yLeft)->upperBound())/2.) ;
+		specRange *newRange = new specRange(min+.1*(max-min),max-.1*(max-min),
+						    (axisScaleDiv(QwtPlot::yLeft)->lowerBound()+
+						     axisScaleDiv(QwtPlot::yLeft)->upperBound())/2.) ;
 		newRange->attach(this) ;
 		alignmentPicker->addSelectable(newRange) ;
 	}
@@ -482,7 +482,7 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(const QwtPlotItem
 		else if (!calcOffset && calcSlope && calcScale)
 		{
 			LOOPPOINTS(ACCUMULATE_X ACCUMULATE_XY ACCUMULATE_YY ACCUMULATE_XZ ACCUMULATE_YZ)
-			MATRIX_VECTOR_ASSIGNMENT_TWO(x, xy, yy, xz, yz) ;
+					MATRIX_VECTOR_ASSIGNMENT_TWO(x, xy, yy, xz, yz) ;
 			if (correction[1] != 1.)
 				slope = correction[0]/(1.-correction[1]) ; // TODO check or disable (this is dangerous!)
 		}
@@ -579,8 +579,8 @@ void specSpectrumPlot::multipleSubtraction()
 				if (lower == referenceSpectrum.begin()) continue ;
 				upper = lower-- ;
 				toSub = lower.value() + (upper.value()-lower.value())
-							 * (data[i].nu-lower.key())
-							 / (upper.key()-lower.key());
+						* (data[i].nu-lower.key())
+						/ (upper.key()-lower.key());
 			}
 			data[i].sig -= toSub ;
 		}

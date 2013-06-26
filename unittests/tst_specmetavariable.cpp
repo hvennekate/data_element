@@ -113,15 +113,15 @@ void tst_specMetaVariable::values_data()
 				  << (QVector<double>() << 1620 << 1650 << 1680)
 				  << (QVector<double>() << integral << integral << integral) ;
 	QTest::newRow("xValues") << "[::2]x1600-1700"
-				  << (QVector<double>() << 1650 << 1800)
-				  << (QVector<double>() << 1650 << 1800) ;
+				 << (QVector<double>() << 1650 << 1800)
+				 << (QVector<double>() << 1650 << 1800) ;
 	QTest::newRow("yValues") << "[::2]y1600-1700"
-				  << (QVector<double>() << 1650 << 1680)
-				  << (QVector<double>() << 165 << 168) ;
+				 << (QVector<double>() << 1650 << 1680)
+				 << (QVector<double>() << 165 << 168) ;
 	QTest::newRow("MaxSimple") << "[::2]u1600-1700"
-				  << (QVector<double>() << 1650 << 1680)
-				  << (QVector<double>(2,168)) ;
+				   << (QVector<double>() << 1650 << 1680)
+				   << (QVector<double>(2,168)) ;
 	QTest::newRow("MinSimple") << "[::2]l1600-1700"
-				  << (QVector<double>() << 1650 << 1680)
-				  << (QVector<double>(2,165)) ;
+				   << (QVector<double>() << 1650 << 1680)
+				   << (QVector<double>(2,165)) ;
 }

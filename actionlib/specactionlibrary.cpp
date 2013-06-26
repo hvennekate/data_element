@@ -61,10 +61,10 @@ specHistoryWidget::specHistoryWidget(QUndoStack* stack, QWidget *parent)
 }
 
 specActionLibrary::specActionLibrary(QObject *parent) :
-    QObject(parent),
-    progress(0),
-    purgeUndoAction(new QAction(QIcon::fromTheme("user-trash"),tr("Clear history"),this)),
-    dockWidget(0)
+	QObject(parent),
+	progress(0),
+	purgeUndoAction(new QAction(QIcon::fromTheme("user-trash"),tr("Clear history"),this)),
+	dockWidget(0)
 {
 	undoStack = new QUndoStack(this) ; // TODO consider making this a plain variable
 	connect(undoStack,SIGNAL(cleanChanged(bool)),this,SLOT(stackClean(bool))) ;
@@ -220,26 +220,26 @@ void specActionLibrary::writeToStream(QDataStream &out) const
 {
 	out << qint32(undoStack->count()) ;
 	out << qint32(undoStack->index()) ;
-    int progressToGo = 0, progressStart = 0 ;
-    if (progress)
-    {
-        progressStart = progress->value() ;
-        progressToGo = progress->maximum() - progressStart ;
+	int progressToGo = 0, progressStart = 0 ;
+	if (progress)
+	{
+		progressStart = progress->value() ;
+		progressToGo = progress->maximum() - progressStart ;
 
-    }
+	}
 	for (int i = 0 ; i < undoStack->count() ; ++i)
 	{
-        if (progress) progress->setValue(progressStart + (i*progressToGo)/undoStack->count());
+		if (progress) progress->setValue(progressStart + (i*progressToGo)/undoStack->count());
 		specUndoCommand* command = (specUndoCommand*) undoStack->command(i) ;
 		out << type(command->id()) << qint32(parents.indexOf(command->parentObject()))
 		    << *command ;
 	}
-    undoStack->setClean();
+	undoStack->setClean();
 }
 
 specStreamable* specActionLibrary::factory(const type &t) const
 {
-    return commandGenerator.commandById(t) ;
+	return commandGenerator.commandById(t) ;
 }
 
 void specActionLibrary::readFromStream(QDataStream &in)
@@ -275,18 +275,18 @@ void specActionLibrary::readFromStream(QDataStream &in)
 			continue ;
 		}
 		qDebug() << "Reading item:" << i << "total count:" << undoStack->count() << "/" << num ;
-////// For manually discarding corrupted undo commands:
-//		if (QMessageBox::question(0,tr("Really read?"),
-//					  tr("Really read command no. ")
-//					  + QString::number(i)
-//					  + tr("?  Description is:\n")
-//					  + command->text(),
-//					  QMessageBox::Yes | QMessageBox::No,
-//					  QMessageBox::Yes)
-//				== QMessageBox::Yes)
-			undoStack->push(command) ;
-//		else
-//			delete command ;
+		////// For manually discarding corrupted undo commands:
+		//		if (QMessageBox::question(0,tr("Really read?"),
+		//					  tr("Really read command no. ")
+		//					  + QString::number(i)
+		//					  + tr("?  Description is:\n")
+		//					  + command->text(),
+		//					  QMessageBox::Yes | QMessageBox::No,
+		//					  QMessageBox::Yes)
+		//				== QMessageBox::Yes)
+		undoStack->push(command) ;
+		//		else
+		//			delete command ;
 	}
 
 	undoStack->setIndex(position) ;
@@ -314,11 +314,11 @@ int specActionLibrary::moveInternally(const QModelIndex &parent, int row, specVi
 
 int specActionLibrary::deleteInternally(specModel* model)
 {
-    int count = lastRequested.size() ;
-    specUndoCommand *command = specDeleteAction::command(model, lastRequested) ;
-    command->setText(tr("Move items"));
-    push(command) ;
-    return count ;
+	int count = lastRequested.size() ;
+	specUndoCommand *command = specDeleteAction::command(model, lastRequested) ;
+	command->setText(tr("Move items"));
+	push(command) ;
+	return count ;
 }
 
 void specActionLibrary::addPlot(specPlot *plot)
@@ -399,10 +399,10 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
 
 specActionLibrary::~specActionLibrary()
 {
-    delete undoStack ;
+	delete undoStack ;
 }
 
 void specActionLibrary::setProgressDialog(QProgressDialog *p)
 {
-    progress = p ;
+	progress = p ;
 }

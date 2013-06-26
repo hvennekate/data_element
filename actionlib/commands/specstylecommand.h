@@ -16,34 +16,34 @@ public:
 specStyleCommand *generateStyleCommand(specStreamable::type id, specUndoCommand *parent = 0) ;
 
 #define specStyleCommandImplTemplate template<class property, \
-					      property (specCanvasItem::*getProperty)() const, \
-					      void     (specCanvasItem::*setProperty)(const property&), \
-					      int ID>
+	property (specCanvasItem::*getProperty)() const, \
+	void     (specCanvasItem::*setProperty)(const property&), \
+	int ID>
 #define specStyleCommandImplFuncTemplate specStyleCommandImplementation<property, getProperty, setProperty, ID>
 
 specStyleCommandImplTemplate
 class specStyleCommandImplementation : public specStyleCommand
 {
-public:
-	explicit specStyleCommandImplementation(specUndoCommand *parent = 0);
+						      public:
+						      explicit specStyleCommandImplementation(specUndoCommand *parent = 0);
 
-	void setItems(QModelIndexList) ;
-	void obtainStyle(specCanvasItem*) ;
+void setItems(QModelIndexList) ;
+void obtainStyle(specCanvasItem*) ;
 private:
-	void applyStyle(specGenealogy&, int) ; // if int == -1: revert to old style
-	int styleNo(specCanvasItem*) ;
-	void saveStyles(QList<specGenealogy>&) ;
-	type typeId() const { return ID ; }
+void applyStyle(specGenealogy&, int) ; // if int == -1: revert to old style
+int styleNo(specCanvasItem*) ;
+void saveStyles(QList<specGenealogy>&) ;
+type typeId() const { return ID ; }
 
-	void parentAssigned();
-	void doIt() ;
-	void undoIt() ;
-	void writeCommand(QDataStream &out) const;
-	void readCommand(QDataStream &in);
+void parentAssigned();
+void doIt() ;
+void undoIt() ;
+void writeCommand(QDataStream &out) const;
+void readCommand(QDataStream &in);
 
-	property newProperty ;
-	QVector<property> oldProperties ;
-	QList<specGenealogy> Genealogies ;
+property newProperty ;
+QVector<property> oldProperties ;
+QList<specGenealogy> Genealogies ;
 };
 
 #endif // SPECSTYLECOMMAND_H

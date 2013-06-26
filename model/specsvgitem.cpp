@@ -68,16 +68,16 @@ QRectF specSVGItem::boundRect() const
 {
 	if (!plot()) return QRectF() ;
 	qreal px = (ownBounds.x.first == QwtPlot::axisCnt) ? ownBounds.x.second :
-			plot()->invTransform(ownBounds.x.first, ownBounds.x.second),
-	       py = (ownBounds.y.first == QwtPlot::axisCnt) ? ownBounds.y.second :
-			plot()->invTransform(ownBounds.y.first, ownBounds.y.second),
-	       w = (ownBounds.width.first == QwtPlot::axisCnt) ? ownBounds.width.second :
-			(plot()->invTransform(ownBounds.width.first, ownBounds.width.second)
-			- plot()->invTransform(ownBounds.width.first,0)),
-// TODO find out what the convention really is
-	       h = (ownBounds.height.first == QwtPlot::axisCnt) ? ownBounds.height.second :
-			(plot()->invTransform(ownBounds.height.first,0)
-			- plot()->invTransform(ownBounds.height.first, ownBounds.height.second)) ;
+							     plot()->invTransform(ownBounds.x.first, ownBounds.x.second),
+			py = (ownBounds.y.first == QwtPlot::axisCnt) ? ownBounds.y.second :
+								       plot()->invTransform(ownBounds.y.first, ownBounds.y.second),
+			w = (ownBounds.width.first == QwtPlot::axisCnt) ? ownBounds.width.second :
+									  (plot()->invTransform(ownBounds.width.first, ownBounds.width.second)
+									   - plot()->invTransform(ownBounds.width.first,0)),
+			// TODO find out what the convention really is
+			h = (ownBounds.height.first == QwtPlot::axisCnt) ? ownBounds.height.second :
+									   (plot()->invTransform(ownBounds.height.first,0)
+									    - plot()->invTransform(ownBounds.height.first, ownBounds.height.second)) ;
 
 	// shift x
 	switch (anchor)
@@ -115,16 +115,16 @@ void specSVGItem::setBoundRect(const QRectF &br)
 	if (!plot()) return ;
 	QPointF anchorPoint = getPoint(anchor,br) ;
 	ownBounds.width.second = (ownBounds.width.first == QwtPlot::axisCnt) ?  br.width() :
-			(plot()->transform(ownBounds.width.first, br.width())
-			- plot()->transform(ownBounds.width.first, 0));
+										(plot()->transform(ownBounds.width.first, br.width())
+										 - plot()->transform(ownBounds.width.first, 0));
 	// TODO find out convention
 	ownBounds.height.second = (ownBounds.height.first == QwtPlot::axisCnt) ?  br.height() :
-			(plot()->transform(ownBounds.height.first, 0)
-			- plot()->transform(ownBounds.height.first, br.height()));
+										  (plot()->transform(ownBounds.height.first, 0)
+										   - plot()->transform(ownBounds.height.first, br.height()));
 	ownBounds.x.second = (ownBounds.x.first == QwtPlot::axisCnt) ? anchorPoint.x() :
-			plot()->transform(ownBounds.x.first, anchorPoint.x()) ;
+								       plot()->transform(ownBounds.x.first, anchorPoint.x()) ;
 	ownBounds.y.second = (ownBounds.y.first == QwtPlot::axisCnt) ? anchorPoint.y() :
-			plot()->transform(ownBounds.y.first, anchorPoint.y()) ;
+								       plot()->transform(ownBounds.y.first, anchorPoint.y()) ;
 	highlight(highlighting) ;
 }
 
@@ -185,10 +185,10 @@ void specSVGItem::pointMoved(const int & p, const double &x, const double &y)
 	QPointF newPoint(x,y) ;
 
 	if ((point == topLeft ||
-	    point == topRight ||
-	    point == bottomLeft ||
-	    point == bottomRight) &&
-		br.width() && br.height())
+	     point == topRight ||
+	     point == bottomLeft ||
+	     point == bottomRight) &&
+			br.width() && br.height())
 	{
 		QPointF oldPoint(getPoint(point,br)) ;
 		QPointF diff(newPoint - oldPoint) ;
@@ -261,28 +261,28 @@ specSVGItem::SVGCornerPoint specSVGItem::setAnchor(const SVGCornerPoint & p)
 bool specSVGItem::bounds::operator ==(const specSVGItem::bounds& other) const
 {
 	return x      == other.x     &&
-	       y      == other.y     &&
-	       width  == other.width &&
-	       height == other.height ;
+			y      == other.y     &&
+			width  == other.width &&
+			height == other.height ;
 }
 
 QString specSVGItem::toolTip(const QString &column) const
 {
-    QByteArray byteArray ;
-    QBuffer buffer(&byteArray) ;
-    QSvgRenderer renderer(data) ;
-    QSize defaultSize = renderer.defaultSize() ;
-    defaultSize.scale(150,150, Qt::KeepAspectRatio);
-    QImage image(defaultSize.width(),defaultSize.height(), QImage::Format_ARGB32) ;
-    image.fill(Qt::transparent);
-    QPainter painter(&image) ;
-    renderer.render(&painter);
-    buffer.open(QIODevice::WriteOnly) ;
-    image.save(&buffer, "PNG") ;
+	QByteArray byteArray ;
+	QBuffer buffer(&byteArray) ;
+	QSvgRenderer renderer(data) ;
+	QSize defaultSize = renderer.defaultSize() ;
+	defaultSize.scale(150,150, Qt::KeepAspectRatio);
+	QImage image(defaultSize.width(),defaultSize.height(), QImage::Format_ARGB32) ;
+	image.fill(Qt::transparent);
+	QPainter painter(&image) ;
+	renderer.render(&painter);
+	buffer.open(QIODevice::WriteOnly) ;
+	image.save(&buffer, "PNG") ;
 
-    return QString("%1<br><img src=\"data:image/png;base64,%2\"></img>")
-            .arg(specModelItem::toolTip(column))
-            .arg(QString(buffer.data().toBase64())) ;
+	return QString("%1<br><img src=\"data:image/png;base64,%2\"></img>")
+			.arg(specModelItem::toolTip(column))
+			.arg(QString(buffer.data().toBase64())) ;
 }
 
 QWidget* specSVGItem::legendItem() const

@@ -48,5 +48,5 @@ QString specGenericMimeConverter::ownType() const
 
 QStringList specGenericMimeConverter::importableTypes() const
 {
-    return specMimeConverter::importableTypes() << ownType() ;
+	return specMimeConverter::importableTypes() << ownType() ;
 }

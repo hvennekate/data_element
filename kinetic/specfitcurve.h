@@ -29,7 +29,7 @@ private:
 
 	typedef QPair<QString,double> variablePair;
 	QList<variablePair> variables ;
-    QVector<double> numericalErrors ;
+	QVector<double> numericalErrors ;
 	qint16 activeVar ;
 	QStringList fitParameters ;
 	specDescriptor expression ;
@@ -44,31 +44,31 @@ private:
 	void clearParser() ;
 	void generateParser() ;
 	void setParserConstants();
-    bool variablesMulti, expressionMulti, messagesMulti ;
+	bool variablesMulti, expressionMulti, messagesMulti ;
 public:
 	specFitCurve();
 	~specFitCurve() ;
 	QStringList descriptorKeys() ;
 	QString descriptor(const QString& key, bool full=false) ;
-    QString editDescriptor(const QString& key) ;
+	QString editDescriptor(const QString& key) ;
 	bool changeDescriptor(QString key, QString value) ;
 	bool setActiveLine(const QString& key, int n) ;
 	int activeLine(const QString& key) const ;
 	void refreshPlotData();
-    void refit(QwtSeriesData<QPointF>* data) ;
-    QVector<double> getFitData(QwtSeriesData<QPointF>* data) ;
+	void refit(QwtSeriesData<QPointF>* data) ;
+	QVector<double> getFitData(QwtSeriesData<QPointF>* data) ;
 	int rtti() const { return specStreamable::fitCurve ; }
 	void attach(QwtPlot *plot) ;
-    void setDescriptorProperties(QString key, spec::descriptorFlags f) ;
-    spec::descriptorFlags descriptorProperties(const QString& key) const ;
+	void setDescriptorProperties(QString key, spec::descriptorFlags f) ;
+	spec::descriptorFlags descriptorProperties(const QString& key) const ;
 };
 
 // from lmcurve.c:
 typedef struct {
-    double *x;
-    const double *y;
-    mu::Parser *parser ;
-    QVector<std::string>* variableNames ;
+	double *x;
+	const double *y;
+	mu::Parser *parser ;
+	QVector<std::string>* variableNames ;
 } lmcurve_data_struct;
 
 void evaluateParser(const double *parameters, int count, const void *data, double *fitResults, int *info) ;

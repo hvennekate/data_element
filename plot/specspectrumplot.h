@@ -17,23 +17,23 @@ class specSpectrumPlot : public specPlot
 	Q_OBJECT
 private:
 	QAction *offsetAction,
-		*offlineAction,
-		*scaleAction,
-		*shiftAction,
-		*setReferenceAction,
-		*alignWithReferenceAction,
-		*addRangeAction,
-		*removeRangeAction,
-		*subInterpolatedAction ;
+	*offlineAction,
+	*scaleAction,
+	*shiftAction,
+	*setReferenceAction,
+	*alignWithReferenceAction,
+	*addRangeAction,
+	*removeRangeAction,
+	*subInterpolatedAction ;
 	QActionGroup *correctionActions, *alignmentActions ;
 	CanvasPicker *correctionPicker, *alignmentPicker ;
 
 public:
 	/*! Enum for specifying the mode of correction for spectra*/
 	enum move { NoMoveMode = 0,
-			Offset = 1,
-			Scale  = 2,
-			Slope  = 4 } ;
+		    Offset = 1,
+		    Scale  = 2,
+		    Slope  = 4 } ;
 	Q_DECLARE_FLAGS(moveMode,move)
 	moveMode manualAlignment, rangeAlignment ;
 private:

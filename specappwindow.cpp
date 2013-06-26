@@ -83,7 +83,7 @@ void specAppWindow::createActions()
 	newAction->setShortcut(tr("Ctrl+N"));
 	newAction->setStatusTip(tr("Create a new file"));
 	connect(newAction, SIGNAL(triggered()), this, SLOT(newFile()));
-	
+
 	openAction = new QAction(QIcon::fromTheme("document-open"), tr("&Open"), this);
 	openAction->setShortcut(tr("Ctrl+O"));
 	openAction->setStatusTip(tr("Open an existing file"));

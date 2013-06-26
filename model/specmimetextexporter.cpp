@@ -6,7 +6,7 @@
 #include <QMimeData>
 
 specMimeTextExporter::specMimeTextExporter(QObject *parent) :
-    specMimeConverter(parent)
+	specMimeConverter(parent)
 {
 }
 
@@ -21,10 +21,10 @@ void specMimeTextExporter::exportData(QList<specModelItem *> &items, QMimeData *
 
 void specMimeTextExporter::writeItem(specModelItem* item, QTextStream& out)
 {
-    QList<QPair<spec::value, QString> > dataTypeList ;
-    dataTypeList << QPair<spec::value, QString>(spec::wavenumber,"\t")
-            << QPair<spec::value, QString>(spec::signal,"\t")
-            << QPair<spec::value, QString>(spec::maxInt,"\n") ;
+	QList<QPair<spec::value, QString> > dataTypeList ;
+	dataTypeList << QPair<spec::value, QString>(spec::wavenumber,"\t")
+			<< QPair<spec::value, QString>(spec::signal,"\t")
+			<< QPair<spec::value, QString>(spec::maxInt,"\n") ;
 	foreach(QString descriptor, item->descriptorKeys())
 	{
 		QString padding(descriptor.length(),' ') ;
@@ -39,13 +39,13 @@ void specMimeTextExporter::writeItem(specModelItem* item, QTextStream& out)
 		for (int i = 0 ; i < item->children() ; ++i)
 		{
 			out << "# Child item" << endl ;
-            writeItem(((specFolderItem*)item)->child(i),out) ;
+			writeItem(((specFolderItem*)item)->child(i),out) ;
 		}
 	}
 	else
-        item->exportData(QList<QPair<bool,QString> >(), dataTypeList ,out);
+		item->exportData(QList<QPair<bool,QString> >(), dataTypeList ,out);
 
-    out << endl ;
+	out << endl ;
 }
 
 QList<specModelItem*> specMimeTextExporter::importData(const QMimeData *data)

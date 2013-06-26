@@ -10,7 +10,7 @@ void specMetaDelegate::paint(QPainter *painter, const QStyleOptionViewItem &opti
 {
 	QStyleOptionViewItem style = option ;
 	if (!(
-		((specModel*)index.model())->itemPointer(index)
+				((specModel*)index.model())->itemPointer(index)
 				->descriptor("errors").isEmpty())
 			)
 	{

@@ -48,11 +48,11 @@ private:
 	specMetaModel* metaModel ;
 	void checkForNewDescriptors(const QList<specModelItem*>& list, const QModelIndex& parent) ;
 protected:
-    virtual QStringList dataTypes() const ;
+	virtual QStringList dataTypes() const ;
 public:
 	specModel(QObject *par = 0) ;
 	~specModel() ;
-    QStringList mimeTypes() const ;
+	QStringList mimeTypes() const ;
 	void setMetaModel(specMetaModel*) ;
 	specMetaModel* getMetaModel() const ;
 	// Own functions
@@ -86,32 +86,32 @@ public:
 	void applySubMap(const QModelIndexList&) ;
 	const QStringList& descriptors() const ;
 	const QList<spec::descriptorFlags> & descriptorProperties() const;
-    void setDescriptorProperties(spec::descriptorFlags flags, const QString& key) ;
-    void renameDescriptors(const QMap<QString, QString>&) ;
-    void deleteDescriptor(const QString&) ;
-    void dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const ;
-    void restoreDescriptor(qint16 position, spec::descriptorFlags flags, QListIterator<specDescriptor>& origin, const QString& key) ;
-	
+	void setDescriptorProperties(spec::descriptorFlags flags, const QString& key) ;
+	void renameDescriptors(const QMap<QString, QString>&) ;
+	void deleteDescriptor(const QString&) ;
+	void dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const ;
+	void restoreDescriptor(qint16 position, spec::descriptorFlags flags, QListIterator<specDescriptor>& origin, const QString& key) ;
+
 	// QAbstractItemModel virtual functions:
-	
+
 	int columnCount(const QModelIndex &parent) const ;
 	int rowCount(const QModelIndex&) const ;
 	bool removeRows(int position, int rows, const QModelIndex &parent = QModelIndex());
-	
+
 	bool setHeaderData (int section,Qt::Orientation orientation,const QVariant & value,int role = Qt::EditRole);
 	bool insertColumns (int column,int count,const QModelIndex & parent = QModelIndex() );
 	bool removeColumns (int column,int count,const QModelIndex & parent = QModelIndex() );
-	
+
 	QModelIndex parent(const QModelIndex & index) const ;
 	QModelIndex index(int row, int column, const QModelIndex & parent = QModelIndex() ) const ;
 	Qt::ItemFlags flags(const QModelIndex &index) const;
-	
+
 	QVariant data(const QModelIndex &index, int role) const;
 	bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 	QVariant headerData(int section, Qt::Orientation orientation,
 			    int role = Qt::DisplayRole) const;
-	
-// 	// Drag and drop:
+
+	// 	// Drag and drop:
 	void setInternalDrop(bool) ;
 	void setDropSource(specView*) ;
 	void setDropBuddy(specActionLibrary*) ;
@@ -119,19 +119,19 @@ public:
 	QMimeData *mimeData(const QModelIndexList &) const;
 	bool dropMimeData(const QMimeData*, Qt::DropAction, int row, int column, const QModelIndex &parent) ;
 	bool mimeAcceptable(const QMimeData*) const ;
-	
+
 	friend QDataStream& operator<<(QDataStream&, specModel&);
 	friend QDataStream& operator>>(QDataStream&, specModel&);
 
 	void signalBeginReset() { beginResetModel() ; } // TODO just emit from whereever this function is called
 	void signalEndReset() { endResetModel() ; } // TODO just emit from whereever this function is called
 	void signalChanged(const QModelIndex& index) ;
-    void signalChanged(QModelIndex originalBegin, QModelIndex originalEnd) ;
-    virtual QList<specFileImportFunction> acceptableImportFunctions() const ;
-	
-    virtual QValidator* createValidator(const QModelIndex&) const ;
+	void signalChanged(QModelIndex originalBegin, QModelIndex originalEnd) ;
+	virtual QList<specFileImportFunction> acceptableImportFunctions() const ;
 
-// //TODO	
+	virtual QValidator* createValidator(const QModelIndex&) const ;
+
+	// //TODO
 public slots:
 	bool exportData(QModelIndexList& list) ;
 	void svgMoved(specCanvasItem*, int, double, double) ;

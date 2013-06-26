@@ -4,7 +4,7 @@
 #include "specaddconnectionscommand.h"
 
 specAddConnectionsAction::specAddConnectionsAction(QObject *parent) :
-    specUndoAction(parent)
+	specUndoAction(parent)
 {
 	this->setIcon(QIcon(":/toKinetic.png")) ;
 	setToolTip(tr("Connect current to selected."));

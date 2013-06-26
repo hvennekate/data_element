@@ -8,9 +8,9 @@ specRange::specRange(double min, double max, double yinit)
 { // TODO set curve properties
 	QVector<double> x, y ;
 	x << min << max ;
-    y << yinit << yinit ;
+	y << yinit << yinit ;
 	QwtPlotCurve::setSamples(x,y) ;
-	
+
 	QPen pen ( QColor ( 255,139,15,100 ) ) ;
 	pen.setWidth ( 5 ) ;
 	pen.setCapStyle(Qt::RoundCap);
@@ -25,7 +25,7 @@ void specRange::pointMoved(const int& point, const double& x, const double& y)
 		setMinValue(x) ;
 	else
 		setMaxValue(x) ;
-	
+
 	if (!isValid())
 		setInterval(maxValue(),minValue()) ;
 	yVal = y ;
@@ -53,7 +53,7 @@ void specRange::refreshPlotData()
 	xarr << minValue() << maxValue() ;
 	yarr << yVal << yVal ;
 	setSamples(xarr,yarr) ;
-//	((specPlot*) plot())->refreshRanges() ; // TODO check if this works for kinetics also
+	//	((specPlot*) plot())->refreshRanges() ; // TODO check if this works for kinetics also
 }
 
 specRange::~specRange()

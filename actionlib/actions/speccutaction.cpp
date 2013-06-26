@@ -4,7 +4,7 @@
 #include "speccopyaction.h"
 
 specCutAction::specCutAction(QObject *parent) :
-    specDeleteAction(parent)
+	specDeleteAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("edit-cut")) ;
 	setToolTip(tr("Cut selected items")) ;

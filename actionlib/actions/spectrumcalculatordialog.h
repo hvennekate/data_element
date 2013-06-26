@@ -10,11 +10,11 @@ namespace Ui {
 class spectrumCalculatorDialog : public QDialog
 {
 	Q_OBJECT
-	
+
 public:
 	explicit spectrumCalculatorDialog(QWidget *parent = 0);
 	~spectrumCalculatorDialog();
-	
+
 	QString xFormula() const ;
 	QString yFormula() const ;
 private slots:

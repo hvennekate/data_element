@@ -5,7 +5,7 @@
 #include "canvaspicker.h"
 
 specMetaRange::specMetaRange(double x1, double x2, double yinit, specMetaVariable *par)
-    : specRange(x1,x2, yinit),
+	: specRange(x1,x2, yinit),
 	  parent(par)
 {
 }

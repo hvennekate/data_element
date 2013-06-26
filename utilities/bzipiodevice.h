@@ -24,13 +24,13 @@ public:
 	~bzipIODevice() ; //
 	QIODevice *releaseDevice() ;
 	bool atEnd() const ; //
-//	qint64 bytesAvailable() const ;
-//	qint64 bytesToWrite() const ;
+	//	qint64 bytesAvailable() const ;
+	//	qint64 bytesToWrite() const ;
 	void close() ; //
 	bool isSequential() const ; //
 	bool open(OpenMode mode) ; //
-//	bool reset() ;
-//	bool seek(qint64 pos) ;
+	//	bool reset() ;
+	//	bool seek(qint64 pos) ;
 };
 
 #endif // BZIPIODEVICE_H

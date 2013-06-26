@@ -15,19 +15,19 @@ class QwtPlotMarker ;
 
 class plotAxisEdit : public QLineEdit
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
-    plotAxisEdit(QWidget* parent = 0) : QLineEdit(parent) { }
+	plotAxisEdit(QWidget* parent = 0) : QLineEdit(parent) { }
 public slots:
-    void hideAfterEditing(QWidget* old, QWidget* newW)
-    {
-        Q_UNUSED(old)
-        if (newW != (QWidget*) this)
-        {
-            hide() ;
-            disconnect(0,0,this, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
-        }
-    }
+	void hideAfterEditing(QWidget* old, QWidget* newW)
+	{
+		Q_UNUSED(old)
+		if (newW != (QWidget*) this)
+		{
+			hide() ;
+			disconnect(0,0,this, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
+		}
+	}
 };
 
 class specPlot : public QwtPlot, public specStreamable
@@ -38,13 +38,13 @@ private:
 	specZoomer *zoom ;
 	bool scaleX, scaleY ;
 	QAction *fixXAxisAction,
-		*fixYAxisAction,
-		*modifySVGs,
-        *printAction,
-        *legendAction ;
+	*fixYAxisAction,
+	*modifySVGs,
+	*printAction,
+	*legendAction ;
 	CanvasPicker *MetaPicker, *SVGpicker ; // TODO make pickers more prominent: accessible through
-											// function, attach metaRanges direktly to picker etc.
-    QwtPlotMarker *zeroLine ;
+	// function, attach metaRanges direktly to picker etc.
+	QwtPlotMarker *zeroLine ;
 	bool autoScaling ;
 	void readFromStream(QDataStream &in);
 	void writeToStream(QDataStream &out) const ;
@@ -52,12 +52,12 @@ private:
 	specActionLibrary *undoP ;
 	void resizeEvent(QResizeEvent *e) ;
 	void autoScale(const QwtPlotItemList& allItems) ;
-    void mouseDoubleClickEvent(QMouseEvent *e) ;
-    plotAxisEdit xminEdit, xmaxEdit, yminEdit, ymaxEdit ;
+	void mouseDoubleClickEvent(QMouseEvent *e) ;
+	plotAxisEdit xminEdit, xmaxEdit, yminEdit, ymaxEdit ;
 private slots:
-    void setPlotAxis() ;
-    void showLegend(bool) ;
-    void toggleItem(QwtPlotItem*, bool) ;
+	void setPlotAxis() ;
+	void showLegend(bool) ;
+	void toggleItem(QwtPlotItem*, bool) ;
 protected:
 	specView *view ;
 	specActionLibrary* undoPartner() const ;

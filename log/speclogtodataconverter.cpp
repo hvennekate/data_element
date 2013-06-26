@@ -21,13 +21,13 @@ specModelItem* specLogToDataConverter::factory(const type &t) const
 bool specLogToDataConverter::canImport(const QStringList &types)
 {
 	return qobject_cast<specModel*>(parent()) &&
-	       !qobject_cast<specLogModel*>(parent()) &&
-	       types.contains("application/spec.logged.files") ;
+			!qobject_cast<specLogModel*>(parent()) &&
+			types.contains("application/spec.logged.files") ;
 }
 
 QStringList specLogToDataConverter::importableTypes() const
 {
-    return specMimeConverter::importableTypes() << "application/spec.logged.files" ;
+	return specMimeConverter::importableTypes() << "application/spec.logged.files" ;
 }
 
 void specLogToDataConverter::toStream(specModelItem *item, QDataStream & out)
@@ -139,8 +139,8 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
 						     "Kann Datei nicht oeffnen: " + fileName) ;
 				continue ;
 			}
-            // TODO check if this works under windows... (opening an open file again...)
-            specFileImportFunction filter = fileFilter(file.fileName()) ;
+			// TODO check if this works under windows... (opening an open file again...)
+			specFileImportFunction filter = fileFilter(file.fileName()) ;
 			if (!filter)
 			{
 				QMessageBox::warning(0,
@@ -148,9 +148,9 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData *data)
 						     "Kein gueltiger Dateityp:" + fileName) ;
 				continue ;
 			}
-            specFolderItem* newItem = new specFolderItem ;
-            newItem->changeDescriptor("",currentDirectory.absolutePath() + "\n"+ fileName) ;
-            newItem->setActiveLine("",1) ;
+			specFolderItem* newItem = new specFolderItem ;
+			newItem->changeDescriptor("",currentDirectory.absolutePath() + "\n"+ fileName) ;
+			newItem->setActiveLine("",1) ;
 			newItem->addChildren(filter(file)) ;
 			if (parents.isEmpty())
 				items << newItem ;

@@ -34,10 +34,10 @@ void specExchangeDataCommand::undoIt()
 
 void specExchangeDataCommand::doIt()
 {
-    if (!item) return ;
-    specDataItem *pointer = dynamic_cast<specDataItem*>(item->firstItem()) ;
-    if (!pointer) return ;
-    pointer->swapData(data);
+	if (!item) return ;
+	specDataItem *pointer = dynamic_cast<specDataItem*>(item->firstItem()) ;
+	if (!pointer) return ;
+	pointer->swapData(data);
 }
 
 void specExchangeDataCommand::writeCommand(QDataStream &out) const

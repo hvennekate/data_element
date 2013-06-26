@@ -9,7 +9,7 @@
 #include <QtSvg>
 
 specAddSVGItemAction::specAddSVGItemAction(QObject *parent) :
-    specItemAction(parent)
+	specItemAction(parent)
 {
 	setIcon(QIcon::fromTheme("insert-image")) ;
 	setToolTip(tr("Add SVG image")) ;

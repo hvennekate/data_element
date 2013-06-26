@@ -59,12 +59,12 @@ QPair<QString,specDescriptor> readJCAMPldr(QString &first,QTextStream &in)
 		toInterpret.enqueue(first) ;
 		first = in.readLine() ;
 	} while (first.left(2) != "##" && !in.atEnd()) ;
-	
+
 	// extract label
 	int pos = toInterpret[0].indexOf("=") ;
 	QString label = toInterpret[0].mid(2,pos-2) ;
 	toInterpret[0].remove(0,pos+1) ;
-	
+
 	// process lines
 	QString data, nl ;
 	do
@@ -79,10 +79,10 @@ QPair<QString,specDescriptor> readJCAMPldr(QString &first,QTextStream &in)
 		if (commentBegins >= 0)
 			data.truncate(commentBegins) ;
 		nl = '\n' ; // TODO ???
-		
+
 	} while (!toInterpret.isEmpty()) ;
-	
-	
+
+
 	return QPair<QString,specDescriptor>(label,specDescriptor(data)) ;
 }
 
@@ -106,29 +106,29 @@ specModelItem* readJCAMPBlock(QTextStream& in)
 		}
 		else if (parsedLabel == "XYDATA") // TODO keep this and interpret after total block has been read (in case any important keywords follow later)
 		{
-            QString content = ldr.second.content(true) ;
+			QString content = ldr.second.content(true) ;
 			QTextStream dataStream(&content) ;
 			QString typeOfData = dataStream.readLine() ;
 			if (typeOfData=="(X++(Y..Y))")
 				readJCAMPdata(dataStream,data,
 					      (descriptors["LASTX"].content().toDouble()-descriptors["FIRSTX"].content().toDouble())/(descriptors["NPOINTS"].content().toDouble()-1), // TODO use parsed labels
-					       descriptors["XFACTOR"].content().toDouble(),
-					       descriptors["YFACTOR"].content().toDouble()
-					     ) ;
+						descriptors["XFACTOR"].content().toDouble(),
+						descriptors["YFACTOR"].content().toDouble()
+						) ;
 		}
 		else
 			descriptors[ldr.first] = ldr.second ;
 	}
-    specModelItem *item = 0 ;
-	
+	specModelItem *item = 0 ;
+
 	if(descriptors["DATA TYPE"].content() == "LINK")
 	{
 		item = new specFolderItem() ;
 		// pass description down to children
-        for(QHash<QString,specDescriptor>::iterator i = descriptors.begin() ; i != descriptors.end() ; i++)
+		for(QHash<QString,specDescriptor>::iterator i = descriptors.begin() ; i != descriptors.end() ; i++)
 			foreach (specModelItem *child, children)
-                child->changeDescriptor(i.key(),i.value().content()) ;
-        item->addChildren(children,0) ;
+				child->changeDescriptor(i.key(),i.value().content()) ;
+		item->addChildren(children,0) ;
 	}
 	else
 	{
@@ -143,11 +143,11 @@ specModelItem* readJCAMPBlock(QTextStream& in)
 void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, double xfactor, double yfactor) // TODO verify final x-value
 {
 	QRegExp specialCharacters("[?@%A-DF-Za-df-s+\\-\\s]|[Ee](?![+\\-\\s])"),
-		posSQZdigits("[A-DF-I@]|E(?![+\\-\\s])"),
-		negSQZdigits("[a-df-i]|e(?![+\\-\\s])"),
-		posDIFdigits("[J-R%]"),
-		negDIFdigits("[j-r]"),
-		posDUPdigits("[S-Zs]") ;
+			posSQZdigits("[A-DF-I@]|E(?![+\\-\\s])"),
+			negSQZdigits("[a-df-i]|e(?![+\\-\\s])"),
+			posDIFdigits("[J-R%]"),
+			negDIFdigits("[j-r]"),
+			posDUPdigits("[S-Zs]") ;
 	bool wasDiff = false ;
 	QVector<double> yvals, xvals ;
 	while(!in.atEnd())
@@ -155,11 +155,11 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 		QString line = in.readLine() ;
 		QString x = line.left(line.indexOf(specialCharacters)) ;
 		line.remove(0,line.indexOf(specialCharacters)) ;
-//    	if (!xvals.isEmpty() && fabs((x.toDouble()-((xvals.last()+step)/xfactor))/ x.toDouble()) > 1e-5 ) // TODO arbitrary limit!!
-			// TODO check first and last X and Y val.
-        xvals << (xvals.isEmpty() ? x.toDouble()*xfactor : xvals.last()+step) ;
+		//    	if (!xvals.isEmpty() && fabs((x.toDouble()-((xvals.last()+step)/xfactor))/ x.toDouble()) > 1e-5 ) // TODO arbitrary limit!!
+		// TODO check first and last X and Y val.
+		xvals << (xvals.isEmpty() ? x.toDouble()*xfactor : xvals.last()+step) ;
 		// yvalue check -> (5.8.2) in paper Appl. Spec. 42(1), 151
-        if(wasDiff)
+		if(wasDiff)
 		{
 			xvals.remove(xvals.size()-1) ;
 			// identify, retrieve and remove item from head of string.
@@ -170,21 +170,21 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 			yInput.remove(QRegExp("[\\s]")) ;
 			// discard if empty
 			if (yInput.isEmpty()) break ;
-			
+
 			// identify first character and discard if NAN
 			QString firstChar = yInput.left(1) ;
 			yInput.remove(0,1) ;
 			if (firstChar == "?") break ;
-			
+
 			// interpret and discard if not equal
 			if (posSQZdigits.exactMatch(firstChar))
 				yInput.prepend(firstChar == "@" ? "+0" :
-						QString("%1").arg(firstChar.data()->toAscii()-'A'+1)) ;
+								  QString("%1").arg(firstChar.data()->toAscii()-'A'+1)) ;
 			else if (negSQZdigits.exactMatch(firstChar))
 				yInput.prepend(QString("-%1").arg(firstChar.data()->toAscii()-'a'+1)) ;
 			else
 				yInput.prepend(firstChar) ;
-			
+
 			if (yInput.toDouble()*yfactor != yvals.last()) // here no deviation ought to be allowed...
 				break ; // TODO error handling
 		}
@@ -198,8 +198,8 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 			line.remove(0,itemLength) ;
 			yInput.remove(QRegExp("[\\s]")) ;
 			if (yInput.isEmpty()) break ;
-			
-			
+
+
 			// identify first character and treat according to JCAMP rules
 			QString firstChar = yInput.left(1) ;
 			yInput.remove(0,1) ;
@@ -210,12 +210,12 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 				wasDiff = false ;
 				break ;
 			}
-			
+
 			// there might really be something to interpret:
 			if (posSQZdigits.exactMatch(firstChar))
 			{
 				yInput.prepend(firstChar == "@" ? "+0" :
-					QString("%1").arg(firstChar.data()->toAscii()-'A'+1)) ;
+								  QString("%1").arg(firstChar.data()->toAscii()-'A'+1)) ;
 				yvals << yInput.toDouble()*yfactor ;
 				wasDiff = false ;
 			}
@@ -228,7 +228,7 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 			else if (posDIFdigits.exactMatch(firstChar))
 			{
 				yInput.prepend(firstChar == "%" ? "+0" :
-						QString("%1").arg(firstChar.data()->toAscii()-'I')) ;
+								  QString("%1").arg(firstChar.data()->toAscii()-'I')) ;
 				yvals << yInput.toDouble()*yfactor + (yvals.isEmpty() ? NAN : yvals.last()) ;
 				wasDiff = true ;
 			}
@@ -266,18 +266,18 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 			{
 				yvals << QString("%1%2").arg(firstChar,yInput).toDouble()*yfactor ;
 			}
-			
+
 			// fill up xvals
 			while(xvals.size() < yvals.size())
 				xvals << xvals.last() + step ;
 		}
 	}
-	
+
 	// turn vectors into data
 	if (yvals.size() != xvals.size()) return ; // should not be necessary
-	
-    for (int i = 0 ; i < xvals.size() ; i++)
-        data << specDataPoint(xvals[i],yvals[i],0) ;
+
+	for (int i = 0 ; i < xvals.size() ; i++)
+		data << specDataPoint(xvals[i],yvals[i],0) ;
 }
 
 QHash<QString,specDescriptor> fileHeader(QTextStream& in) {
@@ -287,7 +287,7 @@ QHash<QString,specDescriptor> fileHeader(QTextStream& in) {
 	{
 		QString content = QStringList(headerContent[i].split(": ").mid(1)).join(": ").remove(QRegExp("^\"")).remove(QRegExp("\"$")) ;
 		headerItems[headerContent[i].split(": ")[0]] = (specDescriptor(content,
-				(content.contains(QRegExp("\\D"))) ? spec::editable : spec::numeric)) ;
+									       (content.contains(QRegExp("\\D"))) ? spec::editable : spec::numeric)) ;
 	}
 	if (headerItems["Kommentar"].content().contains("@"))
 		headerItems["Pump"] = specDescriptor(headerItems["Kommentar"].content().split("@ ")[1].split(" nm")[0],spec::numeric) ; // Pumpwellenlaenge
@@ -295,24 +295,24 @@ QHash<QString,specDescriptor> fileHeader(QTextStream& in) {
 }
 
 void fileHeader(QString header, QHash<QString, specDescriptor>& description) {
-    QStringList headerContent = header.split(QRegExp(", (?=(\\w+\\s)*\\w+:)")) ;
-    QHash<QString,specDescriptor> headerItems ;
-    QDoubleValidator validator ;
-    int a = 0 ;
-    foreach(QString headerEntry, headerContent)
-    {
-        a = 0 ;
-        QString name = headerEntry.section(": ",0,0),
-                content = headerEntry.section(": ",1) ;
-        content.remove(QRegExp("^\"")).remove(QRegExp("\"$")) ;
-        description[name] = specDescriptor(content,
-                                           validator.validate(content,a) == QValidator::Acceptable ?
-                                               spec::numeric : spec::editable) ;
+	QStringList headerContent = header.split(QRegExp(", (?=(\\w+\\s)*\\w+:)")) ;
+	QHash<QString,specDescriptor> headerItems ;
+	QDoubleValidator validator ;
+	int a = 0 ;
+	foreach(QString headerEntry, headerContent)
+	{
+		a = 0 ;
+		QString name = headerEntry.section(": ",0,0),
+				content = headerEntry.section(": ",1) ;
+		content.remove(QRegExp("^\"")).remove(QRegExp("\"$")) ;
+		description[name] = specDescriptor(content,
+						   validator.validate(content,a) == QValidator::Acceptable ?
+							   spec::numeric : spec::editable) ;
 
-    }
+	}
 
-    if (description["Kommentar"].content().contains("@"))
-        description["Pump"] = specDescriptor(description["Kommentar"].content().section("@ ",1,-1).section(" nm",0,0),spec::numeric) ; // Pumpwellenlaenge
+	if (description["Kommentar"].content().contains("@"))
+		description["Pump"] = specDescriptor(description["Kommentar"].content().section("@ ",1,-1).section(" nm",0,0),spec::numeric) ; // Pumpwellenlaenge
 }
 
 QVector<double> waveNumbers(const QStringList& wns) {
@@ -323,77 +323,77 @@ QVector<double> waveNumbers(const QStringList& wns) {
 
 QList<specModelItem*> readHVMeasurement(const QString& measurement, QString filename)
 {
-    QStringList lines = measurement.split("\n") ;
-    QList<specModelItem*> newItems ;
-    QHash<QString,specDescriptor> headerItems ;
-    headerItems["Datei"] = filename ;
-    fileHeader(lines.takeFirst(), headerItems) ;
-    QStringList wns = lines.takeFirst().split(" ") ;
-    bool polarisatorMessung = wns.takeFirst().toInt() ;
-    QVector<QVector<double> > wavenumbers ;
+	QStringList lines = measurement.split("\n") ;
+	QList<specModelItem*> newItems ;
+	QHash<QString,specDescriptor> headerItems ;
+	headerItems["Datei"] = filename ;
+	fileHeader(lines.takeFirst(), headerItems) ;
+	QStringList wns = lines.takeFirst().split(" ") ;
+	bool polarisatorMessung = wns.takeFirst().toInt() ;
+	QVector<QVector<double> > wavenumbers ;
 
-    QStringList::iterator wnsIt = wns.begin() ;
-    for (int i = 0 ; i+32 <= wns.size() ; i += 32)
-    {
-        wavenumbers << QVector<double>() ;
-        for (int j = 0 ; j < 32 ; ++j)
-            wavenumbers.last() << (wnsIt++)->toDouble() ;
-    }
+	QStringList::iterator wnsIt = wns.begin() ;
+	for (int i = 0 ; i+32 <= wns.size() ; i += 32)
+	{
+		wavenumbers << QVector<double>() ;
+		for (int j = 0 ; j < 32 ; ++j)
+			wavenumbers.last() << (wnsIt++)->toDouble() ;
+	}
 
-    int counter = 0 ;
-    for (QStringList::iterator it = lines.begin() ; it != lines.end() ; ++it)
-    {
-        QStringList dataEntries = it->split(QRegExp("[ ()]"),QString::SkipEmptyParts) ;
-        if (dataEntries.size() < 1) continue ;
-        headerItems["Zeit"] = dataEntries.takeFirst().toDouble() ;
+	int counter = 0 ;
+	for (QStringList::iterator it = lines.begin() ; it != lines.end() ; ++it)
+	{
+		QStringList dataEntries = it->split(QRegExp("[ ()]"),QString::SkipEmptyParts) ;
+		if (dataEntries.size() < 1) continue ;
+		headerItems["Zeit"] = dataEntries.takeFirst().toDouble() ;
 
-        QStringList::iterator entry = dataEntries.begin() ;
-        for (int i = 0 ; (i+1)*32*2 <= dataEntries.size() ; ++i)
-        {
-            QVector<QVector<double> >::iterator currentWns = wavenumbers.begin()
-                    + i/(polarisatorMessung ? 2 : 1) ;
-            QVector<specDataPoint> dataPoints ;
-            for (int j = 0 ; j < 32 ; ++j)
-            {
-                double value = (entry++)->toDouble() ;
-                double mintv = (entry++)->toDouble() ;
-                dataPoints << specDataPoint(currentWns->at(j), value, mintv) ;
-            }
-            headerItems["nu"] = (dataPoints.size() > 1) ?
-                        (dataPoints.first().nu + dataPoints.last().nu)/2. :
-                        ((dataPoints.size() == 1) ? dataPoints.first().nu : NAN) ;
-            if (polarisatorMessung) headerItems["Polarisation"] = i % 2 ;
-	    headerItems["Index"] = counter ++ ;
-            newItems << new specDataItem(dataPoints, headerItems) ;
-        }
-    }
-    return newItems ;
+		QStringList::iterator entry = dataEntries.begin() ;
+		for (int i = 0 ; (i+1)*32*2 <= dataEntries.size() ; ++i)
+		{
+			QVector<QVector<double> >::iterator currentWns = wavenumbers.begin()
+					+ i/(polarisatorMessung ? 2 : 1) ;
+			QVector<specDataPoint> dataPoints ;
+			for (int j = 0 ; j < 32 ; ++j)
+			{
+				double value = (entry++)->toDouble() ;
+				double mintv = (entry++)->toDouble() ;
+				dataPoints << specDataPoint(currentWns->at(j), value, mintv) ;
+			}
+			headerItems["nu"] = (dataPoints.size() > 1) ?
+						(dataPoints.first().nu + dataPoints.last().nu)/2. :
+						((dataPoints.size() == 1) ? dataPoints.first().nu : NAN) ;
+			if (polarisatorMessung) headerItems["Polarisation"] = i % 2 ;
+			headerItems["Index"] = counter ++ ;
+			newItems << new specDataItem(dataPoints, headerItems) ;
+		}
+	}
+	return newItems ;
 }
 
 
 
 QList<specModelItem*> readHVFile(QFile& file)
 {
-    specProfiler profiler("Datei einlesen") ;
-    QTextStream in(&file) ;
+	specProfiler profiler("Datei einlesen") ;
+	QTextStream in(&file) ;
 	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system
-    QStringList measurements = in.readAll().split(QRegExp("\n(?=Solvens)"), QString::SkipEmptyParts) ;
+	QStringList measurements = in.readAll().split(QRegExp("\n(?=Solvens)"), QString::SkipEmptyParts) ;
 
-//    QList<specModelItem*> newItems ;
-    QString filename = QFileInfo(file.fileName()).fileName() ;
-    specFolderItem *top = new specFolderItem(0,filename) ;
-    if (measurements.size() == 1) top->addChildren(readHVMeasurement(measurements.first(), filename)) ;
-    else
-    {
-        int counter = 0 ;
-        foreach(const QString& measurement, measurements)
-        {
-            specFolderItem *folder = new specFolderItem(0, QString::number(counter++)) ;
-            folder->addChildren(readHVMeasurement(measurement, filename)) ;
-            top->addChild(folder, top->children()) ;
-        }
-    }
-    return QList<specModelItem*>() << top ;
+	//    QList<specModelItem*> newItems ;
+	QString filename = QFileInfo(file.fileName()).fileName() ;
+	specFolderItem *top = new specFolderItem(0,filename) ;
+	if (measurements.size() == 1) top->addChildren(readHVMeasurement(measurements.first(), filename)) ;
+	else
+	{
+		int counter = 0 ;
+		foreach(const QString& measurement, measurements)
+		{
+			specFolderItem *folder = new specFolderItem(0, QString::number(counter++)) ;
+			folder->addChildren(readHVMeasurement(measurement, filename)) ;
+			top->addChild(folder, top->children()) ;
+		}
+	}
+	return QList<specModelItem*>() << top ;
 }
 
 QPair<QString,QString> interpretString(QString& string)
@@ -406,7 +406,7 @@ QPair<QString,QString> interpretString(QString& string)
 		string.remove(0,2+final) ;
 		return QPair<QString,QString>("Datei",fileName) ;
 	}
-	
+
 	if (string.left(7) == "Messung")
 	{
 		bool success = (string.mid(8,1) =="e") ;
@@ -440,16 +440,16 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 {
 	QTextStream in(&file) ;
 	QList<specModelItem*> list ;
-	
+
 	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system
-	
+
 	QList<specModelItem*> logData ;
-    QString firstLine, secondLine ;
+	QString firstLine, secondLine ;
 	while(!in.atEnd())
 	{
 		QHash<QString,specDescriptor> descriptors ;
-        if (firstLine.isEmpty()) firstLine = in.readLine() ;
-        // protection agains binary files
+		if (firstLine.isEmpty()) firstLine = in.readLine() ;
+		// protection agains binary files
 		for (QString::iterator i = firstLine.begin() ; i != firstLine.end() ; ++i)
 		{
 			if (!(QChar(*i).isPrint()))
@@ -457,7 +457,7 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 				QMessageBox::critical(0,QObject::tr("Binary File"),
 						      QObject::tr("File ") +
 						      file.fileName() +
-                              QObject::tr(" seems to be binary.  Aborting import (found non-printable character at position ") +
+						      QObject::tr(" seems to be binary.  Aborting import (found non-printable character at position ") +
 						      QString::number(in.pos()) +
 						      QObject::tr(").  Context:\n")+ firstLine) ;
 				for (QList<specModelItem*>::iterator j = logData.begin() ; j != logData.end() ; ++j)
@@ -465,25 +465,25 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 				return QList<specModelItem*>() ;
 			}
 		}
-        // verification of date/time string:
-        QRegExp dateTimeString("^\\d\\d\\.\\d\\d\\.\\d\\d \\d\\d:\\d\\d:\\d\\d : ") ;
-        if (!firstLine.isEmpty() && !dateTimeString.exactMatch(firstLine.left(20)))
-        {
-            QMessageBox::critical(0, QObject::tr("Not a log file"),
-                                  QObject::tr("File ") +
-                                  file.fileName() +
-                                  QObject::tr(" does not conform with the log file format (not date and time at beginning of a line at position ") +
-                                  QString::number(in.pos()) +
-                                  QObject::tr("). Offending line:\n")
-                                  + firstLine) ;
-            for (QList<specModelItem*>::iterator j = logData.begin() ; j != logData.end() ; ++j)
-                delete *j ;
-            return QList<specModelItem*>() ;
-        }
+		// verification of date/time string:
+		QRegExp dateTimeString("^\\d\\d\\.\\d\\d\\.\\d\\d \\d\\d:\\d\\d:\\d\\d : ") ;
+		if (!firstLine.isEmpty() && !dateTimeString.exactMatch(firstLine.left(20)))
+		{
+			QMessageBox::critical(0, QObject::tr("Not a log file"),
+					      QObject::tr("File ") +
+					      file.fileName() +
+					      QObject::tr(" does not conform with the log file format (not date and time at beginning of a line at position ") +
+					      QString::number(in.pos()) +
+					      QObject::tr("). Offending line:\n")
+					      + firstLine) ;
+			for (QList<specModelItem*>::iterator j = logData.begin() ; j != logData.end() ; ++j)
+				delete *j ;
+			return QList<specModelItem*>() ;
+		}
 		if (!in.atEnd()) secondLine = in.readLine() ;
-	descriptors["Tag"] = specDescriptor(takeDateOrTime(secondLine)) ;
+		descriptors["Tag"] = specDescriptor(takeDateOrTime(secondLine)) ;
 		descriptors["Uhrzeit"] = specDescriptor(takeDateOrTime(secondLine)) ;
-        if (firstLine == "")
+		if (firstLine == "")
 		{
 			while(secondLine.count("\"")%2)
 				secondLine += "\n" + in.readLine() ;
@@ -497,7 +497,7 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 			}
 			logData += new specLogMessage(descriptors,0, mainDescriptor) ;
 		}
-        else
+		else
 		{
 			descriptors["A-Tag"] = specDescriptor(takeDateOrTime(firstLine)) ;
 			descriptors["A-Zeit"] = specDescriptor(takeDateOrTime(firstLine)) ;
@@ -507,20 +507,20 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 				QPair<QString,QString> newDescriptor = interpretString(firstLine) ;
 				descriptors[newDescriptor.first] = newDescriptor.second ;
 			}
-            if (secondLine.left(7) == "Messung")
-            {
-                while(secondLine.size())
-                {
-                    QPair<QString,QString> newDescriptor = interpretString(secondLine) ;
-                    descriptors[newDescriptor.first] = newDescriptor.second ;
-                }
-            }
-            else
-            {
-                firstLine = descriptors["Tag"].content() + " " + descriptors["Uhrzeit"].content() + " : " + secondLine ;
-                descriptors["Tag"] = descriptors["A-Tag"] ;
-                descriptors["Uhrzeit"] = descriptors["A-Zeit"] ;
-            }
+			if (secondLine.left(7) == "Messung")
+			{
+				while(secondLine.size())
+				{
+					QPair<QString,QString> newDescriptor = interpretString(secondLine) ;
+					descriptors[newDescriptor.first] = newDescriptor.second ;
+				}
+			}
+			else
+			{
+				firstLine = descriptors["Tag"].content() + " " + descriptors["Uhrzeit"].content() + " : " + secondLine ;
+				descriptors["Tag"] = descriptors["A-Tag"] ;
+				descriptors["Uhrzeit"] = descriptors["A-Zeit"] ;
+			}
 			logData += new specLogEntryItem(descriptors) ;
 		}
 	}
@@ -530,52 +530,52 @@ QList<specModelItem*> readLogFile(QFile& file) // TODO revise when logentry clas
 specFileImportFunction fileFilter(const QString &fileName)
 {
 	QFile file(fileName) ;
-    if (!file.open(QFile::ReadOnly | QFile::Text)) return 0 ;
+	if (!file.open(QFile::ReadOnly | QFile::Text)) return 0 ;
 	QTextStream in(&file) ;
 	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ;
 	QString sample = in.readLine(5) ;
 	QList<specModelItem*> (*pointer)(QFile&) = 0 ;
 	if (sample == "PE IR") pointer = readPEFile ;
-    else if (sample.left(4) == "PEPE") pointer = readPEBinary ;
+	else if (sample.left(4) == "PEPE") pointer = readPEBinary ;
 	else if (sample == "Solve") pointer = readHVFile ;
-    else if (sample == "Time ") pointer = readSKHIFile ;
-    else if (sample.left(2) == "##") pointer = readJCAMPFile ; // ???? TODO
-    else
-    {
-        for (int i = 0 ; i < 10 ; ++i)
-            sample += in.readLine() ;
-        if (sample.contains(QRegExp("^\\d\\d\\.\\d\\d\\.\\d\\d \\d\\d:\\d\\d:\\d\\d : "))) pointer = readLogFile ;
-        else pointer = readXYFILE ;
-    }
+	else if (sample == "Time ") pointer = readSKHIFile ;
+	else if (sample.left(2) == "##") pointer = readJCAMPFile ; // ???? TODO
+	else
+	{
+		for (int i = 0 ; i < 10 ; ++i)
+			sample += in.readLine() ;
+		if (sample.contains(QRegExp("^\\d\\d\\.\\d\\d\\.\\d\\d \\d\\d:\\d\\d:\\d\\d : "))) pointer = readLogFile ;
+		else pointer = readXYFILE ;
+	}
 	file.close() ;
 	return pointer ;
 }
 
 QList<specModelItem*> readPEBinary(QFile &file)
 {
-    file.close();
-    if (!file.open(QFile::ReadOnly)) return QList<specModelItem*>() ;
-    specPEFile peData(file.readAll()) ;
-    specDataItem dataItem(peData) ; // TODO interface is clumsy...
-    dataItem.changeDescriptor("Datei", QFileInfo(file.fileName()).fileName()) ;
-    dataItem.setDescriptorProperties("Datei", spec::def);
-    return QList<specModelItem*>() << new specDataItem(dataItem) ;
+	file.close();
+	if (!file.open(QFile::ReadOnly)) return QList<specModelItem*>() ;
+	specPEFile peData(file.readAll()) ;
+	specDataItem dataItem(peData) ; // TODO interface is clumsy...
+	dataItem.changeDescriptor("Datei", QFileInfo(file.fileName()).fileName()) ;
+	dataItem.setDescriptorProperties("Datei", spec::def);
+	return QList<specModelItem*>() << new specDataItem(dataItem) ;
 }
 
 QList<specModelItem*> readPEFile(QFile& file)
 {
 	QTextStream in(&file) ;
-	
+
 	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system
 	QHash<QString,specDescriptor> headerItems ;
 	headerItems["Datei"] = specDescriptor(QFileInfo(file.fileName()).fileName(),spec::def) ;
 	while(in.readLine() != "#DATA") ; // skip header
-	
+
 	QList<specModelItem*> specData ;
 	QStringList buffer ;
 	QVector<specDataPoint> dataPoints ;
 	while(!in.atEnd() && (buffer = in.readLine().split(QRegExp("\\s+"))).size() >1)
-        dataPoints += specDataPoint(buffer[0].toDouble(),buffer[1].toDouble(),0) ;
+		dataPoints += specDataPoint(buffer[0].toDouble(),buffer[1].toDouble(),0) ;
 	specData += new specDataItem(dataPoints,headerItems) ;
 	specData.last()->invalidate();
 	return specData ;
@@ -623,14 +623,14 @@ QVector<double> gaussjinv(QVector<QVector<double> >& A, QVector<double>& b)
 					A[j][k] -= A[icol][k]*dummy ;
 			}
 		}
-		
+
 	}
-// rearranging the matrix ;	
+	// rearranging the matrix ;
 	for(QVector<QVector<double>::size_type>::size_type i = indxc.size() -1 ; i >= 0 ; i--)
 		if (indxr[i] != indxc[i])
 			for(QVector<QVector<double> >::size_type j = 0 ; j < A.size() ; j++)
 				qSwap(A[j][indxr[i]], A[j][indxc[i]]) ;
-// applying the inverted matrix to the vector
+	// applying the inverted matrix to the vector
 	QVector<double> retval ;
 	for (QVector<QVector<double> >::size_type i = 0 ; i < A.size() ; i++)
 	{
@@ -644,141 +644,141 @@ QVector<double> gaussjinv(QVector<QVector<double> >& A, QVector<double>& b)
 
 QList<specModelItem*> readSKHIFile(QFile& file)
 {
-    QTextStream in(&file) ;
-    in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system
-    QVector<QPair<QPair<double, double>,
-            QPair<QVector<double>, QVector<double> > > > integrale ;
-    QStringList integralNamen = in.readLine().split("\t") ;
-    QVector<double> zeiten ;
-    integralNamen.takeFirst() ;
-    integralNamen.takeFirst() ;
-    foreach(QString integralName, integralNamen)
-        integrale << qMakePair(qMakePair(integralName.section(" - ",0,0).toDouble(),
-                               integralName.section(" - ",1,1).toDouble()),
-                               qMakePair(QVector<double>(), QVector<double>()));
+	QTextStream in(&file) ;
+	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system
+	QVector<QPair<QPair<double, double>,
+			QPair<QVector<double>, QVector<double> > > > integrale ;
+	QStringList integralNamen = in.readLine().split("\t") ;
+	QVector<double> zeiten ;
+	integralNamen.takeFirst() ;
+	integralNamen.takeFirst() ;
+	foreach(QString integralName, integralNamen)
+		integrale << qMakePair(qMakePair(integralName.section(" - ",0,0).toDouble(),
+						 integralName.section(" - ",1,1).toDouble()),
+				       qMakePair(QVector<double>(), QVector<double>()));
 
 
-    QHash<QString,specDescriptor> headerItems ;
-    foreach(QString descriptor, in.readLine().split(", "))
-        headerItems[descriptor.section(": ",0,0)] = specDescriptor(descriptor.section(": ",1,1),spec::numeric | spec::editable) ;
-    headerItems["raw"] = 1 ;
-    headerItems["file"] = QFileInfo(file.fileName()).fileName() ;
+	QHash<QString,specDescriptor> headerItems ;
+	foreach(QString descriptor, in.readLine().split(", "))
+		headerItems[descriptor.section(": ",0,0)] = specDescriptor(descriptor.section(": ",1,1),spec::numeric | spec::editable) ;
+	headerItems["raw"] = 1 ;
+	headerItems["file"] = QFileInfo(file.fileName()).fileName() ;
 
-    while(!in.atEnd())
-    {
-        QStringList firstLine = in.readLine().split("\t") ;
-        QStringList secondLine = in.readLine().split("\t") ;
-        if (firstLine.size() < 2 || secondLine.size() < 2) break ;
-        zeiten << firstLine.takeFirst().toDouble() ;
-        secondLine.takeFirst() ;
-        firstLine.takeFirst() ;
-        secondLine.takeFirst() ;
-        for (int i = 0 ; i < integrale.size() ; ++i)
-        {
-            double a = firstLine.isEmpty() ? NAN : firstLine.takeFirst().toDouble() ;
-            double b = secondLine.isEmpty()? NAN : secondLine.takeFirst().toDouble() ;
-            integrale[i].second.first << a ;
-            integrale[i].second.second << b ;
-        }
-    }
+	while(!in.atEnd())
+	{
+		QStringList firstLine = in.readLine().split("\t") ;
+		QStringList secondLine = in.readLine().split("\t") ;
+		if (firstLine.size() < 2 || secondLine.size() < 2) break ;
+		zeiten << firstLine.takeFirst().toDouble() ;
+		secondLine.takeFirst() ;
+		firstLine.takeFirst() ;
+		secondLine.takeFirst() ;
+		for (int i = 0 ; i < integrale.size() ; ++i)
+		{
+			double a = firstLine.isEmpty() ? NAN : firstLine.takeFirst().toDouble() ;
+			double b = secondLine.isEmpty()? NAN : secondLine.takeFirst().toDouble() ;
+			integrale[i].second.first << a ;
+			integrale[i].second.second << b ;
+		}
+	}
 
-    QList<specModelItem*> newItems ;
-    for (int i = 0 ; i < integrale.size() ; ++i)
-    {
-        headerItems["begin"] = integrale[i].first.first ;
-        headerItems["end"]   = integrale[i].first.second ;
-        QVector<specDataPoint> rawOne, rawTwo, diff ;
-        for (int j = 0 ; j < integrale[i].second.first.size() ; ++j)
-        {
-            double a =  integrale[i].second.first[j],
-                    b = integrale[i].second.second[j],
-                    t = zeiten[j] ;
-            rawOne << specDataPoint(t, a, NAN) ;
-            rawTwo << specDataPoint(t, b, NAN) ;
-            diff   << specDataPoint(t, a-b, NAN) ;
-        }
-        headerItems["raw"] = 1 ;
-        newItems << new specDataItem(rawOne,headerItems)
-                 << new specDataItem(rawTwo,headerItems) ;
-        headerItems["raw"] = 0 ;
-        newItems << new specDataItem(diff,headerItems) ;
-    }
-    return newItems ;
+	QList<specModelItem*> newItems ;
+	for (int i = 0 ; i < integrale.size() ; ++i)
+	{
+		headerItems["begin"] = integrale[i].first.first ;
+		headerItems["end"]   = integrale[i].first.second ;
+		QVector<specDataPoint> rawOne, rawTwo, diff ;
+		for (int j = 0 ; j < integrale[i].second.first.size() ; ++j)
+		{
+			double a =  integrale[i].second.first[j],
+					b = integrale[i].second.second[j],
+					t = zeiten[j] ;
+			rawOne << specDataPoint(t, a, NAN) ;
+			rawTwo << specDataPoint(t, b, NAN) ;
+			diff   << specDataPoint(t, a-b, NAN) ;
+		}
+		headerItems["raw"] = 1 ;
+		newItems << new specDataItem(rawOne,headerItems)
+			 << new specDataItem(rawTwo,headerItems) ;
+		headerItems["raw"] = 0 ;
+		newItems << new specDataItem(diff,headerItems) ;
+	}
+	return newItems ;
 }
 
 QList<specModelItem*> readXYFILE(QFile &file)
 {
-    QTextStream in(&file) ;
-    in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system
-    QList<specModelItem*> newItems ;
+	QTextStream in(&file) ;
+	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ; // File produced on windows system
+	QList<specModelItem*> newItems ;
 
-    // determine separator
-    QChar separator ;
-    QString content = in.readAll() ;
-    if (content.contains('\t')) separator = '\t' ;
-    else if (content.contains(' ')) separator = ' ' ;
-    else if (content.contains(',')) separator = ',' ;
-    else
-    {
-        QMessageBox::critical(0,QObject::tr("XY import failed"), QObject::tr("Could not find valid data field separators (tab, space, comma)")) ;
-        return newItems ;
-    }
+	// determine separator
+	QChar separator ;
+	QString content = in.readAll() ;
+	if (content.contains('\t')) separator = '\t' ;
+	else if (content.contains(' ')) separator = ' ' ;
+	else if (content.contains(',')) separator = ',' ;
+	else
+	{
+		QMessageBox::critical(0,QObject::tr("XY import failed"), QObject::tr("Could not find valid data field separators (tab, space, comma)")) ;
+		return newItems ;
+	}
 
-    // split entries up
-    QList<QStringList> entries ;
-    foreach(QString line, content.split("\n"))
-	entries << line.split(separator, QString::SkipEmptyParts) ;
+	// split entries up
+	QList<QStringList> entries ;
+	foreach(QString line, content.split("\n"))
+		entries << line.split(separator, QString::SkipEmptyParts) ;
 
-    // determine if first line can be used as header
-    QDoubleValidator validator ;
-    int pos = 0 ;
-    QStringList headers ;
-    if (!entries.isEmpty() && !entries.first().isEmpty() && validator.validate(entries.first().first(), pos) != QValidator::Acceptable)
-        headers = entries.takeFirst() ;
+	// determine if first line can be used as header
+	QDoubleValidator validator ;
+	int pos = 0 ;
+	QStringList headers ;
+	if (!entries.isEmpty() && !entries.first().isEmpty() && validator.validate(entries.first().first(), pos) != QValidator::Acceptable)
+		headers = entries.takeFirst() ;
 
-    // determine number of columns
-    if (entries.isEmpty() || entries.first().isEmpty()) return newItems ;
-    int numberOfColums = entries.first().size() ;
-    int i = 0 ;
-    foreach(QStringList line, entries)
-    {
-        ++i ;
-        if (line.size() != numberOfColums && line.size() > 1)
-        {
-            QMessageBox::critical(0, QObject::tr("XY import failed"),
-                                  QObject::tr("The number of columns differs in at least one line"
-                                              " differs from that determined for the first line. "
-                                              "(Error occured in line %1. Pre-determined number of"
-                                              " columns: %2. The line in question has %3 columns.)").
-                                  arg(i).arg(numberOfColums).arg(line.size())) ;
-            return newItems ;
-        }
-    }
+	// determine number of columns
+	if (entries.isEmpty() || entries.first().isEmpty()) return newItems ;
+	int numberOfColums = entries.first().size() ;
+	int i = 0 ;
+	foreach(QStringList line, entries)
+	{
+		++i ;
+		if (line.size() != numberOfColums && line.size() > 1)
+		{
+			QMessageBox::critical(0, QObject::tr("XY import failed"),
+					      QObject::tr("The number of columns differs in at least one line"
+							  " differs from that determined for the first line. "
+							  "(Error occured in line %1. Pre-determined number of"
+							  " columns: %2. The line in question has %3 columns.)").
+					      arg(i).arg(numberOfColums).arg(line.size())) ;
+			return newItems ;
+		}
+	}
 
-    // generate data
-    QVector<double> xValues ;
-    QVector<QVector<double> > yValues(numberOfColums-1) ;
-    foreach(QStringList line, entries)
-    {
-        if (!(line.size()>1)) continue ;
-        xValues << line.first().toDouble() ;
-        for (int i = 0 ; i < numberOfColums-1 ; ++i)
-            yValues[i] << line[i+1].toDouble() ;
-    }
+	// generate data
+	QVector<double> xValues ;
+	QVector<QVector<double> > yValues(numberOfColums-1) ;
+	foreach(QStringList line, entries)
+	{
+		if (!(line.size()>1)) continue ;
+		xValues << line.first().toDouble() ;
+		for (int i = 0 ; i < numberOfColums-1 ; ++i)
+			yValues[i] << line[i+1].toDouble() ;
+	}
 
-    // generate items
-    QHash<QString, specDescriptor> description ;
-    description["File"] = QFileInfo(file.fileName()).fileName() ;
-    for (int i = 0 ; i < numberOfColums-1 ; ++i)
-    {
-        if (headers.size() > i)
-            description["Column"] = headers[i+ (headers.size() == numberOfColums ? 1 : 0)] ;
-        else if (description.contains("Column"))
-            description.remove("Column") ;
-        QVector<specDataPoint> points ;
-        for (int j = 0 ; j < xValues.size() ; ++j)
-            points << specDataPoint(xValues[j], yValues[i][j], NAN) ;
-        newItems << new specDataItem(points, description) ;
-    }
-    return newItems ;
+	// generate items
+	QHash<QString, specDescriptor> description ;
+	description["File"] = QFileInfo(file.fileName()).fileName() ;
+	for (int i = 0 ; i < numberOfColums-1 ; ++i)
+	{
+		if (headers.size() > i)
+			description["Column"] = headers[i+ (headers.size() == numberOfColums ? 1 : 0)] ;
+		else if (description.contains("Column"))
+			description.remove("Column") ;
+		QVector<specDataPoint> points ;
+		for (int j = 0 ; j < xValues.size() ; ++j)
+			points << specDataPoint(xValues[j], yValues[i][j], NAN) ;
+		newItems << new specDataItem(points, description) ;
+	}
+	return newItems ;
 }

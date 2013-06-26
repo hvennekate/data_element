@@ -13,22 +13,22 @@ class specAppWindow : public QMainWindow
 public:
 	specAppWindow();
 	~specAppWindow();
-	
+
 private slots:
 	void newFile();
 	void openFile();
 	void openFile(const QString&) ;
-	
+
 protected:
 	void closeEvent(QCloseEvent*) ;
-	
+
 private:
 	QSettings settings ;
 	void createActions();
 	void createMenus();
 	void createToolBars() ;
 	void addDock(specPlotWidget*) ;
-	
+
 	QMenu *fileMenu;
 	QMenu *helpMenu;
 	QToolBar *fileToolBar;

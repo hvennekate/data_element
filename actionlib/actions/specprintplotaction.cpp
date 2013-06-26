@@ -10,12 +10,12 @@
 
 specPrintPlotAction::specPrintPlotAction(QObject *parent) :
 	specUndoAction(parent),
-    printer(0)
+	printer(0)
 {
 #ifndef WIN32BUILD
-    signal(SIGPIPE, SIG_IGN) ;
+	signal(SIGPIPE, SIG_IGN) ;
 #endif
-    printer = new QPrinter ; // TODO seems to cause CUPS-related program crashes...
+	printer = new QPrinter ; // TODO seems to cause CUPS-related program crashes...
 	specPlot *plot = (specPlot*) parentWidget() ;
 	QSize plotSize = plot->size() ;
 	double aspectRatio = (double) plotSize.width() / plotSize.height() ;

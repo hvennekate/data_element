@@ -14,7 +14,7 @@ private:
 protected:
 	double yVal ;
 public:
-    specRange ( double,double, double y = 0 );
+	specRange ( double,double, double y = 0 );
 	void pointMoved ( const int&, const double&, const double& ) ;
 	virtual void refreshPlotData() ;
 	int rtti() const { return spec::zeroRange ; }

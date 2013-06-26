@@ -1,8 +1,8 @@
 #include "specundocommand.h"
 
 specUndoCommand::specUndoCommand(specUndoCommand *parent) :
-    QUndoCommand(parent),
-    pO(parent ? parent->parentObject() : 0) //parent->parentWidget()) // TODO adapt calling code
+	QUndoCommand(parent),
+	pO(parent ? parent->parentObject() : 0) //parent->parentWidget()) // TODO adapt calling code
 {
 }
 

@@ -14,13 +14,13 @@ bool specMimeConverter::canImport(const QMimeData *data)
 
 bool specMimeConverter::canImport(const QStringList &types)
 {
-    QStringList importable = importableTypes() ;
-    foreach(const QString& type, types)
-        if (importable.contains(type)) return true ;
+	QStringList importable = importableTypes() ;
+	foreach(const QString& type, types)
+		if (importable.contains(type)) return true ;
 	return false ;
 }
 
 QStringList specMimeConverter::importableTypes() const
 {
-    return QStringList() ;
+	return QStringList() ;
 }

@@ -15,7 +15,7 @@ void specToggleFitStyleCommand::setup(const QModelIndex & i)
 
 void specToggleFitStyleCommand::parentAssigned()
 {
-//	if (!parentObject()) return ;
+	//	if (!parentObject()) return ;
 	item.setModel(qobject_cast<specModel*>(parentObject()));
 }
 

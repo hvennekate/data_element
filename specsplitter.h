@@ -5,11 +5,11 @@
 
 class specSplitterHandle : public QSplitterHandle
 {
-    Q_OBJECT
+	Q_OBJECT
 private:
-    void mousePressEvent(QMouseEvent *) ;
+	void mousePressEvent(QMouseEvent *) ;
 public:
-    specSplitterHandle(Qt::Orientation orientation, QSplitter * parent) ;
+	specSplitterHandle(Qt::Orientation orientation, QSplitter * parent) ;
 };
 
 class specSplitter : public QSplitter
@@ -20,7 +20,7 @@ public:
 	explicit specSplitter(QWidget *parent= 0) ;
 
 private:
-    QSplitterHandle* createHandle() ;
+	QSplitterHandle* createHandle() ;
 };
 
 #endif // SPECSPLITTER_H

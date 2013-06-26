@@ -1,7 +1,7 @@
 #include "specrequiresitemaction.h"
 
 specRequiresItemAction::specRequiresItemAction(QObject *parent) :
-    specItemAction(parent)
+	specItemAction(parent)
 {
 }
 

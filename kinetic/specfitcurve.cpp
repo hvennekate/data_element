@@ -54,7 +54,7 @@ void specFitCurve::fitData::reevaluate()
 	{
 		try
 		{
-				parser->Eval(y, samples.size()) ;
+			parser->Eval(y, samples.size()) ;
 		}
 		catch(mu::Parser::exception_type &p)
 		{
@@ -72,10 +72,10 @@ void specFitCurve::fitData::reevaluate()
 
 specFitCurve::specFitCurve()
 	: expression(specDescriptor("",spec::editable)),
-      parser(0),
-      variablesMulti(false),
-      expressionMulti(false),
-      messagesMulti(false)
+	  parser(0),
+	  variablesMulti(false),
+	  expressionMulti(false),
+	  messagesMulti(false)
 {
 }
 
@@ -97,14 +97,14 @@ void specFitCurve::refreshPlotData()
 
 QString specFitCurve::editDescriptor(const QString &key)
 {
-    if (key == QObject::tr("Fit variables"))
-    {
-        QStringList results ;
-        foreach(variablePair vpair, variables)
-            results << vpair.first + " = " + QString::number(vpair.second) ;
-        return results.join("\n") ;
-    }
-    return descriptor(key, true) ;
+	if (key == QObject::tr("Fit variables"))
+	{
+		QStringList results ;
+		foreach(variablePair vpair, variables)
+			results << vpair.first + " = " + QString::number(vpair.second) ;
+		return results.join("\n") ;
+	}
+	return descriptor(key, true) ;
 }
 
 QString specFitCurve::descriptor(const QString &key, bool full)
@@ -112,12 +112,12 @@ QString specFitCurve::descriptor(const QString &key, bool full)
 	if (QObject::tr("Fit variables") == key)
 	{
 		QStringList variableDescriptors ;
-        for (int i = 0 ; i < variables.size() ; ++i)
-            variableDescriptors << variables[i].first + " = " + QString::number(variables[i].second)
-                                   + ((i < numericalErrors.size() && !std::isnan(numericalErrors[i])) ?
-                                          " +/- " + QString::number(numericalErrors[i])
-                                        : QString(""));
-        if (full || variablesMulti)
+		for (int i = 0 ; i < variables.size() ; ++i)
+			variableDescriptors << variables[i].first + " = " + QString::number(variables[i].second)
+					       + ((i < numericalErrors.size() && !std::isnan(numericalErrors[i])) ?
+							  " +/- " + QString::number(numericalErrors[i])
+							: QString(""));
+		if (full || variablesMulti)
 			return variableDescriptors.join("\n") ;
 		if (activeVar >= 0 && activeVar < variableDescriptors.size())
 			return variableDescriptors[activeVar] ;
@@ -126,7 +126,7 @@ QString specFitCurve::descriptor(const QString &key, bool full)
 	if (QObject::tr("Fit parameters") == key)
 		return fitParameters.join(", ") ;
 	if (QObject::tr("Fit expression") == key)
-        return expression.content(full || expressionMulti) ;
+		return expression.content(full || expressionMulti) ;
 	if (QObject::tr("Fit messages") == key)
 	{
 		if (!errorString.isEmpty())
@@ -137,7 +137,7 @@ QString specFitCurve::descriptor(const QString &key, bool full)
 		}
 		if (fitData* fit = dynamic_cast<fitData*>(data()))
 		{
-            if (full || messagesMulti)
+			if (full || messagesMulti)
 				return fit->errorString ;
 			return fit->errorString.section("\n",0,0) ;
 		}
@@ -155,24 +155,24 @@ bool specFitCurve::changeDescriptor(QString key, QString value)
 	if (QObject::tr("Fit variables") == key)
 	{
 		variables.clear();
-        numericalErrors.clear();
+		numericalErrors.clear();
 		foreach(QString line, value.split("\n"))
 		{
-            line.remove(QRegExp("\\s")) ;
-            double errorValue = NAN ;
-            bool ok = true ;
-            QStringList l = line.split("+/-") ;
-            line = l.first() ;
-            errorValue = (l.size() > 1 ? l[1].toDouble(&ok) : NAN) ;
-            if (!ok) errorValue =  NAN ;
-            if (! line.contains("=")) continue ;
+			line.remove(QRegExp("\\s")) ;
+			double errorValue = NAN ;
+			bool ok = true ;
+			QStringList l = line.split("+/-") ;
+			line = l.first() ;
+			errorValue = (l.size() > 1 ? l[1].toDouble(&ok) : NAN) ;
+			if (!ok) errorValue =  NAN ;
+			if (! line.contains("=")) continue ;
 			QString var = line.section("=",0,0) ;
 			double value = line.section("=",1,1).toDouble() ;
 			if (acceptableVariable(var))
-            {
-                numericalErrors << errorValue ;
-                variables << qMakePair(var,value) ;
-            }
+			{
+				numericalErrors << errorValue ;
+				variables << qMakePair(var,value) ;
+			}
 		}
 	}
 	if (QObject::tr("Fit parameters") == key)
@@ -200,9 +200,9 @@ void specFitCurve::attach(QwtPlot *plot)
 	qDebug() << "Data size:" << dataSize() ;
 	for (size_t i  = 0 ; i < qMin((size_t) 10,dataSize()) ; ++i)
 		qDebug() << sample(i) ;
-//	if (plot)
-//		if (fitData *d = dynamic_cast<fitData*>(data()))
-//			d->setRectOfInterest(plot->);
+	//	if (plot)
+	//		if (fitData *d = dynamic_cast<fitData*>(data()))
+	//			d->setRectOfInterest(plot->);
 	specCanvasItem::attach(plot) ;
 }
 
@@ -233,25 +233,25 @@ bool specFitCurve::acceptableVariable(const QString &s)
 void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 {
 	generateParser();
-    if (!parser || fitParameters.isEmpty()) return ;
-    QVector<std::string> variableNames(fitParameters.size()) ;
+	if (!parser || fitParameters.isEmpty()) return ;
+	QVector<std::string> variableNames(fitParameters.size()) ;
 
 	double x[data->size()], y[data->size()], parameters[fitParameters.size()] ;
 	// Set the fit data up
 	for (size_t i = 0 ; i < data->size() ; ++i)
 	{
-        x[i] = data->sample(i).x() ;
+		x[i] = data->sample(i).x() ;
 		y[i] = data->sample(i).y() ;
 	}
 	// Set the parser up for fitting
-    foreach (const variablePair& var, variables)
+	foreach (const variablePair& var, variables)
 	{
 		if (fitParameters.contains(var.first))
 		{
 			int index = fitParameters.indexOf(var.first) ;
 			parameters[index] = var.second ;
 			parser->DefineConst(var.first.toStdString(), parameters[index]);
-            variableNames[index] = var.first.toStdString() ;
+			variableNames[index] = var.first.toStdString() ;
 		}
 		else
 			parser->DefineConst(var.first.toStdString(), var.second);
@@ -262,8 +262,8 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	lm_control_struct control = lm_control_double ;
 
 	lmcurve_data_struct fitParams = { x, y, parser, &variableNames} ;
-    gsl_matrix *covarianceMatrix = gsl_matrix_alloc(fitParameters.size(),fitParameters.size()) ;
-    double sumOfSquaredResiduals = 0 ;
+	gsl_matrix *covarianceMatrix = gsl_matrix_alloc(fitParameters.size(),fitParameters.size()) ;
+	double sumOfSquaredResiduals = 0 ;
 	lmmin(fitParameters.size(),
 	      parameters,
 	      data->size(),
@@ -271,64 +271,64 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	      evaluateParser,
 	      &control,
 	      &status,
-          0,
-          covarianceMatrix->data,
-          &sumOfSquaredResiduals) ;
+	      0,
+	      covarianceMatrix->data,
+	      &sumOfSquaredResiduals) ;
 
 	// get the fit parameters back out:
 	for (QList<variablePair>::iterator i = variables.begin() ; i != variables.end() ; ++i)
 		if (fitParameters.contains(i->first))
 			i->second = parameters[fitParameters.indexOf(i->first)] ;
 
-    // compute asymptotic standard error of fit parameters:
-    gsl_set_error_handler_off() ;
-    numericalErrors.clear();
-    if (GSL_EDOM != gsl_linalg_cholesky_decomp(covarianceMatrix))
-    {
-        gsl_linalg_cholesky_invert(covarianceMatrix) ;
-        for(QList<variablePair>::Iterator i = variables.begin() ; i != variables.end() ; ++i)
-        {
-            int j = fitParameters.indexOf(i->first) ;
-            numericalErrors << (j > -1 ?
-                                  sqrt(gsl_matrix_get(covarianceMatrix,j,j)*sumOfSquaredResiduals / (data->size()-fitParameters.size()))
-                                  : NAN) ;
-        }
-    }
-    else
-    {
-        errorString = QObject::tr("Covariance matrix not positive definite.") +
-                  QObject::tr("Could not determine errors.") ;
-    }
+	// compute asymptotic standard error of fit parameters:
+	gsl_set_error_handler_off() ;
+	numericalErrors.clear();
+	if (GSL_EDOM != gsl_linalg_cholesky_decomp(covarianceMatrix))
+	{
+		gsl_linalg_cholesky_invert(covarianceMatrix) ;
+		for(QList<variablePair>::Iterator i = variables.begin() ; i != variables.end() ; ++i)
+		{
+			int j = fitParameters.indexOf(i->first) ;
+			numericalErrors << (j > -1 ?
+						    sqrt(gsl_matrix_get(covarianceMatrix,j,j)*sumOfSquaredResiduals / (data->size()-fitParameters.size()))
+						  : NAN) ;
+		}
+	}
+	else
+	{
+		errorString = QObject::tr("Covariance matrix not positive definite.") +
+				QObject::tr("Could not determine errors.") ;
+	}
 
-    gsl_matrix_free(covarianceMatrix) ;
+	gsl_matrix_free(covarianceMatrix) ;
 
-    // set up the new parser
-    generateParser();
-    setParserConstants();
-    setData(new fitData(parser));
+	// set up the new parser
+	generateParser();
+	setParserConstants();
+	setData(new fitData(parser));
 }
 
 QVector<double> specFitCurve::getFitData(QwtSeriesData<QPointF> *data)
 {
-    double *xvals = new double[dataSize()] ;
-    for (size_t i = 0 ; i < dataSize() ; ++i)
-        xvals[i] = data->sample(i).x() ;
-    double *oldX = (double*) (parser->GetVar().at("x")) ;
-    parser->DefineVar("x", xvals);
+	double *xvals = new double[dataSize()] ;
+	for (size_t i = 0 ; i < dataSize() ; ++i)
+		xvals[i] = data->sample(i).x() ;
+	double *oldX = (double*) (parser->GetVar().at("x")) ;
+	parser->DefineVar("x", xvals);
 
-    QVector<double> yValues(dataSize(), NAN) ;
+	QVector<double> yValues(dataSize(), NAN) ;
 
-    try
-    {
-        parser->Eval(yValues.data(), dataSize()) ;
-    }
-    catch(...)
-    {
-    }
+	try
+	{
+		parser->Eval(yValues.data(), dataSize()) ;
+	}
+	catch(...)
+	{
+	}
 
-    parser->DefineVar("x", oldX) ;
-    delete[] xvals ;
-    return yValues ;
+	parser->DefineVar("x", oldX) ;
+	delete[] xvals ;
+	return yValues ;
 }
 
 void evaluateParser(const double *parameters, int count, const void *data, double *fitResults, int *info)
@@ -359,7 +359,7 @@ void evaluateParser(const double *parameters, int count, const void *data, doubl
 
 void specFitCurve::setParserConstants()
 {
-    if (!parser) return ;
+	if (!parser) return ;
 	foreach (const variablePair& var, variables)
 		parser->DefineConst(var.first.toStdString(), var.second) ;
 }
@@ -371,34 +371,34 @@ void specFitCurve::writeToStream(QDataStream &out) const
 	       activeVar <<
 	       fitParameters <<
 	       expression <<
-           errorString <<
-           numericalErrors ;
-    if (variablesMulti || expressionMulti || messagesMulti)
-        out << qint8(variablesMulti + 2*expressionMulti + 4*messagesMulti) ;
+	       errorString <<
+	       numericalErrors ;
+	if (variablesMulti || expressionMulti || messagesMulti)
+		out << qint8(variablesMulti + 2*expressionMulti + 4*messagesMulti) ;
 }
 
 void specFitCurve::readFromStream(QDataStream &in)
 {
-    specCanvasItem::readFromStream(in) ;
-    in >> variables >>
-          activeVar >>
-          fitParameters >>
-          expression >>
-          errorString >>
-          numericalErrors ;
-    if (in.atEnd())
-        expressionMulti = messagesMulti = variablesMulti = false ;
-    else
-    {
-        qint8 a ;
-        in >> a ;
-        messagesMulti = a & qint8(4) ;
-        expressionMulti = a & qint8(2) ;
-        variablesMulti = a & qint8(1) ;
-    }
-    generateParser();
-    setParserConstants();
-//	setData(new fitData(parser)) ;
+	specCanvasItem::readFromStream(in) ;
+	in >> variables >>
+	      activeVar >>
+	      fitParameters >>
+	      expression >>
+	      errorString >>
+	      numericalErrors ;
+	if (in.atEnd())
+		expressionMulti = messagesMulti = variablesMulti = false ;
+	else
+	{
+		qint8 a ;
+		in >> a ;
+		messagesMulti = a & qint8(4) ;
+		expressionMulti = a & qint8(2) ;
+		variablesMulti = a & qint8(1) ;
+	}
+	generateParser();
+	setParserConstants();
+	//	setData(new fitData(parser)) ;
 }
 
 void specFitCurve::clearParser()
@@ -424,22 +424,22 @@ void specFitCurve::generateParser()
 	}
 	setData(new fitData(parser));
 
-    // Make sure all fit parameters are actually variables!
-    QStringList::iterator i = fitParameters.begin() ;
-    while (i != fitParameters.end())
-    {
-        bool isVariable = false ;
-        foreach(variablePair variable, variables)
-        {
-            if (*i == variable.first)
-            {
-                isVariable = true ;
-                break ;
-            }
-        }
-        if (!isVariable) i = fitParameters.erase(i) ;
-        else ++i ;
-    }
+	// Make sure all fit parameters are actually variables!
+	QStringList::iterator i = fitParameters.begin() ;
+	while (i != fitParameters.end())
+	{
+		bool isVariable = false ;
+		foreach(variablePair variable, variables)
+		{
+			if (*i == variable.first)
+			{
+				isVariable = true ;
+				break ;
+			}
+		}
+		if (!isVariable) i = fitParameters.erase(i) ;
+		else ++i ;
+	}
 }
 
 specFitCurve::~specFitCurve()
@@ -449,18 +449,18 @@ specFitCurve::~specFitCurve()
 
 void specFitCurve::setDescriptorProperties(QString key, spec::descriptorFlags f)
 {
-    // TODO implement
-    if (key == QObject::tr("Fit variables")) variablesMulti = f & spec::multiline ;
-    if (key == QObject::tr("Fit expression")) expressionMulti = f & spec::multiline ;
-    if (key == QObject::tr("Fit messages")) messagesMulti = f & spec::multiline ;
+	// TODO implement
+	if (key == QObject::tr("Fit variables")) variablesMulti = f & spec::multiline ;
+	if (key == QObject::tr("Fit expression")) expressionMulti = f & spec::multiline ;
+	if (key == QObject::tr("Fit messages")) messagesMulti = f & spec::multiline ;
 }
 
 spec::descriptorFlags specFitCurve::descriptorProperties(const QString &key) const
 {
-    spec::descriptorFlags flags = spec::def ;
-    if (key != QObject::tr("Fit messages")) flags |= spec::editable ;
-    if (key == QObject::tr("Fit variables") && variablesMulti) flags |= spec::multiline ;
-    if (key == QObject::tr("Fit expression") && expressionMulti) flags |= spec::multiline ;
-    if (key == QObject::tr("Fit messages") && messagesMulti) flags |= spec::multiline ;
-    return flags ;
+	spec::descriptorFlags flags = spec::def ;
+	if (key != QObject::tr("Fit messages")) flags |= spec::editable ;
+	if (key == QObject::tr("Fit variables") && variablesMulti) flags |= spec::multiline ;
+	if (key == QObject::tr("Fit expression") && expressionMulti) flags |= spec::multiline ;
+	if (key == QObject::tr("Fit messages") && messagesMulti) flags |= spec::multiline ;
+	return flags ;
 }

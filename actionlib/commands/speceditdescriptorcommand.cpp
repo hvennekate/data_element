@@ -10,10 +10,10 @@ specEditDescriptorCommand::specEditDescriptorCommand(specUndoCommand *parent)
 void specEditDescriptorCommand::setItem(const QModelIndex &index, QString desc,
 					QString newContent, int activeLine)
 {
-    previousContent.clear();
-    previousActiveLine.clear();
-    previousContent << newContent ;
-    previousActiveLine << activeLine ;
+	previousContent.clear();
+	previousActiveLine.clear();
+	previousContent << newContent ;
+	previousActiveLine << activeLine ;
 	specModelItem *pointer = ((specModel*) (index.model()))->itemPointer(index) ;
 	item.setModel(0); // TODO invalidate item
 	if (!pointer) return ;
@@ -36,45 +36,45 @@ void specEditDescriptorCommand::parentAssigned()
 void specEditDescriptorCommand::doIt()
 {
 	specModelItem *pointer = item.firstItem() ;
-    if (!pointer || previousActiveLine.isEmpty() || previousContent.isEmpty()) return ;
-    QVector<int>::iterator previousActiveLineIterator(previousActiveLine.begin()) ;
-    QStringList::iterator previousContentIterator(previousContent.begin()) ;
+	if (!pointer || previousActiveLine.isEmpty() || previousContent.isEmpty()) return ;
+	QVector<int>::iterator previousActiveLineIterator(previousActiveLine.begin()) ;
+	QStringList::iterator previousContentIterator(previousContent.begin()) ;
 
-    QStringList newContent ;
-    QVector<int> newActiveLines ;
+	QStringList newContent ;
+	QVector<int> newActiveLines ;
 
-    QQueue<specModelItem*> items ;
-    items.enqueue(pointer) ;
-    while(!items.isEmpty())
-    {
-        pointer = items.dequeue() ;
-        QString currentContent = pointer->descriptor(descriptor,true) ;
-        int currentLine = pointer->activeLine(descriptor) ;
+	QQueue<specModelItem*> items ;
+	items.enqueue(pointer) ;
+	while(!items.isEmpty())
+	{
+		pointer = items.dequeue() ;
+		QString currentContent = pointer->descriptor(descriptor,true) ;
+		int currentLine = pointer->activeLine(descriptor) ;
 
-        if (pointer->changeDescriptor(descriptor, *previousContentIterator))
-        {
-            pointer->setActiveLine(descriptor, *previousActiveLineIterator) ;
-            newContent << currentContent ;
-            newActiveLines << currentLine ;
-            if (previousActiveLineIterator+1 != previousActiveLine.end())
-                ++ previousActiveLineIterator;
-            if (previousContentIterator+1 != previousContent.end())
-                ++ previousContentIterator ;
+		if (pointer->changeDescriptor(descriptor, *previousContentIterator))
+		{
+			pointer->setActiveLine(descriptor, *previousActiveLineIterator) ;
+			newContent << currentContent ;
+			newActiveLines << currentLine ;
+			if (previousActiveLineIterator+1 != previousActiveLine.end())
+				++ previousActiveLineIterator;
+			if (previousContentIterator+1 != previousContent.end())
+				++ previousContentIterator ;
 
-        }
-        else if (pointer->isFolder())
-        {
-            specFolderItem *folder = dynamic_cast<specFolderItem*>(pointer) ;
-            if (!folder) continue ;
-            for (int i = 0 ; i < folder->children() ; ++i)
-                items.enqueue(folder->child(i)) ;
-        }
-    }
+		}
+		else if (pointer->isFolder())
+		{
+			specFolderItem *folder = dynamic_cast<specFolderItem*>(pointer) ;
+			if (!folder) continue ;
+			for (int i = 0 ; i < folder->children() ; ++i)
+				items.enqueue(folder->child(i)) ;
+		}
+	}
 
-    if (item.model()) // TODO: maybe implement specModel::index(specModelItem*, QString descriptor)
-        item.model()->signalChanged(item.firstIndex()) ;
-    previousContent.swap(newContent) ;
-    previousActiveLine.swap(newActiveLines);
+	if (item.model()) // TODO: maybe implement specModel::index(specModelItem*, QString descriptor)
+		item.model()->signalChanged(item.firstIndex()) ;
+	previousContent.swap(newContent) ;
+	previousActiveLine.swap(newActiveLines);
 }
 
 void specEditDescriptorCommand::writeCommand(QDataStream &out) const

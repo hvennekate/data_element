@@ -1,7 +1,7 @@
 #include "specundoaction.h"
 
 specUndoAction::specUndoAction(QObject *parent) :
-    QAction(parent)
+	QAction(parent)
 {
 	setShortcutContext(Qt::WidgetShortcut);
 	if (QWidget* w = qobject_cast<QWidget*>(parent))
@@ -10,7 +10,7 @@ specUndoAction::specUndoAction(QObject *parent) :
 
 void specUndoAction::gotTrigger()
 {
-    if (!parent()) return ;
+	if (!parent()) return ;
 	execute() ;
 }
 

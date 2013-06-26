@@ -21,10 +21,10 @@ specModelItem::specModelItem(specFolderItem* par, QString desc)
 	  sortPlotData(true)
 {
 	setParent(par) ;
-    setItemAttribute(Legend, true) ;
-    setLegendAttribute(LegendNoAttribute, false) ;
-    setLegendAttribute(LegendShowLine, true) ;
-    setLegendAttribute(LegendShowSymbol, true) ;
+	setItemAttribute(Legend, true) ;
+	setLegendAttribute(LegendNoAttribute, false) ;
+	setLegendAttribute(LegendShowLine, true) ;
+	setLegendAttribute(LegendShowSymbol, true) ;
 }
 
 specModelItem::~specModelItem()
@@ -34,11 +34,11 @@ specModelItem::~specModelItem()
 		disconnectClient(client) ;
 	setParent(0) ;
 }
-		
+
 void specModelItem::setParent(specFolderItem* par)
 {
-//	if (par == iparent)
-//		return ;
+	//	if (par == iparent)
+	//		return ;
 	if (iparent)
 		iparent->removeChild(this) ;
 	if (!par) // TODO review and maybe find better place
@@ -71,10 +71,10 @@ bool specModelItem::changeDescriptor(QString key, QString value)
 	if (key == "" && description.isEditable())
 	{
 		description.setContent(value) ;
-        setTitle(value) ;
+		setTitle(value) ;
 		return true ;
 	}
-	
+
 	return false ;
 }
 
@@ -120,8 +120,8 @@ void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
 			xt << xtemplate ;
 			yt << ysum/(i-j) ;
 		}
-        x.swap(xt) ;
-        y.swap(yt) ;
+		x.swap(xt) ;
+		y.swap(yt) ;
 	}
 }
 
@@ -208,7 +208,7 @@ void specModelItem::writeToStream(QDataStream &out) const
 {
 	specCanvasItem::writeToStream(out) ;
 	out << mergePlotData << sortPlotData
-		<< description ;
+	    << description ;
 }
 
 void specModelItem::readFromStream(QDataStream & in)
@@ -216,19 +216,19 @@ void specModelItem::readFromStream(QDataStream & in)
 	specCanvasItem::readFromStream(in) ;
 	in >> mergePlotData >> sortPlotData
 	   >> description ;
-    setTitle(descriptor("",true));
+	setTitle(descriptor("",true));
 	invalidate() ;
 }
 
 spec::descriptorFlags specModelItem::descriptorProperties(const QString& key) const
 {
-    if(key=="") return description.flags() ;
+	if(key=="") return description.flags() ;
 	return spec::def ;
 }
 
 void specModelItem::setDescriptorProperties(const QString &key, spec::descriptorFlags f)
 {
-    if (key == "") description.setFlags(f) ;
+	if (key == "") description.setFlags(f) ;
 }
 
 void specModelItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out)
@@ -310,7 +310,7 @@ specModelItem* specModelItem::itemFactory(specStreamable::type t)
 	case specStreamable::sysEntry : return new specLogMessage ;
 	case specStreamable::svgItem : return new specSVGItem ;
 	case specStreamable::metaItem : return new specMetaItem ;
-    case specStreamable::legacyDataItem : return new specLegacyDataItem ;
+	case specStreamable::legacyDataItem : return new specLegacyDataItem ;
 	default: return 0 ;
 	}
 }
@@ -354,50 +354,50 @@ void specModelItem::detach()
 
 QString specModelItem::toolTip(const QString &column) const
 {
-    return descriptor(column,true) ;
+	return descriptor(column,true) ;
 }
 
 specModelItem::specModelItem(const specModelItem &other)
-    : specCanvasItem(other.description.content()), // TODO hm...
-      iparent(0),
-      dataValid(false),
-      description(other.description)
+	: specCanvasItem(other.description.content()), // TODO hm...
+	  iparent(0),
+	  dataValid(false),
+	  description(other.description)
 {}
 
 bool specModelItem::isNumeric(const QString &key) const
 {
-    Q_UNUSED(key)
-    return false ;
+	Q_UNUSED(key)
+	return false ;
 }
 
 void specModelItem::renameDescriptors(const QMap<QString, QString> &map)
 {
-    Q_UNUSED(map) ;
+	Q_UNUSED(map) ;
 }
 
 void specModelItem::deleteDescriptor(const QString &descriptors)
 {
-    Q_UNUSED(descriptors) ;
+	Q_UNUSED(descriptors) ;
 }
 
 void specModelItem::dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const
 {
-    if (key == "")
-        destination << description ;
-    else
-        destination << specDescriptor() ;
+	if (key == "")
+		destination << description ;
+	else
+		destination << specDescriptor() ;
 }
 
 void specModelItem::restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key)
 {
-    if (!origin.hasNext()) return ;
-    if (key == "")
-        description = origin.next() ;
-    else
-        origin.next() ;
+	if (!origin.hasNext()) return ;
+	if (key == "")
+		description = origin.next() ;
+	else
+		origin.next() ;
 }
 
 QString specModelItem::editDescriptor(const QString &key) const
 {
-    return descriptor(key, true) ;
+	return descriptor(key, true) ;
 }

@@ -10,7 +10,7 @@
 #include "specdataview.h"
 
 specDeleteAction::specDeleteAction(QObject *parent) :
-    specRequiresItemAction(parent)
+	specRequiresItemAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("edit-delete"));
 	setToolTip(tr("Delete")) ;
@@ -27,7 +27,7 @@ specUndoCommand* specDeleteAction::command(specModel* model, QModelIndexList& se
 		specMetaModel *metaModel = model->getMetaModel() ;
 		specModel *dataModel = metaModel->getDataModel() ;
 
-        parentCommand = new specMultiCommand(parentsParent) ;
+		parentCommand = new specMultiCommand(parentsParent) ;
 		parentCommand->setParentObject(model) ;
 
 		// collect all indexes and remove connections
@@ -80,7 +80,7 @@ specUndoCommand* specDeleteAction::command(specModel* model, QModelIndexList& se
 	command->setParentObject(model);
 	command->setItems(selection) ;
 	command->setParentObject(model); // TODO: Again???
-//	view->selectionModel()->clearSelection();
+	//	view->selectionModel()->clearSelection();
 
 	if (!parentCommand)
 	{
@@ -93,5 +93,5 @@ specUndoCommand* specDeleteAction::command(specModel* model, QModelIndexList& se
 
 specUndoCommand* specDeleteAction::generateUndoCommand()
 {
-    return command(model, selection) ;
+	return command(model, selection) ;
 }

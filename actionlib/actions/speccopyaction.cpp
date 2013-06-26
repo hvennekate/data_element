@@ -4,7 +4,7 @@
 #include <QClipboard>
 
 specCopyAction::specCopyAction(QObject *parent) :
-    specRequiresItemAction(parent)
+	specRequiresItemAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("edit-copy")) ;
 	setToolTip(tr("Copy selected items")) ;

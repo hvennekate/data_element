@@ -7,9 +7,9 @@
 class specEditDescriptorCommand : public specUndoCommand
 {
 private:
-    QStringList previousContent ;
+	QStringList previousContent ;
 	QString descriptor ;
-    QVector<int> previousActiveLine ;
+	QVector<int> previousActiveLine ;
 	specGenealogy item ;
 	void doIt() ;
 	void undoIt() ;
@@ -21,8 +21,8 @@ public:
 	explicit specEditDescriptorCommand(specUndoCommand* parent = 0) ;
 	void setItem(const QModelIndex &index, QString descriptor,
 		     QString newContent, int activeLine= 0) ;
-//	bool mergeWith(const QUndoCommand *other) ;
-//	bool mergeable(const specUndoCommand *other) ;
+	//	bool mergeWith(const QUndoCommand *other) ;
+	//	bool mergeable(const specUndoCommand *other) ;
 };
 
 #endif // SPECEDITDESCRIPTORCOMMAND_H

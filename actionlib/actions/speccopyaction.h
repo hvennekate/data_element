@@ -5,7 +5,7 @@
 
 class specCopyAction : public specRequiresItemAction
 {
-    Q_OBJECT
+	Q_OBJECT
 public:
 	explicit specCopyAction(QObject *parent = 0);
 	static void copyToClipboard(specModel*, const QModelIndexList& selection) ;

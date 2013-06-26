@@ -90,26 +90,26 @@ void specMetaItem::writeToStream(QDataStream &out) const
 void specMetaItem::readFromStream(QDataStream &in)
 {
 	delete fitCurve ;
-    fitCurve = 0 ;
+	fitCurve = 0 ;
 	styleFitCurve = false ;
 	specModelItem::readFromStream(in) ;
 	quint8 stylingWasToFit ;
 	in >> stylingWasToFit >> variables >> oldConnections;
-    /*stylingWasToFit introduced on Oct 12 2012 (Commit:  Fixed meta item peculiarity)
+	/*stylingWasToFit introduced on Oct 12 2012 (Commit:  Fixed meta item peculiarity)
     Merged into office branch (muParser) on Nov 13 2012 (Commit: Merge branch 'innovations' of /fs/hvennek/dataelement-src into muParser)
 
     Old files (before Nov 13 2012) do not contain StylingWasToFit!
     Fix:  remove ">> stylingWasToFit" in specmetaitem.cpp (line 96) and set stylingWasToFit = 0 (line 95)
-          read and save old files. */
+	  read and save old files. */
 	styleFitCurve = stylingWasToFit ;
 	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;
 	quint8 hasFitCurve ;
-    in >> hasFitCurve ; // redundant
-    if (hasFitCurve)
-    {
-        fitCurve = new specFitCurve ;
-        in >> *fitCurve ;
-    }
+	in >> hasFitCurve ; // redundant
+	if (hasFitCurve)
+	{
+		fitCurve = new specFitCurve ;
+		in >> *fitCurve ;
+	}
 	invalidate() ; // TODO maybe insert in data item or just model item.
 }
 
@@ -167,10 +167,10 @@ void specMetaItem::refreshOtherPlots()
 	foreach(specModelItem* item, items)
 		otherPlots << ((specPlot*) item->plot()) ;
 	otherPlots.remove(0) ;
-    QColor rangeColor = pen().color() ;
-    rangeColor.setAlpha(128);
+	QColor rangeColor = pen().color() ;
+	rangeColor.setAlpha(128);
 	if (plot())
-        filter->attachRanges(otherPlots, rangeColor)  ;
+		filter->attachRanges(otherPlots, rangeColor)  ;
 	else
 		filter->detachRanges();
 	foreach(QwtPlot *otherPlot, otherPlots)
@@ -210,15 +210,15 @@ QStringList specMetaItem::descriptorKeys() const
 QString specMetaItem::descriptor(const QString &key, bool full) const
 {
 	if (key == "") return specModelItem::descriptor(key,full) ;
-    if (fitCurveDescriptor(key))
+	if (fitCurveDescriptor(key))
 		return fitCurve->descriptor(key,full) ;
 	return variables[key].content(full) ;
 }
 
 QString specMetaItem::editDescriptor(const QString &key) const
 {
-    if(fitCurveDescriptor(key)) return fitCurve->editDescriptor(key) ;
-    return specModelItem::editDescriptor(key) ;
+	if(fitCurveDescriptor(key)) return fitCurve->editDescriptor(key) ;
+	return specModelItem::editDescriptor(key) ;
 }
 
 bool specMetaItem::changeDescriptor(QString key, QString value)
@@ -238,15 +238,15 @@ spec::descriptorFlags specMetaItem::descriptorProperties(const QString &key) con
 	if (key == "") return specModelItem::descriptorProperties(key) ;
 	if (variables.contains(key))
 		return variables[key].flags() ;
-    if (fitCurveDescriptor(key)) return fitCurve->descriptorProperties(key) ; // TODO dangerous
+	if (fitCurveDescriptor(key)) return fitCurve->descriptorProperties(key) ; // TODO dangerous
 	return spec::def ;
 }
 
 void specMetaItem::setDescriptorProperties(const QString &key, spec::descriptorFlags f)
 {
-    if (key == "") specModelItem::setDescriptorProperties(key, f) ;
-    if (variables.contains(key)) variables[key].setFlags(f) ;
-    if (fitCurveDescriptor(key) && key != "") fitCurve->setDescriptorProperties(key, f) ;
+	if (key == "") specModelItem::setDescriptorProperties(key, f) ;
+	if (variables.contains(key)) variables[key].setFlags(f) ;
+	if (fitCurveDescriptor(key) && key != "") fitCurve->setDescriptorProperties(key, f) ;
 }
 
 QIcon specMetaItem::decoration() const
@@ -326,12 +326,12 @@ void specMetaItem::toggleFitStyle()
 
 #define STYLEROUTINGFUNCTION(TYPE,GETNAME,SETNAME) \
 	void specMetaItem::SETNAME(const TYPE& arg) { \
-		if (styleFitCurve && fitCurve) fitCurve->SETNAME(arg) ; \
-		else specModelItem::SETNAME(arg) ; } \
+	if (styleFitCurve && fitCurve) fitCurve->SETNAME(arg) ; \
+	else specModelItem::SETNAME(arg) ; } \
 	\
 	TYPE specMetaItem::GETNAME() const { \
-		if (styleFitCurve && fitCurve) return fitCurve->GETNAME() ; \
-		else return specModelItem::GETNAME() ; }
+	if (styleFitCurve && fitCurve) return fitCurve->GETNAME() ; \
+	else return specModelItem::GETNAME() ; }
 
 STYLEROUTINGFUNCTION(double, lineWidth,   setLineWidth)
 STYLEROUTINGFUNCTION(int,    symbolStyle, setSymbolStyle)
@@ -363,27 +363,27 @@ void specMetaItem::setSymbolSize(int w, int h)
 
 void specMetaItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out) // TODO split into two
 {
-    revalidate();
+	revalidate();
 
-    for (int i = 0 ; i < headerFormat.size() ; i++)
-        out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
-    out << endl ;
-    QVector<double> fitValues ;
-    if (fitCurve) fitValues = fitCurve->getFitData(data()) ;
-    for (size_t j = 0 ; j < dataSize() ; j++)
-    {
-        for (int i = 0 ; i < dataFormat.size() ; i++)
-        {
-            switch(dataFormat[i].first)
-            {
-                case spec::wavenumber: out << sample(j).x() ; break ;
-                case spec::signal: out << sample(j).y() ; break ;
-                case spec::maxInt:
-                    if (j < (size_t) fitValues.size())
-                        out <<  fitValues[j] ; break ;
-            }
-            out << dataFormat[i].second ;
-        }
-    }
-    out << endl ;
+	for (int i = 0 ; i < headerFormat.size() ; i++)
+		out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
+	out << endl ;
+	QVector<double> fitValues ;
+	if (fitCurve) fitValues = fitCurve->getFitData(data()) ;
+	for (size_t j = 0 ; j < dataSize() ; j++)
+	{
+		for (int i = 0 ; i < dataFormat.size() ; i++)
+		{
+			switch(dataFormat[i].first)
+			{
+			case spec::wavenumber: out << sample(j).x() ; break ;
+			case spec::signal: out << sample(j).y() ; break ;
+			case spec::maxInt:
+				if (j < (size_t) fitValues.size())
+					out <<  fitValues[j] ; break ;
+			}
+			out << dataFormat[i].second ;
+		}
+	}
+	out << endl ;
 }

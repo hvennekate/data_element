@@ -59,7 +59,7 @@ void specGenealogy::takeItems()
 		seekParent() ;
 	if (!valid()) return ;
 	foreach(specModelItem* item, Items)
-        if (item) item->setParent(0) ;
+		if (item) item->setParent(0) ;
 	owning = true ;
 }
 
@@ -86,9 +86,9 @@ specFolderItem* specGenealogy::parent()
 void specGenealogy::writeToStream(QDataStream &out) const
 {
 	out << indexes
-		<< qint8(owning)
-		<< qint32(Items.size())
-		<< quint64(Model) ;
+	    << qint8(owning)
+	    << qint32(Items.size())
+	    << quint64(Model) ;
 	if (owning)
 	{
 		for(int i = 0 ; i < Items.size() ; ++i)
@@ -141,7 +141,7 @@ bool specGenealogy::seekParent()
 void specGenealogy::setModel(specModel *model)
 {
 	Model = model ;
-//	seekParent() ;
+	//	seekParent() ;
 }
 
 void specGenealogy::getItemPointers()

@@ -18,14 +18,14 @@ public:
 	specFolderItem(specFolderItem* par=0, QString description="");
 	/*! Standard destructor.*/
 	~specFolderItem();
-	
+
 	/*! Add an item as child at index \a position.*/
 	bool addChild(specModelItem*, QList<specModelItem*>::size_type position) ;
 	/*! Add all elements of \a list as children at index \a position.*/
 	bool addChildren(QList<specModelItem*> list, QList<specModelItem*>::size_type position = 0) ;
 	/*! @todo remove children:  tell parent via destructor or let parent remove child? */
 	void removeChild(specModelItem*) ;
-	
+
 	/*! Returns number of children*/
 	QList<specModelItem*>::size_type children() const;
 	/*! Wraps specModelItem if key is empty, otherwise returns true if \a key is editable in any child. */
@@ -49,10 +49,10 @@ public:
 	void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
 	void haltRefreshes(bool halt = true) ;
 	void subMap(const QMap<double,double>&) ;
-    void deleteDescriptor(const QString& key) ;
-    void renameDescriptors(const QMap<QString, QString> &map);
-    void dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const ;
-    void restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key) ;
+	void deleteDescriptor(const QString& key) ;
+	void renameDescriptors(const QMap<QString, QString> &map);
+	void dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const ;
+	void restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key) ;
 };
 
 #endif

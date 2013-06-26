@@ -6,7 +6,7 @@
 #include <QMessageBox>
 
 specImportSpecAction::specImportSpecAction(QObject *parent) :
-    specItemAction(parent)
+	specItemAction(parent)
 {
 	setIcon(QIcon(":/fileimport.png"));
 	setToolTip(tr("Import files")) ;
@@ -25,12 +25,12 @@ specUndoCommand *specImportSpecAction::generateUndoCommand()
 	}
 
 	QStringList fileNames = QFileDialog::getOpenFileNames(view,tr("Files to import")) ; // TODO get proper file type from model
-    if (fileNames.isEmpty()) return 0 ;
+	if (fileNames.isEmpty()) return 0 ;
 	QList<specModelItem*> importedItems ;
 	for(int i = 0 ; i < fileNames.size() ; ++i)
 	{
 		QList<specModelItem*> (*importFunction)(QFile&) = fileFilter(fileNames[i]);
-        if (!model->acceptableImportFunctions().contains(importFunction))
+		if (!model->acceptableImportFunctions().contains(importFunction))
 		{
 			QMessageBox::critical(0,tr("Cannot import"),tr("Cannot import this type of data here:")+ fileNames[i],QMessageBox::Ok) ;
 			continue ;
@@ -39,7 +39,7 @@ specUndoCommand *specImportSpecAction::generateUndoCommand()
 		fileToImport.open(QFile::ReadOnly | QFile::Text) ;
 		importedItems << importFunction(fileToImport) ;
 	}
-    if (importedItems.isEmpty()) return 0 ;
+	if (importedItems.isEmpty()) return 0 ;
 
 	if (! model->insertItems(importedItems, currentIndex, row)) return 0 ;
 	specAddFolderCommand *command = new specAddFolderCommand ;
@@ -48,8 +48,8 @@ specUndoCommand *specImportSpecAction::generateUndoCommand()
 		newIndexes << model->index(row+i,0,currentIndex) ;
 	command->setItems(newIndexes) ;
 	command->setParentObject(view->model()) ;
-    command->setText((fileNames.size() > 1 ? tr("Import data (files:") : tr("Import data (file:"))
-                     + fileNames.join(", ") + ")") ;
+	command->setText((fileNames.size() > 1 ? tr("Import data (files:") : tr("Import data (file:"))
+			 + fileNames.join(", ") + ")") ;
 	return command ;
 }
 

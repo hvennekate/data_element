@@ -34,7 +34,7 @@ void specExchangeFitCurveCommand::doIt()
 	if (!pointer) return ;
 	item.model()->signalBeginReset(); // to get the selection right // TODO improve!
 	curve = pointer->setFitCurve(curve);
-    if (curve) curve->detach();
+	if (curve) curve->detach();
 	item.model()->signalChanged(item.firstIndex());
 	item.model()->signalEndReset(); // to get the selection right
 }

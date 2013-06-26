@@ -18,7 +18,7 @@ class specCanvasItem;
 /*! Class for handling plot interactions other than zooming (taken from Qwt library's example code) */
 class CanvasPicker: public QObject
 { // TODO subclass different pickers for zero ranges...
-    Q_OBJECT
+	Q_OBJECT
 private:
 	void select(const QPoint &);
 	void move(const QPoint &);
@@ -41,7 +41,7 @@ private:
 public:
 	explicit CanvasPicker(specPlot *plot);
 	~CanvasPicker() ;
-	virtual bool eventFilter(QObject *, QEvent *);	
+	virtual bool eventFilter(QObject *, QEvent *);
 	virtual bool event(QEvent *);
 	void addSelectable(const QSet<specCanvasItem*>&) ;
 	void addSelectable(specCanvasItem*) ;

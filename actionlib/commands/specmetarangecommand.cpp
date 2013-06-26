@@ -15,7 +15,7 @@ void specMetaRangeCommand::doIt()
 	if (item->items().isEmpty()) return ;
 	((specMetaItem*) item->items().first())->setRange(variableNo, rangeNo, pointNo, newX, newY) ;
 	specModel* model ;
-    if (parentObject() && (model = qobject_cast<specModel*>(parentObject())))
+	if (parentObject() && (model = qobject_cast<specModel*>(parentObject())))
 		model->signalChanged(model->index(item->items().first(), model->descriptors().indexOf("variables")));
 }
 
@@ -30,7 +30,7 @@ void specMetaRangeCommand::undoIt()
 
 bool specMetaRangeCommand::mergeWith(const QUndoCommand *ot)
 {
-    if (!parentObject()) return false ;
+	if (!parentObject()) return false ;
 	const specMetaRangeCommand* other = (const specMetaRangeCommand*) ot ;
 	if (! (this->item && other->item)) return false ;
 	if (*(other->item) != *item) return false ;
