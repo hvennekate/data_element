@@ -26,7 +26,7 @@
 #include <QLabel>
 
 specPlotWidget::specPlotWidget(QWidget *parent)
-	: specDockWidget(tr("Data"), parent),
+	: specDockWidget(tr("Data"), parent, false),
 	  actions(new specActionLibrary(this)),
 	  items(new specDataView(this)),
 	  kineticWidget(new specKineticWidget(parent)),
@@ -38,7 +38,6 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	  logAction(logWidget->toggleViewAction()),
 	  undoViewWidget(actions->undoWidget())
 {
-	undoViewWidget->setParent(parent) ;
 
 	items->setModel(new specModel(items)); // TODO redundant!  durchschleifen!
 	plot->setView(items) ;

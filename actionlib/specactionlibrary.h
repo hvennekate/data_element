@@ -74,7 +74,7 @@ class specHistoryWidget : public specDockWidget
 	QList<QWidget*> mainWidgets() const ;
 	QUndoView* undoView ;
 public:
-	explicit specHistoryWidget(QUndoStack* stack = 0) ;
+	explicit specHistoryWidget(QUndoStack* stack = 0, QWidget *parent = 0) ;
 } ;
 
 #endif // SPECACTIONLIBRARY_H

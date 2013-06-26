@@ -18,7 +18,7 @@ protected:
 	virtual QList<QWidget*> mainWidgets() const = 0 ;
 public:
 	void setupWindow(specActionLibrary* actions) ;
-	explicit specDockWidget(QString type, QWidget *parent = 0);
+	explicit specDockWidget(QString type, QWidget *parent = 0, bool floating = true);
 };
 
 #endif // SPECDOCKWIDGET_H

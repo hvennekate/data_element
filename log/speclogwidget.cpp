@@ -12,7 +12,6 @@ specLogWidget::specLogWidget(QWidget *parent)
 	  logView(new specLogView(this))
 {
 	setWhatsThis(tr("Log widget -- This widget contains log data.  Individual log items may be dragged to the data widget in order to import the corresponding data sets."));
-	setFloating(true) ;
 	logView->setModel(new specLogModel(logView));
 	new specGenericMimeConverter(logView->model()) ;
 	new specLogToDataConverter(logView->model()) ;

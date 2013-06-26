@@ -15,7 +15,6 @@ specKineticWidget::specKineticWidget(QWidget *parent)
 	: specDockWidget(tr("Meta"), parent)
 {
 	setWhatsThis(tr("Meta dock widget - In this widget, further processing of the primary data can be done (integration, max, min, etc.)"));
-	setFloating(true) ;
 	plot = new specPlot ;
 	items = new specMetaView(this) ;
 	

@@ -9,11 +9,13 @@
 
 #define APPLYTOSUBDOCKS foreach(specDockWidget* sub, subDocks)
 
-specDockWidget::specDockWidget(QString type, QWidget *parent) :
+specDockWidget::specDockWidget(QString type, QWidget *parent, bool floating) :
 	QDockWidget(parent),
 	widgetTypeName(type),
 	changingTitle(false)
-{}
+{
+	setFloating(floating);
+}
 
 void specDockWidget::setupWindow(specActionLibrary *actions)
 {
