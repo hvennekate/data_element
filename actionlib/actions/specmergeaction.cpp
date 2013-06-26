@@ -199,7 +199,20 @@ public:
 		deletionCommand->setItems(deleteList) ;
 		deletionCommand->setParentObject(model) ;
 
-		Command->setText(tr("Merge items")) ;
+		// compile description
+		QStringList criteriaDescription ;
+		foreach(const stringDoublePair& comparison, criteria)
+			criteriaDescription << comparison.first + " (" + QString::number(comparison.second) + ")" ;
+		QString description = tr("Merge ")
+				+ QString::number(toBeDeleted.size())
+				+ tr(" items to ")
+				+ QString::number(newlyInserted.size())
+				+ tr(" items.") ;
+		if (spectralAdaptation)
+			descrition += tr(" Items aligned prior to merging.") ;
+		if (!criteriaDescription.isEmpty())
+			(description += tr(" Criteria (Tolerance): ")) += criteriaDescription.join(", ") ;
+		Command->setText(description) ;
 		cleanUp() ;
 		emit progressValue(total+offset);
 	}
