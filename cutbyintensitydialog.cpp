@@ -60,16 +60,16 @@ void cutByIntensityDialog::assignSpectra(QList<specModelItem *> spectra)
 		}
 	}
 
-	//    QRectF boundaries ;
-	//    foreach(specModelItem* item, items)
-	//        boundaries |= item->boundingRect() ;
-	//    QSizeF size = boundaries.size() ;
-	//    boundaries.translate(-.05*size.width(), -.05*size.height()) ;
-	//    boundaries.setSize(1.1*size);
+	QRectF boundaries ;
+	foreach(specModelItem* item, items)
+		boundaries |= item->boundingRect() ;
+	QSizeF size = boundaries.size() ;
+	boundaries.translate(-.05*size.width(), -.05*size.height()) ;
+	boundaries.setSize(1.1*size);
 
-	//    plot->setAxisScale(QwtPlot::yLeft,boundaries.top(),boundaries.bottom()) ;
-	//    plot->setAxisScale(QwtPlot::xBottom,boundaries.left(), boundaries.right());
-	//    plot->setAutoScaling(false) ; // false
+	plot->setAxisScale(QwtPlot::yLeft,boundaries.top(),boundaries.bottom()) ;
+	plot->setAxisScale(QwtPlot::xBottom,boundaries.left(), boundaries.right());
+	plot->setAutoScaling(false) ; // false
 	plot->replot() ;
 }
 
