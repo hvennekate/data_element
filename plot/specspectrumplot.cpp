@@ -333,10 +333,10 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 		// do coefficient calculation
 		coeffs = gaussjinv(matrix,yVals) ;
 
-		int i = 0 ;
-		scale = scaleAction->isChecked() && !coeffs.isEmpty() ? coeffs[i++] : 1. ,
-				offset= offsetAction->isChecked()&& !coeffs.isEmpty() ? coeffs[i++] : 0. ,
-				offline=offlineAction->isChecked()&&!coeffs.isEmpty() ? coeffs[i++] : 0. ;
+		int i = 0 ; // TODO make offset and offline supersede scale
+		scale = scaleAction->isChecked() && i < coeffs.size() ? coeffs[i++] : 1. ,
+				offset= offsetAction->isChecked()&& i < coeffs.size() ? coeffs[i++] : 0. ,
+				offline=offlineAction->isChecked()&& i < coeffs.size() ? coeffs[i++] : 0. ;
 	}
 	specPlotMoveCommand *command = new specPlotMoveCommand ;
 	command->setItem(view->model()->index( (specModelItem*) item)) ; // TODO do dynamic cast first!!
