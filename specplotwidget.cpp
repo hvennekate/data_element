@@ -61,6 +61,8 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	logWidget->setupWindow(actions);
 	setupWindow(actions);
 	subDocks << logWidget << kineticWidget << undoViewWidget ;
+
+	changeEvent(new QEvent(QEvent::WindowTitleChange));
 	setObjectName("mainWidget");
 }
 
