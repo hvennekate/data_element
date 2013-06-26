@@ -43,8 +43,16 @@ specUndoCommand* specRemoveDataAction::generateUndoCommand()
 		command->setItem(index,item->getDataExcept(ranges)) ;
 	}
 
-	delete dialog ;
+	QStringList rangeStrings ;
+	foreach (specRange* range, ranges)
+		rangeStrings << QString::number(range->minValue()) + "--" + QString::number(range->maxValue()) ;
+	groupCommand->setText(tr("Delete data points in ranges: ") + rangeStrings.join(", ") + tr(".")) ;
 
-	groupCommand->setText(tr("Delete data points")) ;
+	delete dialog ;
+	if (ranges.isEmpty())
+	{
+		delete groupCommand ;
+		return 0 ;
+	}
 	return groupCommand ;
 }
