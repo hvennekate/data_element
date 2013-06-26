@@ -9,9 +9,9 @@ specFolderItem::specFolderItem(specFolderItem* par, QString description)
 
 specFolderItem::~specFolderItem()
 {
-	foreach(specModelItem* childPointer, childrenList)
+	foreach(specModelItem* childPointer, ChildrenList)
 		delete childPointer ;
-	childrenList.clear() ;
+	ChildrenList.clear() ;
 }
 
 bool specFolderItem::addChild(specModelItem* item, QList<specModelItem*>::size_type position)
@@ -26,7 +26,7 @@ bool specFolderItem::addChildren(QList<specModelItem*> list, QList<specModelItem
 	for(int i = 0 ; i < list.size() ; i++)
 	{
 		list[i]->setParent(this) ;
-		childrenList.insert(position+i, list[i]) ;
+		ChildrenList.insert(position+i, list[i]) ;
 	}
 	invalidate();
 	return true ;
@@ -34,7 +34,7 @@ bool specFolderItem::addChildren(QList<specModelItem*> list, QList<specModelItem
 
 QList<specModelItem*>::size_type specFolderItem::children() const
 {
-	return childrenList.size() ;
+	return ChildrenList.size() ;
 }
 
 bool specFolderItem::isFolder() const { return true ;}
@@ -46,7 +46,7 @@ bool specFolderItem::isEditable(QString key) const
 	if (key =="")
 		return specModelItem::isEditable(key) ;
 
-	foreach(specModelItem* item, childrenList)
+	foreach(specModelItem* item, ChildrenList)
 		if(item->isEditable(key))
 			return true ;
 
@@ -59,7 +59,7 @@ void specFolderItem::refreshPlotData()
 	timer.start();
 	if (suspendRefresh) return ;
 	QVector<double> x, y ;
-	foreach(specModelItem* item, childrenList)
+	foreach(specModelItem* item, ChildrenList)
 	{
 		for (size_t i = 0 ; i < item->dataSize() ; i++)
 		{
@@ -75,16 +75,16 @@ void specFolderItem::refreshPlotData()
 void specFolderItem::removeChild(specModelItem* child)
 {// TODO this is terrible!
 	QVector<specModelItem*> newChildren ;
-	foreach (specModelItem* childPointer, childrenList)
+	foreach (specModelItem* childPointer, ChildrenList)
 		if (childPointer != child)
 			newChildren << childPointer ;
-	childrenList.swap(newChildren) ;
+	ChildrenList.swap(newChildren) ;
 	invalidate();///! @todo move this to view/plotwidget (suspend frequent refreshes) -- maybe removeChildren instead
 }
 
 void specFolderItem::readFromStream(QDataStream& in)
 {
-	foreach(specModelItem* child, childrenList)
+	foreach(specModelItem* child, ChildrenList)
 		delete child ;
 	quint64 numChildren ;
 	specModelItem::readFromStream(in) ;
@@ -100,7 +100,7 @@ void specFolderItem::writeToStream(QDataStream& out) const
 {
 	specModelItem::writeToStream(out) ;
 	out << (quint64) children() ;
-	foreach(specModelItem* child, childrenList)
+	foreach(specModelItem* child, ChildrenList)
 		out << *child ;
 }
 
@@ -109,7 +109,7 @@ QStringList specFolderItem::descriptorKeys() const
 {
 	QStringList keys;
 	keys << specModelItem::descriptorKeys() ;
-	foreach(specModelItem *child, childrenList)
+	foreach(specModelItem *child, ChildrenList)
 	{
 		QStringList childKeys = child->descriptorKeys() ;
 		for(QStringList::size_type i = 0 ; i < childKeys.size() ; i++)
@@ -134,11 +134,11 @@ void specFolderItem::buildTree(QStringList descriptors)
 	for (int i = 0 ; i < children() ; i++)
 	{
 		QList<specModelItem*> list ;
-		QString compValue = childrenList[i]->descriptor(compDescriptor) ;
+		QString compValue = ChildrenList[i]->descriptor(compDescriptor) ;
 		// Generate List of items to put in one folder
 		for (int j = i ; j < children() ; j++)
-			if(childrenList[j]->descriptor(compDescriptor) == compValue)
-				list << childrenList[j] ;
+			if(ChildrenList[j]->descriptor(compDescriptor) == compValue)
+				list << ChildrenList[j] ;
 
 		// if list is more than one item and not merely all the childrenList create new item,
 		// move selected items there, perform tree-building within that item and add it as
@@ -164,23 +164,23 @@ void specFolderItem::buildTree(QStringList descriptors)
 }
 
 specModelItem* specFolderItem::child(QList<specModelItem*>::size_type i) const
-{ return 0 <= i && i < childrenList.size() ? childrenList[i] : NULL ; }
+{ return 0 <= i && i < ChildrenList.size() ? ChildrenList[i] : NULL ; }
 
 int specFolderItem::childNo(specModelItem* child) const
-{ return childrenList.indexOf(child) ; }
+{ return ChildrenList.indexOf(child) ; }
 
 spec::descriptorFlags specFolderItem::descriptorProperties(const QString& key) const
 {
 	if (key == "") return specModelItem::descriptorProperties(key) ;
 	spec::descriptorFlags flags = spec::numeric | spec::editable ;
-	foreach(specModelItem* child, childrenList)
+	foreach(specModelItem* child, ChildrenList)
 		flags = (spec::descriptorFlags) (flags & child->descriptorProperties(key)) ;
 	return flags ;
 }
 
 void specFolderItem::scaleBy(const double& factor)
 {
-	foreach(specModelItem* child, childrenList)
+	foreach(specModelItem* child, ChildrenList)
 		child->scaleBy(factor) ;
 	invalidate(); // TODO include this in child's function
 }
@@ -188,21 +188,21 @@ void specFolderItem::scaleBy(const double& factor)
 void specFolderItem::addToSlope(const double& offset)
 {
 
-	foreach(specModelItem* child, childrenList)
+	foreach(specModelItem* child, ChildrenList)
 		child->addToSlope(offset) ;
 	invalidate();
 }
 
 void specFolderItem::moveYBy(const double& offset)
 {
-	foreach(specModelItem* child, childrenList)
+	foreach(specModelItem* child, ChildrenList)
 		child->moveYBy(offset) ;
 	invalidate();
 }
 
 void specFolderItem::moveXBy(const double& offset)
 {
-	foreach(specModelItem* child, childrenList)
+	foreach(specModelItem* child, ChildrenList)
 		child->moveXBy(offset) ;
 	invalidate();
 }
@@ -222,7 +222,7 @@ void specFolderItem::exportData(const QList<QPair<bool,QString> >& headerFormat,
 	}*/
 	// 	else
 	// 	{
-	foreach(specModelItem* child, childrenList)
+	foreach(specModelItem* child, ChildrenList)
 		child->exportData(headerFormat, dataFormat, out) ;
 	// 	}
 }
@@ -236,33 +236,33 @@ void specFolderItem::haltRefreshes(bool halt) // TODO redundant
 void specFolderItem::subMap(const QMap<double, double> & map)
 {
 	haltRefreshes(true) ;
-	foreach(specModelItem *item, childrenList)
+	foreach(specModelItem *item, ChildrenList)
 		item->subMap(map) ;
 	haltRefreshes(false) ;
 }
 
 void specFolderItem::deleteDescriptor(const QString &descriptorName)
 {
-	foreach(specModelItem* child, childrenList)
+	foreach(specModelItem* child, ChildrenList)
 		child->deleteDescriptor(descriptorName) ;
 }
 
 void specFolderItem::renameDescriptors(const QMap<QString, QString> &map)
 {
-	foreach(specModelItem* child, childrenList)
+	foreach(specModelItem* child, ChildrenList)
 		child->renameDescriptors(map) ;
 }
 
 void specFolderItem::dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const
 {
 	specModelItem::dumpDescriptor(destination, key) ;
-	foreach(specModelItem* child, childrenList)
+	foreach(specModelItem* child, ChildrenList)
 		child->dumpDescriptor(destination, key) ;
 }
 
 void specFolderItem::restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key)
 {
 	specModelItem::restoreDescriptor(origin, key) ;
-	foreach(specModelItem *child, childrenList)
+	foreach(specModelItem *child, ChildrenList)
 		child->restoreDescriptor(origin, key) ;
 }

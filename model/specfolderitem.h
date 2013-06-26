@@ -8,7 +8,7 @@
 class specFolderItem : public specModelItem
 {
 private:
-	QVector<specModelItem*> childrenList ;
+	QVector<specModelItem*> ChildrenList ;
 	bool suspendRefresh ;
 	void readFromStream(QDataStream& in) ;
 	void writeToStream(QDataStream& out) const ;
