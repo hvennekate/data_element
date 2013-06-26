@@ -209,7 +209,7 @@ public:
 				+ QString::number(newlyInserted.size())
 				+ tr(" items.") ;
 		if (spectralAdaptation)
-			descrition += tr(" Items aligned prior to merging.") ;
+			description += tr(" Items aligned prior to merging.") ;
 		if (!criteriaDescription.isEmpty())
 			(description += tr(" Criteria (Tolerance): ")) += criteriaDescription.join(", ") ;
 		Command->setText(description) ;

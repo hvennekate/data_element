@@ -132,7 +132,7 @@ specGenealogy::specGenealogy()
 bool specGenealogy::seekParent()
 {
 	if (!Model) return false ;
-	Parent = (specFolderItem*) Model->itemPointer(indexes)->parent() ;
+	Parent = (specFolderItem*) (Model->itemPointer(indexes.mid(1))); // Only look for the parent
 	if (!owning)
 		getItemPointers();
 	return Parent ;

@@ -474,9 +474,31 @@ bool specModel::dropMimeData(const QMimeData *data,
 	return true ;
 }
 
+#ifdef QT_DEBUG
+void printModelContentSummary(specFolderItem* folder, QString indent)
+{
+	int n = 0 ;
+	if (folder->parent()) n = folder->parent()->childNo(folder) ;
+	qDebug() << indent + QString::number(n) + " contains " + QString::number(folder->children()) ;
+	indent += "  " ;
+	for(int i = 0 ; i < folder->children() ; ++i)
+	{
+		if (folder->child(i)->isFolder())
+			printModelContentSummary((specFolderItem*) (folder->child(i)), indent);
+	}
+}
+
+#endif
+
 specModelItem* specModel::itemPointer(const QVector<int> &indexes) const
 {
 	specModelItem* pointer = root ;
+#ifdef QT_DEBUG
+	qDebug() << "seeking pointer for item" << indexes ;
+	qDebug() << "============ Model summary: ============" ;
+	printModelContentSummary((specFolderItem*) root, "");
+	qDebug() << "========================================" ;
+#endif
 	for (int i =  indexes.size() - 1 ; i >= 0 && pointer && pointer->isFolder() ; --i)
 		pointer = ((specFolderItem*) pointer)->child(indexes[i]) ;
 	return pointer ;
