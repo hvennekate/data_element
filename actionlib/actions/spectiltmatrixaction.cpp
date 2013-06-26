@@ -11,7 +11,7 @@
 specTiltMatrixAction::specTiltMatrixAction(QObject *parent) :
 	specRequiresItemAction(parent)
 {
-	setIcon(QIcon("exchangex.png")) ;
+	setIcon(QIcon(":/exchangex.png")) ;
 	setToolTip(tr("Exchange x data for descriptive field")) ;
 	setWhatsThis(tr("Generates new items from the selected items' data, simultaneously turning the x-axis data into a description field and exchanging it for a different description field."));
 	setText(tr("Exchange x...")) ;
