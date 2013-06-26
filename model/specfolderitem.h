@@ -53,6 +53,7 @@ public:
 	void renameDescriptors(const QMap<QString, QString> &map);
 	void dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const ;
 	void restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key) ;
+	QList<specModelItem*> childrenList() const ;
 };
 
 #endif

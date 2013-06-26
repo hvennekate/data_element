@@ -266,3 +266,8 @@ void specFolderItem::restoreDescriptor(QListIterator<specDescriptor> &origin, co
 	foreach(specModelItem *child, ChildrenList)
 		child->restoreDescriptor(origin, key) ;
 }
+
+QList<specModelItem*> specFolderItem::childrenList() const
+{
+	return ChildrenList.toList() ;
+}
