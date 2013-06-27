@@ -54,5 +54,6 @@
         <file>legend.png</file>
         <file>exchangex.png</file>
         <file>notree.png</file>
+        <file>normalize.png</file>
     </qresource>
 </RCC>

@@ -40,6 +40,7 @@
 #include "specplotwidget.h"
 #include <QMessageBox>
 #include <specdockwidget.h>
+#include "specnormalizeaction.h"
 
 specDockWidget* specActionLibrary::undoWidget()
 {
@@ -161,6 +162,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 			addNewAction(bar, new specRemoveDataAction(target)) ;
 			addNewAction(bar, new specAverageDataAction(target)) ;
 			addNewAction(bar, new specSpectrumCalculatorAction(target)) ;
+			addNewAction(bar, new specNormalizeAction(target)) ;
 		}
 		if (metaView)
 		{

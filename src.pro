@@ -125,7 +125,8 @@ SOURCES += main.cpp \
     actionlib/actions/specformulavalidator.cpp \
     actionlib/actions/spectrumcalculatordialog.cpp \
     specdockwidget.cpp \
-    actionlib/actions/specflattentreeaction.cpp
+    actionlib/actions/specflattentreeaction.cpp \
+    actionlib/actions/specnormalizeaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -252,7 +253,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/specformulavalidator.h \
     actionlib/actions/spectrumcalculatordialog.h \
     specdockwidget.h \
-    actionlib/actions/specflattentreeaction.h
+    actionlib/actions/specflattentreeaction.h \
+    actionlib/actions/specnormalizeaction.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -309,7 +311,8 @@ FORMS += \
     kinetic/metaitemproperties.ui \
     model/svgitemproperties.ui \
     actionlib/actions/specexchangedescriptorxdialog.ui \
-    actionlib/actions/spectrumcalculatordialog.ui
+    actionlib/actions/spectrumcalculatordialog.ui \
+    actionlib/actions/specnormalizeactiondialog.ui
 
 OTHER_FILES += icons/oxygen/index.theme \
     icons/oxygen/geticons.py
