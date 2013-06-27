@@ -54,7 +54,7 @@ specUndoCommand* specSpectrumCalculatorAction::generateUndoCommand()
 	// prepare items
 	QList<specModelItem*> items, folders ;
 	expandSelectedFolders(items, folders);
-	if (items.isEmpty()) return 0 ;
+	if (items.isEmpty()) return 0 ; // TODO include this in requirements
 
 	// get formulae
 	spectrumCalculatorDialog dialog ;

@@ -156,11 +156,11 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		{
 			addNewAction(bar, new specMergeAction(target)) ;
 			addNewAction(bar, new specTiltMatrixAction(target)) ;
-			addNewAction(bar, new specSpectrumCalculatorAction(target)) ;
 			addNewAction(bar, new specDescriptorEditAction(target)) ;
 			bar->addSeparator() ;
 			addNewAction(bar, new specRemoveDataAction(target)) ;
 			addNewAction(bar, new specAverageDataAction(target)) ;
+			addNewAction(bar, new specSpectrumCalculatorAction(target)) ;
 		}
 		if (metaView)
 		{
