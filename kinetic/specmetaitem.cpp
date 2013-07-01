@@ -193,8 +193,9 @@ void specMetaItem::attach(QwtPlot *plot)
 
 void specMetaItem::detach()
 {
-	attach(0) ;
-	specModelItem::detach() ; // TODO find out why this is necessary
+	if (fitCurve) fitCurve->detach();
+	specModelItem::detach() ;
+	refreshOtherPlots();
 }
 
 void specMetaItem::refreshPlotData()
