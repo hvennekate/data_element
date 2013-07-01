@@ -288,8 +288,6 @@ QVariant specModel::data(const QModelIndex &index, int role) const
 		return "" ;
 	case Qt::ForegroundRole :
 		return pointer->pen().color() ;
-	case spec::fullContentRole :
-		return pointer->descriptor(Descriptors[index.column()],true) ;
 	case Qt::EditRole :
 		return pointer->editDescriptor(Descriptors[index.column()]) ;
 	case Qt::ToolTipRole :
@@ -341,10 +339,6 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 		{
 			changed = true ;
 			itemPointer(index)->mergePlotData = value.toBool() ;
-		}
-		else if (role == spec::activeLineRole)
-		{
-			changed = itemPointer(index)->setActiveLine(Descriptors[index.column()], value.toInt()) ;
 		}
 	}
 	if (changed) emit dataChanged(index,index) ;

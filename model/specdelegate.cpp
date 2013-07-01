@@ -42,16 +42,10 @@ void specDelegate::setEditorData(QWidget *e, const QModelIndex &index) const
 
 void specDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-	int activeLine = 0 ;
-	int lastNewLine = ((QTextEdit*) editor)->textCursor().position() ;
-	while ((lastNewLine = ((QTextEdit*) editor)->toPlainText().lastIndexOf(QRegExp("\n"),lastNewLine) - 1) > -1)
-		++ activeLine;
-	if (activeLine == 0)
-		model->setData(index,((QTextEdit*) editor)->toPlainText(),Qt::EditRole) ;
-	else
-		model->setData(index,
-			       QList<QVariant>() << ((QTextEdit*) editor)->toPlainText()
-			       << activeLine,Qt::EditRole) ;
+	QTextEdit *ed = (QTextEdit*) editor ;
+	model->setData(index,
+		       QList<QVariant>() << ed->toPlainText() << ed->textCursor().blockNumber(),
+		       Qt::EditRole) ;
 }
 
 void specDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
