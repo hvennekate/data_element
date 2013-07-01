@@ -77,6 +77,10 @@ specFitCurve::specFitCurve()
 	  expressionMulti(false),
 	  messagesMulti(false)
 {
+	setItemAttribute(Legend, true) ;
+	setLegendAttribute(LegendNoAttribute, false) ;
+	setLegendAttribute(LegendShowLine, true) ;
+	setLegendAttribute(LegendShowSymbol, true) ;
 }
 
 QStringList specFitCurve::descriptorKeys()

@@ -25,6 +25,7 @@ private:
 	specFitCurve *fitCurve ;
 	bool styleFitCurve ;
 	bool fitCurveDescriptor(const QString&) const ;
+	void syncFitCurveName() const ;
 public:
 	void refreshOtherPlots() ;
 	void setModels(specModel* meta, specModel* data) ;

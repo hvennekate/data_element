@@ -9,6 +9,12 @@ bool specMetaItem::fitCurveDescriptor(const QString &s) const
 	return fitCurve && fitCurve->descriptorKeys().contains(s) ;
 }
 
+void specMetaItem::syncFitCurveName() const
+{
+	if (fitCurve)
+		fitCurve->setTitle(QObject::tr("") + descriptor("") + QObject::tr(" (Fit)"));
+}
+
 specMetaItem::specMetaItem(specFolderItem *par, QString description)
 	: specModelItem(par,description),
 	  filter(0),
@@ -111,6 +117,7 @@ void specMetaItem::readFromStream(QDataStream &in)
 		in >> *fitCurve ;
 	}
 	invalidate() ; // TODO maybe insert in data item or just model item.
+	syncFitCurveName();
 }
 
 QList<specModelItem*> specMetaItem::purgeConnections()
@@ -223,7 +230,12 @@ QString specMetaItem::editDescriptor(const QString &key) const
 
 bool specMetaItem::changeDescriptor(QString key, QString value)
 {
-	if (key == "") return specModelItem::changeDescriptor(key,value) ;
+	if (key == "")
+	{
+		bool result = specModelItem::changeDescriptor(key,value) ;
+		syncFitCurveName();
+		return result ;
+	}
 	if (fitCurveDescriptor(key))
 		return fitCurve->changeDescriptor(key,value) ;
 	if (!variables.contains(key)) return false ;
@@ -276,7 +288,9 @@ bool specMetaItem::setActiveLine(const QString &s, int i)
 		variables[s].setActiveLine(i) ;
 		return true ;
 	}
-	return specModelItem::setActiveLine(s,i) ;
+	bool result = specModelItem::setActiveLine(s,i) ;
+	syncFitCurveName();
+	return result ;
 }
 
 int specMetaItem::activeLine(const QString &key) const
@@ -299,6 +313,7 @@ specFitCurve* specMetaItem::setFitCurve(specFitCurve *fc)
 	specFitCurve *old = fitCurve ;
 	fitCurve = fc ;
 	if (fitCurve && plot()) fitCurve->attach(plot()) ;
+	syncFitCurveName();
 	return old ;
 }
 
@@ -340,7 +355,8 @@ STYLEROUTINGFUNCTION(QColor, symbolBrushColor, setSymbolBrushColor)
 STYLEROUTINGFUNCTION(QSize, symbolSize, setSymbolSize)
 STYLEROUTINGFUNCTION(qint8, penStyle, setPenStyle)
 
-void specMetaItem::setPenColor(const QColor& arg) {
+void specMetaItem::setPenColor(const QColor& arg)
+{
 	if (styleFitCurve && fitCurve) fitCurve->setPenColor(arg) ;
 	else
 	{
