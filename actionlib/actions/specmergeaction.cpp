@@ -4,19 +4,11 @@
 #include "specmulticommand.h"
 #include "specspectrumplot.h"
 
-#include <QDialog>
-#include <QDialogButtonBox>
-#include <QGridLayout>
-#include <QVBoxLayout>
 #include "names.h"
-#include <QCheckBox>
-#include <QLineEdit>
-#include <QDoubleValidator>
-#include <QScrollArea>
-#include <QLabel>
 #include "specprofiler.h"
 #include <QProgressDialog>
 #include "specdataitem.h"
+#include "specmergedialog.h"
 
 #include "specworkerthread.h"
 
@@ -219,13 +211,19 @@ public:
 };
 
 specMergeAction::specMergeAction(QObject *parent)
-	: specItemAction(parent)
+	: specItemAction(parent),
+	  dialog(new specMergeDialog(0))
 {
 	setIcon(QIcon(":/merge.png")) ;
 	setToolTip(tr("Merge items")) ;
 	setWhatsThis(tr("Merge selected data items.  You may define criteria and processing options for merging."));
 	setText(tr("Merge items...")) ;
 	setShortcut(tr("Ctrl+M"));
+}
+
+specMergeAction::~specMergeAction()
+{
+	delete dialog ;
 }
 
 specUndoCommand* specMergeAction::generateUndoCommand()
@@ -242,66 +240,14 @@ specUndoCommand* specMergeAction::generateUndoCommand()
 	// let user define similarities
 	QList<stringDoublePair > criteria ;
 	bool spectralAdaptation ;
-	if (!getMergeCriteria(criteria, model->descriptors(), model->descriptorProperties(),spectralAdaptation)) return 0 ;
-
+	dialog->setDescriptors(model->descriptors(), model->descriptorProperties()) ;
+	if (dialog->exec() != QDialog::Accepted) return 0 ;
+	dialog->getMergeCriteria(criteria, spectralAdaptation);
+	if (criteria.isEmpty()) return 0 ;
 	mergeActionThread mat(model,items,criteria,spectralAdaptation) ;
 	mat.run();
 	return mat.command() ;
 }
-
-
-bool specMergeAction::getMergeCriteria(QList<stringDoublePair>& toCompare, const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties, bool& doSpectralAdaptation)
-{ // TODO separate class
-	typedef QPair<QCheckBox*,QLineEdit*>  checkBoxEditPair ;
-	QList<checkBoxEditPair> input ;
-	QDialog *descriptorMatch = new QDialog() ;
-	descriptorMatch->setWindowTitle(tr("Merge items")) ;
-	QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel) ;
-	connect(buttons,SIGNAL(accepted()), descriptorMatch, SLOT(accept()));
-	connect(buttons,SIGNAL(rejected()), descriptorMatch, SLOT(reject()));
-	QGridLayout *descriptorLayout = new QGridLayout ;
-	QVBoxLayout *dialogLayout = new QVBoxLayout ;
-	dialogLayout->addWidget(new QLabel(tr("Criteria selected below will be used\n (possibly including some numerical tolerance, if given) to determine\n whether items match and need to be merged."),descriptorMatch)) ;
-	//TODO Label fuer tolerance ...
-	descriptorLayout->addWidget(new QLabel(tr("To merge, ... must match"),descriptorMatch),0,0) ;
-	bool hasNumeric = false ;
-	for(QStringList::size_type i = 0 ; i < descriptors.size() ; i++)
-	{
-		QCheckBox *mustMatchBox(new QCheckBox(descriptors[i])) ;
-		QLineEdit *tolerance = 0 ;
-		descriptorLayout->addWidget(mustMatchBox,i+1,0) ;
-		if(descriptorProperties[i] & spec::numeric)
-		{
-			tolerance = new QLineEdit("0") ;
-			tolerance->setValidator(new QDoubleValidator(tolerance)) ;
-			((QDoubleValidator*) tolerance->validator())->setBottom(0) ;
-			descriptorLayout->addWidget(tolerance,i+1,1) ;
-			hasNumeric = true ;
-		}
-		input << qMakePair(mustMatchBox, tolerance) ;
-	}
-	if (hasNumeric)
-		descriptorLayout->addWidget(new QLabel("Numerical tolerance",descriptorMatch),0,1);
-	QScrollArea *scrollArea = new QScrollArea ;
-	QWidget *areaWidget = new QWidget ;
-	QCheckBox *spectralAdaptation = new QCheckBox(tr("Try to align merged data sets using offset/slope correction"),descriptorMatch) ;
-	areaWidget->setLayout(descriptorLayout) ;
-	scrollArea->setWidget(areaWidget) ;
-	dialogLayout->addWidget(scrollArea) ;
-	dialogLayout->addWidget(spectralAdaptation);
-	dialogLayout->addWidget(buttons) ;
-	descriptorMatch->setLayout(dialogLayout) ;
-	bool retval = descriptorMatch->exec() ;
-
-	foreach(checkBoxEditPair item, input)
-		if (item.first->isChecked())
-			toCompare << qMakePair(item.first->text(),item.second ? item.second->text().toDouble() : -1) ; // -1 encodes non-numerical
-
-	doSpectralAdaptation = spectralAdaptation->checkState() ;
-	delete descriptorMatch ;
-	return retval ;
-}
-
 
 bool mergeActionThread::itemsAreEqual(specModelItem* first, specModelItem* second, const QList<stringDoublePair>& criteria) // TODO insert actual strings into merge criteria
 {

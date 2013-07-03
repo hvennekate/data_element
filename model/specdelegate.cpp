@@ -50,8 +50,8 @@ void specDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, cons
 		model->setData(index,((QTextEdit*) editor)->toPlainText(),Qt::EditRole) ;
 	else
 		model->setData(index,
-			       QList<QVariant>() << ((QTextEdit*) editor)->toPlainText()
-			       << activeLine,Qt::EditRole) ;
+				   QList<QVariant>() << ((QTextEdit*) editor)->toPlainText()
+				   << activeLine,Qt::EditRole) ;
 }
 
 void specDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -60,11 +60,6 @@ void specDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewI
 	if(!index.column()) // TODO :  Improve!!
 		geom.setX(geom.x()+option.decorationSize.width()+3) ;
 	editor->setGeometry(geom);
-}
-
-
-specDelegate::~specDelegate()
-{
 }
 
 
