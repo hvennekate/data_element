@@ -1,7 +1,6 @@
 #include "specmodel.h"
 #include <QString>
 #include <QMimeData>
-#include <QFileDialog>
 
 #include "exportdialog.h"
 #include "specmovecommand.h"
@@ -43,30 +42,6 @@ bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QLi
 QStringList specModel::dataTypes() const
 {
 	return QStringList() << "wavenumber" << "signal" << "maximum intensity" ;
-}
-
-bool specModel::exportData(QModelIndexList& list)
-{
-	QFile *exportFile = new QFile(QFileDialog::getSaveFileName(0,"File name","","ASCII files (*.asc)")) ;
-	exportDialog *exportFormat = new exportDialog(&Descriptors, dataTypes()) ;
-	if ( exportFile->fileName() == "" || ! exportFormat->exec() )
-	{
-		delete exportFormat ;
-		return false ;
-	}
-	exportFile->open(QIODevice::WriteOnly | QIODevice::Text) ;
-	QTextStream out(exportFile) ;
-	QList<QPair<bool,QString> > headerFormat = exportFormat->headerFormat() ;
-	QList<QPair<spec::value,QString> > dataFormat = exportFormat->dataFormat() ;
-	if (list.isEmpty())
-		for (int i = 0 ; i < root->children() ; i++)
-			((specFolderItem*) root)->child(i)->exportData(headerFormat, dataFormat, out) ; // TODO make root specFolderItem
-	else
-		for (int i = 0 ; i < list.size() ; i++)
-			itemPointer(list[i])->exportData(headerFormat, dataFormat, out) ;
-	exportFile->close() ;
-	delete exportFormat ;
-	return true ;
 }
 
 QModelIndexList ancestry(const QModelIndex& index)

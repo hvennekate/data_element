@@ -47,9 +47,8 @@ private:
 	QList<specMimeConverter*> mimeConverters() const ;
 	specMetaModel* metaModel ;
 	void checkForNewDescriptors(const QList<specModelItem*>& list, const QModelIndex& parent) ;
-protected:
-	virtual QStringList dataTypes() const ;
 public:
+	virtual QStringList dataTypes() const ;
 	specModel(QObject *par = 0) ;
 	~specModel() ;
 	QStringList mimeTypes() const ;
@@ -133,7 +132,6 @@ public:
 
 	// //TODO
 public slots:
-	bool exportData(QModelIndexList& list) ;
 	void svgMoved(specCanvasItem*, int, double, double) ;
 };
 

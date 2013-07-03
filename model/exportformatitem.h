@@ -23,6 +23,7 @@ public:
 	spec::value value() ;
 	void setValue(spec::value) ;
 	void setSeparator(spec::separator) ;
+	void setDataTypes(const QStringList& ds) ;
 signals:
 	void changed() ;
 

@@ -43,10 +43,24 @@ void exportLayoutItem::freeFormMode(int on)
 	(on==Qt::Checked ? (QWidget*) freeText : (QWidget*) descriptor)->show() ;
 }
 
+void exportLayoutItem::setDescriptors(const QStringList &ds)
+{
+	QString currentText = descriptor->currentText() ;
+	if (!ds.contains(currentText) && !isFreeText())
+	{
+		remove();
+		return ;
+	}
+	descriptor->clear();
+	descriptor->addItems(ds) ;
+	if (ds.contains(currentText)) ;
+		descriptor->setCurrentIndex(ds.indexOf(currentText)) ;
+}
+
 void exportLayoutItem::remove()
 {
-	if (parentWidget() && parentWidget()->layout())
-		parentWidget()->layout()->removeWidget(this) ;
+//	if (parentWidget() && parentWidget()->layout())
+//		parentWidget()->layout()->removeWidget(this) ;
 	delete this ;
 }
 

@@ -27,6 +27,7 @@ public:
 
 	bool isFreeText() ;
 	QString text() ;
+	void setDescriptors(const QStringList&) ;
 	~exportLayoutItem();
 signals:
 	void changed() ;

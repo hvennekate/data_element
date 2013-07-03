@@ -7,8 +7,11 @@
 #include <QHBoxLayout>
 #include <QStringList>
 #include <QScrollArea>
-#include "exportlayoutitem.h"
-#include "exportformatitem.h"
+
+#include "names.h"
+
+class exportFormatItem ;
+class exportLayoutItem ;
 
 class exportDialog : public QDialog
 {
@@ -16,18 +19,21 @@ class exportDialog : public QDialog
 private:
 	QPushButton *addButton, *addDataButton ;
 	QBoxLayout *layout, *inLayout, *dataLayout ;
-	QStringList *descriptors ;
+	QStringList descriptors ;
 	QStringList dataTypes ;
 	QScrollArea *scrollHeader, *scrollData ;
 	void prepareHeader() ;
 	void prepareData() ;
+	template<class itemType> QList<itemType*> getItems() const ;
 private slots :
 	void addHeaderItem() ;
 	void addDataItem() ;
 public:
-	exportDialog (QStringList* descriptors, const QStringList& dataTypes, QWidget *parent = 0 );
-	QList<QPair<bool,QString> > headerFormat() ;
-	QList<QPair<spec::value,QString> > dataFormat() ;
+	explicit exportDialog (QWidget *parent = 0 );
+	void setDataTypes(const QStringList& dataTypes) ;
+	void setDescriptors(const QStringList& descriptors) ;
+	QList<QPair<bool,QString> > headerFormat() const ;
+	QList<QPair<spec::value,QString> > dataFormat() const ;
 	~exportDialog();
 };
 
