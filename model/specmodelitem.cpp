@@ -271,6 +271,7 @@ void specModelItem::invalidate()
 	dataValid = false ;
 	foreach(specMetaItem *client, clients) // TODO consider tying to the condition that item has been valid before
 		client->invalidate();
+	if(iparent) iparent->invalidate();
 }
 
 void specModelItem::revalidate()
