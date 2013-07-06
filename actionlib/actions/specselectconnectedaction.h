@@ -1,17 +1,17 @@
 #ifndef SPECSELECTCONNECTEDACTION_H
 #define SPECSELECTCONNECTEDACTION_H
 
-#include "specitemaction.h"
+#include "specconnectionsaction.h"
 
-class specSelectConnectedAction : public specItemAction
+class specMetaView ;
+
+class specSelectConnectedAction : public specConnectionsAction
 {
 	Q_OBJECT
 private:
-	bool requirements() ;
 	specUndoCommand* generateUndoCommand() ;
 public:
 	explicit specSelectConnectedAction(QObject *parent = 0);
-	const std::type_info& possibleParent() ;
 };
 
 #endif // SPECSELECTCONNECTEDACTION_H

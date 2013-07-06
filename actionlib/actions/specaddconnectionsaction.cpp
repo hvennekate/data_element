@@ -2,9 +2,10 @@
 #include "specmetaview.h"
 #include "specplotwidget.h"
 #include "specaddconnectionscommand.h"
+#include "specmulticommand.h"
 
 specAddConnectionsAction::specAddConnectionsAction(QObject *parent) :
-	specUndoAction(parent)
+	specConnectionsAction(parent)
 {
 	this->setIcon(QIcon(":/toKinetic.png")) ;
 	setToolTip(tr("Connect current to selected."));
@@ -13,29 +14,28 @@ specAddConnectionsAction::specAddConnectionsAction(QObject *parent) :
 	setShortcut(tr("Ctrl+Alt+c"));
 }
 
-const std::type_info &specAddConnectionsAction::possibleParent()
+bool specAddConnectionsAction::requirements()
 {
-	return typeid(specMetaView) ;
+	if (!specConnectionsAction::requirements()) return false ;
+	if (!dataView->model()) return false ;
+	QModelIndexList servers = dataView->getSelection() ;
+	dataView->model()->expandFolders(servers) ;
+	return !servers.empty() ;
 }
 
-void specAddConnectionsAction::execute()
+specUndoCommand* specAddConnectionsAction::generateUndoCommand()
 {
-	specMetaView *view = (specMetaView*) parent() ;
-	specView *serverView = view->getDataView() ;
+	specMultiCommand *command = new specMultiCommand ;
+	command->setParentObject(model);
+	foreach(specModelItem* item, pointers)
+	{
+		QModelIndex target = model->index(item) ;
+		if (!target.isValid()) continue ;
+		specAddConnectionsCommand *connectionsCommand = new specAddConnectionsCommand(command) ;
+		command->setItems(target,servers) ;
+	}
 
-	QModelIndex target = view->currentIndex() ;
-	QModelIndexList servers = serverView->getSelection() ;
-	serverView->model()->expandFolders(servers) ;
-
-	if (!target.isValid() || servers.isEmpty()) return ;
-
-	specAddConnectionsCommand *command = new specAddConnectionsCommand ;
-	command->setParentObject((QObject*) view->model()) ;
-	command->setItems(target,servers) ;
 	command->setText(tr("Connect to data items")) ;
-
-	if (command->ok())
-		library->push(command) ;
-	else
-		delete command ;
+	return command ;
 }
+

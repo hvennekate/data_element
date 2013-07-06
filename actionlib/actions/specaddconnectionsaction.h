@@ -1,16 +1,17 @@
 #ifndef SPECADDCONNECTIONSACTION_H
 #define SPECADDCONNECTIONSACTION_H
 
-#include "specundoaction.h"
+#include "specconnectionsaction.h"
 
-class specAddConnectionsAction : public specUndoAction
+class specAddConnectionsAction : public specConnectionsAction
 {
 	Q_OBJECT
 public:
 	explicit specAddConnectionsAction(QObject *parent = 0);
-	const std::type_info &possibleParent() ;
 private:
-	void execute() ;
+	specUndoCommand* generateUndoCommand() ;
+	bool requirements() ;
+	QModelIndexList servers ;
 };
 
 #endif // SPECADDCONNECTIONSACTION_H

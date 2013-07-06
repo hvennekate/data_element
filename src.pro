@@ -127,7 +127,8 @@ SOURCES += main.cpp \
     specdockwidget.cpp \
     actionlib/actions/specflattentreeaction.cpp \
     actionlib/actions/specnormalizeaction.cpp \
-    actionlib/actions/specmergedialog.cpp
+    actionlib/actions/specmergedialog.cpp \
+    actionlib/actions/specconnectionsaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -256,7 +257,8 @@ HEADERS += cutbyintensitydialog.h \
     specdockwidget.h \
     actionlib/actions/specflattentreeaction.h \
     actionlib/actions/specnormalizeaction.h \
-    actionlib/actions/specmergedialog.h
+    actionlib/actions/specmergedialog.h \
+    actionlib/actions/specconnectionsaction.h
 
 INCLUDEPATH += kinetic \
 	log \
