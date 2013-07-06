@@ -5,7 +5,7 @@
 #include "specmulticommand.h"
 
 specConductFitAction::specConductFitAction(QObject *parent) :
-	specItemAction(parent)
+	specRequiresMetaItemAction(parent)
 {
 	setIcon(QIcon(":/doFit.png")) ;
 	setToolTip(tr("Conduct fit")) ;
@@ -29,15 +29,9 @@ specUndoCommand* specConductFitAction::generateUndoCommand()
 		item->conductFit();
 		QString newDescriptor = item->descriptor(tr("Fit variables"), true) ;
 		specEditDescriptorCommand *editCommand = new specEditDescriptorCommand(parentCommand) ;
-		editCommand->setParentObject(model) ;
 		editCommand->setItem(index,tr("Fit variables"), newDescriptor, item->activeLine(tr("Fit variables"))) ;
 		item->changeDescriptor(tr("Fit variables"), oldDescriptor) ;
 		item->setActiveLine(tr("Fit variables"), oldActiveLine) ;
-	}
-	if (!parentCommand->childCount())
-	{
-		delete parentCommand ;
-		return 0 ;
 	}
 	return parentCommand ;
 }

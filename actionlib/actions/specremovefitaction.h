@@ -1,9 +1,9 @@
 #ifndef SPECREMOVEFITACTION_H
 #define SPECREMOVEFITACTION_H
 
-#include "specitemaction.h"
+#include "specrequiresitemaction.h"
 
-class specRemoveFitAction : public specItemAction
+class specRemoveFitAction : public specRequiresMetaItemAction
 {
 	Q_OBJECT
 public:

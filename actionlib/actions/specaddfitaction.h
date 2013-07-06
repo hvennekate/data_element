@@ -1,9 +1,9 @@
 #ifndef SPECADDFITACTION_H
 #define SPECADDFITACTION_H
 
-#include "specitemaction.h"
+#include "specrequiresitemaction.h"
 
-class specAddFitAction : public specItemAction
+class specAddFitAction : public specRequiresMetaItemAction
 {
 	Q_OBJECT
 public:

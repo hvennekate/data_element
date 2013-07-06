@@ -9,7 +9,7 @@
 #include "specexchangedescriptorxdialog.h"
 
 specTiltMatrixAction::specTiltMatrixAction(QObject *parent) :
-	specRequiresItemAction(parent)
+	specRequiresDataItemAction(parent)
 {
 	setIcon(QIcon(":/exchangex.png")) ;
 	setToolTip(tr("Exchange x data for descriptive field")) ;
@@ -138,11 +138,11 @@ specUndoCommand* specTiltMatrixAction::generateUndoCommand()
 
 	parentCommand->setParentObject(model) ;
 	parentCommand->setText(tr("Exchange \"")+
-			       conversionDescriptor+
-			       tr("\" and \"")+
-			       newDescriptor+
-			       tr("\" in ")+
-			       QString::number(newItems.size())+
-			       tr(" items.")) ;
+				   conversionDescriptor+
+				   tr("\" and \"")+
+				   newDescriptor+
+				   tr("\" in ")+
+				   QString::number(newItems.size())+
+				   tr(" items.")) ;
 	return parentCommand ;
 }

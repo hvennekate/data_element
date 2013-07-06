@@ -8,7 +8,7 @@ namespace  Ui {
 	class specNormalizeActionDialog ;
 }
 
-class specNormalizeAction : public specRequiresItemAction
+class specNormalizeAction : public specRequiresDataItemAction
 {
 	Q_OBJECT
 public:

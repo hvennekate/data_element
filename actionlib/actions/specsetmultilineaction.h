@@ -1,9 +1,9 @@
 #ifndef SPECSETMULTILINEACTION_H
 #define SPECSETMULTILINEACTION_H
 
-#include "specitemaction.h"
+#include "specrequiresitemaction.h"
 
-class specSetMultilineAction : public specItemAction
+class specSetMultilineAction : public specRequiresItemAction
 {
 	Q_OBJECT
 public:

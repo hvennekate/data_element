@@ -154,7 +154,7 @@ public:
 };
 
 specTreeAction::specTreeAction(QObject *parent) :
-	specItemAction(parent)
+	specRequiresItemAction(parent)
 {
 	setIcon(QIcon(":/tree.png")) ;
 	setToolTip(tr("Set up a directory tree")) ;

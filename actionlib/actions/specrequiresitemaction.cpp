@@ -5,7 +5,38 @@ specRequiresItemAction::specRequiresItemAction(QObject *parent) :
 {
 }
 
+specRequiresDataItemAction::specRequiresDataItemAction(QObject *parent)
+	: specRequiresItemAction(parent)
+{}
+
+specRequiresMetaItemAction::specRequiresMetaItemAction(QObject *parent)
+	: specRequiresItemAction(parent)
+{}
+
 bool specRequiresItemAction::requirements()
 {
-	return !selection.isEmpty() ;
+	return !pointers.isEmpty() ;
+}
+
+QList<specStreamable::type> specRequiresItemAction::requiredTypes() const
+{
+	return QList<specStreamable::type>()
+			<< specStreamable::dataItem
+			<< specStreamable::folder
+			<< specStreamable::logEntry
+			<< specStreamable::sysEntry
+			<< specStreamable::metaItem
+			<< specStreamable::svgItem ;
+}
+
+QList<specStreamable::type> specRequiresDataItemAction::requiredTypes() const
+{
+	return QList<specStreamable::type>()
+			<< specStreamable::dataItem ;
+}
+
+QList<specStreamable::type> specRequiresMetaItemAction::requiredTypes() const
+{
+	return QList<specStreamable::type>()
+			<< specStreamable::metaItem ;
 }

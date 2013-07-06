@@ -10,7 +10,7 @@ public:
 	explicit specFlattenTreeAction(QObject *parent = 0);
 protected:
 	specUndoCommand* generateUndoCommand() ;
-	bool requirements() ;
+	QList<specStreamable::type> requiredTypes() const ;
 };
 
 #endif // SPECFLATTENTREEACTION_H

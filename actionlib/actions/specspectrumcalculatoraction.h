@@ -2,7 +2,7 @@
 #define SPECSPECTRUMCALCULATORACTION_H
 #include "specrequiresitemaction.h"
 
-class specSpectrumCalculatorAction : public specRequiresItemAction
+class specSpectrumCalculatorAction : public specRequiresDataItemAction
 {
 	Q_OBJECT
 public:

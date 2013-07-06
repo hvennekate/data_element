@@ -3,7 +3,7 @@
 
 #include "specrequiresitemaction.h"
 
-class specRemoveDataAction : public specRequiresItemAction
+class specRemoveDataAction : public specRequiresDataItemAction
 {
 	Q_OBJECT
 public:

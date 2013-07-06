@@ -3,7 +3,7 @@
 
 #include "specrequiresitemaction.h"
 
-class specAverageDataAction : public specRequiresItemAction
+class specAverageDataAction : public specRequiresDataItemAction
 {
 	Q_OBJECT
 public:

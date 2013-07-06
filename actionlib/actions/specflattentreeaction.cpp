@@ -11,16 +11,6 @@ specFlattenTreeAction::specFlattenTreeAction(QObject *parent) :
 	setWhatsThis(tr("Flattens all selected directories (one level) and places the actual data items in their places."));
 }
 
-bool specFlattenTreeAction::requirements()
-{
-	if (! specRequiresItemAction::requirements()) return false ;
-	// Make sure we have at least one folder selected
-	foreach(specModelItem* item, model->pointerList(selection))
-		if (item->isFolder())
-			return true ;
-	return false ;
-}
-
 specUndoCommand *specFlattenTreeAction::generateUndoCommand()
 {
 	model->eliminateChildren(selection) ;
@@ -42,8 +32,8 @@ specUndoCommand *specFlattenTreeAction::generateUndoCommand()
 		QModelIndex folderIndex = model->index(folder) ;
 		QModelIndexList containedIndexes = model->indexList(folder->childrenList()) ;
 		moveCommand->setItems(containedIndexes,
-				      model->parent(folderIndex),
-				      folderIndex.row());
+					  model->parent(folderIndex),
+					  folderIndex.row());
 		moveCommand->redo();
 	}
 
@@ -57,4 +47,7 @@ specUndoCommand *specFlattenTreeAction::generateUndoCommand()
 	return command ;
 }
 
-
+QList<specStreamable::type> specFlattenTreeAction::requiredTypes() const
+{
+	return QList<specStreamable::type>() << specStreamable::folder ;
+}

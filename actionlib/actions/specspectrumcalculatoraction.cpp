@@ -35,7 +35,7 @@ QStringList specSpectrumCalculatorAction::descriptorNames(QString& teststring)
 }
 
 specSpectrumCalculatorAction::specSpectrumCalculatorAction(QObject *parent) :
-	specRequiresItemAction(parent)
+	specRequiresDataItemAction(parent)
 {
 	setIcon(QIcon::fromTheme("accessories-calculator")) ;
 	setToolTip(tr("Data calculator")) ;
@@ -146,13 +146,13 @@ specUndoCommand* specSpectrumCalculatorAction::generateUndoCommand()
 
 	if (failCount)
 		QMessageBox::warning(0,tr("Failed to evaluate"), tr("Failed to evaluate new data for ")
-				     + QString::number(failCount)
-				     + tr(" items. These items remained unchanged.")) ;
+					 + QString::number(failCount)
+					 + tr(" items. These items remained unchanged.")) ;
 
 	// return command
 	parentCommand->setText(tr("Arithmetic operation on data. New x: ")
-			       + dialog.xFormula() + ". New y: "
-			       + dialog.yFormula() + "." );
+				   + dialog.xFormula() + ". New y: "
+				   + dialog.yFormula() + "." );
 	return parentCommand ;
 }
 

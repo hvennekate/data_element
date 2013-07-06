@@ -7,7 +7,7 @@
 #include "specdataview.h"
 
 specNormalizeAction::specNormalizeAction(QObject *parent) :
-	specRequiresItemAction(parent),
+	specRequiresDataItemAction(parent),
 	uiDialog(new QDialog),
 	ui(new Ui::specNormalizeActionDialog)
 
@@ -34,11 +34,6 @@ const std::type_info& specNormalizeAction::possibleParent()
 
 specUndoCommand* specNormalizeAction::generateUndoCommand()
 {
-	// Prepare items
-	QList<specModelItem*> items, folders ;
-	expandSelectedFolders(items, folders) ;
-	if (items.isEmpty()) return 0 ; // TODO include this in requirements
-
 	// Run dialog
 	if (uiDialog->exec() == QDialog::Rejected) return 0 ;
 
@@ -47,7 +42,7 @@ specUndoCommand* specNormalizeAction::generateUndoCommand()
 	command->setParentObject(model) ;
 
 	// Compute corrections and prepare item commands
-	foreach(specModelItem* item, items)
+	foreach(specModelItem* item, pointers)
 	{
 		if (!item->dataSize()) continue ;
 
@@ -70,10 +65,10 @@ specUndoCommand* specNormalizeAction::generateUndoCommand()
 		specPlotMoveCommand* moveCommand = new specPlotMoveCommand(command) ;
 		moveCommand->setItem(model->index(item)) ;
 		moveCommand->setCorrections(ui->shiftXValue->isChecked() ?
-						    ui->xValue->text().toDouble() - item->sample(extremum).x() : 0,
-					    0,0,
-					    ui->scaleYValue->isChecked() && previousValue ? // Avoid div by 0
-						    ui->yValue->text().toDouble() / previousValue : 0) ;
+							ui->xValue->text().toDouble() - item->sample(extremum).x() : 0,
+						0,0,
+						ui->scaleYValue->isChecked() && previousValue ? // Avoid div by 0
+							ui->yValue->text().toDouble() / previousValue : 0) ;
 	}
 
 	// Set description of command

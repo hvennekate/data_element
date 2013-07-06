@@ -5,7 +5,7 @@
 #include "specdataview.h"
 
 specRemoveDataAction::specRemoveDataAction(QObject *parent)
-	: specRequiresItemAction(parent)
+	: specRequiresDataItemAction(parent)
 {
 	setIcon(QIcon(":/cbi.png")) ;
 	setToolTip(tr("Remove data")) ;
@@ -22,7 +22,7 @@ const std::type_info& specRemoveDataAction::possibleParent()
 specUndoCommand* specRemoveDataAction::generateUndoCommand()
 {
 	cutByIntensityDialog *dialog = new cutByIntensityDialog(parentWidget()) ;
-	dialog->assignSpectra(model->pointerList(selection)) ;
+	dialog->assignSpectra(pointers) ;
 	if (dialog->exec() == QDialog::Rejected)
 	{
 		delete dialog ;

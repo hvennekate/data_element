@@ -1,12 +1,12 @@
 #ifndef SPECMERGEACTION_H
 #define SPECMERGEACTION_H
 
-#include "specitemaction.h"
+#include "specrequiresitemaction.h"
 #include "specdataview.h"
 
 class specMergeDialog ;
 
-class specMergeAction : public specItemAction
+class specMergeAction : public specRequiresDataItemAction
 {
 	Q_OBJECT
 private:

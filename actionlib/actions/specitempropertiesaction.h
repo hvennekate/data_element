@@ -1,7 +1,7 @@
 #ifndef SPECITEMPROPERTIESACTION_H
 #define SPECITEMPROPERTIESACTION_H
 
-#include "specitemaction.h"
+#include "specrequiresitemaction.h"
 
 class specItemPropertiesAction : public specItemAction
 {
@@ -11,6 +11,7 @@ public:
 
 private:
 	specUndoCommand* generateUndoCommand() ;
+	bool requirements() ;
 };
 
 #endif // SPECITEMPROPERTIESACTION_H

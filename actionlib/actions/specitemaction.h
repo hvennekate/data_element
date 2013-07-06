@@ -13,6 +13,7 @@ class specItemAction : public specUndoAction
 public:
 	explicit specItemAction(QObject *parent = 0) ;
 	virtual const std::type_info& possibleParent() ;
+	virtual QList<specStreamable::type> requiredTypes() const ;
 private: // TODO
 	virtual bool requirements() { return true ;}
 protected:
@@ -21,6 +22,7 @@ protected:
 	specModel* model ;
 	QModelIndex currentIndex, insertionIndex ;
 	QModelIndexList selection ;
+	QList<specModelItem*> pointers ;
 	specModelItem* currentItem ;
 	int insertionRow ;
 	void expandSelectedFolders(QList<specModelItem*>& items, QList<specModelItem*>& folders) ;

@@ -14,7 +14,7 @@
 #include <QRadioButton>
 
 specAverageDataAction::specAverageDataAction(QObject *parent) :
-	specRequiresItemAction(parent)
+	specRequiresDataItemAction(parent)
 {
 	setIcon(QIcon(":/ave.png")) ;
 	setToolTip(tr("Average Data")) ;
@@ -128,7 +128,6 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 			}
 			item->reverseCorrection(newData);
 			specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
-			command->setParentObject(view->model()) ;
 			command->setItem(index,newData);
 		}
 		groupCommand->setText(tr("Average data (") + QString::number(number->value()) + tr(" points") +  (running->isChecked() ? tr(", running)") : tr(")"))) ;
@@ -155,12 +154,6 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 			averageToNew(oldData.begin(), oldData.end(), comp, std::back_inserter(newData)) ;
 			command->setItem(index, newData) ;
 		}
-	}
-
-	if (!groupCommand->childCount())
-	{
-		delete groupCommand ;
-		return 0 ;
 	}
 
 	return groupCommand ;

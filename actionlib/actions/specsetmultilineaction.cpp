@@ -2,7 +2,7 @@
 #include "specdescriptorflagscommand.h"
 
 specSetMultilineAction::specSetMultilineAction(QObject *parent) :
-	specItemAction(parent)
+	specRequiresItemAction(parent)
 {
 	setIcon(QIcon(":/multilineOn.png")) ;
 	setToolTip(tr("Toggle showing all lines") );

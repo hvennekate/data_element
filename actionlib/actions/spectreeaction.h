@@ -1,9 +1,9 @@
 #ifndef SPECTREEACTION_H
 #define SPECTREEACTION_H
 
-#include "specitemaction.h"
+#include "specrequiresitemaction.h"
 
-class specTreeAction : public specItemAction
+class specTreeAction : public specRequiresItemAction
 {
 	Q_OBJECT
 public:

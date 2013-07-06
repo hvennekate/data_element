@@ -3,7 +3,7 @@
 
 #include "specrequiresitemaction.h"
 
-class specTiltMatrixAction : public specRequiresItemAction
+class specTiltMatrixAction : public specRequiresDataItemAction
 {
 	Q_OBJECT
 public:

@@ -1,6 +1,7 @@
 #include "specitemaction.h"
 #include "specview.h"
 #include "specmodel.h"
+#include "specmulticommand.h"
 
 specItemAction::specItemAction(QObject *parent)
 	: specUndoAction(parent),
@@ -22,6 +23,19 @@ void specItemAction::execute()
 	if (!(model = view->model())) return ;
 	currentIndex = view->currentIndex() ;
 	selection = view->getSelection() ;
+	QList<specStreamable::type> types = requiredTypes() ;
+	pointers.clear();
+
+	// Recursively eliminate folders (TODO think this through!)
+	if (!types.contains(specStreamable::folder))
+		model->expandFolders(selection);
+
+	if (!types.isEmpty())
+	{
+		foreach(specModelItem* item, model->pointerList(selection))
+			if (types.contains(item->typeId()))
+				pointers << item ;
+	}
 	currentItem = model->itemPointer(currentIndex) ;
 
 	if (currentItem && !currentItem->isFolder())
@@ -44,6 +58,13 @@ void specItemAction::execute()
 	//		delete command;
 	//		return ;
 	//	}
+
+	if (dynamic_cast<specMultiCommand*>(commad) && !command->childCount())
+	{
+		delete command ;
+		return ;
+	}
+
 	if (!library)
 	{
 		command->redo();
@@ -67,4 +88,9 @@ void specItemAction::expandSelectedFolders(QList<specModelItem *> &items, QList<
 			folders << items.takeAt(i--) ;
 		}
 	}
+}
+
+QList<specStreamable::type> specItemAction::requiredTypes() const
+{
+	return QList<specStreamable::type>() ;
 }

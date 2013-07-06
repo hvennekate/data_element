@@ -211,7 +211,7 @@ public:
 };
 
 specMergeAction::specMergeAction(QObject *parent)
-	: specItemAction(parent),
+	: specRequiresDataItemAction(parent),
 	  dialog(new specMergeDialog(0))
 {
 	setIcon(QIcon(":/merge.png")) ;
@@ -232,8 +232,8 @@ specUndoCommand* specMergeAction::generateUndoCommand()
 	qSort(selection) ;
 	if (selection.size() < 2) return 0 ;
 	QList<specDataItem*> items ;
-	foreach(QModelIndex index, selection)
-		items << dynamic_cast<specDataItem*>(model->itemPointer(index)) ;
+	foreach(specModelItem* pointer, pointers)
+		items << (specModelItem*) pointer ;
 	items.removeAll(0) ;
 	if (items.isEmpty()) return 0 ;
 
