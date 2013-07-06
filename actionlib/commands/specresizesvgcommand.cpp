@@ -14,7 +14,7 @@ void specResizeSVGcommand::setItem(const QModelIndex &index, const specSVGItem::
 {
 	if (item)
 		delete item ;
-	item = new specGenealogy(QModelIndexList() << index) ;
+	item = new specGenealogy(index) ;
 	other = bounds ;
 	anchor = a ;
 	doIt() ;

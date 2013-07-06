@@ -10,7 +10,7 @@ void specToggleFitStyleCommand::setup(const QModelIndex & i)
 	if (!parentObject()) return ;
 	specMetaItem *pointer = dynamic_cast<specMetaItem*>(((specModel*) parentObject())->itemPointer(i)) ;
 	if (!pointer) return ;
-	item = specGenealogy(QModelIndexList() << i) ;
+	item = specGenealogy(i) ;
 }
 
 void specToggleFitStyleCommand::parentAssigned()

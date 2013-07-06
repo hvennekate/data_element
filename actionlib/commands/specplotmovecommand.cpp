@@ -53,7 +53,7 @@ bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
 void specPlotMoveCommand::setItem(QModelIndex index)
 {
 	if (items) delete items ;
-	items = new specGenealogy(QModelIndexList() << index) ;
+	items = new specGenealogy(index) ;
 }
 
 void specPlotMoveCommand::setCorrections(double xShift, double yOffset, double ySlope, double yScale)

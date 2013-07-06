@@ -45,7 +45,7 @@ bool specMetaRangeCommand::mergeWith(const QUndoCommand *ot)
 void specMetaRangeCommand::setItem(QModelIndex index, int variableIndex, int rangeIndex, int point, double nX, double nY)
 {
 	if (item) delete item ;
-	item = new specGenealogy(QModelIndexList() << index) ;
+	item = new specGenealogy(index) ;
 	pointNo = point ;
 	variableNo = variableIndex ;
 	rangeNo = rangeIndex ;

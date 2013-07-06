@@ -17,7 +17,7 @@ void specExchangeDataCommand::setItem(const QModelIndex & index, const QVector<s
 	item = 0 ;
 	if (!pointer)
 		return ;
-	item = new specGenealogy(QModelIndexList() << index) ;
+	item = new specGenealogy(index) ;
 }
 
 void specExchangeDataCommand::parentAssigned()

@@ -18,14 +18,8 @@ specPasteAction::specPasteAction(QObject *parent) :
 
 specUndoCommand* specPasteAction::generateUndoCommand()
 {
-	int row = 0 ;
-	if (!currentItem->isFolder())
-	{
-		row = currentIndex.row()+1 ;
-		currentIndex = currentIndex.parent() ;
-	}
-	int count = model->itemPointer(currentIndex)->children() ;
-	if (! model->dropMimeData(QApplication::clipboard()->mimeData(),Qt::CopyAction,row,0,currentIndex)) return 0 ;
+	int count = model->itemPointer(insertionIndex)->children() ;
+	if (! model->dropMimeData(QApplication::clipboard()->mimeData(),Qt::CopyAction,insertionRow,0,insertionIndex)) return 0 ;
 	count = model->itemPointer(currentIndex)->children() - count ; // now we know, how many were inserted...
 	specAddFolderCommand *command = new specAddFolderCommand ;
 	QModelIndexList list ;

@@ -15,9 +15,14 @@ specAddFolderAction::specAddFolderAction(QObject *parent)
 
 specUndoCommand* specAddFolderAction::generateUndoCommand()
 {
-	if (! model->insertItems(QList<specModelItem*>() << new specFolderItem(), insertionIndex, insertionRow)) return 0 ;
+	specFolderItem* newItem = new specFolderItem ;
+	if (! model->insertItems(QList<specModelItem*>() << newItem, insertionIndex, insertionRow))
+	{
+		delete newItem ;
+		return 0 ;
+	}
 	specAddFolderCommand *command = new specAddFolderCommand ;
-	command->setItems(QModelIndexList() << model->index(insertionRow,0,insertionIndex)) ;
+	command->setItems(QModelIndexList() << model->index(newItem)) ;
 
 	command->setText(tr("Add folder")) ;
 	command->setParentObject(model) ;
