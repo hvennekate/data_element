@@ -53,7 +53,7 @@ void exportLayoutItem::setDescriptors(const QStringList &ds)
 	}
 	descriptor->clear();
 	descriptor->addItems(ds) ;
-	if (ds.contains(currentText)) ;
+	if (ds.contains(currentText))
 		descriptor->setCurrentIndex(ds.indexOf(currentText)) ;
 }
 
