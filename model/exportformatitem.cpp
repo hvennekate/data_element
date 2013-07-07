@@ -33,8 +33,8 @@ exportFormatItem::exportFormatItem ( const QStringList& values, QWidget *parent 
 
 void exportFormatItem::remove()
 {
-	if (parentWidget() && parentWidget()->layout())
-		parentWidget()->layout()->removeWidget(this) ;
+//	if (parentWidget() && parentWidget()->layout())
+//		parentWidget()->layout()->removeWidget(this) ;
 	delete this ;
 }
 
@@ -71,4 +71,17 @@ void exportFormatItem::setValue(spec::value v)
 void exportFormatItem::setSeparator(spec::separator s)
 {
 	Separator->setCurrentIndex(s) ;
+}
+
+void exportFormatItem::setDataTypes(const QStringList &ds)
+{
+	QString currentText = Value->currentText() ;
+	if (!ds.contains(currentText))
+	{
+		remove() ;
+		return ;
+	}
+	Value->clear();
+	Value->addItems(ds) ;
+	Value->setCurrentIndex(ds.indexOf(currentText));
 }

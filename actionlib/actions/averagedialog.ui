@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>averageDialog</class>
+ <widget class="QDialog" name="averageDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>241</width>
+    <height>209</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QWidget" name="widget" native="true">
+     <layout class="QVBoxLayout" name="verticalLayout_3">
+      <item>
+       <widget class="QRadioButton" name="byPointNumber">
+        <property name="text">
+         <string>Average by point index</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QSpinBox" name="number">
+        <property name="minimum">
+         <number>2</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="running">
+        <property name="text">
+         <string>Running average</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="runningLabel">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Points will be taken symmetrically from both sides (if available)</string>
+        </property>
+        <property name="wordWrap">
+         <bool>true</bool>
+        </property>
+        <property name="indent">
+         <number>30</number>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="line">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QRadioButton" name="byTolerance">
+        <property name="text">
+         <string>Average by x value</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QDoubleSpinBox" name="toleranceEdit">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="rightToLeft">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
+        <property name="text">
+         <string>Invert direction (start from larger x values)</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+     <zorder>rightToLeft</zorder>
+     <zorder>byPointNumber</zorder>
+     <zorder>byTolerance</zorder>
+     <zorder>running</zorder>
+     <zorder>number</zorder>
+     <zorder>rightToLeft</zorder>
+     <zorder>runningLabel</zorder>
+     <zorder>toleranceEdit</zorder>
+     <zorder>line</zorder>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="enabled">
+      <bool>true</bool>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>running</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>runningLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>60</x>
+     <y>62</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>89</x>
+     <y>90</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>byTolerance</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>toleranceEdit</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>49</x>
+     <y>123</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>59</x>
+     <y>154</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>byTolerance</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>rightToLeft</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>33</x>
+     <y>118</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>43</x>
+     <y>161</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>byPointNumber</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>number</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>11</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>108</x>
+     <y>40</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>byPointNumber</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>running</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>136</x>
+     <y>17</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>136</x>
+     <y>63</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>byPointNumber</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>runningLabel</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>194</x>
+     <y>14</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>192</x>
+     <y>89</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>averageDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>236</x>
+     <y>204</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>240</x>
+     <y>208</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>averageDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>222</x>
+     <y>198</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>208</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

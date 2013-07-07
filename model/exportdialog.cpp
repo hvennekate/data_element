@@ -3,11 +3,18 @@
 #include <QSpacerItem>
 #include <QTextStream>
 #include <QLabel>
+#include "exportlayoutitem.h"
+#include "exportformatitem.h"
 
-exportDialog::exportDialog (QStringList* Descriptors, const QStringList &DataTypes, QWidget *parent )
+template <class itemType>
+QList<itemType*> exportDialog::getItems() const
+{
+	return findChildren<itemType*>() ;
+
+}
+
+exportDialog::exportDialog (QWidget *parent )
 	: QDialog ( parent ),
-	  descriptors(Descriptors),
-	  dataTypes(DataTypes),
 	  scrollData(0)
 {
 	setWindowTitle(tr("Output format")) ;
@@ -22,14 +29,25 @@ exportDialog::exportDialog (QStringList* Descriptors, const QStringList &DataTyp
 
 	prepareHeader() ;
 	prepareData() ;
-	layout->addWidget(new QLabel("Item description format")) ;
-	layout->addWidget(scrollHeader) ;
-	if (scrollData)
-	{
-		layout->addWidget(new QLabel("Individual data point output format")) ;
-		layout->addWidget(scrollData) ;
-	}
 	layout->addWidget(buttonBox) ;
+}
+
+void exportDialog::setDataTypes(const QStringList &dTs)
+{
+	bool dataTypesWereEmpty = dataTypes.isEmpty() ;
+	dataTypes = dTs ;
+	if (dataTypesWereEmpty)
+		prepareData();
+	foreach(exportFormatItem* pointer, getItems<exportFormatItem>())
+		pointer->setDataTypes(dataTypes) ;
+}
+
+void exportDialog::setDescriptors(const QStringList &newDs)
+{
+	descriptors = newDs ;
+	foreach(exportLayoutItem* pointer, getItems<exportLayoutItem>())
+		pointer->setDescriptors(newDs) ;
+
 }
 
 void exportDialog::prepareHeader()
@@ -61,11 +79,15 @@ void exportDialog::prepareHeader()
 	inLayout->addStretch() ;
 	inLayout->setSpacing(0) ;
 	inLayout->setContentsMargins(0,0,0,0) ;
+
+	layout->addWidget(new QLabel("Item description format", this)) ;
+	layout->addWidget(scrollHeader) ;
 }
 
 void exportDialog::prepareData()
 {
 	if (dataTypes.isEmpty()) return ;
+	delete scrollData ;
 	scrollData = new QScrollArea() ;
 
 	//set up scroll widget
@@ -112,11 +134,17 @@ void exportDialog::prepareData()
 			(pointer =
 			 dynamic_cast<exportFormatItem*>(dataLayout->itemAt(dataTypes.size()-1)->widget())))
 		pointer->setSeparator(spec::newline) ;
+
+	if (scrollData)
+	{
+		layout->insertWidget(layout->count()-1,new QLabel("Individual data point output format", this)) ;
+		layout->insertWidget(layout->count()-1, scrollData);
+	}
 }
 
 void exportDialog::addHeaderItem()
 {
-	inLayout->insertWidget(inLayout->count()-2,new exportLayoutItem(*descriptors, this)) ;
+	inLayout->insertWidget(inLayout->count()-2,new exportLayoutItem(descriptors, this)) ;
 }
 
 void exportDialog::addDataItem()
@@ -125,27 +153,19 @@ void exportDialog::addDataItem()
 	dataLayout->insertWidget(dataLayout->count()-2,new exportFormatItem(dataTypes, this)) ;
 }
 
-QList<QPair<spec::value,QString> > exportDialog::dataFormat()
+QList<QPair<spec::value,QString> > exportDialog::dataFormat() const
 {
 	QList<QPair<spec::value, QString> > returnData ;
-	for (int i = 0 ; i < dataLayout->count()-1 ; i++)
-	{
-		exportFormatItem* pointer ;
-		if (dataLayout->itemAt(i) && (pointer = dynamic_cast<exportFormatItem*>(dataLayout->itemAt(i)->widget())))
-			returnData << QPair<spec::value, QString>(pointer->value(), pointer->separator()) ;
-	}
+	foreach(exportFormatItem *pointer, getItems<exportFormatItem>())
+		returnData << QPair<spec::value, QString>(pointer->value(), pointer->separator()) ;
 	return returnData ;
 }
 
-QList<QPair<bool,QString> > exportDialog::headerFormat()
+QList<QPair<bool,QString> > exportDialog::headerFormat() const
 {
 	QList<QPair<bool,QString> > returnData ;
-	for (int i = 0 ; i < inLayout->count()-1 ; i++)
-	{
-		exportLayoutItem *pointer ;
-		if (inLayout->itemAt(i) && (pointer = dynamic_cast<exportLayoutItem*>(inLayout->itemAt(i)->widget())) )
-			returnData << QPair<bool,QString>(pointer->isFreeText(),pointer->text()) ;
-	}
+	foreach(exportLayoutItem *pointer, getItems<exportLayoutItem>())
+		returnData << QPair<bool,QString>(pointer->isFreeText(),pointer->text()) ;
 	return returnData ;
 }
 

@@ -2,18 +2,20 @@
 <qresource prefix="icons/oxygen">
 	<file alias="index.theme">icons/oxygen/index.theme</file>
 
-	<file alias="16x16/go-up.png">icons/oxygen/go-up.png</file>
+	<file alias="16x16/document-revert.png">icons/oxygen/document-revert.png</file>
 	<file alias="16x16/document-new.png">icons/oxygen/document-new.png</file>
 	<file alias="16x16/edit-copy.png">icons/oxygen/edit-copy.png</file>
 	<file alias="16x16/edit-undo.png">icons/oxygen/edit-undo.png</file>
-	<file alias="16x16/insert-image.png">icons/oxygen/insert-image.png</file>
+	<file alias="16x16/edit-delete.png">icons/oxygen/edit-delete.png</file>
 	<file alias="16x16/document-open.png">icons/oxygen/document-open.png</file>
 	<file alias="16x16/document-properties.png">icons/oxygen/document-properties.png</file>
 	<file alias="16x16/document-print.png">icons/oxygen/document-print.png</file>
 	<file alias="16x16/dialog-warning.png">icons/oxygen/dialog-warning.png</file>
 	<file alias="16x16/go-down.png">icons/oxygen/go-down.png</file>
 	<file alias="16x16/image-x-generic.png">icons/oxygen/image-x-generic.png</file>
-	<file alias="16x16/edit-delete.png">icons/oxygen/edit-delete.png</file>
+	<file alias="16x16/accessories-calculator.png">icons/oxygen/accessories-calculator.png</file>
+	<file alias="16x16/go-up.png">icons/oxygen/go-up.png</file>
+	<file alias="16x16/insert-image.png">icons/oxygen/insert-image.png</file>
 	<file alias="16x16/document-save.png">icons/oxygen/document-save.png</file>
 	<file alias="16x16/edit-cut.png">icons/oxygen/edit-cut.png</file>
 	<file alias="16x16/format-text-italic.png">icons/oxygen/format-text-italic.png</file>

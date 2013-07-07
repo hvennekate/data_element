@@ -1,7 +1,6 @@
 #include "specmodel.h"
 #include <QString>
 #include <QMimeData>
-#include <QFileDialog>
 
 #include "exportdialog.h"
 #include "specmovecommand.h"
@@ -13,9 +12,25 @@
 #include "specmimeconverter.h"
 #include "specfolderitem.h"
 #include "utility-functions.h"
+#include <QtAlgorithms>
 
 
 // TODO replace isFolder() by addChildren(empty list,0)
+bool specModel::pointerIsLessComparison(specModelItem*a, specModelItem* b)
+{
+	QVector<int> aHierarchy(hierarchy(a)),
+			bHierarchy(hierarchy(b)) ;
+	int i = 0, n = qMin(aHierarchy.size(), bHierarchy.size()) ;
+	int haSize = aHierarchy.size()-1, hbSize = bHierarchy.size()-1 ;
+	while (i < n && aHierarchy[haSize] == bHierarchy[hbSize])
+	{
+		++i ;
+		--haSize ;
+		--hbSize ;
+	}
+	if (i == n) return aHierarchy.size() < bHierarchy.size() ;
+	return aHierarchy[haSize] < bHierarchy[hbSize] ;
+}
 
 bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria)
 {
@@ -43,30 +58,6 @@ bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QLi
 QStringList specModel::dataTypes() const
 {
 	return QStringList() << "wavenumber" << "signal" << "maximum intensity" ;
-}
-
-bool specModel::exportData(QModelIndexList& list)
-{
-	QFile *exportFile = new QFile(QFileDialog::getSaveFileName(0,"File name","","ASCII files (*.asc)")) ;
-	exportDialog *exportFormat = new exportDialog(&Descriptors, dataTypes()) ;
-	if ( exportFile->fileName() == "" || ! exportFormat->exec() )
-	{
-		delete exportFormat ;
-		return false ;
-	}
-	exportFile->open(QIODevice::WriteOnly | QIODevice::Text) ;
-	QTextStream out(exportFile) ;
-	QList<QPair<bool,QString> > headerFormat = exportFormat->headerFormat() ;
-	QList<QPair<spec::value,QString> > dataFormat = exportFormat->dataFormat() ;
-	if (list.isEmpty())
-		for (int i = 0 ; i < root->children() ; i++)
-			((specFolderItem*) root)->child(i)->exportData(headerFormat, dataFormat, out) ; // TODO make root specFolderItem
-	else
-		for (int i = 0 ; i < list.size() ; i++)
-			itemPointer(list[i])->exportData(headerFormat, dataFormat, out) ;
-	exportFile->close() ;
-	delete exportFormat ;
-	return true ;
 }
 
 QModelIndexList ancestry(const QModelIndex& index)
@@ -288,8 +279,6 @@ QVariant specModel::data(const QModelIndex &index, int role) const
 		return "" ;
 	case Qt::ForegroundRole :
 		return pointer->pen().color() ;
-	case spec::fullContentRole :
-		return pointer->descriptor(Descriptors[index.column()],true) ;
 	case Qt::EditRole :
 		return pointer->editDescriptor(Descriptors[index.column()]) ;
 	case Qt::ToolTipRole :
@@ -341,10 +330,6 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 		{
 			changed = true ;
 			itemPointer(index)->mergePlotData = value.toBool() ;
-		}
-		else if (role == spec::activeLineRole)
-		{
-			changed = itemPointer(index)->setActiveLine(Descriptors[index.column()], value.toInt()) ;
 		}
 	}
 	if (changed) emit dataChanged(index,index) ;

@@ -14,9 +14,10 @@ class specExchangeDescriptorXDialog : public QDialog
 	Q_OBJECT
 
 public:
-	explicit specExchangeDescriptorXDialog(const QStringList& items, QWidget *parent = 0);
+	explicit specExchangeDescriptorXDialog(QWidget *parent = 0);
 	QString descriptorToConvert() const ;
 	QString newDescriptor() const ;
+	void setDescriptors(const QStringList&) ;
 	~specExchangeDescriptorXDialog();
 
 private slots:

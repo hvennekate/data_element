@@ -2,11 +2,16 @@
 #define SPECSPECTRUMCALCULATORACTION_H
 #include "specrequiresitemaction.h"
 
+class spectrumCalculatorDialog ;
+
 class specSpectrumCalculatorAction : public specRequiresDataItemAction
 {
 	Q_OBJECT
+private:
+	spectrumCalculatorDialog* dialog ;
 public:
 	explicit specSpectrumCalculatorAction(QObject *parent = 0);
+	~specSpectrumCalculatorAction() ;
 	const std::type_info& possibleParent() ;
 protected:
 	specUndoCommand* generateUndoCommand() ;

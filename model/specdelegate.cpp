@@ -1,12 +1,23 @@
 #include "specdelegate.h"
 #include <QModelIndex>
 #include <QTextStream>
-#include <QTextEdit>
+#include "textedit.h"
 #include "names.h"
+#include <QCompleter>
+#include <QSet>
+#include "specmodel.h"
 
 specDelegate::specDelegate(QObject *parent)
-	: QItemDelegate(parent)
+	: QItemDelegate(parent),
+	  completerMap(new QMap<QString, QStringList*>())
 {
+}
+
+specDelegate::~specDelegate()
+{
+	foreach(QStringList* list, completerMap->values())
+		delete list ;
+	delete completerMap ;
 }
 
 bool specDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
@@ -14,22 +25,30 @@ bool specDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const Q
 	return QItemDelegate::editorEvent(event,model,option,index) ;
 }
 
+void specDelegate::syncCompleterMap(const QStringList &descriptors) const
+{
+	QSet<QString> newDescriptors(descriptors.toSet()),
+			currentDescriptors(completerMap->keys().toSet()) ;
+	foreach(const QString& descriptor, currentDescriptors - newDescriptors)
+		delete completerMap->take(descriptor) ;
+	foreach(const QString& descriptor, newDescriptors - currentDescriptors)
+		completerMap->insert(descriptor, new QStringList()) ;
+}
+
 QWidget* specDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
 	Q_UNUSED(option)
-	Q_UNUSED(index)
-	QTextEdit *editor = new QTextEdit(parent) ;
-	QPalette palette = editor->palette() ;
-	palette.setColor(QPalette::Base,palette.toolTipBase().color());
-	palette.setColor(QPalette::Text,palette.toolTipText().color());
-	editor->setPalette(palette) ;
-	editor->setFrameShadow(QFrame::Plain);
-	editor->setFrameShape(QFrame::NoFrame) ;
-	editor->setAcceptRichText(false) ;
-	editor->setBackgroundRole(QPalette::Text);
-	editor->setLineWrapMode(QTextEdit::NoWrap) ;
-	editor->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-	editor->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+	TextEdit *editor = new TextEdit(parent) ;
+
+	const specModel *model = qobject_cast<const specModel*>(index.model()) ;
+	if (model)
+	{
+		syncCompleterMap(model->descriptors()) ;
+		QCompleter *completer = new QCompleter(*(completerMap->value(model->descriptors()[index.column()])), editor) ; // TODO use parent instead
+		completer->setModelSorting(QCompleter::CaseSensitivelySortedModel);
+		editor->setCompleter(completer);
+	}
+
 	return editor ;
 }
 
@@ -42,16 +61,25 @@ void specDelegate::setEditorData(QWidget *e, const QModelIndex &index) const
 
 void specDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-	int activeLine = 0 ;
-	int lastNewLine = ((QTextEdit*) editor)->textCursor().position() ;
-	while ((lastNewLine = ((QTextEdit*) editor)->toPlainText().lastIndexOf(QRegExp("\n"),lastNewLine) - 1) > -1)
-		++ activeLine;
-	if (activeLine == 0)
-		model->setData(index,((QTextEdit*) editor)->toPlainText(),Qt::EditRole) ;
-	else
-		model->setData(index,
-				   QList<QVariant>() << ((QTextEdit*) editor)->toPlainText()
-				   << activeLine,Qt::EditRole) ;
+	QTextEdit *ed = (QTextEdit*) editor ;
+	QString text = ed->toPlainText() ;
+	model->setData(index,
+		       QList<QVariant>() << text << ed->textCursor().blockNumber(),
+		       Qt::EditRole) ;
+	specModel* sm = qobject_cast<specModel*>(model) ;
+	if (sm)
+	{
+		QString descriptor = sm->descriptors()[index.column()] ;
+		if (completerMap->contains(descriptor))
+		{
+			QSet<QString> newWords = completerMap->value(descriptor)->toSet() ;
+			foreach(const QString& word, text.split(QRegExp("\\s+")))
+				newWords << word ;
+			QStringList newList = newWords.toList() ;
+			qSort(newList) ;
+			completerMap->value(descriptor)->swap(newList) ;
+		}
+	}
 }
 
 void specDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -61,5 +89,3 @@ void specDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewI
 		geom.setX(geom.x()+option.decorationSize.width()+3) ;
 	editor->setGeometry(geom);
 }
-
-

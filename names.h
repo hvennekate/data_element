@@ -18,7 +18,7 @@ namespace spec{
 	enum value{ wavenumber=0, signal=1, maxInt=2 } ;
 
 	enum undoActionIds{ } ;
-	enum itemRoles { descriptorPropertyRole = 34, activeLineRole = 50, fullContentRole = 51 } ;
+	enum itemRoles { descriptorPropertyRole = 34 } ;
 
 	enum rtti {canvasItem = 1001, spectrum = 1010, zeroRange = 1020, metaItem = 1030, kineticRange = 1040, SVGItem = 1050, metaRange = 1060 } ;
 }

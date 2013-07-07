@@ -47,9 +47,8 @@ private:
 	QList<specMimeConverter*> mimeConverters() const ;
 	specMetaModel* metaModel ;
 	void checkForNewDescriptors(const QList<specModelItem*>& list, const QModelIndex& parent) ;
-protected:
-	virtual QStringList dataTypes() const ;
 public:
+	virtual QStringList dataTypes() const ;
 	specModel(QObject *par = 0) ;
 	~specModel() ;
 	QStringList mimeTypes() const ;
@@ -62,6 +61,7 @@ public:
 	QModelIndex index(specModelItem*, int column = 0) const ;
 	static QVector<int> hierarchy(specModelItem*) ;
 	static QVector<int> hierarchy(const QModelIndex&) ;
+	static bool pointerIsLessComparison(specModelItem *, specModelItem *) ;
 	QList<specModelItem*> pointerList(const QModelIndexList&) const ;
 	QModelIndexList indexList(const QList<specModelItem*>&) const ;
 	bool contains(specModelItem*) const ;
@@ -134,7 +134,6 @@ public:
 
 	// //TODO
 public slots:
-	bool exportData(QModelIndexList& list) ;
 	void svgMoved(specCanvasItem*, int, double, double) ;
 };
 

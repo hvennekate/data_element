@@ -32,6 +32,7 @@ specPlot::specPlot(QWidget *parent)
 	  ymaxEdit(this),
 	  view(0)
 {
+	setAutoDelete(false);
 	zeroLine = new QwtPlotMarker ;
 	zeroLine->setLineStyle(QwtPlotMarker::HLine);
 	zeroLine->setLinePen(QPen(Qt::DotLine));

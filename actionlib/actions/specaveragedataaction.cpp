@@ -12,15 +12,27 @@
 #include "specdataview.h"
 #include "utility-functions.h"
 #include <QRadioButton>
+#include "ui_averagedialog.h"
 
 specAverageDataAction::specAverageDataAction(QObject *parent) :
-	specRequiresDataItemAction(parent)
+	specRequiresDataItemAction(parent),
+	dialog(new QDialog),
+	ui(new Ui::averageDialog)
 {
 	setIcon(QIcon(":/ave.png")) ;
 	setToolTip(tr("Average Data")) ;
 	setWhatsThis(tr("Smooth data by averaging.  You can choose between plainly averaging any number of data points or calculating a moving average."));
 	setText(tr("Average data...")) ;
 	setShortcut(tr("Ctrl+Shift+a"));
+	ui->setupUi(dialog);
+	connect(ui->running, SIGNAL(toggled(bool)), this, SLOT(runningToggled())) ;
+	ui->toleranceEdit->setMaximum(INFINITY);
+}
+
+specAverageDataAction::~specAverageDataAction()
+{
+	delete ui ;
+	delete dialog ;
 }
 
 const std::type_info& specAverageDataAction::possibleParent()
@@ -40,58 +52,23 @@ public:
 	}
 };
 
+void specAverageDataAction::runningToggled()
+{
+	ui->number->setMinimum(ui->running->isChecked() ? 1 : 2);
+}
+
 specUndoCommand* specAverageDataAction::generateUndoCommand()
 {
-	// TODO subclass QDialog, make one instance persistent in memory
-	// also:  minimale Anzahl Punkte, wenn nicht laufend: 2, sonst 1
-	QDialog dialog(parentWidget()) ;
-	dialog.setWindowTitle(tr("Average")) ;
-	dialog.setLayout(new QVBoxLayout(&dialog)) ;
-
-	QRadioButton *byPointNumber = new QRadioButton(tr("Average by point"), &dialog) ;
-	dialog.layout()->addWidget(byPointNumber);
-	byPointNumber->setChecked(true) ;
-
-	QSpinBox *number = new QSpinBox(&dialog) ;
-	number->setMinimum(1) ;
-	number->setSuffix(tr(" points")) ;
-	number->setSpecialValueText(tr("1 point")) ;
-	dialog.layout()->addWidget(number) ;
-	QCheckBox *running = new QCheckBox(tr("running average"),&dialog) ;
-	QLabel *runningLabel = new QLabel("Points will be taken symmetrically\nfrom both sides\n(if available)",&dialog) ;
-	runningLabel->setVisible(running->isChecked()) ;
-	dialog.layout()->addWidget(runningLabel);
-	dialog.layout()->addWidget(running) ;
-	connect(running,SIGNAL(toggled(bool)),runningLabel,SLOT(setVisible(bool))) ;
-
-	QRadioButton *byTolerance = new QRadioButton(tr("Average by x value"), &dialog) ;
-	dialog.layout()->addWidget(byTolerance);
-
-	QLineEdit *toleranceEdit = new QLineEdit("0",&dialog) ;
-	toleranceEdit->setValidator(new QDoubleValidator(0, INFINITY, 2, toleranceEdit)) ;
-	QHBoxLayout *toleranceLayout = new QHBoxLayout ;
-	toleranceLayout->addWidget(new QLabel(tr("Tolerance:"), &dialog)) ;
-	toleranceLayout->addWidget(toleranceEdit) ;
-	dialog.layout()->addItem(toleranceLayout) ;
-
-	QCheckBox *rightToLeft = new QCheckBox(tr("Invert direction (start from larger x values)"),&dialog) ;
-	dialog.layout()->addWidget(rightToLeft) ;
-
-	QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok|QDialogButtonBox::Cancel,Qt::Horizontal,&dialog) ;
-	dialog.layout()->addWidget(buttonBox);
-	connect(buttonBox,SIGNAL(accepted()),&dialog,SLOT(accept())) ;
-	connect(buttonBox,SIGNAL(rejected()),&dialog,SLOT(reject())) ;
-
-	if (!dialog.exec())
+	if (!dialog->exec())
 		return 0 ;
 
-	int numAverages = number->value() ;
-	if (byPointNumber->isChecked() && numAverages == 1 && !running->isChecked()) return 0 ;
+	int numAverages = ui->number->value() ;
+	if (ui->byPointNumber->isChecked() && numAverages == 1 && !ui->running->isChecked()) return 0 ;
 	specMultiCommand *groupCommand = new specMultiCommand ;
 	groupCommand->setParentObject(model) ;
 	groupCommand->setMergeable(false) ;
 
-	if (byPointNumber->isChecked())
+	if (ui->byPointNumber->isChecked())
 	{
 		foreach(QModelIndex index, selection)
 		{
@@ -99,13 +76,12 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 			if (!item) continue ;
 			QVector<specDataPoint> oldData(item->allData()), newData ;
 			item->applyCorrection(oldData);
-			if (running->isChecked())
+			if (ui->running->isChecked())
 			{
-				//			newData.resize(oldData.size());
 				for (int i = 0 ; i < oldData.size() ; ++i)
 				{
 					int limit = qMin(i+numAverages+1, oldData.size()) ;
-					specDataPoint dataPoint ; //= newData[i];
+					specDataPoint dataPoint ;
 					for (int j = qMax(0,i-numAverages) ; j < limit ; ++j)
 						dataPoint += oldData[j] ;
 					dataPoint /= limit - qMax(0,i-numAverages) ;
@@ -114,11 +90,10 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 			}
 			else
 			{
-				//			newData.resize(oldData.size()/numAverages+1) ;
 				int avs = std::ceil(double(oldData.size())/numAverages) ;
 				for (int i = 0 ; i < avs ; ++i)
 				{
-					specDataPoint dataPoint ; //= newData[i] ;
+					specDataPoint dataPoint ;
 					int limit = qMin(oldData.size(), (i+1)*numAverages) ;
 					for (int j = i*numAverages ; j < limit ; ++ j)
 						dataPoint += oldData[j] ;
@@ -130,13 +105,18 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 			specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
 			command->setItem(index,newData);
 		}
-		groupCommand->setText(tr("Average data (") + QString::number(number->value()) + tr(" points") +  (running->isChecked() ? tr(", running)") : tr(")"))) ;
+		groupCommand->setText(tr("Average data (")
+					  + QString::number(ui->number->value())
+					  + tr(" points")
+					  +  (ui->running->isChecked() ? tr(", running)") : tr(")"))) ;
 	}
-	else if (byTolerance->isChecked())
+	else if (ui->byTolerance->isChecked())
 	{
-		groupCommand->setText(tr("Averaged data with a tolerance of ") + toleranceEdit->text() + tr(".")) ;
+		groupCommand->setText(tr("Averaged data with a tolerance of ")
+					  + ui->toleranceEdit->text()
+					  + (ui->rightToLeft->isChecked() ? tr(", inverse x direction") : tr("."))) ;
 
-		tolerantComparison comp(toleranceEdit->text().toDouble()) ;
+		tolerantComparison comp(ui->toleranceEdit->text().toDouble()) ;
 		foreach(QModelIndex index, selection)
 		{
 			specDataItem *item = dynamic_cast<specDataItem*>(model->itemPointer(index)) ;
@@ -144,7 +124,7 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 			specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
 			command->setParentObject(model) ;
 			QVector<specDataPoint> newData, oldData(item->allData()) ;
-			if (rightToLeft->isChecked())
+			if (ui->rightToLeft->isChecked())
 			{
 				newData.reserve(oldData.size());
 				std::reverse_copy(oldData.begin(), oldData.end(), std::back_inserter(newData)) ;

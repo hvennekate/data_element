@@ -3,6 +3,8 @@
 
 #include <QDialog>
 
+class QStringListModel ;
+
 namespace Ui {
 	class spectrumCalculatorDialog;
 }
@@ -26,8 +28,12 @@ private slots:
 
 	void errorChanged(const QString&) ;
 
+	void syncFormulae() const ;
+
 private:
 	Ui::spectrumCalculatorDialog *ui;
+	QStringListModel *xFormulae, *yFormulae ;
+	void syncFormula(const QString& formula, QStringListModel* model) const ;
 };
 
 #endif // SPECTRUMCALCULATORDIALOG_H
