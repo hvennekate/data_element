@@ -5,6 +5,7 @@
 #include "specmulticommand.h"
 #include "specplotmovecommand.h"
 #include "specdataview.h"
+#include "specdataitem.h"
 
 specNormalizeAction::specNormalizeAction(QObject *parent) :
 	specRequiresItemAction(parent),
@@ -50,6 +51,7 @@ specUndoCommand* specNormalizeAction::generateUndoCommand()
 	foreach(specModelItem* item, items)
 	{
 		if (!item->dataSize()) continue ;
+		if (!dynamic_cast<specDataItem*>(item)) continue ;
 
 		// find extremum
 		size_t extremum = 0 ;

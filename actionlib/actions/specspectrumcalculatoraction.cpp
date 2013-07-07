@@ -35,7 +35,8 @@ QStringList specSpectrumCalculatorAction::descriptorNames(QString& teststring)
 }
 
 specSpectrumCalculatorAction::specSpectrumCalculatorAction(QObject *parent) :
-	specRequiresItemAction(parent)
+	specRequiresItemAction(parent),
+	dialog(new spectrumCalculatorDialog)
 {
 	setIcon(QIcon::fromTheme("accessories-calculator")) ;
 	setToolTip(tr("Data calculator")) ;
@@ -43,6 +44,10 @@ specSpectrumCalculatorAction::specSpectrumCalculatorAction(QObject *parent) :
 	setWhatsThis(tr("Perform mathematical operations on x- and y-data."));
 }
 
+specSpectrumCalculatorAction::~specSpectrumCalculatorAction()
+{
+	delete dialog ;
+}
 
 const std::type_info& specSpectrumCalculatorAction::possibleParent()
 {
@@ -57,8 +62,7 @@ specUndoCommand* specSpectrumCalculatorAction::generateUndoCommand()
 	if (items.isEmpty()) return 0 ; // TODO include this in requirements
 
 	// get formulae
-	spectrumCalculatorDialog dialog ;
-	if (!dialog.exec()) return 0 ;
+	if (!dialog->exec()) return 0 ;
 
 	// prepare multi command
 	specMultiCommand *parentCommand = new specMultiCommand ;
@@ -67,7 +71,7 @@ specUndoCommand* specSpectrumCalculatorAction::generateUndoCommand()
 
 	// prepare the parsers
 	mu::Parser xParser, yParser ;
-	QString xFormula(dialog.xFormula()), yFormula(dialog.yFormula()) ;
+	QString xFormula(dialog->xFormula()), yFormula(dialog->yFormula()) ;
 	QStringList xDescriptors(descriptorNames(xFormula)), yDescriptors(descriptorNames(yFormula)) ;
 	try
 	{
@@ -151,8 +155,8 @@ specUndoCommand* specSpectrumCalculatorAction::generateUndoCommand()
 
 	// return command
 	parentCommand->setText(tr("Arithmetic operation on data. New x: ")
-			       + dialog.xFormula() + ". New y: "
-			       + dialog.yFormula() + "." );
+			       + dialog->xFormula() + ". New y: "
+			       + dialog->yFormula() + "." );
 	return parentCommand ;
 }
 

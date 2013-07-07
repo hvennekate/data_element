@@ -8,8 +8,14 @@
 #include "specdeletecommand.h"
 #include "specexchangedescriptorxdialog.h"
 
+specTiltMatrixAction::~specTiltMatrixAction()
+{
+	delete dialog ;
+}
+
 specTiltMatrixAction::specTiltMatrixAction(QObject *parent) :
-	specRequiresItemAction(parent)
+	specRequiresItemAction(parent),
+	dialog(new specExchangeDescriptorXDialog)
 {
 	setIcon(QIcon(":/exchangex.png")) ;
 	setToolTip(tr("Exchange x data for descriptive field")) ;
@@ -79,10 +85,10 @@ specUndoCommand* specTiltMatrixAction::generateUndoCommand()
 	if (items.isEmpty()) return 0 ;
 
 	// Get input from user
-	specExchangeDescriptorXDialog dialog(model->descriptors()) ;
-	if(QDialog::Accepted != dialog.exec()) return 0 ;
-	QString newDescriptor = dialog.newDescriptor(),
-			conversionDescriptor = dialog.descriptorToConvert() ;
+	dialog->setDescriptors(model->descriptors()) ;
+	if(QDialog::Accepted != dialog->exec()) return 0 ;
+	QString newDescriptor = dialog->newDescriptor(),
+			conversionDescriptor = dialog->descriptorToConvert() ;
 
 	// collect the data
 	QMap<double, dataItemPreparationObject> newData ;

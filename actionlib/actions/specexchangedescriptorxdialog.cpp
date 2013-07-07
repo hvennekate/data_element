@@ -2,10 +2,9 @@
 #include "ui_specexchangedescriptorxdialog.h"
 #include "specdescriptoreditaction.h"
 
-specExchangeDescriptorXDialog::specExchangeDescriptorXDialog(const QStringList &items, QWidget *parent) :
+specExchangeDescriptorXDialog::specExchangeDescriptorXDialog(QWidget *parent) :
 	QDialog(parent),
 	ui(new Ui::specExchangeDescriptorXDialog),
-	entries(items),
 	validator(new stringListValidator(this))
 {
 	ui->setupUi(this);
@@ -13,7 +12,6 @@ specExchangeDescriptorXDialog::specExchangeDescriptorXDialog(const QStringList &
 	QString newLabel(tr("old x")) ;
 	validator->fixup(newLabel) ;
 	ui->xName->setText(newLabel);
-	ui->columnToConvert->addItems(items) ;
 }
 
 specExchangeDescriptorXDialog::~specExchangeDescriptorXDialog()
@@ -30,6 +28,15 @@ void specExchangeDescriptorXDialog::on_columnToConvert_currentIndexChanged(const
 
 	validator->setForbidden(listContent);
 	ui->xName->setText(ui->xName->text());
+}
+
+void specExchangeDescriptorXDialog::setDescriptors(const QStringList &ds)
+{
+	QString current = ui->columnToConvert->currentText() ;
+	ui->columnToConvert->clear();
+	ui->columnToConvert->addItems(ds) ;
+	if (ds.contains(current))
+		ui->columnToConvert->setCurrentIndex(ds.indexOf(current));
 }
 
 QString specExchangeDescriptorXDialog::descriptorToConvert() const

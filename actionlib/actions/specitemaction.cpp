@@ -53,7 +53,7 @@ void specItemAction::execute()
 	library->push(command) ;
 }
 
-void specItemAction::expandSelectedFolders(QList<specModelItem *> &items, QList<specModelItem *> &folders)
+void specItemAction::expandSelectedFolders(QList<specModelItem *> &items, QList<specModelItem *> &folders) ////////// TODO make available to all item actions (subclass)!!!!!
 {
 	if (!model) return ;
 	folders.clear();
