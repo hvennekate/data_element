@@ -1,49 +1,36 @@
 #include "specgenealogy.h"
 #include "specfolderitem.h"
 
-//specGenealogy::specGenealogy(const QList<specModelItem *> &Items, specModel *mod)
-//	: Model(mod)
-//{
-//	getItemPointers(Items) ;
-//}
 
-specGenealogy::specGenealogy(const QModelIndex &index)
-	: owning(false)
+specGenealogy::specGenealogy(specModelItem *p, specModel *m)
+	: Model(m),
+	  owning(false)
 {
-	Model = (specModel*) index.model() ;
-	Items << Model->itemPointer(index) ;
-	indexes = Model->hierarchy(index) ;
-	Parent = Items.first()->parent() ;
+	Items << p ;
+	indexes = Model->hierarchy(p) ;
+	Parent = p->parent() ;
 }
 
-specGenealogy::specGenealogy(QModelIndexList &list)
-	: owning(false)
+specGenealogy::specGenealogy(QList<specModelItem *>& l, specModel *m)
+	: Model(m),
+	  owning(false)
 {
-	if (list.isEmpty()) return ;
-	QModelIndexList::iterator last = list.begin() ;
-	Model = (specModel*) last->model() ;
-	QModelIndex parentIndex= last->parent() ;
-	int next = last->row() ;
+	if (l.empty()) return ;
+	Parent = l.first()->parent() ;
+	indexes = Model->hierarchy(l.first()) ;
+	int row = Parent->childNo(l.first()) ;
 
-	// find iterator of end item
-	while (	last != list.end() &&
-			last->parent() == parentIndex &&
-			last->row() == next)
+	QList<specModelItem*>::iterator it = l.begin() ;
+	while (it != l.end()
+		   && (*it)->parent() == Parent
+		   && Parent->childNo(*it) == row)
 	{
-		next ++ ;
-		last ++ ;
+		Items << *it ;
+		++it ;
+		++row ;
 	}
 
-	// getting pointers to Items to put into our list
-	for (QModelIndexList::iterator i = list.begin() ; i != last ; ++i)
-		Items << Model->itemPointer(*i) ;
-
-	// getting index cascade and parent
-	indexes = Model->hierarchy(list.first()) ;
-	Parent = Items.first()->parent() ;
-
-	// rid the list of those entries we took
-	list.erase(list.begin(),last) ;
+	l.erase(l.begin(), it) ;
 }
 
 bool specGenealogy::valid()
@@ -86,9 +73,9 @@ specFolderItem* specGenealogy::parent()
 void specGenealogy::writeToStream(QDataStream &out) const
 {
 	out << indexes
-	    << qint8(owning)
-	    << qint32(Items.size())
-	    << quint64(Model) ;
+		<< qint8(owning)
+		<< qint32(Items.size())
+		<< quint64(Model) ;
 	if (owning)
 	{
 		for(int i = 0 ; i < Items.size() ; ++i)

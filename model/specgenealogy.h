@@ -19,8 +19,8 @@ private:
 	type typeId() const { return specStreamable::genealogyId ; }
 	specModelItem* factory(const type &t) const ;
 public:
-	explicit specGenealogy(QModelIndexList&);
-	explicit specGenealogy(const QModelIndex&) ;
+	specGenealogy(specModelItem* p, specModel* m) ;
+	specGenealogy(QList<specModelItem*>& l, specModel* m) ;
 	virtual ~specGenealogy() ;
 	specGenealogy(specModel*, QDataStream&) ;
 	specGenealogy() ;

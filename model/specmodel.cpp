@@ -407,6 +407,24 @@ void specModel::eliminateChildren(QModelIndexList& list) const
 	}
 }
 
+void specModel::eliminateChildren(QList<specModelItem *>& l) const
+{
+	QSet<specModelItem*> allChildren ;
+	for(QList<specModelItem*>::iterator it = l.begin() ; it != l.end() ; ++it)
+	{
+		specFolderItem* folder = dynamic_cast<specFolderItem*>(*it) ;
+		if (folder)
+			allChildren << folder->childrenList() ;
+	}
+
+	QList<specModelItem*> filtered ;
+	for (QList<specModelItem*>::iterator it = l.begin() ; it != l.end() ; ++it)
+		if (!allChildren.contains(*it))
+			filtered << *it ;
+
+	l.swap(filtered);
+}
+
 QMimeData *specModel::mimeData(const QModelIndexList &indices) const
 {
 	QMimeData *mimeData = new QMimeData() ;

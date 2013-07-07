@@ -80,6 +80,7 @@ public:
 
 	bool isFolder(const QModelIndex&) const ;
 	void eliminateChildren(QModelIndexList&) const ;
+	void eliminateChildren(QList<specModelItem*>&) const ;
 	void expandFolders(QModelIndexList&) const ;
 	virtual bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row=0) ;
 	void fillSubMap(const QModelIndexList&) ;
