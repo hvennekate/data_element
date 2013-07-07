@@ -97,7 +97,7 @@ specView::specView(QWidget* parent)
 	setAcceptDrops(true) ;
 	setDropIndicatorShown(true) ;
 	QAbstractItemDelegate *olddel = itemDelegate() ;
-	setItemDelegate(new specDelegate) ;
+	setItemDelegate(new specDelegate(this)) ;
 	delete olddel ;
 	setAllColumnsShowFocus(true) ;
 

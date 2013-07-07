@@ -127,7 +127,8 @@ SOURCES += main.cpp \
     specdockwidget.cpp \
     actionlib/actions/specflattentreeaction.cpp \
     actionlib/actions/specnormalizeaction.cpp \
-    actionlib/actions/specmergedialog.cpp
+    actionlib/actions/specmergedialog.cpp \
+    model/textedit.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -256,7 +257,8 @@ HEADERS += cutbyintensitydialog.h \
     specdockwidget.h \
     actionlib/actions/specflattentreeaction.h \
     actionlib/actions/specnormalizeaction.h \
-    actionlib/actions/specmergedialog.h
+    actionlib/actions/specmergedialog.h \
+    model/textedit.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -315,7 +317,8 @@ FORMS += \
     actionlib/actions/specexchangedescriptorxdialog.ui \
     actionlib/actions/spectrumcalculatordialog.ui \
     actionlib/actions/specnormalizeactiondialog.ui \
-    actionlib/actions/specmergedialog.ui
+    actionlib/actions/specmergedialog.ui \
+    actionlib/actions/averagedialog.ui
 
 OTHER_FILES += icons/oxygen/index.theme \
     icons/oxygen/geticons.py
