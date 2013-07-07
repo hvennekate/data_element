@@ -229,13 +229,13 @@ specMergeAction::~specMergeAction()
 specUndoCommand* specMergeAction::generateUndoCommand()
 {
 	specProfiler profiler("Prepare merge commands:") ;
-	qSort(selection) ;
 	if (selection.size() < 2) return 0 ;
 	QList<specDataItem*> items ;
 	foreach(QModelIndex index, selection)
 		items << dynamic_cast<specDataItem*>(model->itemPointer(index)) ;
 	items.removeAll(0) ;
 	if (items.isEmpty()) return 0 ;
+	qSort(items.begin(), items.end(), specModel::pointerIsLessComparison) ;
 
 	// let user define similarities
 	QList<stringDoublePair > criteria ;

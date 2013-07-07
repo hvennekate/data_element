@@ -12,9 +12,25 @@
 #include "specmimeconverter.h"
 #include "specfolderitem.h"
 #include "utility-functions.h"
+#include <QtAlgorithms>
 
 
 // TODO replace isFolder() by addChildren(empty list,0)
+bool specModel::pointerIsLessComparison(specModelItem*a, specModelItem* b)
+{
+	QVector<int> aHierarchy(hierarchy(a)),
+			bHierarchy(hierarchy(b)) ;
+	int i = 0, n = qMin(aHierarchy.size(), bHierarchy.size()) ;
+	int haSize = aHierarchy.size()-1, hbSize = bHierarchy.size()-1 ;
+	while (i < n && aHierarchy[haSize] == bHierarchy[hbSize])
+	{
+		++i ;
+		--haSize ;
+		--hbSize ;
+	}
+	if (i == n) return aHierarchy.size() < bHierarchy.size() ;
+	return aHierarchy[haSize] < bHierarchy[hbSize] ;
+}
 
 bool specModel::itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria)
 {

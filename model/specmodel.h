@@ -61,6 +61,7 @@ public:
 	QModelIndex index(specModelItem*, int column = 0) const ;
 	static QVector<int> hierarchy(specModelItem*) ;
 	static QVector<int> hierarchy(const QModelIndex&) ;
+	static bool pointerIsLessComparison(specModelItem *, specModelItem *) ;
 	QList<specModelItem*> pointerList(const QModelIndexList&) const ;
 	QModelIndexList indexList(const QList<specModelItem*>&) const ;
 	bool contains(specModelItem*) const ;
