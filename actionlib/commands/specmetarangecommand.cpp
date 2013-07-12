@@ -2,21 +2,16 @@
 #include "specmetaitem.h"
 
 specMetaRangeCommand::specMetaRangeCommand(specUndoCommand *parent)
-	: specUndoCommand(parent),
-	  item(0)
+	: specSingleItemCommand(parent)
 {
 }
 
 void specMetaRangeCommand::doIt()
 {
-	if (!item) return ;
-	item->seekParent() ;
-	if (!item->valid()) return ;
-	if (item->items().isEmpty()) return ;
-	((specMetaItem*) item->items().first())->setRange(variableNo, rangeNo, pointNo, newX, newY) ;
-	specModel* model ;
-	if (parentObject() && (model = qobject_cast<specModel*>(parentObject())))
-		model->signalChanged(model->index(item->items().first(), model->descriptors().indexOf("variables")));
+	itemPointer()->setRange(variableNo, rangeNo, pointNo, newX, newY) ;
+	specModel* model = qobject_cast<specModel*>(parentObject());
+	if (model)
+		model->signalChanged(model->index(itemPointer(), model->descriptors().indexOf("variables")));
 }
 
 void specMetaRangeCommand::undoIt()
@@ -32,8 +27,7 @@ bool specMetaRangeCommand::mergeWith(const QUndoCommand *ot)
 {
 	if (!parentObject()) return false ;
 	const specMetaRangeCommand* other = (const specMetaRangeCommand*) ot ;
-	if (! (this->item && other->item)) return false ;
-	if (*(other->item) != *item) return false ;
+	if (! (this->itemPointer() && other->itemPointer())) return false ;
 	if (other->variableNo != variableNo) return false ;
 	if (other->rangeNo != rangeNo) return false ;
 	if (other->pointNo != pointNo) return false ;
@@ -42,35 +36,30 @@ bool specMetaRangeCommand::mergeWith(const QUndoCommand *ot)
 	return true ;
 }
 
-void specMetaRangeCommand::setItem(QModelIndex index, int variableIndex, int rangeIndex, int point, double nX, double nY)
+void specMetaRangeCommand::setItem(specMetaItem *i, int variableIndex, int rangeIndex, int point, double nX, double nY)
 {
-	if (item) delete item ;
-	item = new specGenealogy(index) ;
+	specSingleItemCommand::setItem(i) ;
 	pointNo = point ;
 	variableNo = variableIndex ;
 	rangeNo = rangeIndex ;
 	newX = nX ;
 	newY = nY ;
-	((specMetaItem*) (item->items().first()))->getRangePoint(variableNo, rangeNo, pointNo, oldX, oldY) ;
+	i->getRangePoint(variableNo, rangeNo, pointNo, oldX, oldY) ;
 }
 
 void specMetaRangeCommand::writeCommand(QDataStream &out) const
 { // TODO careful when writing pointer to genealogy.  Make local variable
-	out << oldX << oldY << newX << newY << rangeNo << pointNo << variableNo << *item ;
+	out << oldX << oldY << newX << newY << rangeNo << pointNo << variableNo ;
+	writeItem(out) ;
 }
 
 void specMetaRangeCommand::readCommand(QDataStream &in)
 {
-	if (!item) item = new specGenealogy ;
-	in >> oldX >> oldY >> newX >> newY >> rangeNo >> pointNo >> variableNo >> *item ;
+	in >> oldX >> oldY >> newX >> newY >> rangeNo >> pointNo >> variableNo ;
+	readItem(in);
 }
 
 bool specMetaRangeCommand::mergeable(const specUndoCommand *other)
 {
-	return *(((specMetaRangeCommand*) other)->item) == *item ;
-}
-
-void specMetaRangeCommand::parentAssigned()
-{
-	if (item) item->setModel(qobject_cast<specModel*>(parentObject()));
+	return (((specMetaRangeCommand*) other)->itemPointer()) == itemPointer() ;
 }

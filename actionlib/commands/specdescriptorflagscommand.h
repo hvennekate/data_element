@@ -5,7 +5,9 @@
 #include "specgenealogy.h"
 
 class specDescriptorFlagsCommand : public specUndoCommand
-{
+{// TODO: replace with genuine multiline action or rewrite for use
+	// with any single descriptorflag
+	// THIS seems to be highly uneconomical
 private:
 	typedef QPair<specGenealogy,qint8>  itemPropertyPair ;
 	typedef QVector<itemPropertyPair> itemsContainer ;
@@ -19,8 +21,8 @@ private:
 	void parentAssigned();
 public:
 	explicit specDescriptorFlagsCommand(specUndoCommand* parent = 0) ;
-	void setItems(const QModelIndexList& list, QString key, spec::descriptorFlags f) ;
-	void addItem(const QModelIndex& index, QString Key, spec::descriptorFlags f) ;
+	void setItems(QList<specModelItem *> &, QString key, spec::descriptorFlags f) ;
+	void addItem(specModelItem *item, QString Key, spec::descriptorFlags f) ;
 };
 
 #endif // SPECDESCRIPTORFLAGSCOMMAND_H

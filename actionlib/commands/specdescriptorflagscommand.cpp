@@ -5,20 +5,20 @@ specDescriptorFlagsCommand::specDescriptorFlagsCommand(specUndoCommand *parent)
 {
 }
 
-void specDescriptorFlagsCommand::setItems(const QModelIndexList &list, QString Key, spec::descriptorFlags f)
+void specDescriptorFlagsCommand::setItems(QList<specModelItem*>& list, QString Key, spec::descriptorFlags f)
 {
 	key = Key ;
 	items.clear();
 	if (list.isEmpty()) return ;
-	foreach(QModelIndex index, list)
-		items << itemPropertyPair(specGenealogy(index), f) ;
+	foreach(specModelItem* item, list)
+		items << itemPropertyPair(specGenealogy(item, model()), f) ;
 }
 
-void specDescriptorFlagsCommand::addItem(const QModelIndex& index, QString Key, spec::descriptorFlags f)
+void specDescriptorFlagsCommand::addItem(specModelItem* item, QString Key, spec::descriptorFlags f)
 {
-	if (!index.isValid()) return ;
+	if (!item) return ;
 	key = Key ;
-	items << itemPropertyPair(specGenealogy(index), f) ;
+	items << itemPropertyPair(specGenealogy(item, model()), f) ;
 }
 
 void specDescriptorFlagsCommand::undoIt()

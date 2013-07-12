@@ -2,29 +2,14 @@
 #include "qwt_plot.h"
 
 specExchangeDataCommand::specExchangeDataCommand(specUndoCommand *parent)
-	: specUndoCommand(parent),
-	  item(0)
+	: specSingleItemCommand(parent)
 {
 }
 
-void specExchangeDataCommand::setItem(const QModelIndex & index, const QVector<specDataPoint> &newData)
+void specExchangeDataCommand::setItem(specModelItem* p, const QVector<specDataPoint> &newData)
 {
 	data = newData ;
-	if (!parentObject()) return ; // TODO dynamic cast/ obtain model from index
-	specDataItem *pointer = dynamic_cast<specDataItem*>(((specModel*) parentObject())->itemPointer(index)) ;
-	if (item)
-		delete item ;
-	item = 0 ;
-	if (!pointer)
-		return ;
-	item = new specGenealogy(index) ;
-}
-
-void specExchangeDataCommand::parentAssigned()
-{
-	if (!parentObject()) return ;
-	if (!item) return ;
-	item->setModel(qobject_cast<specModel*>(parentObject())) ;
+	specSingleItemCommand::setItem(p) ;
 }
 
 void specExchangeDataCommand::undoIt()
@@ -34,19 +19,19 @@ void specExchangeDataCommand::undoIt()
 
 void specExchangeDataCommand::doIt()
 {
-	if (!item) return ;
-	specDataItem *pointer = dynamic_cast<specDataItem*>(item->firstItem()) ;
+	specDataItem *pointer = itemPointer() ;
 	if (!pointer) return ;
 	pointer->swapData(data);
 }
 
 void specExchangeDataCommand::writeCommand(QDataStream &out) const
 {
-	out << data << *item ;
+	out << data ;
+	writeItem(out) ;
 }
 
 void specExchangeDataCommand::readCommand(QDataStream &in)
 {
-	if (!item) item = new specGenealogy ;
-	in >> data >> *item ;
+	in >> data ;
+	readItem(in) ;
 }

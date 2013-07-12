@@ -7,10 +7,10 @@ specAddFolderCommand::specAddFolderCommand(specUndoCommand* parent)
 
 void specAddFolderCommand::doIt()
 {
-	restore();
+	restoreItems();
 }
 
 void specAddFolderCommand::undoIt()
 {
-	take() ;
+	takeItems();
 }

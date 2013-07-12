@@ -9,6 +9,7 @@ private:
 	void doIt();
 	void undoIt();
 	type typeId() const { return specStreamable::newConnectionsCommandId ; }
+	void processServers(specMetaItem *client, QList<specModelItem *> &servers) const ;
 public:
 	specAddConnectionsCommand(specUndoCommand *parent = 0);
 };

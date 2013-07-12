@@ -9,28 +9,21 @@ specStyleCommandImplFuncTemplate::specStyleCommandImplementation(specUndoCommand
 }
 
 specStyleCommandImplTemplate
-void specStyleCommandImplFuncTemplate::setItems(QModelIndexList items)
+void specStyleCommandImplFuncTemplate::setItems(QList<specModelItem*> items)
 {
+	specModel* model = qobject_cast<specModel*>(parentObject()) ;
+	QMap<int, QList<specModelItem*> > groups ;
+	foreach(specModelItem* item, items)
+		groups[styleNo(item)] << item ;
 
-	specModel *model = qobject_cast<specModel*>(parentObject()) ;
-
-	QMap<int, QModelIndexList > groups ;
-	for (int i = 0 ; i < items.size() ; ++i)
+	for (QMap<int, QList<specModelItem*> >::iterator i = groups.begin() ; i != groups.end() ; ++i)
 	{
-		specModelItem* item = dynamic_cast<specModelItem*>(model->itemPointer(items[i])) ;
-		if (!item) continue ;
-		groups[styleNo(item)] << items[i] ;
-	}
-
-	for (QMap<int, QModelIndexList>::iterator i = groups.begin() ; i != groups.end() ; ++i)
-	{
-		qSort(i.value()) ;
+		qSort(i.value().begin(), i.value().end(), model->lessThanItemPointer) ;
 		while (!i.value().isEmpty())
-			Genealogies << specGenealogy(i.value()) ;
+			Genealogies << specGenealogy(i.value(), model) ;
 	}
 
 	saveStyles(Genealogies) ;
-
 }
 
 specStyleCommandImplTemplate
@@ -50,7 +43,7 @@ void specStyleCommandImplFuncTemplate::undoIt()
 specStyleCommandImplTemplate
 void specStyleCommandImplFuncTemplate::writeCommand(QDataStream &out) const
 {
-	out << quint32(Genealogies.size()) << newProperty << oldProperties ;
+	out << qint32(Genealogies.size()) << newProperty << oldProperties ;
 	for (int i = 0 ; i < Genealogies.size() ; ++i)
 		out << Genealogies[i] ;
 }
@@ -58,9 +51,9 @@ void specStyleCommandImplFuncTemplate::writeCommand(QDataStream &out) const
 specStyleCommandImplTemplate
 void specStyleCommandImplFuncTemplate::readCommand(QDataStream &in)
 {
-	quint32 size ;
+	qint32 size ;
 	in >> size >> newProperty >> oldProperties ;
-	for (quint32 i = 0 ; i < size ; ++i)
+	for (qint32 i = 0 ; i < size ; ++i)
 	{
 		Genealogies << specGenealogy() ;
 		in >> Genealogies.last() ;

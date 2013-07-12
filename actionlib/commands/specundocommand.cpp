@@ -1,8 +1,9 @@
 #include "specundocommand.h"
+#include "specmodel.h"
 
 specUndoCommand::specUndoCommand(specUndoCommand *parent) :
 	QUndoCommand(parent),
-	pO(parent ? parent->parentObject() : 0) //parent->parentWidget()) // TODO adapt calling code
+	pO(parent ? parent->parentObject() : 0)
 {
 }
 
@@ -44,4 +45,9 @@ void specUndoCommand::readFromStream(QDataStream &in)
 QString specUndoCommand::description() const
 {
 	return text() ;
+}
+
+specModel* specUndoCommand::model() const
+{
+	return dynamic_cast<specModel*>(parentObject()) ;
 }

@@ -1,16 +1,14 @@
 #ifndef SPECRESIZESVGCOMMAND_H
 #define SPECRESIZESVGCOMMAND_H
 
-#include <QModelIndex>
-#include "specundocommand.h"
-#include "model/specsvgitem.h"
+#include "specsingleitemcommand.h"
+#include "specsvgitem.h"
 
 class specGenealogy ;
 
-class specResizeSVGcommand : public specUndoCommand
+class specResizeSVGcommand : public specSingleItemCommand<specSVGItem>
 {
 private:
-	specGenealogy *item ;
 	specSVGItem::bounds other ;
 	specSVGItem::SVGCornerPoint anchor ;
 	void doIt() ;
@@ -18,12 +16,10 @@ private:
 	void writeCommand(QDataStream &out) const;
 	void readCommand(QDataStream &in) ;
 	type typeId() const { return specStreamable::resizeSVGCommandId ; }
-	void parentAssigned();
 public:
 	explicit specResizeSVGcommand(specUndoCommand *parent = 0) ;
-	void setItem(const QModelIndex&, const specSVGItem::bounds&,
-		     specSVGItem::SVGCornerPoint anchor = specSVGItem::undefined) ;
-	bool ok() ;
+	void setItem(specModelItem* item, const specSVGItem::bounds&,
+			 specSVGItem::SVGCornerPoint anchor = specSVGItem::undefined) ;
 	bool mergeable(const specUndoCommand *other) ;
 	bool mergeWith(const QUndoCommand *other) ;
 };

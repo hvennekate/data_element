@@ -7,10 +7,10 @@ specDeleteCommand::specDeleteCommand(specUndoCommand *parent)
 
 void specDeleteCommand::doIt()
 {
-	take();
+	takeItems();
 }
 
 void specDeleteCommand::undoIt()
 {
-	restore() ;
+	restoreItems(); ;
 }

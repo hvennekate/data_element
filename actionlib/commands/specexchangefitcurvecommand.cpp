@@ -2,25 +2,16 @@
 #include "specfitcurve.h"
 
 specExchangeFitCurveCommand::specExchangeFitCurveCommand(specUndoCommand *parent)
-	: specUndoCommand(parent),
+	: specSingleItemCommand(parent),
 	  curve(0)
 {
 }
 
-void specExchangeFitCurveCommand::setup(const QModelIndex &i, specFitCurve *c)
+void specExchangeFitCurveCommand::setup(specModelItem *i, specFitCurve *c)
 {
-	if (!parentObject()) return ;
-	specMetaItem *pointer = dynamic_cast<specMetaItem*>(((specModel*) parentObject())->itemPointer(i)) ;
-	if (!pointer) return ;
 	if (curve) delete curve ;
 	curve = c ;
-	item = specGenealogy(QModelIndexList() << i) ;
-}
-
-void specExchangeFitCurveCommand::parentAssigned()
-{
-	if (!parentObject()) return ;
-	item.setModel(qobject_cast<specModel*>(parentObject())) ;
+	setItem(i) ;
 }
 
 void specExchangeFitCurveCommand::undoIt()
@@ -30,18 +21,19 @@ void specExchangeFitCurveCommand::undoIt()
 
 void specExchangeFitCurveCommand::doIt()
 {
-	specMetaItem *pointer = dynamic_cast<specMetaItem*>(item.firstItem()) ;
+	specMetaItem *pointer = itemPointer() ;
 	if (!pointer) return ;
-	item.model()->signalBeginReset(); // to get the selection right // TODO improve!
+	model()->signalBeginReset(); // to get the selection right // TODO improve!
 	curve = pointer->setFitCurve(curve);
 	if (curve) curve->detach();
-	item.model()->signalChanged(item.firstIndex());
-	item.model()->signalEndReset(); // to get the selection right
+	model()->signalChanged(model()->index(itemPointer()));
+	model()->signalEndReset(); // to get the selection right
 }
 
 void specExchangeFitCurveCommand::writeCommand(QDataStream &out) const
 {
-	out << quint8((bool) curve) << item ;
+	out << quint8((bool) curve) ;
+	writeItem(out);
 	if (curve) out << *curve ;
 }
 
@@ -49,7 +41,8 @@ void specExchangeFitCurveCommand::readCommand(QDataStream &in)
 {
 	delete curve ;
 	quint8 hasCurve(0) ;
-	in >> hasCurve >> item ;
+	in >> hasCurve ;
+	readItem(in) ;
 	if(hasCurve)
 	{
 		curve = new specFitCurve ;

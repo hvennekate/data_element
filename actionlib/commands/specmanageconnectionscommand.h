@@ -1,29 +1,28 @@
 #ifndef SPECMANAGECONNECTIONSCOMMAND_H
 #define SPECMANAGECONNECTIONSCOMMAND_H
 
-#include "specundocommand.h"
-#include "specgenealogy.h"
+#include "specmultipleitemcommand.h"
 
-class specManageConnectionsCommand : public specUndoCommand
+class specMetaModel ;
+
+//// Change: This class is ONLY for connecting dataItems (servers) to a metaItem (client)
+class specManageConnectionsCommand : public specMultipleItemCommand
 {
 private:
-	QVector<specGenealogy*> items ;
-	specGenealogy* target ;
-	void clear() ;
-	QVector<specModelItem*> itemPointers() const ;
-	specMetaItem* targetPointer() const ;
-	bool sameModel(specGenealogy*) const ;
+	specGenealogy target ;
+	specMetaItem* targetPointer() ;
+	specMetaModel* targetModel ;
+	bool sameModel ;
 	void writeCommand(QDataStream &out) const;
 	void readCommand(QDataStream &in) ;
 	void parentAssigned();
 protected:
+	virtual void processServers(specMetaItem* client, QList<specModelItem*>& servers) const = 0 ;
 	void take() ;
 	void restore() ;
 public:
 	explicit specManageConnectionsCommand(specUndoCommand *parent = 0);
-	virtual ~specManageConnectionsCommand() ;
-	bool ok() const ;
-	void setItems(const QModelIndex& client, QModelIndexList& servers) ;
+	virtual void setItems(specMetaItem* client, QList<specModelItem*> servers) ;
 };
 
 #endif // SPECMANAGECONNECTIONSCOMMAND_H

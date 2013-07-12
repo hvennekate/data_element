@@ -4,6 +4,8 @@
 #include <QUndoCommand>
 #include "specstreamable.h"
 
+class specModel ;
+
 class specUndoCommand : public QUndoCommand, public specStreamable
 {
 private:
@@ -17,6 +19,7 @@ protected:
 	virtual void parentAssigned() {}
 	virtual void writeCommand(QDataStream &out) const = 0 ;
 	virtual void readCommand(QDataStream &in) = 0 ;
+	specModel* model() const ; // TODO to subclass
 public:
 	explicit specUndoCommand(specUndoCommand *parent = 0);
 	void redo() ;

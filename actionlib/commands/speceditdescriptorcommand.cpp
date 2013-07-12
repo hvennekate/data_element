@@ -1,24 +1,21 @@
 #include "speceditdescriptorcommand.h"
-#include "specmodelitem.h"
 #include <QQueue>
 
 specEditDescriptorCommand::specEditDescriptorCommand(specUndoCommand *parent)
-	: specUndoCommand(parent)
+	: specSingleItemCommand(parent)
 {
 }
 
-void specEditDescriptorCommand::setItem(const QModelIndex &index, QString desc,
+void specEditDescriptorCommand::setItem(specModelItem *i, QString desc,
 					QString newContent, int activeLine)
 {
 	previousContent.clear();
 	previousActiveLine.clear();
 	previousContent << newContent ;
 	previousActiveLine << activeLine ;
-	specModelItem *pointer = ((specModel*) (index.model()))->itemPointer(index) ;
-	item.setModel(0); // TODO invalidate item
-	if (!pointer) return ;
+	if (!i) return ;
+	specSingleItemCommand::setItem(i) ;
 	descriptor = desc ;
-	item = specGenealogy(index) ;
 }
 
 void specEditDescriptorCommand::undoIt()
@@ -26,16 +23,10 @@ void specEditDescriptorCommand::undoIt()
 	doIt() ;
 }
 
-void specEditDescriptorCommand::parentAssigned()
-{
-	item.setModel(qobject_cast<specModel*>(parentObject()));
-}
-
-
 
 void specEditDescriptorCommand::doIt()
 {
-	specModelItem *pointer = item.firstItem() ;
+	specModelItem *pointer = itemPointer() ;
 	if (!pointer || previousActiveLine.isEmpty() || previousContent.isEmpty()) return ;
 	QVector<int>::iterator previousActiveLineIterator(previousActiveLine.begin()) ;
 	QStringList::iterator previousContentIterator(previousContent.begin()) ;
@@ -71,8 +62,9 @@ void specEditDescriptorCommand::doIt()
 		}
 	}
 
-	if (item.model()) // TODO: maybe implement specModel::index(specModelItem*, QString descriptor)
-		item.model()->signalChanged(item.firstIndex()) ;
+	specModel* model = qobject_cast<specModel*>(parentObject()) ;
+	if (model) // TODO: maybe implement specModel::index(specModelItem*, QString descriptor)
+		model->signalChanged(model->index(itemPointer())) ;
 	previousContent.swap(newContent) ;
 	previousActiveLine.swap(newActiveLines);
 }
@@ -80,17 +72,17 @@ void specEditDescriptorCommand::doIt()
 void specEditDescriptorCommand::writeCommand(QDataStream &out) const
 {
 	out << previousContent
-	    << descriptor
-	    << previousActiveLine
-	    << item ;
+		<< descriptor
+		<< previousActiveLine ;
+	writeItem(out);
 }
 
 void specEditDescriptorCommand::readCommand(QDataStream &in)
 {
 	in >> previousContent
 	   >> descriptor
-	   >> previousActiveLine
-	   >> item ;
+	   >> previousActiveLine ;
+	readItem(in);
 }
 
 //bool specEditDescriptorCommand::mergeable(const specUndoCommand *other)

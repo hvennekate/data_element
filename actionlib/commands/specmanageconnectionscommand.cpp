@@ -3,118 +3,71 @@
 #include "specmetamodel.h"
 
 specManageConnectionsCommand::specManageConnectionsCommand(specUndoCommand *parent)
-	: specUndoCommand(parent),
-	  target(0)
+	: specMultipleItemCommand(parent),
+	  targetModel(0)
 {
 }
 
-void specManageConnectionsCommand::clear()
+void specManageConnectionsCommand::setItems(specMetaItem *client, QList<specModelItem *> servers)
 {
-	if (target)
-		delete target ;
-	foreach(specGenealogy *item, items)
-		delete item ;
-	items.clear();
-	target = 0 ;
-}
-
-specManageConnectionsCommand::~specManageConnectionsCommand()
-{
-	clear() ;
-}
-
-void specManageConnectionsCommand::setItems(const QModelIndex &client, QModelIndexList &servers)
-{
-	// TODO check if client is metaItem
-	clear() ;
-	target = new specGenealogy(client) ;
-	//	((specModel*) servers.first().model())->eliminateChildren(servers); // TODO does this need to be?
-	// this previous line prevents deleting connections when deleting items from working.
-	//	qSort(servers) ;
-	while(!servers.isEmpty())
-		items << new specGenealogy(servers) ;
-}
-
-bool specManageConnectionsCommand::ok() const
-{
-	return parentObject() && !items.isEmpty() && target ;
+	if (!parentObject()) return ;
+	if (!targetModel)
+		setParentObject(parentObject()); // Cannot be done by specUndoCommand's constructor
+	// -> polymorphism not yet complete
+	processServers(client, servers) ;
+	target = specGenealogy(client, targetModel) ;
+	qSort(servers.begin(), servers.end(), specModel::lessThanItemPointer) ;
+	specMultipleItemCommand::setItems(servers) ;
 }
 
 void specManageConnectionsCommand::restore()
 {
-	QVector<specModelItem*> pointers = itemPointers() ;
 	specMetaItem* client = targetPointer() ;
-	foreach(specModelItem *pointer, pointers)
+	foreach(specModelItem *pointer, itemPointers())
 		client->connectServer(pointer); // TODO consider removal from list if false is returned.
 }
 
 void specManageConnectionsCommand::take()
 {
-	QVector<specModelItem*> pointers = itemPointers() ;
 	specMetaItem* client = targetPointer() ;
-	foreach(specModelItem *pointer, pointers)
+	foreach(specModelItem *pointer, itemPointers())
 		pointer->disconnectClient(client) ;
 }
 
 void specManageConnectionsCommand::writeCommand(QDataStream &out) const
 {
-	if (!ok()) return ; // TODO why check if ok?
-	out << qint32(items.size())
-	    << *target ;
-	for (int i = 0 ; i < items.size() ; ++i)
-		out << *(items[i]) ;
+	out << itemCount() << target ;
+	writeItems(out) ;
 }
 
 void specManageConnectionsCommand::readCommand(QDataStream &in)
 {
-	clear() ;
 	qint32 toRead ;
-	in >> toRead ;
-	target = new specGenealogy ;
-	in >> *target ;
-	for (int i = 0 ; i < toRead ; ++i)
-	{
-		specGenealogy* genealogy = new specGenealogy;
-		in >> *genealogy ;
-		items << genealogy ;
-	}
+	in >> toRead >> target ;
+	readItems(in, toRead) ;
 }
 
 void specManageConnectionsCommand::parentAssigned()
 {
 	if (!parentObject()) return ;
-	if (!target) return ;
 
-	specModel *thisModel = qobject_cast<specMetaModel*>(parentObject()) ;
-	if (!thisModel) // Necessary for specMultiCommand
+	/// This section is responsible for the exclusive character of this class (i.e.
+	/// only dataItems -> metaItem)
+	// Check if we have been assigned a metaModel as parentObject (wrong)
+	targetModel = qobject_cast<specMetaModel*>(parentObject()) ;
+	if (targetModel) // yes, so we need to change that.
 	{
-		thisModel = qobject_cast<specModel*>(parentObject()) ;
-		if (!thisModel) return ;
-		thisModel = thisModel->getMetaModel() ;
+		setParentObject(targetModel->getDataModel()) ;
+		// here, we will be called again, now with the correct parrentObject
+		return ;
 	}
-	specModel *otherModel = ((specMetaModel*) thisModel)->getDataModel() ;
-	foreach(specGenealogy* genealogy, items)
-		genealogy->setModel(sameModel(genealogy) ? thisModel : otherModel) ;
-	target->setModel(thisModel) ;
+
+	targetModel = model()->getMetaModel() ;
+	target.setModel(targetModel);
+	specMultipleItemCommand::parentAssigned() ;
 }
 
-QVector<specModelItem*> specManageConnectionsCommand::itemPointers() const
+specMetaItem *specManageConnectionsCommand::targetPointer()
 {
-	QVector<specModelItem*> pointers ;
-	foreach(specGenealogy *genealogy,items)
-		pointers << genealogy->items() ; // TODO think over
-	return pointers ;
-}
-
-specMetaItem *specManageConnectionsCommand::targetPointer() const
-{
-
-	return (specMetaItem*) (target->firstItem()) ;
-}
-
-bool specManageConnectionsCommand::sameModel(specGenealogy* item) const
-{
-	if (!target || !item) return false ;
-	// TODO check
-	return target->model() == item->model() ;
+	return (specMetaItem*) (target.firstItem()) ;
 }

@@ -1,37 +1,28 @@
 #include "specplotmovecommand.h"
 
 specPlotMoveCommand::specPlotMoveCommand(specUndoCommand* parent)
-	: specUndoCommand(parent),
-	  items(0)
+	: specSingleItemCommand<specModelItem>(parent)
 {
 }
 
 void specPlotMoveCommand::doIt()
 {
-	if (!items) return ;
-	items->seekParent() ;
-	if (!items->valid()) return ;
-	foreach(specCanvasItem* item, items->items())
-	{
-		item->moveXBy(shift) ;
-		item->scaleBy(scale) ; // TODO prevent scaling by zero.
-		item->moveYBy(offset) ;
-		item->addToSlope(slope) ;
-	}
+	specModelItem* item = itemPointer() ;
+	if (!item) return ;
+	item->moveXBy(shift) ;
+	item->scaleBy(scale) ; // TODO prevent scaling by zero.
+	item->moveYBy(offset) ;
+	item->addToSlope(slope) ;
 }
 
 void specPlotMoveCommand::undoIt()
 {
-	if (!items) return ;
-	items->seekParent() ;
-	if (!items->valid()) return ;
-	foreach(specCanvasItem* item, items->items())
-	{
-		item->addToSlope(-slope) ;
-		item->moveYBy(-offset) ;
-		item->scaleBy(1./scale) ;
-		item->moveXBy(-shift) ;
-	}
+	specModelItem* item = itemPointer() ;
+	if (!item) return ;
+	item->addToSlope(-slope) ;
+	item->moveYBy(-offset) ;
+	item->scaleBy(1./scale) ;
+	item->moveXBy(-shift) ;
 }
 
 
@@ -39,8 +30,7 @@ bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
 {
 	if (!parentObject()) return false ;
 	const specPlotMoveCommand *other = (const specPlotMoveCommand*) ot ;
-	if (! (this->items && other->items)) return false ;
-	if (*(other->items) != *(this->items)) return false ;
+	if (! (this->itemPointer() && other->itemPointer())) return false ;
 	if (isnan(other->scale) || isnan(scale)) return false ;
 	slope += other->slope * scale ;
 	offset+= other->offset * scale - other->slope * scale * shift ;
@@ -48,12 +38,6 @@ bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
 	shift += other->shift ;
 	generateDescription();
 	return true ;
-}
-
-void specPlotMoveCommand::setItem(QModelIndex index)
-{
-	if (items) delete items ;
-	items = new specGenealogy(index) ;
 }
 
 void specPlotMoveCommand::setCorrections(double xShift, double yOffset, double ySlope, double yScale)
@@ -67,19 +51,20 @@ void specPlotMoveCommand::setCorrections(double xShift, double yOffset, double y
 
 void specPlotMoveCommand::writeCommand(QDataStream &out) const
 {
-	out << slope << offset << scale << shift << *items ;
+	out << slope << offset << scale << shift ;
+	writeItem(out) ;
 }
 
 void specPlotMoveCommand::readCommand(QDataStream &in)
 {
-	if (!items) items = new specGenealogy ;
-	in >> slope >> offset >> scale >> shift >> *items ;
+	in >> slope >> offset >> scale >> shift ;
+	readItem(in) ;
 	generateDescription();
 }
 
 bool specPlotMoveCommand::mergeable(const specUndoCommand *other)
 {
-	return *(((specPlotMoveCommand*) other)->items) == *items ;
+	return (((specPlotMoveCommand*) other)->itemPointer()) == itemPointer() ;
 }
 
 void specPlotMoveCommand::generateDescription()
@@ -97,9 +82,4 @@ void specPlotMoveCommand::generateDescription()
 QString specPlotMoveCommand::description() const
 {
 	return QString() ;
-}
-
-void specPlotMoveCommand::parentAssigned()
-{
-	if (items) items->setModel(qobject_cast<specModel*>(parentObject()));
 }
