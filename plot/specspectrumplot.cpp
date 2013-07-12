@@ -22,8 +22,8 @@ unsigned int qHash(const double& d)
 specSpectrumPlot::moveMode specSpectrumPlot::correctionsStatus() const
 {
 	qDebug() << ((offsetAction->isChecked() ? Offset : NoMoveMode)
-		     | (offlineAction->isChecked() ? Slope : NoMoveMode)
-		     | (scaleAction->isChecked() ? Scale : NoMoveMode)) ;
+			 | (offlineAction->isChecked() ? Slope : NoMoveMode)
+			 | (scaleAction->isChecked() ? Scale : NoMoveMode)) ;
 	qDebug() << (offsetAction->isChecked() ? Offset : NoMoveMode)
 		 << (offlineAction->isChecked() ? Slope : NoMoveMode)
 		 << (scaleAction->isChecked() ? Scale : NoMoveMode) ;
@@ -227,8 +227,8 @@ void specSpectrumPlot::alignmentChanged(QAction *action)
 	{
 		double min = axisScaleDiv(QwtPlot::xBottom)->lowerBound(), max = axisScaleDiv(QwtPlot::xBottom)->upperBound() ;
 		specRange *newRange = new specRange(min+.1*(max-min),max-.1*(max-min),
-						    (axisScaleDiv(QwtPlot::yLeft)->lowerBound()+
-						     axisScaleDiv(QwtPlot::yLeft)->upperBound())/2.) ;
+							(axisScaleDiv(QwtPlot::yLeft)->lowerBound()+
+							 axisScaleDiv(QwtPlot::yLeft)->upperBound())/2.) ;
 		newRange->attach(this) ;
 		alignmentPicker->addSelectable(newRange) ;
 	}
@@ -288,7 +288,9 @@ void specSpectrumPlot::detachFromPicker(specCanvasItem* item)
 
 void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double y)
 {
-	if (!view) return ;
+	if (!view || !view->model()) return ;
+	specModelItem* modelItem = dynamic_cast<specModelItem*>(item) ;
+	if (!modelItem) return ;
 	// get reference to point list from point hash (in order to re-use old code below)
 	QList<int>& selectedPoints = pointHash[item] ;
 	// Add new Point to list.
@@ -339,7 +341,7 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 				offline=offlineAction->isChecked()&& i < coeffs.size() ? coeffs[i++] : 0. ;
 	}
 	specPlotMoveCommand *command = new specPlotMoveCommand ;
-	command->setItem(view->model()->index( (specModelItem*) item)) ; // TODO do dynamic cast first!!
+	command->setItem(modelItem) ;
 	command->setCorrections(shift,offset,offline,scale) ;
 	command->setParentObject(view->model()) ;
 	undoPartner()->push(command) ;
@@ -367,8 +369,8 @@ void generatePointsInRange(const QwtPlotItemList& zeroRanges,
 }
 
 void generateReferenceSpectrum(const QMap<double,double>& referenceSpectrum,
-			       const QSet<double>& xValues,
-			       QMap<double, double>& refSpectrum)
+				   const QSet<double>& xValues,
+				   QMap<double, double>& refSpectrum)
 {
 	if (referenceSpectrum.isEmpty())
 		foreach(const double& x, xValues)
@@ -425,12 +427,12 @@ void generateReferenceSpectrum(const QMap<double,double>& referenceSpectrum,
 	QVector<double> correction = gaussjinv(matrix, vec) ;
 
 specMultiCommand * specSpectrumPlot::generateCorrectionCommand(const QwtPlotItemList &zeroRanges,
-							       const QwtPlotItemList &spectra,
-							       const QMap<double, double> &referenceSpectrum,
-							       specModel *model,
-							       bool calcOffset,
-							       bool calcSlope,
-							       bool calcScale)
+								   const QwtPlotItemList &spectra,
+								   const QMap<double, double> &referenceSpectrum,
+								   specModel *model,
+								   bool calcOffset,
+								   bool calcSlope,
+								   bool calcScale)
 {
 	if (!calcOffset && !calcSlope) return 0 ; // Nur scale macht keinen Sinn (Referenz wird skaliert)
 	specMultiCommand *zeroCommand = new specMultiCommand ;
@@ -511,10 +513,8 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(const QwtPlotItem
 		}
 
 		specPlotMoveCommand *command = new specPlotMoveCommand(zeroCommand) ;
-		if (model)
-			command->setItem(model->index(spectrum));
+		command->setItem(spectrum);
 		command->setCorrections(0, offset, slope, 1.) ;
-		command->setParentObject(model);
 	}
 	return zeroCommand ;
 }
@@ -589,7 +589,7 @@ void specSpectrumPlot::multipleSubtraction()
 		if (view && view->model())
 		{
 			command->setParentObject(view->model());
-			command->setItem(view->model()->index(spectrum),data);
+			command->setItem(spectrum,data);
 		}
 	}
 

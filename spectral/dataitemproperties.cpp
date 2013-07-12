@@ -92,7 +92,7 @@ void dataItemProperties::refreshPlot()
 		selectedData << item.sample(selectedItem->row()) ;
 	highlightSelected.setSamples(selectedData) ;
 	highlightCurrent.setSamples(QVector<QPointF>() <<
-				    item.sample(ui->dataWidget->currentRow())) ;
+					item.sample(ui->dataWidget->currentRow())) ;
 
 	ui->dataPreview->replot();
 }
@@ -107,9 +107,9 @@ specUndoCommand* dataItemProperties::changeCommands(QObject* parent)
 	else dataUnchanged = false ;
 
 	correctionUnchanged = (item.slope == originalItem->slope &&
-			       item.offset == originalItem->offset &&
-			       item.xshift == originalItem->xshift &&
-			       item.factor == originalItem->factor) ;
+				   item.offset == originalItem->offset &&
+				   item.xshift == originalItem->xshift &&
+				   item.factor == originalItem->factor) ;
 
 	if (correctionUnchanged && dataUnchanged) return 0 ;
 
@@ -120,13 +120,11 @@ specUndoCommand* dataItemProperties::changeCommands(QObject* parent)
 		parentMulti->setParentObject(parent) ;
 	}
 
-	QModelIndex itemIndex = ((specModel*) parent)->index(originalItem) ;
-
 	if (!dataUnchanged)
 	{
 		specExchangeDataCommand* dataCommand = new specExchangeDataCommand(parentMulti) ;
 		dataCommand->setParentObject(parent);
-		dataCommand->setItem(itemIndex,item.data) ;
+		dataCommand->setItem(originalItem, item.data) ;
 		if (correctionUnchanged)
 		{
 			dataCommand->setText(tr("Modify item data"));
@@ -137,8 +135,8 @@ specUndoCommand* dataItemProperties::changeCommands(QObject* parent)
 	if (!correctionUnchanged)
 	{
 		specPlotMoveCommand *correctionCommand = new specPlotMoveCommand(parentMulti) ;
-		correctionCommand->setParentObject(parent) ;
-		correctionCommand->setItem(itemIndex);
+		correctionCommand->setParentObject(parent) ; // Cave: noetig, da eventuell kein parent (parentMulti == 0)
+		correctionCommand->setItem(originalItem);
 
 		// TODO this gets ugly.  Make interface more direct!
 		double newFactor = item.factor/originalItem->factor ;

@@ -87,8 +87,7 @@ void specActionLibrary::push(specUndoCommand * cmd)
 	undoStack->push(cmd) ;
 }
 
-template<class toolMenu>
-void specActionLibrary::addNewAction(toolMenu *bar, specUndoAction *action)
+void specActionLibrary::addNewAction(QToolBar *bar, specUndoAction *action)
 {
 	action->setLibrary(this) ;
 	bar->addAction(action) ;
@@ -164,6 +163,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 			addNewAction(bar, new specSpectrumCalculatorAction(target)) ;
 			addNewAction(bar, new specNormalizeAction(target)) ;
 		}
+		addNewAction(bar, new specItemPropertiesAction(target)) ;
 		if (metaView)
 		{
 			addNewAction(bar, new specAddConnectionsAction(target)) ;
@@ -236,7 +236,7 @@ void specActionLibrary::writeToStream(QDataStream &out) const
 		if (progress) progress->setValue(progressStart + (i*progressToGo)/undoStack->count());
 		specUndoCommand* command = (specUndoCommand*) undoStack->command(i) ;
 		out << type(command->id()) << qint32(parents.indexOf(command->parentObject()))
-		    << *command ;
+			<< *command ;
 	}
 	undoStack->setClean();
 }
@@ -319,7 +319,8 @@ int specActionLibrary::moveInternally(const QModelIndex &parent, int row, specVi
 int specActionLibrary::deleteInternally(specModel* model)
 {
 	int count = lastRequested.size() ;
-	specUndoCommand *command = specDeleteAction::command(model, lastRequested) ;
+	QList<specModelItem*> pointers = model->pointerList(lastRequested) ;
+	specUndoCommand *command = specDeleteAction::command(model, pointers) ;
 	command->setText(tr("Move items"));
 	push(command) ;
 	return count ;
@@ -335,69 +336,92 @@ void specActionLibrary::purgeUndo()
 {
 	if (QMessageBox::Yes ==
 			QMessageBox::question(0,
-					      tr("Really Clear History?"),
-					      tr("Do you really want to delete all undo and redo actions?  WARNING:  This cannot be undone."),
-					      QMessageBox::Yes | QMessageBox::No,
-					      QMessageBox::No))
+						  tr("Really Clear History?"),
+						  tr("Do you really want to delete all undo and redo actions?  WARNING:  This cannot be undone."),
+						  QMessageBox::Yes | QMessageBox::No,
+						  QMessageBox::No))
 		undoStack->clear();
 }
 
 QMenu *specActionLibrary::contextMenu(QWidget *w)
 {
-	QMenu *cMenu = new QMenu(w) ;
-	specMetaView* metaView = dynamic_cast<specMetaView*>(w) ;
+//	specMetaView* metaView = dynamic_cast<specMetaView*>(w) ;
 	specView *view = dynamic_cast<specView*>(w) ;
-	specDataView* dataView = dynamic_cast<specDataView*>(w) ;
-	if (metaView && metaView->model())
-	{
-		specModelItem *currentItem = view->model()->itemPointer(metaView->currentIndex()) ;
-		if (specMetaItem* mi = dynamic_cast<specMetaItem*>(currentItem))
-		{
-			addNewAction(cMenu, new specAddConnectionsAction(w)) ;
-			if (mi->getFitCurve())
-			{
-				addNewAction(cMenu, new specRemoveFitAction(w)) ;
-				addNewAction(cMenu, new specConductFitAction(w)) ;
-				addNewAction(cMenu, new specToggleFitStyleAction(w)) ;
-			}
-			else
-				addNewAction(cMenu, new specAddFitAction(w)) ;
-		}
-	}
+//	specDataView* dataView = dynamic_cast<specDataView*>(w) ;
+	QList<QAction*> actions ;
+	actions << view->findChild<specAddConnectionsAction*>()
+			<< view->findChild<specRemoveFitAction*>()
+			<< view->findChild<specConductFitAction*>()
+			<< view->findChild<specToggleFitStyleAction*>()
+			<< view->findChild<specAddFitAction*>()
 
-	if (dataView && dataView->model())
-	{
-		addNewAction(cMenu, new specTiltMatrixAction(w)) ;
-		addNewAction(cMenu, new specSpectrumCalculatorAction(w)) ;
-	}
+			<< view->findChild<specTiltMatrixAction*>()
+			<< view->findChild<specSpectrumCalculatorAction*>()
 
-	if ((dataView && dataView->model()) || (metaView && metaView->model()))
-		addNewAction(cMenu, new changePlotStyleAction(w)) ;
+			<< view->findChild<changePlotStyleAction*>()
 
-	if (view && view->model())
-	{
-		addNewAction(cMenu, new specAddFolderAction(w)) ;
-		specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;
-		specSetMultilineAction *mlAction = new specSetMultilineAction(w) ;
-		addNewAction(cMenu, mlAction) ;
-		if (currentItem && view->currentIndex().isValid())
-			mlAction->setChecked(
-						currentItem->descriptorProperties(
-							view->model()->descriptors()[
-							view->currentIndex().column()]) & spec::multiline) ; // TODO move to action
-		if (dynamic_cast<specDataItem*>(currentItem)
-				|| dynamic_cast<specMetaItem*>(currentItem)
-				|| dynamic_cast<specSVGItem*>(currentItem))
-			addNewAction(cMenu, new specItemPropertiesAction(w)) ;
-		if (QApplication::clipboard()->mimeData())
-			addNewAction(cMenu, new specPasteAction(w)) ;
-		if (!view->getSelection().isEmpty())
-		{
-			addNewAction(cMenu, new specCopyAction(w)) ;
-			addNewAction(cMenu, new specCutAction(w)) ;
-			addNewAction(cMenu, new specDeleteAction(w)) ;
-		}
-	}
+			<< view->findChild<specAddFolderAction*>()
+			<< view->findChild<specSetMultilineAction*>() // TODO:  set Checked behavior
+			<< view->findChild<specItemPropertiesAction*>()
+			<< view->findChild<specPasteAction*>()
+			<< view->findChild<specCopyAction*>()
+			<< view->findChild<specCutAction*>()
+			<< view->findChild<specDeleteAction*>() ;
+	actions.removeAll(0) ;
+	if (actions.isEmpty()) return 0 ;
+
+	QMenu *cMenu = new QMenu(w) ;
+	cMenu->addActions(actions) ;
+//	if (metaView && metaView->model())
+//	{
+//		specModelItem *currentItem = view->model()->itemPointer(metaView->currentIndex()) ;
+//		if (specMetaItem* mi = dynamic_cast<specMetaItem*>(currentItem))
+//		{
+//			addNewAction(cMenu, new specAddConnectionsAction(w)) ;
+//			if (mi->getFitCurve()) // TODO should be handled by the actions requirements
+//			{
+//				addNewAction(cMenu, new specRemoveFitAction(w)) ;
+//				addNewAction(cMenu, new specConductFitAction(w)) ;
+//				addNewAction(cMenu, new specToggleFitStyleAction(w)) ;
+//			}
+//			else
+//				addNewAction(cMenu, new specAddFitAction(w)) ;
+//		}
+//	}
+
+//	if (dataView && dataView->model())
+//	{
+//		addNewAction(cMenu, new specTiltMatrixAction(w)) ;
+//		addNewAction(cMenu, new specSpectrumCalculatorAction(w)) ;
+//	}
+
+//	if ((dataView && dataView->model()) || (metaView && metaView->model()))
+//		addNewAction(cMenu, new changePlotStyleAction(w)) ;
+
+//	if (view && view->model())
+//	{
+//		addNewAction(cMenu, new specAddFolderAction(w)) ;
+//		specModelItem *currentItem = view->model()->itemPointer(view->currentIndex()) ;
+//		specSetMultilineAction *mlAction = new specSetMultilineAction(w) ;
+//		addNewAction(cMenu, mlAction) ;
+//		if (currentItem && view->currentIndex().isValid())
+//			mlAction->setChecked(
+//						currentItem->descriptorProperties(
+//							view->model()->descriptors()[
+//							view->currentIndex().column()]) & spec::multiline) ; // TODO move to action
+//		if (dynamic_cast<specDataItem*>(currentItem)
+//				|| dynamic_cast<specMetaItem*>(currentItem)
+//				|| dynamic_cast<specSVGItem*>(currentItem))
+//			addNewAction(cMenu, new specItemPropertiesAction(w)) ;
+//		if (QApplication::clipboard()->mimeData())
+//			addNewAction(cMenu, new specPasteAction(w)) ;
+//		if (!view->getSelection().isEmpty())
+//		{
+//			addNewAction(cMenu, new specCopyAction(w)) ;
+//			addNewAction(cMenu, new specCutAction(w)) ;
+//			addNewAction(cMenu, new specDeleteAction(w)) ;
+//		}
+//	}
 	return cMenu ;
 }
 

@@ -32,6 +32,7 @@ public:
 	bool disconnectServer(specModelItem*) ;
 	bool connectServer(specModelItem*) ;
 	QList<specModelItem*> serverList() const { return items ; }
+	bool isServedBy(specModelItem* item) const { return items.contains(item) ;}
 	explicit specMetaItem(specFolderItem* par=0, QString description="");
 	~specMetaItem() ;
 	QList<specModelItem*> purgeConnections() ;

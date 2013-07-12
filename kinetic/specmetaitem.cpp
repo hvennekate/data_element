@@ -82,12 +82,33 @@ void specMetaItem::writeToStream(QDataStream &out) const
 	out << ((quint8) styleFitCurve) << variables ;
 	if (!metaModel || !dataModel) return ;
 	QVector<QPair<specGenealogy,qint8> > currentConnections ;
-	QModelIndexList indexes ;
-	foreach(specModelItem* item, items)
-		indexes << (metaModel->contains(item) ? metaModel->index(item) : dataModel->index(item)) ;
 
-	while (!indexes.isEmpty())
-		currentConnections << qMakePair<specGenealogy,qint8>(specGenealogy(indexes), indexes.first().model() == metaModel) ;
+// Make chunks of items in order to exploit the genealogy's compression mechanism
+	int i = 0 ;
+	while (i < items.size())
+	{
+		int j = 1 ;
+		bool isMeta = metaModel->contains(items[i]) ;
+		while (i+j < items.size() &&
+			   metaModel->contains(items[i+j]) == isMeta)
+			++j ;
+		QList<specModelItem*> section = items.mid(i,j) ;
+		i += j ;
+		while (!section.isEmpty())
+			currentConnections << qMakePair<specGenealogy, qint8>(
+						specGenealogy(section, isMeta ? metaModel : dataModel),
+						isMeta) ;
+	}
+
+
+////// alternative formulation (untested!)
+//	foreach(specModelItem* item, items)
+//	{
+//		bool isMeta = metaModel->contains(item) ;
+//		currentConnections << qMakePair<specGenealogy, qint8>(
+//					specGenealogy(item, isMeta ? metaModel : dataModel),
+//					isMeta) ;
+//	}
 	out << currentConnections ;
 	out << (quint8 ((bool) fitCurve)) ;
 	if (fitCurve) out << *fitCurve ;
@@ -102,10 +123,10 @@ void specMetaItem::readFromStream(QDataStream &in)
 	quint8 stylingWasToFit ;
 	in >> stylingWasToFit >> variables >> oldConnections;
 	/*stylingWasToFit introduced on Oct 12 2012 (Commit:  Fixed meta item peculiarity)
-    Merged into office branch (muParser) on Nov 13 2012 (Commit: Merge branch 'innovations' of /fs/hvennek/dataelement-src into muParser)
+	Merged into office branch (muParser) on Nov 13 2012 (Commit: Merge branch 'innovations' of /fs/hvennek/dataelement-src into muParser)
 
-    Old files (before Nov 13 2012) do not contain StylingWasToFit!
-    Fix:  remove ">> stylingWasToFit" in specmetaitem.cpp (line 96) and set stylingWasToFit = 0 (line 95)
+	Old files (before Nov 13 2012) do not contain StylingWasToFit!
+	Fix:  remove ">> stylingWasToFit" in specmetaitem.cpp (line 96) and set stylingWasToFit = 0 (line 95)
 	  read and save old files. */
 	styleFitCurve = stylingWasToFit ;
 	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;

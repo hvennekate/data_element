@@ -49,7 +49,6 @@ public:
 	specView* mainView() ;
 	QToolBar *createToolbar();
 public slots :
-	void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) ; // TODO consider making these private
 	bool saveFile() ;
 };
 

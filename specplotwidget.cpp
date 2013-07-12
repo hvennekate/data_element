@@ -73,9 +73,9 @@ void specPlotWidget::read(QString fileName)
 	if (!file.open(QFile::ReadOnly))
 	{
 		QMessageBox::critical(0,tr("Error opening"),
-				      tr("Cannot opten file ")
-				      + fileName
-				      + tr(" for reading.")) ;
+					  tr("Cannot open file ")
+					  + fileName
+					  + tr(" for reading.")) ;
 		return ;
 	}
 
@@ -86,9 +86,9 @@ void specPlotWidget::read(QString fileName)
 	if (check != FILECHECKRANDOMNUMBER && check != FILECHECKCOMPRESSNUMBER)
 	{
 		QMessageBox::critical(0,tr("File error"),
-				      tr("File ")
-				      + fileName
-				      + tr("does not seem to have the right format.")) ;
+					  tr("File ")
+					  + fileName
+					  + tr("does not seem to have the right format.")) ;
 		return ;
 	}
 
@@ -195,8 +195,8 @@ bool specPlotWidget::saveFile()
 	if (!file.open(QFile::WriteOnly))
 	{
 		QMessageBox::critical(0, tr("Write error"), tr("Could not open file ")
-				      + file.fileName()
-				      + tr("for writing.")) ;
+					  + file.fileName()
+					  + tr("for writing.")) ;
 		return false ;
 	}
 
@@ -255,7 +255,6 @@ void specPlotWidget::setConnections()
 {
 	connect(saveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 	connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveFile()));
-	connect(items->selectionModel(),SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),this,SLOT(selectionChanged(const QItemSelection&, const QItemSelection&))) ;
 	connect(kineticWidget->internalPlot(),SIGNAL(replotted()),plot,SLOT(replot())) ;
 	connect(kineticWidget->internalPlot(), SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(), SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
 	connect(plot, SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(),SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
@@ -269,19 +268,6 @@ void specPlotWidget::svgModification(bool mod)
 	else disconnect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
 
 	plot->svgPicker()->highlightSelectable(mod) ;
-}
-
-void specPlotWidget::selectionChanged(const QItemSelection & selected, const QItemSelection & deselected)
-{
-	foreach(QModelIndex index, deselected.indexes())
-		if (!index.column() && index.isValid())
-			((specModelItem*) index.internalPointer())->detach() ;
-
-	foreach(QModelIndex index, selected.indexes())
-		if (!index.column())
-			((specModelItem*) index.internalPointer())->attach(plot) ;
-
-	plot->replot() ;
 }
 
 specView* specPlotWidget::mainView()

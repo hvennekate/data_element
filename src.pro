@@ -129,7 +129,9 @@ SOURCES += main.cpp \
     actionlib/actions/specnormalizeaction.cpp \
     actionlib/actions/specmergedialog.cpp \
     actionlib/actions/specconnectionsaction.cpp \
-    model/textedit.cpp
+    model/textedit.cpp \
+    actionlib/commands/specsingleitemcommand.cpp \
+    actionlib/commands/specmultipleitemcommand.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -260,7 +262,9 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/specnormalizeaction.h \
     actionlib/actions/specmergedialog.h \
     actionlib/actions/specconnectionsaction.h \
-    model/textedit.h
+    model/textedit.h \
+    actionlib/commands/specsingleitemcommand.h \
+    actionlib/commands/specmultipleitemcommand.h
 
 INCLUDEPATH += kinetic \
 	log \

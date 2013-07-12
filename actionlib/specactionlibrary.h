@@ -60,8 +60,7 @@ private:
 	QVector<specModel*> partners;
 	QModelIndexList lastRequested ;
 	void addParent(QObject*) ;
-	template<class toolMenu>
-	void addNewAction(toolMenu*, specUndoAction*) ;
+	void addNewAction(QToolBar*, specUndoAction*) ;
 	specStreamable* factory(const type &t) const ;
 	QProgressDialog *progress ;
 	QAction* purgeUndoAction ;

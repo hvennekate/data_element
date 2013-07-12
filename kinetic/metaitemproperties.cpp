@@ -257,34 +257,27 @@ void metaItemProperties::moveSelection(bool down)
 specUndoCommand* metaItemProperties::changedConnections(QObject *parent)
 {
 	specModel* model = qobject_cast<specModel*>(parent) ;
-	if (!parent) return 0 ;
-	QList<specModelItem*> newConnections ;
+	if (!model) return 0 ;
+	QList<specModelItem*> deletedConnections ;
 	for (int i = 0 ; i < ui->connectedItemsList->count() ; ++i)
 	{
-		QListWidgetItem* item = ui->connectedItemsList->item(i) ;
-		if (item->checkState() == Qt::Checked)
-			newConnections << itemInfo[item].item ;
+		QListWidgetItem* widgetItem = ui->connectedItemsList->item(i) ;
+		if (widgetItem->checkState() == Qt::Unchecked)
+			deletedConnections << itemInfo[widgetItem].item ;
 	}
 
 	specMultiCommand *parentCommand = new specMultiCommand ;
 	parentCommand->setParentObject(parent) ;
+	parentCommand->setText(tr("Modify properties of meta item ") + originalItem->descriptor(""));
 
 	specDeleteConnectionsCommand *deleteCommand = new specDeleteConnectionsCommand(parentCommand) ;
-	deleteCommand->setParentObject(parent) ;
-	QModelIndexList indexList = generateConnectionList(originalItem->items) ;
-	deleteCommand->setItems(model->index(originalItem), indexList) ;
-
-	specAddConnectionsCommand *addCommand = new specAddConnectionsCommand(parentCommand) ;
-	addCommand->setParentObject(parent) ;
-	indexList = generateConnectionList(newConnections) ;
-	addCommand->setItems(model->index(originalItem), indexList) ;
-	parentCommand->setText(tr("Modify meta item properties"));
+	deleteCommand->setItems(originalItem, deletedConnections) ;
 
 	if (ui->styleFit->checkState() != originalItem->styleFitCurve)
 	{
 		specToggleFitStyleCommand* fitStyleCommand = new specToggleFitStyleCommand(parentCommand) ;
 		fitStyleCommand->setParentObject(parent) ;
-		fitStyleCommand->setup(model->index(originalItem));
+		fitStyleCommand->setItem(originalItem);
 	}
 
 	if (!parentCommand->childCount())

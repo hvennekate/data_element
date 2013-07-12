@@ -16,7 +16,6 @@ private:
 	void readFromStream(QDataStream &in) ;
 	type typeId() const { return specStreamable::metaWidget ;}
 private slots:
-	void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) ;
 	void svgModification(bool mod) ;
 protected:
 	QList<QWidget*> mainWidgets() const ;
