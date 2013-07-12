@@ -16,7 +16,7 @@
 
 
 // TODO replace isFolder() by addChildren(empty list,0)
-bool specModel::pointerIsLessComparison(specModelItem*a, specModelItem* b)
+bool specModel::lessThanItemPointer(specModelItem*a, specModelItem* b)
 {
 	QVector<int> aHierarchy(hierarchy(a)),
 			bHierarchy(hierarchy(b)) ;
@@ -72,7 +72,7 @@ bool lessThanIndex(const QModelIndex& one, const QModelIndex& two)
 		return lessThanIndex(one.parent(), two.parent()) ;
 	// old version:
 	return levelOne < levelTwo ? lessThanIndex(one,two.parent()) :
-				     lessThanIndex(one.parent(),two) ;
+					 lessThanIndex(one.parent(),two) ;
 	// 	return levelOne < levelTwo ;
 }
 
@@ -212,14 +212,10 @@ bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int 
 
 	emit layoutAboutToBeChanged() ;
 	beginInsertRows(parent, row, row+list.size()-1);
-	if (itemPointer(parent)->isFolder())
-		((specFolderItem*) itemPointer(parent))->haltRefreshes(true) ;
 	bool retVal = itemPointer(parent)->addChildren(list,row) ;
 	endInsertRows();
 	emit layoutChanged() ;
 
-	if (itemPointer(parent)->isFolder())
-		((specFolderItem*) itemPointer(parent))->haltRefreshes(false) ;
 	return retVal ;
 }
 
@@ -313,10 +309,10 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 					delete command ;
 					return false ;
 				}
-				command->setItem(index, desc, list[0].toString(), list[1].toInt()) ;
+				command->setItem(pointer, desc, list[0].toString(), list[1].toInt()) ;
 			}
 			else
-				command->setItem(index, desc, value.toString()) ;
+				command->setItem(pointer, desc, value.toString()) ;
 			// TODO unite in value-variant
 			command->setText(tr("Edit data")) ;
 			dropBuddy->push(command) ;
@@ -337,7 +333,7 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 }
 
 QVariant specModel::headerData(int section, Qt::Orientation orientation,
-			       int role) const
+				   int role) const
 {
 	Q_UNUSED(orientation)
 	if (role == Qt::DisplayRole)
@@ -373,7 +369,7 @@ void specModel::setInternalDrop(bool val)
 Qt::DropActions specModel::supportedDropActions() const
 { return Qt::CopyAction | Qt::MoveAction | Qt::LinkAction ; }
 
-void specModel::eliminateChildren(QModelIndexList& list) const
+void specModel::eliminateChildren(QModelIndexList& list)
 {
 	for( QModelIndexList::size_type j = 0 ; j < list.size() ; j++)
 		if(list[j].column())
@@ -392,14 +388,15 @@ void specModel::eliminateChildren(QModelIndexList& list) const
 	}
 }
 
-void specModel::eliminateChildren(QList<specModelItem *>& l) const
+void specModel::eliminateChildren(QList<specModelItem *>& l)
 {
 	QSet<specModelItem*> allChildren ;
 	for(QList<specModelItem*>::iterator it = l.begin() ; it != l.end() ; ++it)
 	{
 		specFolderItem* folder = dynamic_cast<specFolderItem*>(*it) ;
 		if (folder)
-			allChildren << folder->childrenList() ;
+			foreach(specModelItem* pointer, folder->childrenList())
+				allChildren << pointer ;
 	}
 
 	QList<specModelItem*> filtered ;
@@ -434,7 +431,7 @@ bool specModel::mimeAcceptable(const QMimeData *data) const
 }
 
 bool specModel::dropMimeData(const QMimeData *data,
-			     Qt::DropAction action, int row, int column, const QModelIndex &parent)
+				 Qt::DropAction action, int row, int column, const QModelIndex &parent)
 {
 	Q_UNUSED(column)
 	if (action == Qt::IgnoreAction)
@@ -463,12 +460,11 @@ bool specModel::dropMimeData(const QMimeData *data,
 	if (!newItems.isEmpty())
 	{
 		insertItems(newItems,parent,row) ;
-		QModelIndexList newIndexes = indexList(newItems) ;
 		if (dropBuddy && dropSource)
 		{
 			specAddFolderCommand *command = new specAddFolderCommand ;
 			command->setParentObject(this) ;
-			command->setItems(newIndexes) ;
+			command->setItems(newItems) ;
 			command->setText(tr("Insert items")) ;
 			dropBuddy->push(command);
 		}
@@ -589,7 +585,7 @@ void specModel::svgMoved(specCanvasItem *i, int point, double x, double y)
 	specResizeSVGcommand *command = new specResizeSVGcommand ;
 	command->setParentObject(this) ;
 	item->pointMoved(point,x,y) ;
-	command->setItem(index(item), item->getBounds()) ;
+	command->setItem(item, item->getBounds()) ;
 	command->undo();
 	command->setText(tr("Resize/move SVG item"));
 	dropBuddy->push(command) ;
@@ -647,20 +643,20 @@ void specModel::signalChanged(QModelIndex begin, QModelIndex end)
 	emit dataChanged(begin, index(end.row(), Descriptors.count(), end.parent())) ;
 }
 
-void specModel::expandFolders(QModelIndexList &list) const
+QList<specModelItem*> specModel::expandFolders(const QList<specModelItem*>& list, bool retain)
 {
-	for (QModelIndexList::iterator i = list.begin() ; i != list.end() ; ++i)
+	QList<specModelItem*> result ;
+	foreach(specModelItem* item, list)
 	{
-		if (itemPointer(*i)->isFolder())
+		if (item->isFolder())
 		{
-			QModelIndexList newList = allChildren(*i) ;
-			QModelIndexList reverseNewList ;
-			std::reverse_copy(newList.begin(), newList.end(), std::back_inserter(reverseNewList)) ;
-			i = list.erase(i);
-			foreach(const QModelIndex& index, reverseNewList)
-				i = list.insert(i, index) ;
+			if (retain) result << item ;
+			result << expandFolders(((specFolderItem*) item)->childrenList(), retain) ;
 		}
+		else
+			result << item ;
 	}
+	return result ;
 }
 
 QStringList specModel::mimeTypes() const

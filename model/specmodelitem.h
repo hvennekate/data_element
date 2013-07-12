@@ -83,7 +83,7 @@ public:
 	virtual void setDescriptorProperties(const QString& key, spec::descriptorFlags f) ;
 	virtual void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
 	virtual QVector<double> intensityData() const ;
-	virtual int removeData(QList<specRange*>*) { refreshPlotData() ; return 0 ; }
+	virtual int removeData(QList<specRange*>*) { invalidate() ; return 0 ; }
 	virtual void movingAverage(int) {}
 	virtual void average(int) {}
 	virtual void subMap(const QMap<double,double>&) {}

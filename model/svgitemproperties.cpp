@@ -78,7 +78,7 @@ specUndoCommand* svgItemProperties::generateCommand(QObject *parent)
 	specResizeSVGcommand *command = new specResizeSVGcommand ;
 	command->setParentObject(parent) ;
 	item->setBounds(newBounds) ;
-	command->setItem(((specModel*) parent)->index(item),oldBounds,oldAnchor) ;
+	command->setItem(item,oldBounds,oldAnchor) ;
 	command->setText(tr("Modify SVG item"));
 	return command ;
 }

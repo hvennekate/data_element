@@ -114,8 +114,6 @@ void specView::contextMenuEvent(QContextMenuEvent* event)
 	if (!actionLibrary) return ;
 	QMenu *cMenu = actionLibrary->contextMenu(this) ;
 	cMenu->exec(event->globalPos()) ;
-	foreach (QAction* action, cMenu->actions())
-		delete action ; // TODO check!
 	delete cMenu ;
 	event->accept() ;
 }

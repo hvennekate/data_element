@@ -3,7 +3,7 @@
 #include <QTime>
 
 specFolderItem::specFolderItem(specFolderItem* par, QString description)
-	: specModelItem(par, description), suspendRefresh(false)
+	: specModelItem(par, description)
 {
 }
 
@@ -54,13 +54,11 @@ bool specFolderItem::isEditable(QString key) const
 }
 
 void specFolderItem::refreshPlotData()
-{ ///! @todo suspend frequent refreshes
-	QTime timer ;
-	timer.start();
-	if (suspendRefresh) return ;
+{
 	QVector<double> x, y ;
 	foreach(specModelItem* item, ChildrenList)
 	{
+		item->revalidate();
 		for (size_t i = 0 ; i < item->dataSize() ; i++)
 		{
 			x << item->sample(i).x() ;
@@ -69,17 +67,12 @@ void specFolderItem::refreshPlotData()
 	}
 	processData(x,y) ;
 	setSamples(x,y) ;
-	//	processData() ;
 }
 
 void specFolderItem::removeChild(specModelItem* child)
-{// TODO this is terrible!
-	QVector<specModelItem*> newChildren ;
-	foreach (specModelItem* childPointer, ChildrenList)
-		if (childPointer != child)
-			newChildren << childPointer ;
-	ChildrenList.swap(newChildren) ;
-	invalidate();///! @todo move this to view/plotwidget (suspend frequent refreshes) -- maybe removeChildren instead
+{
+	ChildrenList.removeOne(child) ; // Maybe all
+	invalidate();
 }
 
 void specFolderItem::readFromStream(QDataStream& in)
@@ -117,50 +110,6 @@ QStringList specFolderItem::descriptorKeys() const
 				keys << childKeys[i] ;
 	}
 	return keys ;
-}
-
-void specFolderItem::buildTree(QStringList descriptors)
-{
-	// 	QTextStream cout(stdout,QIODevice::WriteOnly) ;
-	// 	cout << "Starting tree-building... (descriptors: " ;
-	// 	for (int i = 0 ; i < descriptors.size() ; i++)
-	// 		cout << descriptors[i] << ", " ;
-	// 	cout << ")" << endl ;
-	if(descriptors.isEmpty())
-		return ;
-	QString compDescriptor = descriptors.takeFirst() ;
-	// 	cout << "starting comparison on:  " << compDescriptor << endl ;
-	suspendRefresh = true ;
-	for (int i = 0 ; i < children() ; i++)
-	{
-		QList<specModelItem*> list ;
-		QString compValue = ChildrenList[i]->descriptor(compDescriptor) ;
-		// Generate List of items to put in one folder
-		for (int j = i ; j < children() ; j++)
-			if(ChildrenList[j]->descriptor(compDescriptor) == compValue)
-				list << ChildrenList[j] ;
-
-		// if list is more than one item and not merely all the childrenList create new item,
-		// move selected items there, perform tree-building within that item and add it as
-		// a child.
-		if(list.size() == children()) break ;
-		// 		cout << "Starting to build up new child with " << list.size() << "items.  (Common value:  " << compDescriptor << ")" << endl ;
-		if(list.size() > 1)
-		{
-			// 			cout << "Creating new folder... " << endl ;
-			specFolderItem *newItem = new specFolderItem(0,compValue) ;
-			// 			cout << "Moving selected items over to new folder..." << endl ;
-			newItem->addChildren(list,0) ;
-			// 			cout << "Initiating tree-building in newly created folder..." << endl ;
-			newItem->buildTree(descriptors) ;
-			// 			cout << "Adding new folder as child" << endl ;
-			addChild(newItem,i) ;
-		}
-	}
-	// Maybe the remaining criteria are usable for some tree-building...
-	buildTree(descriptors) ;
-	suspendRefresh = false ;
-	invalidate();
 }
 
 specModelItem* specFolderItem::child(QList<specModelItem*>::size_type i) const
@@ -227,18 +176,11 @@ void specFolderItem::exportData(const QList<QPair<bool,QString> >& headerFormat,
 	// 	}
 }
 
-void specFolderItem::haltRefreshes(bool halt) // TODO redundant
-{
-	suspendRefresh = halt ;
-	refreshPlotData() ;
-}
-
 void specFolderItem::subMap(const QMap<double, double> & map)
 {
-	haltRefreshes(true) ;
 	foreach(specModelItem *item, ChildrenList)
 		item->subMap(map) ;
-	haltRefreshes(false) ;
+	invalidate();
 }
 
 void specFolderItem::deleteDescriptor(const QString &descriptorName)
@@ -269,5 +211,5 @@ void specFolderItem::restoreDescriptor(QListIterator<specDescriptor> &origin, co
 
 QList<specModelItem*> specFolderItem::childrenList() const
 {
-	return ChildrenList.toList() ;
+	return ChildrenList ;
 }

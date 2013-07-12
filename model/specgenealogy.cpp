@@ -33,7 +33,7 @@ specGenealogy::specGenealogy(QList<specModelItem *>& l, specModel *m)
 	l.erase(l.begin(), it) ;
 }
 
-bool specGenealogy::valid()
+bool specGenealogy::valid() const
 {
 	return Model && Parent && !indexes.isEmpty() && !Items.isEmpty() ;
 }
@@ -60,12 +60,12 @@ void specGenealogy::returnItems()
 	owning = false ;
 }
 
-specModel* specGenealogy::model()
+specModel* specGenealogy::model() const
 {
 	return Model ;
 }
 
-specFolderItem* specGenealogy::parent()
+specFolderItem* specGenealogy::parent() const
 {
 	return Parent ;
 }
@@ -75,7 +75,7 @@ void specGenealogy::writeToStream(QDataStream &out) const
 	out << indexes
 		<< qint8(owning)
 		<< qint32(Items.size())
-		<< quint64(Model) ;
+		<< quint64(Model) ; // TODO: Why? Why?
 	if (owning)
 	{
 		for(int i = 0 ; i < Items.size() ; ++i)
@@ -85,12 +85,13 @@ void specGenealogy::writeToStream(QDataStream &out) const
 
 void specGenealogy::readFromStream(QDataStream &in)
 {
+	clear();
 	qint8 own ;
 	qint32 itemCount ;
 	quint64 m ;
 	in >> indexes >> own >> itemCount >> m;
 	owning = own ;
-	Model = (specModel*) m ; // TODO invalidate?
+	Model = 0 ;
 	Items.fill(0,itemCount);
 	if (owning)
 		for (int i = 0 ; i < itemCount ; ++i)
@@ -100,13 +101,6 @@ void specGenealogy::readFromStream(QDataStream &in)
 specModelItem* specGenealogy::factory(const type &t) const
 {
 	return specModelItem::itemFactory(t) ;
-}
-
-specGenealogy::specGenealogy(specModel* mod, QDataStream &in)
-{
-	Parent = 0 ;
-	Model = mod ;
-	readFromStream(in);
 }
 
 specGenealogy::specGenealogy()
@@ -137,13 +131,17 @@ void specGenealogy::getItemPointers()
 		Items[i] = Parent->child(i+indexes.first()) ;
 }
 
-
-specGenealogy::~specGenealogy()
+void specGenealogy::clear()
 {
 	indexes.clear();
 	if(owning)
 		foreach(specModelItem* item, Items)
 			delete item ;
+}
+
+specGenealogy::~specGenealogy()
+{
+	clear() ;
 }
 
 QVector<specModelItem*> specGenealogy::items()
@@ -153,10 +151,23 @@ QVector<specModelItem*> specGenealogy::items()
 	return Items ;
 }
 
+QVector<specModelItem*> specGenealogy::items() const
+{
+	if (!valid()) return QVector<specModelItem*>() ;
+	return Items ;
+}
+
 specModelItem* specGenealogy::firstItem()
 {
 	if (!Parent)
 		seekParent() ;
+	if (!valid()) return 0 ;
+	if (Items.isEmpty()) return 0 ;
+	return Items.first() ;
+}
+
+specModelItem* specGenealogy::firstItem() const
+{
 	if (!valid()) return 0 ;
 	if (Items.isEmpty()) return 0 ;
 	return Items.first() ;
@@ -183,6 +194,7 @@ bool specGenealogy::operator !=(const specGenealogy& other)
 
 specGenealogy& specGenealogy::operator =(const specGenealogy& other)
 {
+	clear() ;
 	Model = other.Model ;
 	indexes = other.indexes ;
 	Parent = other.Parent ;

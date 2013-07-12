@@ -19,9 +19,6 @@ class QValidator ;
 QDataStream& operator<<(QDataStream&, specModel&);
 QDataStream& operator>>(QDataStream& in, specModel& model) ;
 
-// TODO put these funktions into a sensible context
-bool lessThanIndex(const QModelIndex&, const QModelIndex&) ;
-int indexLevel(const QModelIndex& index) ;
 
 class specView ;
 
@@ -61,7 +58,8 @@ public:
 	QModelIndex index(specModelItem*, int column = 0) const ;
 	static QVector<int> hierarchy(specModelItem*) ;
 	static QVector<int> hierarchy(const QModelIndex&) ;
-	static bool pointerIsLessComparison(specModelItem *, specModelItem *) ;
+	static bool lessThanItemPointer(specModelItem *, specModelItem *) ;
+	static bool lessThanIndex(const QModelIndex&, const QModelIndex&) ;
 	QList<specModelItem*> pointerList(const QModelIndexList&) const ;
 	QModelIndexList indexList(const QList<specModelItem*>&) const ;
 	bool contains(specModelItem*) const ;
@@ -79,9 +77,9 @@ public:
 	}
 
 	bool isFolder(const QModelIndex&) const ;
-	void eliminateChildren(QModelIndexList&) const ;
-	void eliminateChildren(QList<specModelItem*>&) const ;
-	void expandFolders(QModelIndexList&) const ;
+	static void eliminateChildren(QModelIndexList&);
+	static void eliminateChildren(QList<specModelItem*>&);
+	static QList<specModelItem*> expandFolders(const QList<specModelItem*>&, bool retain = false) ;
 	virtual bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row=0) ;
 	void fillSubMap(const QModelIndexList&) ;
 	void applySubMap(const QModelIndexList&) ;
@@ -110,7 +108,7 @@ public:
 	QVariant data(const QModelIndex &index, int role) const;
 	bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
 	QVariant headerData(int section, Qt::Orientation orientation,
-			    int role = Qt::DisplayRole) const;
+				int role = Qt::DisplayRole) const;
 
 	// 	// Drag and drop:
 	void setInternalDrop(bool) ;

@@ -8,8 +8,7 @@
 class specFolderItem : public specModelItem
 {
 private:
-	QVector<specModelItem*> ChildrenList ;
-	bool suspendRefresh ;
+	QList<specModelItem*> ChildrenList ;
 	void readFromStream(QDataStream& in) ;
 	void writeToStream(QDataStream& out) const ;
 	type typeId() const { return specStreamable::folder ; }
@@ -47,7 +46,6 @@ public:
 	void moveYBy(const double&) ;
 	void moveXBy(const double &) ;
 	void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
-	void haltRefreshes(bool halt = true) ;
 	void subMap(const QMap<double,double>&) ;
 	void deleteDescriptor(const QString& key) ;
 	void renameDescriptors(const QMap<QString, QString> &map);

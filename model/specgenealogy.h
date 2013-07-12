@@ -18,21 +18,24 @@ private:
 	void readFromStream(QDataStream &in) ;
 	type typeId() const { return specStreamable::genealogyId ; }
 	specModelItem* factory(const type &t) const ;
+	void clear() ;
 public:
 	specGenealogy(specModelItem* p, specModel* m) ;
 	specGenealogy(QList<specModelItem*>& l, specModel* m) ;
 	virtual ~specGenealogy() ;
-	specGenealogy(specModel*, QDataStream&) ;
 	specGenealogy() ;
 	void setModel(specModel* model) ;
 	void takeItems() ;
 	void returnItems() ;
-	bool valid() ;
+	bool valid() const ;
 	bool seekParent() ;
-	specModel* model() ;
-	specFolderItem* parent() ;
+	int size() const { return Items.size() ; }
+	specModel* model() const ;
+	specFolderItem* parent() const ;
 	QVector<specModelItem*> items() ;
+	QVector<specModelItem*> items() const ;
 	specModelItem* firstItem() ;
+	specModelItem* firstItem() const ;
 	QModelIndex firstIndex() ;
 
 	bool operator==(const specGenealogy& other) ;
