@@ -13,11 +13,9 @@ specToggleFitStyleAction::specToggleFitStyleAction(QObject *parent) :
 
 specUndoCommand* specToggleFitStyleAction::generateUndoCommand()
 {
-	specMetaItem *item = dynamic_cast<specMetaItem*>(currentItem) ; // TODO template itemAction
-	if (!item) return 0 ;
 	specToggleFitStyleCommand *command = new specToggleFitStyleCommand ;
 	command->setText(tr("Toggle styling to fit")) ;
 	command->setParentObject(model) ;
-	command->setup(currentIndex) ;
+	command->setItem(currentItem) ;
 	return command ;
 }

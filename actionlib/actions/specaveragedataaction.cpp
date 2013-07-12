@@ -103,7 +103,7 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 			}
 			item->reverseCorrection(newData);
 			specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
-			command->setItem(index,newData);
+			command->setItem(item, newData);
 		}
 		groupCommand->setText(tr("Average data (")
 					  + QString::number(ui->number->value())
@@ -132,7 +132,7 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 				oldData.swap(newData) ;
 			}
 			averageToNew(oldData.begin(), oldData.end(), comp, std::back_inserter(newData)) ;
-			command->setItem(index, newData) ;
+			command->setItem(item, newData) ;
 		}
 	}
 

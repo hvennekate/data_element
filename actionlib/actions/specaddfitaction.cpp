@@ -23,10 +23,15 @@ specUndoCommand* specAddFitAction::generateUndoCommand()
 	{
 		specMetaItem *item = (specMetaItem*) pointer ; // TODO template itemAction
 		if (item->getFitCurve()) continue ;
-		specExchangeFitCurveCommand *command = new specExchangeFitCurveCommand(parentCommand) ;
+		(new specExchangeFitCurveCommand(parentCommand))
+				->setup(pointer, new specFitCurve) ;
 		// TODO changed this to inherit parentObject from parent -> check other places for redundancy: command->setParentObject(model) ;
-		command->setup(currentIndex, new specFitCurve) ;
 	}
 
+	if (!parentCommand->childCount())
+	{
+		delete parentCommand ;
+		return 0 ;
+	}
 	return parentCommand ;
 }

@@ -19,9 +19,9 @@ specUndoCommand* specConductFitAction::generateUndoCommand()
 	specMultiCommand *parentCommand = new specMultiCommand ;
 	parentCommand->setText(tr("Conduct fitting")) ;
 	parentCommand->setParentObject(model);
-	foreach(QModelIndex index, selection)
+	foreach(specModelItem* modelItem, pointers)
 	{
-		specMetaItem *item = dynamic_cast<specMetaItem*>(model->itemPointer(index)) ;
+		specMetaItem* item = dynamic_cast<specMetaItem*>(modelItem) ;
 		if (!item) continue;
 		if(!(item->getFitCurve())) continue ;
 		QString oldDescriptor = item->descriptor(tr("Fit variables"), true) ;
@@ -29,7 +29,7 @@ specUndoCommand* specConductFitAction::generateUndoCommand()
 		item->conductFit();
 		QString newDescriptor = item->descriptor(tr("Fit variables"), true) ;
 		specEditDescriptorCommand *editCommand = new specEditDescriptorCommand(parentCommand) ;
-		editCommand->setItem(index,tr("Fit variables"), newDescriptor, item->activeLine(tr("Fit variables"))) ;
+		editCommand->setItem(item,tr("Fit variables"), newDescriptor, item->activeLine(tr("Fit variables"))) ;
 		item->changeDescriptor(tr("Fit variables"), oldDescriptor) ;
 		item->setActiveLine(tr("Fit variables"), oldActiveLine) ;
 	}

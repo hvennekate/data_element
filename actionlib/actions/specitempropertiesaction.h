@@ -11,7 +11,7 @@ public:
 
 private:
 	specUndoCommand* generateUndoCommand() ;
-	bool requirements() ;
+	bool specificRequirements() ;
 };
 
 #endif // SPECITEMPROPERTIESACTION_H

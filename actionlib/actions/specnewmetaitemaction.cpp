@@ -38,8 +38,8 @@ specUndoCommand * specNewMetaItemAction::generateUndoCommand()
 		return 0;
 	}
 	specAddFolderCommand *command = new specAddFolderCommand ;
-	command->setItems(QModelIndexList() << model->index(pointer)) ;
 	command->setParentObject(model) ;
+	command->setItem(pointer) ;
 	command->setText(tr("Add meta item")) ;
 	return command ;
 }

@@ -6,7 +6,7 @@
 #include "specdeleteconnectionscommand.h"
 #include <QMap>
 #include "speclogmodel.h"
-
+#include "specmetaitem.h"
 #include "specdataview.h"
 
 specDeleteAction::specDeleteAction(QObject *parent) :
@@ -19,72 +19,43 @@ specDeleteAction::specDeleteAction(QObject *parent) :
 	setShortcut(Qt::Key_Delete);
 }
 
-specUndoCommand* specDeleteAction::command(specModel* model, QModelIndexList& selection, specUndoCommand* parentsParent)
+specUndoCommand* specDeleteAction::command(specModel* model, QList<specModelItem*>& selection, specUndoCommand* parentsParent)
 {
 	specMultiCommand *parentCommand = 0 ;
+	QString descriptionText = tr("Delete ") + selection.size() + tr(" items.") ;
 	if (!qobject_cast<specLogModel*>(model))
 	{
-		specMetaModel *metaModel = model->getMetaModel() ;
-		specModel *dataModel = metaModel->getDataModel() ;
-
 		parentCommand = new specMultiCommand(parentsParent) ;
 		parentCommand->setParentObject(model) ;
+		parentCommand->setText(descriptionText) ;
+		parentCommand->setMergeable(false) ;
 
 		// collect all indexes and remove connections
-		QModelIndexList queue = selection ;
-		QMap<specModelItem*, QModelIndex> allItems ;
 
-		while (!queue.isEmpty())
+		selection = specModel::expandFolders(selection, true) ;
+
+		QMap<specMetaItem*, QList<specModelItem*> > toDisconnect ;
+		foreach(specModelItem* item, selection)
 		{
-			QModelIndex item = queue.takeFirst() ;
-			specModel *model = (specModel*) (item.model()) ;
-			specModelItem *itemPointer = model->itemPointer(item) ;
-			allItems[itemPointer] = item ;
-			if (itemPointer->children())
-				for (int i = 0 ; i < itemPointer->children() ; ++i)
-					queue << model->index(((specFolderItem*) itemPointer)->child(i)) ;
+			specMetaItem* metaItem = dynamic_cast<specMetaItem*>(item) ;
+			if (metaItem)
+				toDisconnect[metaItem] << metaItem->serverList() ;
+			foreach(specMetaItem* metaItem, item->clientList())
+				toDisconnect[metaItem] << item ;
 		}
 
-		QMap<QModelIndex, QModelIndexList> toDisconnect ;
-		for (QMap<specModelItem*, QModelIndex>::iterator i = allItems.begin() ; i != allItems.end() ; ++i)
-		{
-			if (i.value().model() == metaModel)
-			{
-				foreach (specModelItem* server, i.key()->serverList())
-				{
-					QModelIndex serverIndex = dataModel->index(server) ;
-					if (!serverIndex.isValid())
-						serverIndex = metaModel->index(server) ;
-					toDisconnect[i.value()] << serverIndex ;
-				}
-			}
-			foreach (specMetaItem *client, i.key()->clientList())
-			{
-				QModelIndex clientIndex = metaModel->index((specModelItem*) client) ;
-				if (!toDisconnect[clientIndex].contains(i.value()))
-					toDisconnect[clientIndex] << i.value() ;
-			}
-		}
-
-		for(QMap<QModelIndex,QModelIndexList>::iterator i = toDisconnect.begin() ; i != toDisconnect.end() ; ++i)
-		{
-			specDeleteConnectionsCommand *connectionsCommand = new specDeleteConnectionsCommand(parentCommand) ;
-			connectionsCommand->setParentObject(metaModel) ; // TODO model statt metaModel (and let the command pick the right one)
-			connectionsCommand->setItems(i.key(),i.value());
-		}
-		parentCommand->setText(tr("Delete")) ;
-		parentCommand->setMergeable(false) ;
+		foreach(specMetaItem* metaItem, toDisconnect.keys())
+			(new specDeleteConnectionsCommand(parentCommand))->
+				setItems(metaItem, toDisconnect[metaItem]) ;
 	}
 
 	specDeleteCommand *command = new specDeleteCommand(parentCommand) ;
 	command->setParentObject(model);
 	command->setItems(selection) ;
-	command->setParentObject(model); // TODO: Again???
-	//	view->selectionModel()->clearSelection();
 
 	if (!parentCommand)
 	{
-		command->setText(tr("Delete")) ;
+		command->setText(descriptionText) ;
 		return command ;
 	}
 
@@ -93,5 +64,5 @@ specUndoCommand* specDeleteAction::command(specModel* model, QModelIndexList& se
 
 specUndoCommand* specDeleteAction::generateUndoCommand()
 {
-	return command(model, selection) ;
+	return command(model, pointers) ;
 }

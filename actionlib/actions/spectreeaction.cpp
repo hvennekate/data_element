@@ -111,7 +111,7 @@ public:
 		}
 
 		specAddFolderCommand *insertTree = new specAddFolderCommand(Command) ;
-		insertTree->setItems(QModelIndexList() << model->index(treeRoot));
+		insertTree->setItem(treeRoot);
 		treeRoot = 0 ;
 		insertTree->setParentObject(model) ;
 
@@ -128,8 +128,7 @@ public:
 		// delete superfluous folders:  TODO: connections???
 		specDeleteCommand *deleteOldFolders = new specDeleteCommand(Command) ;
 		deleteOldFolders->setParentObject(model) ;
-		QModelIndexList indexes = model->indexList(toBeDeletedFolders) ;
-		deleteOldFolders->setItems(indexes) ;
+		deleteOldFolders->setItems(toBeDeletedFolders) ;
 		if (cleanUp()) return ;
 		emit progressValue(100);
 	}

@@ -10,8 +10,11 @@ public:
 	explicit specAddConnectionsAction(QObject *parent = 0);
 private:
 	specUndoCommand* generateUndoCommand() ;
-	bool requirements() ;
-	QModelIndexList servers ;
+	bool dataViewRequirement, metaViewRequirement, changing ;
+	void checkRequirements() ;
+private slots:
+	void changeByDataView() ;
+	void changedByMetaView() ;
 };
 
 #endif // SPECADDCONNECTIONSACTION_H

@@ -144,7 +144,7 @@ specUndoCommand* specSpectrumCalculatorAction::generateUndoCommand()
 				dataItem->reverseCorrection(newData) ;
 			specExchangeDataCommand *command = new specExchangeDataCommand(parentCommand) ;
 			command->setParentObject(model) ;
-			command->setItem(model->index(item), newData);
+			command->setItem(item, newData);
 		}
 	}
 

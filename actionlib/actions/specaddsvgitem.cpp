@@ -44,10 +44,8 @@ specUndoCommand* specAddSVGItemAction::generateUndoCommand()
 	}
 
 	specAddFolderCommand *command = new specAddFolderCommand ;
-	command->setItems(QModelIndexList() << model->index(row,0,currentIndex)) ;
-
 	command->setParentObject(model) ;
+	command->setItem(newItem) ;
 	command->setText(tr("Add SVG item")) ;
-
 	return command ;
 }

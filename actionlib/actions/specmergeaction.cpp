@@ -40,18 +40,14 @@ private:
 	specModel* model ;
 	QList<stringDoublePair > criteria ;
 	bool spectralAdaptation ;
-	QList<specDataItem*> items ;
-	QVector<specDataItem*> toBeDeleted ;
-	QVector<specModelItem*> newlyInserted ;
+	QList<specModelItem*> items ;
+	QList<specModelItem*> toBeDeleted ;
+	QList<specModelItem*> newlyInserted ;
 
 	bool cleanUp() // TODO parentClass
 	{
 		if (!toTerminate) return false ;
-		foreach(specModelItem* item, newlyInserted)
-			delete item ;
-		newlyInserted.clear();
 		items.clear();
-		toBeDeleted.clear();
 		delete Command ;
 		return true ;
 	}
@@ -61,7 +57,7 @@ private:
 	static const int offset = 10 ;
 
 public:
-	mergeActionThread(specModel* Model, QList<specDataItem*> itms, QList<stringDoublePair> crit, bool sadap)
+	mergeActionThread(specModel* Model, QList<specModelItem*> itms, QList<stringDoublePair> crit, bool sadap)
 		: specWorkerThread(itms.size()+offset),
 		  Command(0),
 		  model(Model),
@@ -82,8 +78,8 @@ public:
 	{
 		emit progressValue(0);
 		specProfiler profiler("run merge command thread:") ;
-		QVector<specDataItem*> toBeDeleted ;
-		QVector<specModelItem*> newlyInserted ;
+		QList<specModelItem*> toBeDeleted ;
+		QList<specModelItem*> newlyInserted ;
 
 		// Create and insert new merged items
 		int total = items.size() ;
@@ -96,13 +92,13 @@ public:
 			int progress = total-items.size() ;
 			emit progressValue(progress);
 			// form chunk -> only merge if same parent! (new logic)
-			QList<specDataItem*> chunk ;
+			QList<specModelItem*> chunk ;
 			specFolderItem * const parent = items.first()->parent() ;
 			const int row = parent->childNo(items.first()) ;
 			while (!items.isEmpty() && items.first()->parent() == parent && parent->childNo(items.first()) == row + chunk.size())
 				chunk << items.takeFirst() ;
 
-			QVector<specModelItem*> toInsert ;
+			QList<specModelItem*> toInsert ;
 			int chunkSize =chunk.size() ;
 			qSort(chunk.begin(), chunk.end(), sorter) ;
 			while (!chunk.isEmpty())
@@ -110,12 +106,12 @@ public:
 				emit progressValue(progress+chunkSize-chunk.size()) ;
 				if (cleanUp()) return ;
 				specDataItem *newItem = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
-				QList<specDataItem*> toMergeWith ;
+				QList<specModelItem*> toMergeWith ;
 				// look for items to merge with
 				do toMergeWith << chunk.takeFirst() ;
 				while (!chunk.isEmpty() && itemsAreEqual(toMergeWith.first(), chunk.first(), criteria)) ;
 
-				toBeDeleted << toMergeWith.toVector() ;
+				toBeDeleted << toMergeWith ;
 				// if there are others, do the merge
 				if (!toMergeWith.isEmpty())
 				{
@@ -146,7 +142,7 @@ public:
 							if (overlappingCount == 2)
 							{
 								QwtPlotItemList spectra ;
-								for (QList<specDataItem*>::iterator i = toMergeWith.begin() ; i != toMergeWith.end() ; ++i)
+								for (QList<specModelItem*>::iterator i = toMergeWith.begin() ; i != toMergeWith.end() ; ++i)
 									spectra << (QwtPlotItem*) *i ;
 
 								// perform spectral adaptation
@@ -169,27 +165,14 @@ public:
 				}
 				toInsert << newItem ; // this creates overhead if  there are many items not to be merged...
 			}
-			if (model->insertItems(toInsert.toList(), model->index(parent), row))
-				newlyInserted += toInsert ; // TODO else...
+			if (model->insertItems(toInsert, model->index(parent), row))
+				newlyInserted << toInsert ; // TODO else...
 		}
 		emit progressValue(total) ;
 
 		Command = new specMultiCommand ;
 		Command->setParentObject(model) ;
 		Command->setMergeable(false) ;
-
-		// preparing insertion command
-		specAddFolderCommand *insertionCommand = new specAddFolderCommand(Command) ;
-		QModelIndexList insertList = model->indexList(newlyInserted.toList()) ;
-		insertionCommand->setItems(insertList) ;
-		insertionCommand->setParentObject(model) ;
-
-
-		// prepare to delete the old items
-		specDeleteCommand *deletionCommand = new specDeleteCommand(Command) ;
-		QModelIndexList deleteList = model->indexList(toBeDeleted.toList()) ;
-		deletionCommand->setItems(deleteList) ;
-		deletionCommand->setParentObject(model) ;
 
 		// compile description
 		QStringList criteriaDescription ;
@@ -205,6 +188,18 @@ public:
 		if (!criteriaDescription.isEmpty())
 			(description += tr(" Criteria (Tolerance): ")) += criteriaDescription.join(", ") ;
 		Command->setText(description) ;
+
+		// preparing insertion command
+		specAddFolderCommand *insertionCommand = new specAddFolderCommand(Command) ;
+		insertionCommand->setParentObject(model) ;
+		insertionCommand->setItems(newlyInserted) ;
+
+
+		// prepare to delete the old items
+		specDeleteCommand *deletionCommand = new specDeleteCommand(Command) ;
+		deletionCommand->setParentObject(model) ;
+		deletionCommand->setItems(toBeDeleted) ;
+
 		cleanUp() ;
 		emit progressValue(total+offset);
 	}
@@ -230,12 +225,7 @@ specUndoCommand* specMergeAction::generateUndoCommand()
 {
 	specProfiler profiler("Prepare merge commands:") ;
 	if (selection.size() < 2) return 0 ;
-	QList<specDataItem*> items ;
-	foreach(specModelItem* pointer, pointers)
-		items << (specModelItem*) pointer ;
-	items.removeAll(0) ;
-	if (items.isEmpty()) return 0 ;
-	qSort(items.begin(), items.end(), specModel::pointerIsLessComparison) ;
+	qSort(pointers.begin(), pointers.end(), specModel::lessThanItemPointer) ;
 
 	// let user define similarities
 	QList<stringDoublePair > criteria ;
@@ -244,7 +234,7 @@ specUndoCommand* specMergeAction::generateUndoCommand()
 	if (dialog->exec() != QDialog::Accepted) return 0 ;
 	dialog->getMergeCriteria(criteria, spectralAdaptation);
 	if (criteria.isEmpty()) return 0 ;
-	mergeActionThread mat(model,items,criteria,spectralAdaptation) ;
+	mergeActionThread mat(model, pointers, criteria, spectralAdaptation) ;
 	mat.run();
 	return mat.command() ;
 }

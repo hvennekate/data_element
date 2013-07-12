@@ -65,7 +65,7 @@ specUndoCommand* specNormalizeAction::generateUndoCommand()
 		}
 
 		specPlotMoveCommand* moveCommand = new specPlotMoveCommand(command) ;
-		moveCommand->setItem(model->index(item)) ;
+		moveCommand->setItem(item) ;
 		moveCommand->setCorrections(ui->shiftXValue->isChecked() ?
 							ui->xValue->text().toDouble() - item->sample(extremum).x() : 0,
 						0,0,

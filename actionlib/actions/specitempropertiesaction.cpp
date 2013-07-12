@@ -1,6 +1,7 @@
 #include "specitempropertiesaction.h"
 #include "specdataitem.h"
 #include "specsvgitem.h"
+#include "specmetaitem.h"
 
 specItemPropertiesAction::specItemPropertiesAction(QObject *parent) :
 	specItemAction(parent)
@@ -18,7 +19,7 @@ specUndoCommand* specItemPropertiesAction::generateUndoCommand()
 	return currentItem->itemPropertiesAction(model) ;
 }
 
-bool specItemPropertiesAction::requirements()
+bool specItemPropertiesAction::specificRequirements()
 {
 	return (dynamic_cast<specDataItem*>(currentItem)
 			|| dynamic_cast<specMetaItem*>(currentItem)

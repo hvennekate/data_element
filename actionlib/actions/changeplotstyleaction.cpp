@@ -193,7 +193,7 @@ specUndoCommand* changePlotStyleAction::generateUndoCommand()
 	if (!newCommand) return 0;
 	newCommand->obtainStyle(&item) ;
 	newCommand->setParentObject(model) ;
-	newCommand->setItems(selection) ;
+	newCommand->setItems(pointers) ;
 	return newCommand ;
 }
 

@@ -8,7 +8,8 @@ class specRequiresItemAction : public specItemAction
 public:
 	explicit specRequiresItemAction(QObject *parent = 0);
 protected:
-	bool requirements() ;
+	bool specificRequirements() ;
+	bool postProcessingRequirements() const ;
 private:
 	QList<specStreamable::type> requiredTypes() const ;
 };

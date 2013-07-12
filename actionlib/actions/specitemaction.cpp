@@ -19,16 +19,14 @@ const std::type_info& specItemAction::possibleParent()
 
 void specItemAction::execute()
 {
-	if (!(view = qobject_cast<specView*>(parent()))) return ;
-	if (!(model = view->model())) return ;
-	currentIndex = view->currentIndex() ;
-	selection = view->getSelection() ;
+	if (!requirements()) return ;
+
 	QList<specStreamable::type> types = requiredTypes() ;
 	pointers.clear();
 
-	// Recursively eliminate folders (TODO think this through!)
-	if (!types.contains(specStreamable::folder))
-		model->expandFolders(selection);
+//	// Recursively eliminate folders (TODO think this through!) --> not necessary, folders will not appear in pointers anyway!
+//	if (!types.contains(specStreamable::folder))
+//		model->expandFolders(selection);
 
 	if (!types.isEmpty())
 	{
@@ -36,7 +34,6 @@ void specItemAction::execute()
 			if (types.contains(item->typeId()))
 				pointers << item ;
 	}
-	currentItem = model->itemPointer(currentIndex) ;
 
 	if (currentItem && !currentItem->isFolder())
 	{
@@ -50,16 +47,12 @@ void specItemAction::execute()
 		insertionIndex = currentIndex ;
 	}
 
-	if (!requirements()) return ;
+	if (!postProcessingRequirements()) return ;
+
 	specUndoCommand* command = generateUndoCommand();
 	if (!command) return ;
-	//	if (!command->ok())
-	//	{
-	//		delete command;
-	//		return ;
-	//	}
 
-	if (dynamic_cast<specMultiCommand*>(commad) && !command->childCount())
+	if (dynamic_cast<specMultiCommand*>(command) && !command->childCount())
 	{
 		delete command ;
 		return ;
@@ -93,4 +86,14 @@ void specItemAction::expandSelectedFolders(QList<specModelItem *> &items, QList<
 QList<specStreamable::type> specItemAction::requiredTypes() const
 {
 	return QList<specStreamable::type>() ;
+}
+
+bool specItemAction::requirements()
+{
+	if (!(view = qobject_cast<specView*>(parent()))) return false ;
+	if (!(model = view->model())) return false ;
+	currentIndex = view->currentIndex() ;
+	currentItem = model->itemPointer(currentIndex) ;
+	selection = view->getSelection() ;
+	return specificRequirements() ;
 }

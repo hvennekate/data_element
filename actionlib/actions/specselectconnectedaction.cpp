@@ -22,7 +22,7 @@ specUndoCommand *specSelectConnectedAction::generateUndoCommand()
 		QModelIndexList dataItems, metaItems ;
 		metaPointer->connectedItems(dataItems, metaItems) ;
 		metaView->selectionModel()->select(specViewState::indexesToSelection(metaItems,(specModel*) metaView->model()), QItemSelectionModel::Select) ;
-		dataView->getDataView()->selectionModel()->select(specViewState::indexesToSelection(dataItems, metaView->getDataView()->model()), QItemSelectionModel::ClearAndSelect) ;
+		dataView->selectionModel()->select(specViewState::indexesToSelection(dataItems, metaView->getDataView()->model()), QItemSelectionModel::ClearAndSelect) ;
 	}
 	return 0 ;
 }

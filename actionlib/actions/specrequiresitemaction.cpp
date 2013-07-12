@@ -13,7 +13,12 @@ specRequiresMetaItemAction::specRequiresMetaItemAction(QObject *parent)
 	: specRequiresItemAction(parent)
 {}
 
-bool specRequiresItemAction::requirements()
+bool specRequiresItemAction::specificRequirements()
+{
+	return !selection.isEmpty() ;
+}
+
+bool specRequiresItemAction::postProcessingRequirements() const
 {
 	return !pointers.isEmpty() ;
 }

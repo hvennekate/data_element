@@ -132,17 +132,15 @@ specUndoCommand* specTiltMatrixAction::generateUndoCommand()
 
 	// command generation
 	specMultiCommand* parentCommand = new specMultiCommand ;
+	parentCommand->setParentObject(model) ;
 	parentCommand->setMergeable(false) ;
 	specAddFolderCommand *insertionCommand = new specAddFolderCommand(parentCommand) ;
-	QModelIndexList newIndexes = model->indexList(newItems) ;
-	insertionCommand->setItems(newIndexes); // TODO integrate into command constructor
+	insertionCommand->setItems(newItems); // TODO integrate into command constructor
 
 	// delete old items
-	QModelIndexList newItemIndexes = model->indexList(items) ;
-	newItemIndexes << model->indexList(toBeDeletedFolders) ;
-	specDeleteAction::command(model, newItemIndexes, parentCommand) ;
+	items << toBeDeletedFolders ;
+	specDeleteAction::command(model, items, parentCommand) ;
 
-	parentCommand->setParentObject(model) ;
 	parentCommand->setText(tr("Exchange \"")+
 				   conversionDescriptor+
 				   tr("\" and \"")+

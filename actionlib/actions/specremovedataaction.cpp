@@ -40,7 +40,7 @@ specUndoCommand* specRemoveDataAction::generateUndoCommand()
 		if (!item) continue ;
 		specExchangeDataCommand *command = new specExchangeDataCommand(groupCommand) ;
 		command->setParentObject(model) ;
-		command->setItem(index,item->getDataExcept(ranges)) ;
+		command->setItem(item, item->getDataExcept(ranges)) ;
 	}
 
 	QStringList rangeStrings ;

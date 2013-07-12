@@ -2,6 +2,7 @@
 #include "specmetaitem.h"
 #include "specfitcurve.h"
 #include "specexchangefitcurvecommand.h"
+#include "specmulticommand.h"
 
 specRemoveFitAction::specRemoveFitAction(QObject *parent) :
 	specRequiresMetaItemAction(parent)
@@ -15,12 +16,23 @@ specRemoveFitAction::specRemoveFitAction(QObject *parent) :
 
 specUndoCommand* specRemoveFitAction::generateUndoCommand()
 {
-	specMetaItem *item = dynamic_cast<specMetaItem*>(currentItem) ; // TODO template itemAction
-	if (!item) return 0 ;
-	if (!item->getFitCurve()) return 0 ;
-	specExchangeFitCurveCommand *command = new specExchangeFitCurveCommand ;
-	command->setText(tr("Remove fit curve"))  ;
-	command->setParentObject(model) ;
-	command->setup(currentIndex, 0) ;
-	return command ;
+	specMultiCommand *parentCommand = new specMultiCommand ;
+	parentCommand->setText(tr("Remove fit curve"));
+	parentCommand->setParentObject(model) ;
+	foreach(specModelItem* modelItem, pointers)
+	{
+		specMetaItem *item = dynamic_cast<specMetaItem*>(modelItem) ;
+		if (!item) continue ;
+		if (!item->getFitCurve()) continue;
+		(new specExchangeFitCurveCommand(parentCommand))
+				->setup(item, 0) ;
+	}
+
+	if (!parentCommand->childCount()) // TODO per virtual functions in parent Klasse unterbringen
+	{
+		delete parentCommand ;
+		return 0 ;
+	}
+
+	return parentCommand ;
 }

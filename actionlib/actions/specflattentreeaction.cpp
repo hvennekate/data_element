@@ -38,8 +38,7 @@ specUndoCommand *specFlattenTreeAction::generateUndoCommand()
 	}
 
 	specDeleteCommand *deleteCommand = new specDeleteCommand(command) ;
-	QModelIndexList foldersToDelete = model->indexList(foldersToFlatten) ;
-	deleteCommand->setItems(foldersToDelete) ;
+	deleteCommand->setItems(foldersToFlatten) ;
 	deleteCommand->redo();
 	command->undo();
 

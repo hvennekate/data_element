@@ -14,9 +14,10 @@ public:
 	explicit specItemAction(QObject *parent = 0) ;
 	virtual const std::type_info& possibleParent() ;
 	virtual QList<specStreamable::type> requiredTypes() const ;
-private: // TODO
-	virtual bool requirements() { return true ;}
+	bool requirements() ;
 protected:
+	virtual bool specificRequirements() { return true ;}
+	virtual bool postProcessingRequirements() const  { return true ; }
 	void execute();
 	specView* view ;
 	specModel* model ;

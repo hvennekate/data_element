@@ -18,15 +18,17 @@ specPasteAction::specPasteAction(QObject *parent) :
 
 specUndoCommand* specPasteAction::generateUndoCommand()
 {
-	int count = model->itemPointer(insertionIndex)->children() ;
-	if (! model->dropMimeData(QApplication::clipboard()->mimeData(),Qt::CopyAction,insertionRow,0,insertionIndex)) return 0 ;
-	count = model->itemPointer(currentIndex)->children() - count ; // now we know, how many were inserted...
+	specFolderItem* parentFolder = dynamic_cast<specFolderItem*>(model->itemPointer(insertionIndex)) ;
+	if (!parentFolder) return 0 ;
+	QList<specModelItem*> oldChildren = parentFolder->childrenList() ;
+	if (!model->dropMimeData(QApplication::clipboard()->mimeData(),Qt::CopyAction,insertionRow,0,insertionIndex)) return 0 ;
+	QList<specModelItem*> insertedItems ;
+	foreach(specModelItem* item, parentFolder->childrenList())
+		if(!oldChildren.contains(item))
+			insertedItems << item ;
 	specAddFolderCommand *command = new specAddFolderCommand ;
-	QModelIndexList list ;
-	for (int i = 0 ; i < count ; ++i)
-		list << model->index(i+row,0,currentIndex) ;
-	command->setItems(list) ;
-	command->setText(tr("Paste items")) ;
 	command->setParentObject(model) ;
+	command->setItems(insertedItems) ;
+	command->setText(tr("Paste items")) ;
 	return command ;
 }

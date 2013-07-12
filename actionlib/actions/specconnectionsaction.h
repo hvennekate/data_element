@@ -3,11 +3,13 @@
 
 #include "specrequiresitemaction.h"
 
+class specMetaView ;
+
 class specConnectionsAction : public specRequiresMetaItemAction
 {
 	Q_OBJECT
 private:
-	bool requirements() ;
+	bool specificRequirements() ;
 protected:
 	specView *dataView ;
 	specMetaView *metaView ;

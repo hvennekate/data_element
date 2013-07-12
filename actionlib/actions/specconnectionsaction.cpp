@@ -1,4 +1,5 @@
 #include "specconnectionsaction.h"
+#include "specmetaview.h"
 
 specConnectionsAction::specConnectionsAction(QObject *parent) :
 	specRequiresMetaItemAction(parent),
@@ -7,15 +8,13 @@ specConnectionsAction::specConnectionsAction(QObject *parent) :
 {
 }
 
-bool specConnectionsAction::requirements()
+bool specConnectionsAction::specificRequirements()
 {
-	metaView = qobject_cast<specMetaView*>(view) ;
-	if (!metaView) return false ;
-	dataView = metaView->getDataView() ;
-	return dataView ;
+	return (metaView = qobject_cast<specMetaView*>(view))
+			&& (dataView = metaView->getDataView()) ;
 }
 
-const std::type_info& specSelectConnectedAction::possibleParent()
+const std::type_info& specConnectionsAction::possibleParent()
 {
 	return typeid(specMetaView) ;
 }
