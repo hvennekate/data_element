@@ -156,7 +156,7 @@ QMap<QString, QString> stringListChangeDialog::active() const
 specDescriptorEditAction::specDescriptorEditAction(QObject *parent)
 	: specUndoAction(parent)
 {
-	setIcon(QIcon::fromTheme("document-properties")) ;
+	setIcon(QIcon(":/editDescriptors.png")) ;
 	setToolTip(tr("Edit columns")) ;
 	setWhatsThis(tr("Use this action to edit/delete column headers."));
 	setText(tr("Edit columns")) ;

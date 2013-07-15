@@ -55,5 +55,10 @@
         <file>exchangex.png</file>
         <file>notree.png</file>
         <file>normalize.png</file>
+        <file>addFit.png</file>
+        <file>doFit.png</file>
+        <file>editDescriptors.png</file>
+        <file>styleFit.png</file>
+        <file>removeFit.png</file>
     </qresource>
 </RCC>

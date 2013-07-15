@@ -168,6 +168,10 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 		{
 			addNewAction(bar, new specAddConnectionsAction(target)) ;
 			addNewAction(bar, new specSelectConnectedAction(target)) ;
+			addNewAction(bar, new specAddFitAction(target)) ;
+			addNewAction(bar, new specRemoveFitAction(target)) ;
+			addNewAction(bar, new specToggleFitStyleAction(target));
+			addNewAction(bar, new specConductFitAction(target)) ;
 		}
 		if (logView)
 			addNewAction(bar, new specDescriptorEditAction(target)) ;
@@ -350,10 +354,10 @@ QMenu *specActionLibrary::contextMenu(QWidget *w)
 //	specDataView* dataView = dynamic_cast<specDataView*>(w) ;
 	QList<QAction*> actions ;
 	actions << view->findChild<specAddConnectionsAction*>()
-			<< view->findChild<specRemoveFitAction*>()
-			<< view->findChild<specConductFitAction*>()
-			<< view->findChild<specToggleFitStyleAction*>()
 			<< view->findChild<specAddFitAction*>()
+			<< view->findChild<specRemoveFitAction*>()
+			<< view->findChild<specToggleFitStyleAction*>()
+			<< view->findChild<specConductFitAction*>()
 
 			<< view->findChild<specTiltMatrixAction*>()
 			<< view->findChild<specSpectrumCalculatorAction*>()
