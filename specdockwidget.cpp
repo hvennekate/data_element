@@ -66,6 +66,9 @@ void specDockWidget::setupWindow(specActionLibrary *actions)
 			widget->addToolBar(toolbar);
 	}
 
+	specView *view = findChild<specView*>() ;
+	if (!view) return ;
+	selectionChanged(view->selectionModel()->selection(), QItemSelection());
 }
 
 void specDockWidget::changeEvent(QEvent *event)
