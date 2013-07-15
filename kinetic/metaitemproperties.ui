@@ -71,6 +71,9 @@
          <layout class="QHBoxLayout" name="horizontalLayout">
           <item>
            <widget class="QToolButton" name="moveUpButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>...</string>
             </property>
@@ -78,6 +81,9 @@
           </item>
           <item>
            <widget class="QToolButton" name="moveDownButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>...</string>
             </property>
@@ -85,6 +91,9 @@
           </item>
           <item>
            <widget class="QToolButton" name="removeSelectedConnections">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>...</string>
             </property>
@@ -92,6 +101,9 @@
           </item>
           <item>
            <widget class="QToolButton" name="addSelectedConnections">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
             <property name="text">
              <string>...</string>
             </property>

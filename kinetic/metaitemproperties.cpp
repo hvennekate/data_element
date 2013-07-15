@@ -92,6 +92,21 @@ void metaItemProperties::on_connectedItemsList_itemSelectionChanged()
 	}
 	ui->dataTable->selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
 	refreshPlots();
+	if (!selection.isEmpty())
+	{
+		ui->moveUpButton->setEnabled(selection.indexes().first().row()) ;
+		ui->moveDownButton->setEnabled(selection.indexes().last().row() + 1
+									   != ui->connectedItemsList->count());
+		ui->addSelectedConnections->setEnabled(true) ;
+		ui->removeSelectedConnections->setEnabled(true) ;
+	}
+	else
+	{
+		ui->moveDownButton->setDisabled(true) ;
+		ui->moveUpButton->setDisabled(true) ;
+		ui->addSelectedConnections->setDisabled(true) ;
+		ui->removeSelectedConnections->setDisabled(true);
+	}
 	reselecting = false ;
 }
 
@@ -227,21 +242,22 @@ void metaItemProperties::moveSelection(bool down)
 {
 	QList<QListWidgetItem*> selection = ui->connectedItemsList->selectedItems() ;
 	if (selection.isEmpty()) return ;
+	int lastRow = ui->connectedItemsList->row(selection.last()),
+			firstRow = ui->connectedItemsList->row(selection.first()) ;
 	ui->connectedItemsList->selectionModel()->clearSelection();
-
-	int begin = ui->connectedItemsList->row(selection.first()) ,
-			end   = ui->connectedItemsList->row(selection.last())+1 ;
 	if (down)
 	{
-		if(end == ui->connectedItemsList->count()) return ;
-		for (int i = 0 ; i < end-begin ; ++i)
-			ui->connectedItemsList->insertItem(i+1, ui->connectedItemsList->takeItem(begin+i));
+		if (lastRow == ui->connectedItemsList->count() -1)
+			return ;
+		ui->connectedItemsList->insertItem(firstRow,
+										   ui->connectedItemsList->takeItem(lastRow+1));
 	}
 	else
 	{
-		if(0 == begin) return ;
-		for (int i = 0 ; i < end-begin ; ++i)
-			ui->connectedItemsList->insertItem(i-1, ui->connectedItemsList->takeItem(begin+i));
+		if (!firstRow)
+			return ;
+		ui->connectedItemsList->insertItem(lastRow,
+										   ui->connectedItemsList->takeItem(firstRow-1));
 	}
 
 	buildPoints();
@@ -258,20 +274,27 @@ specUndoCommand* metaItemProperties::changedConnections(QObject *parent)
 {
 	specModel* model = qobject_cast<specModel*>(parent) ;
 	if (!model) return 0 ;
-	QList<specModelItem*> deletedConnections ;
-	for (int i = 0 ; i < ui->connectedItemsList->count() ; ++i)
-	{
-		QListWidgetItem* widgetItem = ui->connectedItemsList->item(i) ;
-		if (widgetItem->checkState() == Qt::Unchecked)
-			deletedConnections << itemInfo[widgetItem].item ;
-	}
 
 	specMultiCommand *parentCommand = new specMultiCommand ;
 	parentCommand->setParentObject(parent) ;
 	parentCommand->setText(tr("Modify properties of meta item ") + originalItem->descriptor(""));
 
-	specDeleteConnectionsCommand *deleteCommand = new specDeleteConnectionsCommand(parentCommand) ;
-	deleteCommand->setItems(originalItem, deletedConnections) ;
+	// radical approach here (easiest to preserve the order of connections set by the user)
+	specDeleteConnectionsCommand * deleteCommand = new specDeleteConnectionsCommand(parentCommand) ;
+	deleteCommand->setItems(originalItem, originalItem->serverList()) ;
+	deleteCommand->redo(); // circumvent the "don't double connect"-mechanism
+	// Get and set new connections
+	QList<specModelItem*> newConnections ;
+	for (int i = 0 ; i < ui->connectedItemsList->count() ; ++i)
+	{
+		QListWidgetItem* widgetItem = ui->connectedItemsList->item(i) ;
+		if (widgetItem->checkState() == Qt::Checked)
+			newConnections << itemInfo[widgetItem].item ;
+	}
+	if (!newConnections.isEmpty())
+		(new specAddConnectionsCommand(parentCommand)) ->
+			setItems(originalItem, newConnections) ;
+	deleteCommand->undo(); // see above.
 
 	if (ui->styleFit->checkState() != originalItem->styleFitCurve)
 	{
@@ -286,18 +309,6 @@ specUndoCommand* metaItemProperties::changedConnections(QObject *parent)
 		parentCommand = 0 ;
 	}
 	return parentCommand ;
-}
-
-QModelIndexList metaItemProperties::generateConnectionList(const QList<specModelItem*> items)
-{
-	QModelIndexList indexes ;
-	foreach(specModelItem* item, items)
-	{
-		QModelIndex index = originalItem->metaModel->index(item) ;
-		if (!index.isValid()) index = originalItem->dataModel->index(item) ;
-		indexes << index ;
-	}
-	return indexes ;
 }
 
 void metaItemProperties::on_dataTable_itemSelectionChanged()

@@ -53,7 +53,6 @@ private:
 	void buildPoints() ;
 	void refreshPlots() ;
 	void clearItemInfo() ;
-	QModelIndexList generateConnectionList(const QList<specModelItem*> items) ;
 	QTableWidgetItem* firstEntry(QTableWidgetItem*) ;
 	bool reselecting ;
 
