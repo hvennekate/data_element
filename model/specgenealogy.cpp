@@ -210,3 +210,11 @@ specGenealogy& specGenealogy::operator =(specGenealogy& other)
 	other.owning = false ; // taking possession of the items
 	return *this ;
 }
+
+void specGenealogy::signalChange() const
+{
+	if (!Model) return ;
+	if (Items.isEmpty()) return ;
+	if (owning) return ;
+	Model->signalChanged(Model->index(Items.first()), Model->index(Items.last(), Model->descriptors().size()-1));
+}

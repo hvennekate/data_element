@@ -77,6 +77,7 @@ void specStyleCommandImplFuncTemplate::applyStyle(specGenealogy &genealogy, int 
 	QVector<specModelItem*> items = genealogy.items() ;
 	for (int j = 0 ; j < items.size() ; ++j)
 		(items[j]->*setProperty)(prop) ;
+	genealogy.signalChange();
 }
 
 specStyleCommandImplTemplate

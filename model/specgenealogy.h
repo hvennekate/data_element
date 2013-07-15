@@ -30,6 +30,7 @@ public:
 	bool valid() const ;
 	bool seekParent() ;
 	int size() const { return Items.size() ; }
+	void signalChange() const ;
 	specModel* model() const ;
 	specFolderItem* parent() const ;
 	QVector<specModelItem*> items() ;
