@@ -15,6 +15,7 @@ protected:
 	void writeItem(QDataStream& out) const ;
 	void readItem(QDataStream& in) ;
 	void parentAssigned() ;
+	itemType* itemPointer() ;
 	itemType* itemPointer() const ;
 public:
 	specSingleItemCommand(specUndoCommand *parent = 0);

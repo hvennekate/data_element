@@ -33,9 +33,9 @@ specGenealogy::specGenealogy(QList<specModelItem *>& l, specModel *m)
 	l.erase(l.begin(), it) ;
 }
 
-bool specGenealogy::valid() const
-{
-	return Model && Parent && !indexes.isEmpty() && !Items.isEmpty() ;
+bool specGenealogy::valid() const // TODO this should actually be done by some sort of
+{ // state machine mechanism (like "valid" <-> "invalid")
+	return Model && Parent && !indexes.isEmpty() && !Items.isEmpty() && Items.first() ;
 }
 
 

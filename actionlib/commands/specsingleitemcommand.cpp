@@ -50,9 +50,17 @@ void specSingleItemCommand<itemType>::parentAssigned()
 }
 
 template <class itemType>
+itemType* specSingleItemCommand<itemType>::itemPointer()
+{
+	if (!item.valid() && !item.seekParent()) return 0 ;
+	Q_ASSERT(item.firstItem()) ;
+	return const_cast<const specSingleItemCommand<itemType>* >(this)->itemPointer() ;
+}
+
+template <class itemType>
 itemType* specSingleItemCommand<itemType>::itemPointer() const
 {
-	return (item.size() ? dynamic_cast<itemType*>( item.items().first() ) : 0) ;
+	return dynamic_cast<itemType*>(item.firstItem()) ;
 }
 
 // Force instatiation
