@@ -314,7 +314,6 @@ bool specModel::setData(const QModelIndex &index, const QVariant &value, int rol
 			else
 				command->setItem(pointer, desc, value.toString()) ;
 			// TODO unite in value-variant
-			command->setText(tr("Edit data")) ;
 			dropBuddy->push(command) ;
 		}
 		else if (role == Qt::ForegroundRole)

@@ -16,6 +16,7 @@ void specEditDescriptorCommand::setItem(specModelItem *i, QString desc,
 	if (!i) return ;
 	specSingleItemCommand::setItem(i) ;
 	descriptor = desc ;
+	generateDescription();
 }
 
 void specEditDescriptorCommand::undoIt()
@@ -83,6 +84,7 @@ void specEditDescriptorCommand::readCommand(QDataStream &in)
 	   >> descriptor
 	   >> previousActiveLine ;
 	readItem(in);
+	generateDescription();
 }
 
 //bool specEditDescriptorCommand::mergeable(const specUndoCommand *other)
@@ -98,5 +100,18 @@ void specEditDescriptorCommand::readCommand(QDataStream &in)
 //	const specEditDescriptorCommand *p = dynamic_cast<const specEditDescriptorCommand*>(other) ;
 //	if (!p || !mergeable(p)) return false ;
 //	previousActiveLine = p->previousActiveLine ;
+//	generateDescription() ;
 //	return true ;
 //}
+
+QString specEditDescriptorCommand::description() const
+{
+	return QString() ;
+}
+
+void specEditDescriptorCommand::generateDescription()
+{
+	setText(QObject::tr("Changed entry in ")
+				 + descriptor
+				 + QObject::tr(".")) ;
+}

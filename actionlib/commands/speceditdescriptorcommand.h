@@ -14,6 +14,8 @@ private:
 	void writeCommand(QDataStream &out) const ;
 	void readCommand(QDataStream &in) ;
 	type typeId() const {return specStreamable::editDescriptorCommandId ;}
+	QString description() const ;
+	void generateDescription() ;
 public:
 	explicit specEditDescriptorCommand(specUndoCommand* parent = 0) ;
 	void setItem(specModelItem*, QString descriptor,
