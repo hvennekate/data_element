@@ -15,7 +15,7 @@ specRequiresMetaItemAction::specRequiresMetaItemAction(QObject *parent)
 
 bool specRequiresItemAction::specificRequirements()
 {
-	return !view->selectionModel()->hasSelection() ;
+	return view->selectionModel()->hasSelection() ;
 }
 
 bool specRequiresItemAction::postProcessingRequirements() const

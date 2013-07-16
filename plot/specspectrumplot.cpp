@@ -341,9 +341,9 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 				offline=offlineAction->isChecked()&& i < coeffs.size() ? coeffs[i++] : 0. ;
 	}
 	specPlotMoveCommand *command = new specPlotMoveCommand ;
+	command->setParentObject(view->model()) ;
 	command->setItem(modelItem) ;
 	command->setCorrections(shift,offset,offline,scale) ;
-	command->setParentObject(view->model()) ;
 	undoPartner()->push(command) ;
 }
 

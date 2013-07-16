@@ -6,6 +6,10 @@
 class specPasteAction : public specItemAction
 {
 	Q_OBJECT
+private:
+	bool specificRequirements() ;
+private slots:
+	void checkClipboard() ;
 public:
 	explicit specPasteAction(QObject *parent = 0);
 protected:

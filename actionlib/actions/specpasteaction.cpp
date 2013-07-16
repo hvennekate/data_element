@@ -14,6 +14,18 @@ specPasteAction::specPasteAction(QObject *parent) :
 	setWhatsThis(tr("Paste data from clipboard, if possible")) ;
 	setText(tr("Paste")) ;
 	setShortcut(tr("Ctrl+V"));
+	connect(QApplication::clipboard(), SIGNAL(dataChanged()), this, SLOT(checkClipboard())) ;
+	checkClipboard();
+}
+
+void specPasteAction::checkClipboard()
+{
+	setEnabled(model->mimeAcceptable(QApplication::clipboard()->mimeData())) ;
+}
+
+bool specPasteAction::specificRequirements()
+{
+	return isEnabled() ;
 }
 
 specUndoCommand* specPasteAction::generateUndoCommand()
