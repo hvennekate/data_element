@@ -22,6 +22,7 @@ void specItemAction::execute()
 	if (!requirements()) return ;
 
 	QList<specStreamable::type> types = requiredTypes() ;
+	selection = view->getSelection() ;
 	pointers.clear();
 
 //	// Recursively eliminate folders (TODO think this through!) --> not necessary, folders will not appear in pointers anyway!
@@ -94,6 +95,5 @@ bool specItemAction::requirements()
 	if (!(model = view->model())) return false ;
 	currentIndex = view->currentIndex() ;
 	currentItem = model->itemPointer(currentIndex) ;
-	selection = view->getSelection() ;
 	return specificRequirements() ;
 }
