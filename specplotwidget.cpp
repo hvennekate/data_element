@@ -192,18 +192,13 @@ bool specPlotWidget::saveFile()
 			   QFileDialog::getSaveFileName(this,"Name?","","spec-Dateien (*.spec)") :
 			   windowFilePath()) ;
 	if (file.fileName().isEmpty()) return false ;
-	if (!file.open(QFile::WriteOnly))
-	{
-		QMessageBox::critical(0, tr("Write error"), tr("Could not open file ")
-					  + file.fileName()
-					  + tr("for writing.")) ;
-		return false ;
-	}
 
-	QDataStream out(&file) ;
+	QBuffer buffer ;
+	buffer.open(QBuffer::WriteOnly) ;
+	QDataStream out(&buffer) ;
 	out << quint64(FILECHECKCOMPRESSNUMBER) ;
 	out.setDevice(0); // safety
-	bzipIODevice zipDevice(&file) ;
+	bzipIODevice zipDevice(&buffer) ;
 	zipDevice.open(bzipIODevice::WriteOnly) ;
 	QDataStream zipOut(&zipDevice) ;
 
@@ -239,6 +234,19 @@ bool specPlotWidget::saveFile()
 	zipOut << visibility ;
 	zipDevice.close() ;
 	zipDevice.releaseDevice() ;
+	buffer.close();
+	if (!file.open(QFile::WriteOnly))
+	{
+		QMessageBox::critical(0, tr("Write error"), tr("Could not open file ")
+					  + file.fileName()
+					  + tr("for writing.")) ;
+		return false ;
+	}
+	if (file.write(buffer.data()) == -1)
+	{
+		QMessageBox::critical(0, tr("Severe error!"), tr("Error writing file!  Data could not be saved!")) ;
+		return false ;
+	}
 	file.close();
 	changeFileName(file.fileName());
 	return true ;
