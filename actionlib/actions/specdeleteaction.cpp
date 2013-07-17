@@ -22,7 +22,7 @@ specDeleteAction::specDeleteAction(QObject *parent) :
 specUndoCommand* specDeleteAction::command(specModel* model, QList<specModelItem*>& selection, specUndoCommand* parentsParent)
 {
 	specMultiCommand *parentCommand = 0 ;
-	QString descriptionText = tr("Delete ") + selection.size() + tr(" items.") ;
+	QString descriptionText = tr("Delete ") + QString::number(selection.size()) + tr(" items.") ;
 	if (!qobject_cast<specLogModel*>(model))
 	{
 		parentCommand = new specMultiCommand(parentsParent) ;
