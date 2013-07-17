@@ -70,7 +70,6 @@ void specMultipleItemCommand::takeItems()
 	m->signalBeginReset();
 	for(int i = 0 ; i < items.size() ; ++i)
 		items[i].takeItems();
-	m->signalEndReset();
 }
 
 void specMultipleItemCommand::restoreItems()
@@ -80,7 +79,6 @@ void specMultipleItemCommand::restoreItems()
 	m->signalBeginReset();
 	for(int i = 0 ; i < items.size() ; i++)
 		items[i].returnItems();
-	m->signalEndReset();
 }
 
 void specMultipleItemCommand::readItems(QDataStream &in, qint32 n)

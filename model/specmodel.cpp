@@ -132,7 +132,8 @@ specModel::specModel(QObject *par)
 	  dropSource(0),
 	  dropBuddy(0),
 	  dontDelete(0),
-	  metaModel(0)
+	  metaModel(0),
+	  resetPending(false)
 {
 	root = new specFolderItem ;
 	Descriptors += "" ;
@@ -529,6 +530,7 @@ QVector<int> specModel::hierarchy(const QModelIndex &index)
 void specModel::setDropBuddy(specActionLibrary *buddy)
 {
 	dropBuddy = buddy ;
+	connect(dropBuddy, SIGNAL(stackIndexChanged()), this, SLOT(signalEndReset())) ;
 }
 
 QModelIndex specModel::index(const QVector<int> &ancestry,int column) const
@@ -727,4 +729,17 @@ QValidator* specModel::createValidator(const QModelIndex &i) const
 	if (itemPointer(i)->isNumeric(Descriptors[i.column()]))
 		return new QDoubleValidator ;
 	return 0 ;
+}
+
+void specModel::signalBeginReset()
+{
+	if (resetPending) return ;
+	resetPending = true ;
+	beginResetModel();
+}
+
+void specModel::signalEndReset()
+{
+	resetPending = false ;
+	endResetModel();
 }

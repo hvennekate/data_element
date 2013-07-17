@@ -27,7 +27,6 @@ void specRenameDescriptorCommand::doIt()
 	if (!myModel) return ;
 	myModel->signalBeginReset();
 	myModel->renameDescriptors(map) ;
-	myModel->signalEndReset();
 	QMap<QString, QString> inverted ;
 	foreach(const QString& key, map.keys())
 		inverted[map[key]] = key ;

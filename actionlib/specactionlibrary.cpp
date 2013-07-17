@@ -70,6 +70,7 @@ specActionLibrary::specActionLibrary(QObject *parent) :
 {
 	undoStack = new QUndoStack(this) ; // TODO consider making this a plain variable
 	connect(undoStack,SIGNAL(cleanChanged(bool)),this,SLOT(stackClean(bool))) ;
+	connect(undoStack, SIGNAL(indexChanged(int)), this, SIGNAL(stackIndexChanged())) ;
 	connect(purgeUndoAction,SIGNAL(triggered()),this,SLOT(purgeUndo())) ;
 	purgeUndoAction->setWhatsThis(tr("Deletes the complete undo history -- use with care and don't point this at humans."));
 
