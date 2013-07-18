@@ -610,7 +610,6 @@ void specSpectrumPlot::multipleSubtraction()
 		}
 	}
 
-	subCommand->setParentObject(view->model()) ;
 	subCommand->setText(tr("Subtract reference"));
 	undoPartner()->push(subCommand) ;
 	replot() ;

@@ -184,6 +184,7 @@ void specDescriptorEditAction::execute()
 
 	specMultiCommand *command = new specMultiCommand ;
 	command->setText(tr("Modify column heads")) ;
+	command->setParentObject(model);
 	foreach(const QString& key, toDelete)
 	{
 		specDeleteDescriptorCommand *deleteCommand = new specDeleteDescriptorCommand(command,key) ;
@@ -192,7 +193,6 @@ void specDescriptorEditAction::execute()
 	specRenameDescriptorCommand *renameCommand = new specRenameDescriptorCommand(command) ;
 	renameCommand->setRenamingMap(toExchange) ;
 	renameCommand->setParentObject(model) ;
-	command->setParentObject(model);
 	if (!library)
 	{
 		command->redo();

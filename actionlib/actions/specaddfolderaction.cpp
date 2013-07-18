@@ -22,9 +22,8 @@ specUndoCommand* specAddFolderAction::generateUndoCommand()
 		return 0 ;
 	}
 	specAddFolderCommand *command = new specAddFolderCommand ;
-	command->setItem(newItem) ;
-
-	command->setText(tr("Add folder")) ;
 	command->setParentObject(model) ;
+	command->setItem(newItem) ;
+	command->setText(tr("Add folder")) ;
 	return command ;
 }

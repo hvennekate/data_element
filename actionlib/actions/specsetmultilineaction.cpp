@@ -16,11 +16,11 @@ specUndoCommand *specSetMultilineAction::generateUndoCommand()
 {
 	if (!currentIndex.isValid()) return 0 ;
 	specDescriptorFlagsCommand *command = new specDescriptorFlagsCommand ;
+	command->setParentObject(model) ;
 	QString key = model->descriptors()[currentIndex.column()] ; // TODO function descriptor(int) in specModel
 	foreach(specModelItem* item, pointers)
 		command->addItem(item, key, item->descriptorProperties(key)
 				 ^ spec::multiline) ; // XOR
 	command->setText(tr("Toggle multiline")) ;
-	command->setParentObject(model) ;
 	return command ;
 }

@@ -49,8 +49,8 @@ void specMetaView::rangeModified(specCanvasItem *r, int p, double x, double y)
 {
 	specMetaRange::addressObject address = ((specMetaRange*) r)->address() ;
 	specMetaRangeCommand* command = new specMetaRangeCommand ;
-	command->setItem(address.item, address.variable,address.range, p, x, y) ;
 	command->setParentObject(model()) ;
+	command->setItem(address.item, address.variable,address.range, p, x, y) ;
 	command->setText(tr("Modify range")) ;
 	if (!actionLibrary)
 	{

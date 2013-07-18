@@ -111,9 +111,9 @@ public:
 		}
 
 		specAddFolderCommand *insertTree = new specAddFolderCommand(Command) ;
+		insertTree->setParentObject(model) ;
 		insertTree->setItem(treeRoot);
 		treeRoot = 0 ;
-		insertTree->setParentObject(model) ;
 
 		// move items into the new tree:
 		specMoveCommand *moveCommand = new specMoveCommand(Command) ;
