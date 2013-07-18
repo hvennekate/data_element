@@ -26,7 +26,6 @@ void specDeleteDescriptorCommand::readCommand(QDataStream &in)
 	if (!myModel) return ; \
 	myModel->signalBeginReset(); \
 	code ; \
-	myModel->signalEndReset(); \
 	}
 
 DELETEDESCRIPTORFUNCTIONMACRO(doIt, myModel->deleteDescriptor(key))

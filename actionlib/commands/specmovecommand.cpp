@@ -117,7 +117,6 @@ bool specMoveCommand::prepare()
 
 void specMoveCommand::finish()
 {
-	model->signalEndReset();
 	for (QVector<moveUnit>::iterator i = moveUnits.begin() ; i != moveUnits.end() ; ++i)
 		i->pointersToIndexes(model) ;
 }
