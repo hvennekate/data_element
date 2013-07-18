@@ -24,7 +24,8 @@ private:
 	*alignWithReferenceAction,
 	*addRangeAction,
 	*removeRangeAction,
-	*subInterpolatedAction ;
+	*subInterpolatedAction,
+	*applyRangesAction ;
 	QActionGroup *correctionActions, *alignmentActions ;
 	CanvasPicker *correctionPicker, *alignmentPicker ;
 
@@ -45,7 +46,6 @@ private:
 	QList<specDataItem*> folderContent(specModelItem*) ;
 	moveMode correctionsStatus() const ;
 	void setCorrectionsStatus(moveMode) ;
-
 public:
 	explicit specSpectrumPlot(QWidget *parent = 0);
 	~specSpectrumPlot() ;
@@ -67,6 +67,7 @@ private slots:
 	void alignmentChanged(QAction*) ;
 	void pointMoved(specCanvasItem*,int point, double x, double y) ;
 	void applyZeroRanges(specCanvasItem* range,int point, double x, double y) ;
+	void applyZeroRanges() ;
 	void multipleSubtraction() ;
 	void setReference() ;
 	void toggleAligning(bool on=true) ;

@@ -61,6 +61,7 @@ void specSpectrumPlot::toggleAligning(bool on)
 		manualAlignment = correctionsStatus() ;
 		setCorrectionsStatus(rangeAlignment) ;
 		removeRangeAction->setEnabled(false) ;
+		applyRangesAction->setEnabled(false) ;
 	}
 	else
 	{
@@ -101,9 +102,13 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	alignWithReferenceAction->setChecked(false) ;
 	addRangeAction = new QAction(QIcon(":/addZeroRange.png"),tr("Add aligning range"),alignmentActions) ;
 	removeRangeAction = new QAction(QIcon(":/deleteZeroRange.png"),tr("Delete aligning range"),alignmentActions) ;
+	applyRangesAction = new QAction(QIcon(":/zeroRange.png"), tr("Apply current zero ranges"), alignmentActions) ;
+	applyRangesAction->setShortcut(tr("a"));
 
 	setReferenceAction = new QAction(QIcon(":/data.png"),tr("Set reference"),this) ;
+	setReferenceAction->setShortcut(tr("r"));
 	subInterpolatedAction = new QAction(QIcon(":/multiminus.png"), tr("Subtract Reference"),this) ;
+	subInterpolatedAction->setShortcut(tr("s"));
 
 	correctionActions->setExclusive(false);
 	correctionActions->addAction(offsetAction) ;
@@ -117,6 +122,7 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	//	alignmentActions->addAction(alignWithReferenceAction) ;
 	alignmentActions->addAction(addRangeAction) ;
 	alignmentActions->addAction(removeRangeAction) ;
+	alignmentActions->addAction(applyRangesAction) ;
 
 	connect(correctionActions, SIGNAL(triggered(QAction*)), this, SLOT(correctionsChanged(QAction*))) ;
 	connect(alignWithReferenceAction, SIGNAL(toggled(bool)), shiftAction, SLOT(setDisabled(bool))) ;
@@ -127,6 +133,7 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	connect(setReferenceAction,SIGNAL(triggered()),this,SLOT(setReference())) ;
 	connect(alignWithReferenceAction, SIGNAL(toggled(bool)), this, SLOT(checkReferenceForScaling())) ;
 	connect(setReferenceAction, SIGNAL(triggered()), this, SLOT(checkReferenceForScaling())) ;
+	connect(applyRangesAction, SIGNAL(triggered()), this, SLOT(applyZeroRanges())) ;
 
 	toggleAligning(false) ;
 	rangeAlignment = (Offset | Slope) ;
@@ -141,6 +148,7 @@ specSpectrumPlot::specSpectrumPlot(QWidget *parent) :
 	alignWithReferenceAction->setWhatsThis(tr("Enables aligning selected data sets with the reference defined (or with the x axis if no reference has been set).\nFor aligning, a linear function will be subtracted, unless the correction has been limited to subtracting an offset."));
 	addRangeAction->setWhatsThis(tr("Add a range for alignment.  The alignment correction of data sets selected will be calculated based on the points that lie within at least one of those ranges.")) ;
 	removeRangeAction->setWhatsThis(tr("Delete a range for alignment.  The alignment correction of data sets selected will be calculated based on the points that lie within at least one of those ranges."));
+	applyRangesAction->setWhatsThis(tr("Applies the currently active zero ranges")) ;
 
 	setObjectName("mainPlot");
 }
@@ -234,7 +242,9 @@ void specSpectrumPlot::alignmentChanged(QAction *action)
 	}
 	else if (action == removeRangeAction)
 		alignmentPicker->removeSelected();
-	removeRangeAction->setEnabled(alignmentPicker && alignmentPicker->countSelectable());
+	bool enableRemove = alignmentPicker && alignmentPicker->countSelectable() ;
+	removeRangeAction->setEnabled(enableRemove);
+	applyRangesAction->setEnabled(enableRemove) ;
 }
 
 bool specSpectrumPlot::correctionChecked()
@@ -522,8 +532,15 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(const QwtPlotItem
 void specSpectrumPlot::applyZeroRanges(specCanvasItem* range,int point, double newX, double newY)
 {
 	((specRange*) range)->pointMoved(point,newX,newY) ;
+	applyZeroRanges();
+}
+
+void specSpectrumPlot::applyZeroRanges()
+{
 	QwtPlotItemList zeroRanges = itemList(spec::zeroRange) ;
+	if (zeroRanges.isEmpty()) return ;
 	QwtPlotItemList spectra = itemList(spec::spectrum) ; // TODO roll back previous undo command if it was of the same kind and merge with what is to come.
+	if (spectra.isEmpty()) return ;
 	// prepare map of x and y values
 	QMap<double,double> referenceSpectrum ;
 	if (reference)

@@ -60,5 +60,6 @@
         <file>editDescriptors.png</file>
         <file>styleFit.png</file>
         <file>removeFit.png</file>
+        <file>zeroRange.png</file>
     </qresource>
 </RCC>
