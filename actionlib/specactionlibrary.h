@@ -48,6 +48,7 @@ public slots:
 	void push(specUndoCommand*) ;
 signals:
 	void stackModified(bool) ;
+	void stackIndexChanged() ;
 private slots:
 	void stackClean(const bool&) ;
 	void purgeUndo() ;

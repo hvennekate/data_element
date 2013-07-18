@@ -27,7 +27,6 @@ void specExchangeFitCurveCommand::doIt()
 	curve = pointer->setFitCurve(curve);
 	if (curve) curve->detach();
 	model()->signalChanged(model()->index(itemPointer()));
-	model()->signalEndReset(); // to get the selection right
 }
 
 void specExchangeFitCurveCommand::writeCommand(QDataStream &out) const

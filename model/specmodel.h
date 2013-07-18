@@ -44,6 +44,7 @@ private:
 	QList<specMimeConverter*> mimeConverters() const ;
 	specMetaModel* metaModel ;
 	void checkForNewDescriptors(const QList<specModelItem*>& list, const QModelIndex& parent) ;
+	bool resetPending ;
 public:
 	virtual QStringList dataTypes() const ;
 	specModel(QObject *par = 0) ;
@@ -122,8 +123,7 @@ public:
 	friend QDataStream& operator<<(QDataStream&, specModel&);
 	friend QDataStream& operator>>(QDataStream&, specModel&);
 
-	void signalBeginReset() { beginResetModel() ; } // TODO just emit from whereever this function is called
-	void signalEndReset() { endResetModel() ; } // TODO just emit from whereever this function is called
+	void signalBeginReset() ;
 	void signalChanged(const QModelIndex& index) ;
 	void signalChanged(QModelIndex originalBegin, QModelIndex originalEnd) ;
 	virtual QList<specFileImportFunction> acceptableImportFunctions() const ;
@@ -131,6 +131,8 @@ public:
 	virtual QValidator* createValidator(const QModelIndex&) const ;
 
 	// //TODO
+private slots:
+	void signalEndReset()  ;
 public slots:
 	void svgMoved(specCanvasItem*, int, double, double) ;
 };
