@@ -24,7 +24,7 @@ void specMultipleItemCommand::setItems(QList<specModelItem *> &list)
 	addItems(list) ;
 }
 
-QList<specModelItem*> specMultipleItemCommand::firstItems() const
+QList<specModelItem*> specMultipleItemCommand::firstItems()
 {
 	QList<specModelItem*> l ;
 	for (int i = 0 ; i < items.size() ; ++i)
@@ -32,7 +32,7 @@ QList<specModelItem*> specMultipleItemCommand::firstItems() const
 	return l ;
 }
 
-QList<specModelItem*> specMultipleItemCommand::itemPointers() const
+QList<specModelItem*> specMultipleItemCommand::itemPointers()
 {
 	QList<specModelItem*> l ;
 	for (int i = 0 ; i < items.size() ; ++i)

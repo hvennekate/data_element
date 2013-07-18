@@ -18,10 +18,10 @@ protected:
 	void parentAssigned();
 	qint32 itemCount() const ;
 	QSet<specFolderItem*> parents() const;
-	QList<specModelItem*> itemPointers() const ;
+	QList<specModelItem*> itemPointers() ;
 	void addItems(QList<specModelItem*>&) ;
 	void clearItems() ;
-	QList<specModelItem*> firstItems() const ;
+	QList<specModelItem*> firstItems() ;
 public:
 	specMultipleItemCommand(specUndoCommand* parent = 0) ;
 	virtual void setItems(QList<specModelItem*>&) ;
