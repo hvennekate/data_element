@@ -111,7 +111,7 @@ QString specEditDescriptorCommand::description() const
 
 void specEditDescriptorCommand::generateDescription()
 {
-	setText(QObject::tr("Changed entry in ")
+	setText(QObject::tr("Changed entry in \"")
 				 + descriptor
-				 + QObject::tr(".")) ;
+				 + QObject::tr("\".")) ;
 }

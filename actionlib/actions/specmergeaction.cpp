@@ -233,7 +233,6 @@ specUndoCommand* specMergeAction::generateUndoCommand()
 	dialog->setDescriptors(model->descriptors(), model->descriptorProperties()) ;
 	if (dialog->exec() != QDialog::Accepted) return 0 ;
 	dialog->getMergeCriteria(criteria, spectralAdaptation);
-	if (criteria.isEmpty()) return 0 ;
 	mergeActionThread mat(model, pointers, criteria, spectralAdaptation) ;
 	mat.run();
 	return mat.command() ;
