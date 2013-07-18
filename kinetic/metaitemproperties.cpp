@@ -92,10 +92,11 @@ void metaItemProperties::on_connectedItemsList_itemSelectionChanged()
 	}
 	ui->dataTable->selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
 	refreshPlots();
-	if (!selection.isEmpty())
+	QModelIndexList selectionList = ui->connectedItemsList->selectionModel()->selectedIndexes() ;
+	if (!selectionList.isEmpty())
 	{
-		ui->moveUpButton->setEnabled(selection.indexes().first().row()) ;
-		ui->moveDownButton->setEnabled(selection.indexes().last().row() + 1
+		ui->moveUpButton->setEnabled(selectionList.first().row()) ;
+		ui->moveDownButton->setEnabled(selectionList.last().row() + 1
 									   != ui->connectedItemsList->count());
 		ui->addSelectedConnections->setEnabled(true) ;
 		ui->removeSelectedConnections->setEnabled(true) ;
