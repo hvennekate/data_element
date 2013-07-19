@@ -29,6 +29,8 @@ private:
 
 	typedef QPair<QString,double> variablePair;
 	QList<variablePair> variables ;
+	double confidenceInterval(const QString& v) const ;
+	QString plainVariableName(const QString& v) const ;
 	QVector<double> numericalErrors ;
 	qint16 activeVar ;
 	QStringList fitParameters ;

@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <gsl/gsl_linalg.h>
 #include <gsl/gsl_math.h>
+#include <gsl/gsl_cdf.h>
 
 specFitCurve::fitData::fitData(mu::Parser *p)
 	: parser(p),
@@ -192,9 +193,6 @@ bool specFitCurve::changeDescriptor(QString key, QString value)
 
 	generateParser();
 	setParserConstants();
-	qDebug() << "Data size:" << dataSize() ;
-	for (size_t i  = 0 ; i < qMin((size_t) 10,dataSize()) ; ++i)
-		qDebug() << sample(i) ;
 	refreshPlotData();
 	return true ;
 }
@@ -230,7 +228,7 @@ int specFitCurve::activeLine(const QString& key) const
 
 bool specFitCurve::acceptableVariable(const QString &s)
 {
-	QRegExp re("[A-Za-z][A-Za-z0-9]*") ;
+	QRegExp re("[A-Za-z][A-Za-z0-9]*(/0?.[0-9]+)?") ;
 	return re.exactMatch(s) ;
 }
 
@@ -250,15 +248,16 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	// Set the parser up for fitting
 	foreach (const variablePair& var, variables)
 	{
-		if (fitParameters.contains(var.first))
+		QString name = plainVariableName(var.first) ;
+		if (fitParameters.contains(name))
 		{
-			int index = fitParameters.indexOf(var.first) ;
+			int index = fitParameters.indexOf(name) ;
 			parameters[index] = var.second ;
-			parser->DefineConst(var.first.toStdString(), parameters[index]);
-			variableNames[index] = var.first.toStdString() ;
+			parser->DefineConst(name.toStdString(), parameters[index]);
+			variableNames[index] = name.toStdString() ;
 		}
 		else
-			parser->DefineConst(var.first.toStdString(), var.second);
+			parser->DefineConst(name.toStdString(), var.second);
 	}
 
 	//// Perform the fit
@@ -281,8 +280,11 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 
 	// get the fit parameters back out:
 	for (QList<variablePair>::iterator i = variables.begin() ; i != variables.end() ; ++i)
-		if (fitParameters.contains(i->first))
-			i->second = parameters[fitParameters.indexOf(i->first)] ;
+	{
+		QString name = plainVariableName(i->first) ;
+		if (fitParameters.contains(name))
+			i->second = parameters[fitParameters.indexOf(plainVariableName(name))] ;
+	}
 
 	// compute asymptotic standard error of fit parameters:
 	gsl_set_error_handler_off() ;
@@ -290,11 +292,15 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	if (GSL_EDOM != gsl_linalg_cholesky_decomp(covarianceMatrix))
 	{
 		gsl_linalg_cholesky_invert(covarianceMatrix) ;
-		for(QList<variablePair>::Iterator i = variables.begin() ; i != variables.end() ; ++i)
+		foreach(const variablePair& p, variables)
 		{
-			int j = fitParameters.indexOf(i->first) ;
+			QString name = plainVariableName(p.first) ;
+			double confidence = confidenceInterval(p.first) ;
+			int j = fitParameters.indexOf(name) ;
+			int dof = data->size() - fitParameters.size() ;
 			numericalErrors << (j > -1 ?
-						    sqrt(gsl_matrix_get(covarianceMatrix,j,j)*sumOfSquaredResiduals / (data->size()-fitParameters.size()))
+						    sqrt(gsl_matrix_get(covarianceMatrix,j,j)*sumOfSquaredResiduals / dof) *
+						    ((0 < confidence && 1 > confidence) ? gsl_cdf_tdist_Pinv(confidence, dof) : 1)
 						  : NAN) ;
 		}
 	}
@@ -365,7 +371,7 @@ void specFitCurve::setParserConstants()
 {
 	if (!parser) return ;
 	foreach (const variablePair& var, variables)
-		parser->DefineConst(var.first.toStdString(), var.second) ;
+		parser->DefineConst(plainVariableName(var.first).toStdString(), var.second) ;
 }
 
 void specFitCurve::writeToStream(QDataStream &out) const
@@ -435,7 +441,7 @@ void specFitCurve::generateParser()
 		bool isVariable = false ;
 		foreach(variablePair variable, variables)
 		{
-			if (*i == variable.first)
+			if (*i == plainVariableName(variable.first))
 			{
 				isVariable = true ;
 				break ;
@@ -467,4 +473,14 @@ spec::descriptorFlags specFitCurve::descriptorProperties(const QString &key) con
 	if (key == QObject::tr("Fit expression") && expressionMulti) flags |= spec::multiline ;
 	if (key == QObject::tr("Fit messages") && messagesMulti) flags |= spec::multiline ;
 	return flags ;
+}
+
+double specFitCurve::confidenceInterval(const QString &v) const
+{
+	return v.section("/",1,1).toDouble() ;
+}
+
+QString specFitCurve::plainVariableName(const QString &v) const
+{
+	return v.section("/",0,0) ;
 }
