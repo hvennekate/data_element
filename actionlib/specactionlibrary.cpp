@@ -165,6 +165,7 @@ QToolBar* specActionLibrary::toolBar(QWidget *target)
 			addNewAction(bar, new specNormalizeAction(target)) ;
 		}
 		addNewAction(bar, new specItemPropertiesAction(target)) ;
+		addNewAction(bar, new specSetMultilineAction(target)) ;
 		if (metaView)
 		{
 			addNewAction(bar, new specAddConnectionsAction(target)) ;

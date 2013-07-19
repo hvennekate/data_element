@@ -114,12 +114,12 @@ void specViewState::restoreState()
 	for (int i = 0 ; i < widths.size() ; ++i)
 		parent->setColumnWidth(i,widths[i]) ;
 
-	// restore selection
-	parent->selectionModel()->select(pointersToSelection(selectedItems,model()),QItemSelectionModel::Select) ;
-
 	// restore current index
 	if (currentItem)
 		parent->selectionModel()->setCurrentIndex(model()->index(currentItem),QItemSelectionModel::Current) ;
+
+	// restore selection
+	parent->selectionModel()->select(pointersToSelection(selectedItems,model()),QItemSelectionModel::Select) ;
 
 	// restore expanded folders
 	parent->collapseAll();
