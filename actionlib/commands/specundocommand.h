@@ -25,7 +25,7 @@ public:
 	void redo() ;
 	void undo() ;
 
-	virtual bool mergeable(const specUndoCommand* other) { Q_UNUSED(other) ; return true ; }
+	virtual bool mergeable(const specUndoCommand* other) { Q_UNUSED(other) ; return false ; }
 	void setParentObject(QObject*) ; // consider making virtual
 	int id() const { return typeId() ; }
 	QObject *parentObject() const ;
