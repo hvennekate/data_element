@@ -18,7 +18,8 @@ specLogWidget::specLogWidget(QWidget *parent)
 	new specMimeFileImporter(logView->model()) ;
 	new specMimeTextExporter(logView->model()) ;
 	setWhatsThis(tr("This dock window contains log data."));
-	setObjectName("logWidget");
+	setObjectName(tr("Log window")) ;
+	toggleViewAction()->setText(tr("Toggle log window")) ;
 }
 
 void specLogWidget::writeToStream(QDataStream &out) const

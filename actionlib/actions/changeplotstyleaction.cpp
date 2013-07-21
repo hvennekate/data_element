@@ -52,12 +52,29 @@ changePlotStyleAction::changePlotStyleAction(QObject *parent) :
 	painter.drawEllipse(3*l,3*l,l,l);
 	QPixmap customPixmap(icon) ;
 
-	for(int i = -1 ; i < QwtSymbol::Hexagon ; ++i)
+	QStringList symbolNames ;
+	symbolNames << "No symbol"
+		    << "Circle"
+		    << "Square"
+		    << "Diamond"
+		    << "Triangle"
+		    << "Inverted triangle"
+		    << "Up triangle"
+		    << "Left triangle"
+		    << "Right triangle"
+		    << "Cross"
+		    << "XCross"
+		    << "Horizontal line"
+		    << "Vertical line"
+		    << "Star 1"
+		    << "Star 2"
+		    << "Hexagon" ;
+	for(int i = -1 ; i < QwtSymbol::Hexagon+1 ; ++i)
 	{
 		symbol.setStyle(QwtSymbol::Style(i)) ;
 		icon.fill(Qt::white); // change to transparent
 		symbol.drawSymbol(&painter,QPointF(iconSize.width()/2.,iconSize.height()/2.)) ;
-		QAction *newSymbolAction = new QAction(icon,"",this) ;
+		QAction *newSymbolAction = new QAction(icon,symbolNames[i+1],this) ;
 		symbolActions << newSymbolAction ;
 	}
 
@@ -72,20 +89,20 @@ changePlotStyleAction::changePlotStyleAction(QObject *parent) :
 		symbolOuterColorActions << new QAction(icon,"",this) ;
 	}
 
-	lineWidthActions << new QAction(customPixmap,"",this) ;
-	symbolSizeActions << new QAction(customPixmap,"",this) ;
+	lineWidthActions << new QAction(customPixmap,"Custom line width...",this) ;
+	symbolSizeActions << new QAction(customPixmap,"Custom symbol size...",this) ;
 	for (QVector<double>::iterator i = sizes.begin() ; i != sizes.end() ; ++i)
 	{
-		lineWidthActions << new QAction(QString::number(*i),this) ;
-		symbolSizeActions << new QAction(QString::number(*i),this) ;
+		lineWidthActions << new QAction("Line width " + QString::number(*i),this) ;
+		symbolSizeActions << new QAction("Symbol size " + QString::number(*i),this) ;
 	}
 
-	penStyleActions << new QAction("None",this) <<
-			   new QAction("Solid", this) <<
-			   new QAction("Dashed", this) <<
-			   new QAction("Dotted", this) <<
-			   new QAction("Dash-dotted", this) <<
-			   new QAction("Dash-dot-dotted", this) ;
+	penStyleActions << new QAction("No line",this) <<
+			   new QAction("Solid line", this) <<
+			   new QAction("Dashed line", this) <<
+			   new QAction("Dotted line", this) <<
+			   new QAction("Dash-dotted line", this) <<
+			   new QAction("Dash-dot-dotted line", this) ;
 
 	symbolMenu->addActions(symbolActions.toList());
 	lineColorMenu->addActions(lineColorActions.toList()) ;

@@ -166,7 +166,7 @@ void specPlot::autoScale(const QwtPlotItemList& allItems)
 		{
 			if ((pointer = dynamic_cast<specModelItem*>(item)))
 				pointer->revalidate() ;
-			if (item->boundingRect().isValid())
+			if (item->boundingRect().isValid()) // TODO scale axes independently
 				boundaries |= item->boundingRect() ;
 		}
 		if (specMetaRange* r = dynamic_cast<specMetaRange*>(item))

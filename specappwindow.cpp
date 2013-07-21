@@ -1,5 +1,6 @@
 #include "specappwindow.h"
 #include <QFile>
+#include "specshortcutdialog.h"
 
 specAppWindow::specAppWindow()
 	: QMainWindow(), settings()
@@ -13,7 +14,7 @@ specAppWindow::specAppWindow()
 	restoreGeometry(settings.value("mainWindow/geometry").toByteArray()) ;
 	setCentralWidget(0);
 
-	setObjectName("specDataElementApplicationWindow") ;
+	setObjectName("Application window") ;
 	setWindowTitle("SpecDataElement");
 	setWindowFlags(windowFlags() | Qt::WindowContextHelpButtonHint);
 
@@ -94,10 +95,18 @@ void specAppWindow::createActions()
 	restoreSessionAction->setCheckable(true) ;
 	restoreSessionAction->setChecked(settings.value("mainWindow/sessionRestoration",false).toBool()) ;
 
+	shortCutAction = new QAction(QIcon::fromTheme("input-keyboard"), tr("Shortcuts..."), this) ;
+	connect(shortCutAction, SIGNAL(triggered()), this, SLOT(editShortcuts())) ;
 
 	whatsThisAction = new QAction(QIcon::fromTheme("help-contextual"), tr("&What's this"), this) ;
 	whatsThisAction->setStatusTip(tr("What's this?")) ;
 	connect(whatsThisAction, SIGNAL(triggered()), this, SLOT(whatsThisMode())) ;
+}
+
+void specAppWindow::editShortcuts()
+{
+	specShortcutDialog* shortcutDialog = new specShortcutDialog(this) ;
+	shortcutDialog->show();
 }
 
 void specAppWindow::whatsThisMode()
@@ -110,6 +119,7 @@ void specAppWindow::createToolBars()
 	fileToolBar = addToolBar(tr("File"));
 	fileToolBar->addAction(newAction);
 	fileToolBar->addAction(openAction);
+	fileToolBar->addAction(shortCutAction) ;
 	fileToolBar->addAction(restoreSessionAction) ;
 	fileToolBar->addAction(whatsThisAction) ;
 }
@@ -119,6 +129,7 @@ void specAppWindow::createMenus()
 	fileMenu = menuBar()->addMenu(tr("&File"));
 	fileMenu->addAction(newAction);
 	fileMenu->addAction(openAction);
+	fileMenu->addAction(shortCutAction) ;
 	fileMenu->addAction(restoreSessionAction) ;
 
 	helpMenu = menuBar()->addMenu(tr("&Help")) ;

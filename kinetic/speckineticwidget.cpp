@@ -28,7 +28,8 @@ specKineticWidget::specKineticWidget(QWidget *parent)
 
 	connect(plot->svgAction(),SIGNAL(toggled(bool)),this,SLOT(svgModification(bool))) ;
 	svgModification(false) ;
-	setObjectName("metaWidget") ;
+	setObjectName(tr("Meta window")) ;
+	toggleViewAction()->setText(tr("Toggle meta window"));
 	plot->setObjectName("metaPlot");
 }
 

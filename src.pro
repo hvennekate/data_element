@@ -131,7 +131,8 @@ SOURCES += main.cpp \
     actionlib/actions/specconnectionsaction.cpp \
     model/textedit.cpp \
     actionlib/commands/specsingleitemcommand.cpp \
-    actionlib/commands/specmultipleitemcommand.cpp
+    actionlib/commands/specmultipleitemcommand.cpp \
+    specshortcutdialog.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -264,7 +265,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/specconnectionsaction.h \
     model/textedit.h \
     actionlib/commands/specsingleitemcommand.h \
-    actionlib/commands/specmultipleitemcommand.h
+    actionlib/commands/specmultipleitemcommand.h \
+    specshortcutdialog.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -324,7 +326,8 @@ FORMS += \
     actionlib/actions/spectrumcalculatordialog.ui \
     actionlib/actions/specnormalizeactiondialog.ui \
     actionlib/actions/specmergedialog.ui \
-    actionlib/actions/averagedialog.ui
+    actionlib/actions/averagedialog.ui \
+    specshortcutdialog.ui
 
 OTHER_FILES += icons/oxygen/index.theme \
     icons/oxygen/geticons.py

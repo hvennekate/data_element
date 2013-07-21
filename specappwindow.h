@@ -36,9 +36,11 @@ private:
 	QAction *openAction;
 	QAction *whatsThisAction ;
 	QAction *restoreSessionAction ;
+	QAction *shortCutAction ;
 private slots:
 	void about() ;
 	void whatsThisMode() ;
+	void editShortcuts() ;
 };
 
 #endif

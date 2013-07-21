@@ -59,6 +59,8 @@ specHistoryWidget::specHistoryWidget(QUndoStack* stack, QWidget *parent)
 	setWhatsThis("Undo history.  Click on any command to forward/rewind to that particular state.");
 	toggleViewAction()->setIcon(QIcon(":/undoView.png")) ;
 	toggleViewAction()->setWhatsThis(tr("Shows and hides the undo history."));
+	setObjectName(tr("History window"));
+	toggleViewAction()->setText(tr("Toggle undo window"));
 	setupWindow(0);
 }
 
@@ -74,7 +76,7 @@ specActionLibrary::specActionLibrary(QObject *parent) :
 	connect(purgeUndoAction,SIGNAL(triggered()),this,SLOT(purgeUndo())) ;
 	purgeUndoAction->setWhatsThis(tr("Deletes the complete undo history -- use with care and don't point this at humans."));
 
-	dockWidget = new specHistoryWidget(undoStack,qobject_cast<QWidget*>(parent ? parent->parent() :0)) ;
+	dockWidget = new specHistoryWidget(undoStack, qobject_cast<QWidget*>(parent ? parent->parent() :0)) ;
 }
 
 void specActionLibrary::stackClean(const bool &b) // This is due to the stack being clean

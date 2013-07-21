@@ -63,7 +63,8 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	subDocks << logWidget << kineticWidget << undoViewWidget ;
 
 	changeEvent(new QEvent(QEvent::WindowTitleChange));
-	setObjectName("mainWidget");
+	setObjectName(tr("Main window"));
+	toggleViewAction()->setText(tr("Close file"));
 }
 
 void specPlotWidget::read(QString fileName)
