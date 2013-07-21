@@ -38,7 +38,7 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	  logAction(logWidget->toggleViewAction()),
 	  undoViewWidget(actions->undoWidget())
 {
-
+	setVisible(true) ;
 	items->setModel(new specModel(items)); // TODO redundant!  durchschleifen!
 	plot->setView(items) ;
 

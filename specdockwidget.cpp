@@ -17,6 +17,7 @@ specDockWidget::specDockWidget(QString type, QWidget *parent, bool floating) :
 	changingTitle(false)
 {
 	setFloating(floating);
+	setVisible(false) ;
 }
 
 void specDockWidget::setupWindow(specActionLibrary *actions)
