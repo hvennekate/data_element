@@ -157,29 +157,63 @@ void specPlot::autoScale(const QwtPlotItemList& allItems)
 	if (!autoScaling) return ;
 	QRectF boundaries, zoomBase = zoom->zoomBase() ;
 	specModelItem *pointer = 0 ; // TODO find a more concise version.
+	bool firstItem = true ;
 	foreach(QwtPlotItem *item, allItems)
 	{
 		if(!(dynamic_cast<specSVGItem*>(item))
-				&& !(dynamic_cast<specRange*>(item))
+//				&& !(dynamic_cast<specRange*>(item))
 				&& !(dynamic_cast<QwtPlotSvgItem*>(item))
-				&& !(dynamic_cast<specFitCurve*>(item)))
+				&& !(dynamic_cast<specFitCurve*>(item))
+				&& item != zeroLine)
 		{
 			if ((pointer = dynamic_cast<specModelItem*>(item)))
 				pointer->revalidate() ;
-			if (item->boundingRect().isValid()) // TODO scale axes independently
-				boundaries |= item->boundingRect() ;
+			QRectF br = item->boundingRect() ;
+			if (br.isValid() || br.width() || br.height()) // TODO scale axes independently
+				boundaries |= br ;
+			else
+			{
+				QPointF p = br.topLeft() ;
+				if(!boundaries.contains(br))
+				{
+					if (firstItem)
+						boundaries.moveTopLeft(p) ;
+					else
+					{
+						if (p.y() > boundaries.bottom()) boundaries.setBottom(p.y()) ;
+						else if (p.y() < boundaries.top()) boundaries.setTop(p.y()) ;
+						if (p.x() < boundaries.left()) boundaries.setLeft(p.x()) ;
+						else if (p.x() > boundaries.right()) boundaries.setRight(p.x()) ;
+					}
+				}
+			}
+			firstItem = false ;
 		}
-		if (specMetaRange* r = dynamic_cast<specMetaRange*>(item))
-		{
-			boundaries.setLeft(qMin(boundaries.left(),r->minValue()));
-			boundaries.setRight(qMax(boundaries.right(), r->maxValue()));
-		}
+//		if (specMetaRange* r = dynamic_cast<specMetaRange*>(item))
+//		{
+//			boundaries.setLeft(qMin(boundaries.left(),r->minValue()));
+//			boundaries.setRight(qMax(boundaries.right(), r->maxValue()));
+//		}
 	}
 
 	boundaries = boundaries.normalized() ;
-	boundaries.translate(-.05*boundaries.width(),-.05*boundaries.height()) ;
-	boundaries.setWidth(1.1*boundaries.width());
-	boundaries.setHeight(1.1*boundaries.height());
+	if (!boundaries.width())
+	{
+		boundaries.moveLeft(boundaries.left()-5./1.1);
+		boundaries.setWidth(10) ;
+	}
+	else
+		boundaries.setWidth(1.1*boundaries.width());
+
+	if (!boundaries.height())
+	{
+		boundaries.moveTop(boundaries.top()-5./1.1) ;
+		boundaries.setHeight(10) ;
+	}
+	else
+		boundaries.setHeight(1.1*boundaries.height()) ;
+
+	boundaries.translate(-.05/1.1*boundaries.width(),-.05/1.1*boundaries.height()) ;
 	if (fixXAxisAction->isChecked())
 	{
 		boundaries.setLeft(zoomBase.left()) ;
@@ -191,16 +225,16 @@ void specPlot::autoScale(const QwtPlotItemList& allItems)
 		boundaries.setBottom(zoomBase.bottom()) ;
 	}
 
-	if (boundaries.width() <= 0)
-	{
-		boundaries.setLeft(-10);
-		boundaries.setWidth(20) ;
-	}
-	if (boundaries.height() <= 0)
-	{
-		boundaries.setTop(-10);
-		boundaries.setHeight(20);
-	}
+//	if (boundaries.width() <= 0)
+//	{
+//		boundaries.setLeft(-10);
+//		boundaries.setWidth(20) ;
+//	}
+//	if (boundaries.height() <= 0)
+//	{
+//		boundaries.setTop(-10);
+//		boundaries.setHeight(20);
+//	}
 	zoom->changeZoomBase(boundaries) ;
 }
 
