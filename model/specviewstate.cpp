@@ -71,6 +71,7 @@ void specViewState::getState(const specView* view)
 	hierarchyOfCurrentItem = model->hierarchy(currentItem) ;
 
 	currentTopItem = model->itemPointer(view->indexAt(QPoint(0,0))) ;
+	qDebug() << view->visualRect(view->indexAt(QPoint(0,0))) ;
 	hierarchyOfTopItem = model->hierarchy(currentTopItem) ;
 }
 
@@ -128,7 +129,7 @@ void specViewState::restoreState()
 
 	//scroll to topmost item
 	if (currentTopItem)
-		parent->scrollTo(model()->index(currentTopItem),QAbstractItemView::PositionAtTop) ;
+		parent->scrollTo(model()->index(currentTopItem),specView::PositionAtTop) ;
 }
 
 void specViewState::writeToStream(QDataStream &out) const

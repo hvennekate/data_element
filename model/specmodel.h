@@ -19,9 +19,6 @@ class QValidator ;
 QDataStream& operator<<(QDataStream&, specModel&);
 QDataStream& operator>>(QDataStream& in, specModel& model) ;
 
-
-class specView ;
-
 class specModel : public QAbstractItemModel, public specStreamable
 {
 	Q_OBJECT
@@ -35,7 +32,6 @@ private:
 	QModelIndexList allChildren(const QModelIndex&) const ;
 	QMap<double,double> subMap ;
 	bool internalDrop ;
-	specView* dropSource ;
 	specActionLibrary* dropBuddy ;
 	int dontDelete ;
 	void writeToStream(QDataStream &out) const ;
@@ -113,7 +109,6 @@ public:
 
 	// 	// Drag and drop:
 	void setInternalDrop(bool) ;
-	void setDropSource(specView*) ;
 	void setDropBuddy(specActionLibrary*) ;
 	Qt::DropActions supportedDropActions() const ;
 	QMimeData *mimeData(const QModelIndexList &) const;

@@ -134,9 +134,11 @@ specView::~specView()
 
 void specView::dropEvent(QDropEvent *event)
 {
-	model()->setInternalDrop((event->source() == this && event->proposedAction() == Qt::MoveAction)) ;
-	model()->setDropSource(this) ;
-
+	bool internalMove = event->source() == this && event->proposedAction() == Qt::MoveAction ;
+	model()->setInternalDrop(internalMove) ;
+	if (internalMove) // for some reason, we can't find out the topmost item in viewState if moving internally
+		// moving externally and copying via drag'n'drop internally works fine...
+		state = new specViewState(this) ;
 	QTreeView::dropEvent(event) ;
 }
 
@@ -159,8 +161,8 @@ void specView::readFromStream(QDataStream &in)
 
 void specView::prepareReset()
 {
-	state = new specViewState(this) ;
-	state->getState();
+	if (!state)
+		state = new specViewState(this) ;
 }
 
 void specView::resetDone()

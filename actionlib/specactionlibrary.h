@@ -36,7 +36,7 @@ public:
 	QObject* parentId(int) ;
 	void addDragDropPartner(specModel*) ;
 	void setLastRequested(const QModelIndexList&) ;
-	int moveInternally(const QModelIndex&, int row, specView*) ;
+	int moveInternally(const QModelIndex&, int row, specModel *) ;
 	int deleteInternally(specModel*) ;
 	void addPlot(specPlot*) ;
 	QAction* undoAction(QObject*) ;

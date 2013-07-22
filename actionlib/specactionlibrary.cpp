@@ -313,11 +313,11 @@ void specActionLibrary::setLastRequested(const QModelIndexList &list)
 	lastRequested = list ;
 }
 
-int specActionLibrary::moveInternally(const QModelIndex &parent, int row, specView* target)
+int specActionLibrary::moveInternally(const QModelIndex &parent, int row, specModel* target)
 {
 	int count = lastRequested.size() ;
 	specMoveCommand *command = new specMoveCommand ;
-	command->setParentObject(target->model());
+	command->setParentObject(target);
 	command->setItems(lastRequested,parent,row) ;
 	command->setText(tr("Move items"));
 	push(command) ;

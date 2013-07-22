@@ -129,7 +129,6 @@ specModelItem* specModel::itemPointer(const QModelIndex& index) const
 specModel::specModel(QObject *par)
 	: QAbstractItemModel(par),
 	  internalDrop(false),
-	  dropSource(0),
 	  dropBuddy(0),
 	  dontDelete(0),
 	  metaModel(0),
@@ -438,11 +437,10 @@ bool specModel::dropMimeData(const QMimeData *data,
 		return true;
 
 	row = (row != -1 ? row : rowCount(parent) );
-	if (internalDrop && dropBuddy && dropSource)
+	if (internalDrop && dropBuddy)
 	{
-		dontDelete = dropBuddy->moveInternally(parent,row,dropSource) ;
+		dontDelete = dropBuddy->moveInternally(parent,row,this) ;
 		internalDrop = false ;
-		dropSource = 0 ;
 		return true ;
 	}
 
@@ -460,7 +458,7 @@ bool specModel::dropMimeData(const QMimeData *data,
 	if (!newItems.isEmpty())
 	{
 		insertItems(newItems,parent,row) ;
-		if (dropBuddy && dropSource)
+		if (dropBuddy)
 		{
 			specAddFolderCommand *command = new specAddFolderCommand ;
 			command->setParentObject(this) ;
@@ -469,7 +467,6 @@ bool specModel::dropMimeData(const QMimeData *data,
 			dropBuddy->push(command);
 		}
 	}
-	dropSource = 0 ;
 	return true ;
 }
 
@@ -571,11 +568,6 @@ QModelIndexList specModel::indexList(const QList<specModelItem *>& pointers) con
 	for (int i = 0 ; i < pointers.size() ; ++i)
 		returnList << index(pointers[i]) ;
 	return returnList ;
-}
-
-void specModel::setDropSource(specView *view)
-{
-	dropSource = view ;
 }
 
 void specModel::svgMoved(specCanvasItem *i, int point, double x, double y)
