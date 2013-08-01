@@ -44,7 +44,7 @@ private:
 	*legendAction ;
 	CanvasPicker *MetaPicker, *SVGpicker ; // TODO make pickers more prominent: accessible through
 	// function, attach metaRanges direktly to picker etc.
-	QwtPlotMarker *zeroLine ;
+	QwtPlotMarker *zeroYLine, *zeroXLine ;
 	bool autoScaling ;
 	void readFromStream(QDataStream &in);
 	void writeToStream(QDataStream &out) const ;
@@ -54,6 +54,7 @@ private:
 	void autoScale(const QwtPlotItemList& allItems) ;
 	void mouseDoubleClickEvent(QMouseEvent *e) ;
 	plotAxisEdit xminEdit, xmaxEdit, yminEdit, ymaxEdit ;
+	QwtPlotMarker* initializeZeroLine() ;
 private slots:
 	void setPlotAxis() ;
 	void showLegend(bool) ;

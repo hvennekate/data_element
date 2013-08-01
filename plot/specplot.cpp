@@ -18,12 +18,21 @@
 
 // TODO solve the myth of autoscaleaxis...
 
+QwtPlotMarker* specPlot::initializeZeroLine()
+{
+	QwtPlotMarker* zeroLine = new QwtPlotMarker ;
+	zeroLine->setLinePen(QPen(Qt::DotLine)) ;
+	zeroLine->attach(this) ;
+	return zeroLine ;
+}
+
 specPlot::specPlot(QWidget *parent)
 	: QwtPlot(parent),
 	  replotting(false),
 	  MetaPicker(0),
 	  SVGpicker(0),
-	  zeroLine(0),
+	  zeroYLine(0),
+	  zeroXLine(0),
 	  autoScaling(true),
 	  undoP(0),
 	  xminEdit(this),
@@ -33,10 +42,10 @@ specPlot::specPlot(QWidget *parent)
 	  view(0)
 {
 	setAutoDelete(false);
-	zeroLine = new QwtPlotMarker ;
-	zeroLine->setLineStyle(QwtPlotMarker::HLine);
-	zeroLine->setLinePen(QPen(Qt::DotLine));
-	zeroLine->attach(this);
+	zeroYLine = initializeZeroLine() ;
+	zeroYLine->setLineStyle(QwtPlotMarker::HLine);
+	zeroXLine = initializeZeroLine() ;
+	zeroXLine->setLineStyle(QwtPlotMarker::VLine);
 
 	MetaPicker = new CanvasPicker(this) ;
 	SVGpicker  = new CanvasPicker(this) ;
@@ -164,7 +173,8 @@ void specPlot::autoScale(const QwtPlotItemList& allItems)
 //				&& !(dynamic_cast<specRange*>(item))
 				&& !(dynamic_cast<QwtPlotSvgItem*>(item))
 				&& !(dynamic_cast<specFitCurve*>(item))
-				&& item != zeroLine)
+				&& item != zeroYLine
+				&& item != zeroXLine)
 		{
 			if ((pointer = dynamic_cast<specModelItem*>(item)))
 				pointer->revalidate() ;
@@ -240,7 +250,8 @@ void specPlot::autoScale(const QwtPlotItemList& allItems)
 
 specPlot::~specPlot()
 {
-	delete zeroLine ;
+	delete zeroYLine ;
+	delete zeroXLine ;
 	MetaPicker->purgeSelectable();
 	SVGpicker->purgeSelectable();
 }
