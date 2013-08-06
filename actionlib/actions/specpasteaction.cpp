@@ -2,7 +2,7 @@
 #include "specview.h"
 #include "specgenealogy.h"
 #include "specaddfoldercommand.h"
-
+#include <QMessageBox>
 #include <QApplication>
 #include <QClipboard>
 
@@ -33,14 +33,7 @@ specUndoCommand* specPasteAction::generateUndoCommand()
 	specFolderItem* parentFolder = dynamic_cast<specFolderItem*>(model->itemPointer(insertionIndex)) ;
 	if (!parentFolder) return 0 ;
 	QList<specModelItem*> oldChildren = parentFolder->childrenList() ;
-	if (!model->dropMimeData(QApplication::clipboard()->mimeData(),Qt::CopyAction,insertionRow,0,insertionIndex)) return 0 ;
-	QList<specModelItem*> insertedItems ;
-	foreach(specModelItem* item, parentFolder->childrenList())
-		if(!oldChildren.contains(item))
-			insertedItems << item ;
-	specAddFolderCommand *command = new specAddFolderCommand ;
-	command->setParentObject(model) ;
-	command->setItems(insertedItems) ;
-	command->setText(tr("Paste items")) ;
-	return command ;
+	if (!model->dropMimeData(QApplication::clipboard()->mimeData(),Qt::CopyAction,insertionRow,0,insertionIndex))
+		QMessageBox::critical(0,tr("Paste error"), tr("Could not paste correctly."));
+	return 0 ;
 }
