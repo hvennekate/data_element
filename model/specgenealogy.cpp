@@ -220,3 +220,12 @@ void specGenealogy::signalChange() const
 	if (owning) return ;
 	Model->signalChanged(Model->index(Items.first()), Model->index(Items.last(), Model->descriptors().size()-1));
 }
+
+QTextStream& operator<<(QTextStream& out, const specGenealogy& g)
+{
+	QString result = "Genealogy ";
+	foreach(const int& i, g.indexes)
+		result += QString::number(i) + "/" ;
+	result += " size: " + QString::number(g.Items.size()) ;
+	return out << result ;
+}

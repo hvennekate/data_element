@@ -7,6 +7,7 @@
 
 class specGenealogy : public specStreamable
 {
+	friend QTextStream& operator<<(QTextStream& out, const specGenealogy& g) ;
 private:
 	specModel* Model ;
 	QVector<int> indexes ;
@@ -44,5 +45,7 @@ public:
 	specGenealogy& operator=(specGenealogy& other) ;
 	specGenealogy& operator=(const specGenealogy& other) ;
 };
+
+QTextStream& operator<<(QTextStream& out, const specGenealogy& g) ;
 
 #endif // SPECGENEALOGY_H
