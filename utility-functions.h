@@ -75,4 +75,15 @@ inline void averageToNew(forwardIterator begin, forwardIterator end,
 //		*target++ = average(begin, end) ;
 //}
 
+inline bool doubleComparison(const double& a, const double& b)
+{
+	// this is an evil hack to overcome double precision's limitations...
+#ifdef DOUBLEDEVIATIONCORRECTION
+	return fabs(a - b) <=
+			(1./(1L << (NUMBEROFFRACTIONBITSINDOUBLE-ilogb(a)))) ;
+#else
+	return a == b ;
+#endif
+}
+
 #endif

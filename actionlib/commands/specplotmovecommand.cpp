@@ -30,10 +30,10 @@ bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
 {
 	if (!parentObject()) return false ;
 	const specPlotMoveCommand *other = (const specPlotMoveCommand*) ot ;
-	if (! (this->itemPointer() && other->itemPointer())) return false ;
-	if (isnan(other->scale) || isnan(scale)) return false ;
-	slope += other->slope * scale ;
-	offset+= other->offset * scale - other->slope * scale * shift ;
+	if (!mergeable(other)) return false ;
+	if (!isfinite(other->scale) || !isfinite(scale)) return false ;
+	slope = slope  * other->scale + other->slope ;
+	offset= offset * other->scale + other->offset ;
 	scale *= other->scale ;
 	shift += other->shift ;
 	generateDescription();
@@ -42,10 +42,10 @@ bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
 
 void specPlotMoveCommand::setCorrections(double xShift, double yOffset, double ySlope, double yScale)
 {
-	slope = ySlope ;
-	offset = yOffset ;
-	shift = xShift ;
-	scale = yScale ;
+	slope = isfinite(ySlope) ? ySlope : 0. ;
+	offset = isfinite(yOffset) ? yOffset : 0. ;
+	shift = isfinite(xShift) ? xShift : 0. ;
+	scale = isnormal(yScale) ? yScale : 1. ;
 	generateDescription();
 }
 

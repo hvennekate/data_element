@@ -150,13 +150,7 @@ specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 
 bool compareDataPoints(const specDataPoint& a, const specDataPoint& b)
 {
-	// this is an evil hack to overcome double precision's limitations...
-#ifdef DOUBLEDEVIATIONCORRECTION
-	return fabs(a.nu - b.nu) <=
-			(1./(1L << (NUMBEROFFRACTIONBITSINDOUBLE-ilogb(a.nu)))) ;
-#else
 	return a == b ;
-#endif
 }
 
 void specDataItem::flatten()

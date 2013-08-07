@@ -1,5 +1,6 @@
 #include "specdatapoint.h"
 #include <QTextStream>
+#include "utility-functions.h"
 
 QDataStream& operator<<(QDataStream& out, const specDataPoint& point)
 { out << point.nu << point.sig << point.mint ; return out ;}
@@ -17,7 +18,7 @@ bool specDataPoint::operator<(const specDataPoint& toCompare) const
 
 bool specDataPoint::operator==(const specDataPoint& toCompare) const
 {
-	return toCompare.nu == nu ;
+	return doubleComparison(toCompare.nu, nu) ;
 }
 
 bool specDataPoint::operator!=(const specDataPoint& toCompare) const

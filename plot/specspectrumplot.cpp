@@ -18,6 +18,7 @@ unsigned int qHash(const double& d)
 #include "specplotmovecommand.h"
 #include "specactionlibrary.h"
 #include "specexchangedatacommand.h"
+#include "QMessageBox"
 
 specSpectrumPlot::moveMode specSpectrumPlot::correctionsStatus() const
 {
@@ -310,8 +311,15 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 	if (!undoPartner()) return ;
 
 	// collect correction parameters
+	QString failedCorrections ;
+#define CHECKCORRECTIONPARAMETER(PARAMETER,SPECIALCONDITION,PHRASE,DEFAULT,ACTION) \
+		if(!isfinite(PARAMETER) SPECIALCONDITION) { \
+			failedCorrections += tr(PHRASE) + ":\t" + QString::number(PARAMETER) + "\n"; \
+			PARAMETER = DEFAULT ; \
+			ACTION->setChecked(false) ; }
 	// x shift:
 	double shift = shiftAction->isChecked() ? x-item->sample(no).x() : 0 ;
+	CHECKCORRECTIONPARAMETER(shift, , "x shift", 0., shiftAction)
 
 	// compute other corrections:
 	// TODO rewrite code for GSL
@@ -346,10 +354,19 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 		coeffs = gaussjinv(matrix,yVals) ;
 
 		int i = 0 ; // TODO make offset and offline supersede scale
-		scale = scaleAction->isChecked() && i < coeffs.size() ? coeffs[i++] : 1. ,
-				offset= offsetAction->isChecked()&& i < coeffs.size() ? coeffs[i++] : 0. ,
-				offline=offlineAction->isChecked()&& i < coeffs.size() ? coeffs[i++] : 0. ;
+		scale = scaleAction->isChecked() && i < coeffs.size() ? coeffs[i++] : 1. ;
+		offset= offsetAction->isChecked()&& i < coeffs.size() ? coeffs[i++] : 0. ;
+		offline=offlineAction->isChecked()&& i < coeffs.size() ? coeffs[i++] : 0. ;
+
+		CHECKCORRECTIONPARAMETER(scale, || !isnormal(scale), "scaling", 1., scaleAction)
+		CHECKCORRECTIONPARAMETER(offset, , "offset", 0, offsetAction)
+		CHECKCORRECTIONPARAMETER(offline, ,"slope", 0, offlineAction)
 	}
+	if (!failedCorrections.isEmpty())
+		QMessageBox::critical(0, tr("Aligning error"),
+				      tr("The following required alignment parameters were illegal:\n")
+				      + failedCorrections
+				      + tr("The parameters were disabled.")) ;
 	specPlotMoveCommand *command = new specPlotMoveCommand ;
 	command->setParentObject(view->model()) ;
 	command->setItem(modelItem) ;
