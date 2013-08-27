@@ -141,10 +141,6 @@ public:
 							}
 							if (overlappingCount == 2)
 							{
-								QwtPlotItemList spectra ;
-								for (QList<specModelItem*>::iterator i = toMergeWith.begin() ; i != toMergeWith.end() ; ++i)
-									spectra << (QwtPlotItem*) *i ;
-
 								// perform spectral adaptation
 								// TODO NAN protection
 								specMultiCommand *correctionCommand= specSpectrumPlot::generateCorrectionCommand(ranges, QwtPlotItemList() << (QwtPlotItem*) other, reference, model, true, true) ;
