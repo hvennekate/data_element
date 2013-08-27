@@ -11,7 +11,7 @@ void tst_specMetaVariable::init()
 
 	QVector<specDataPoint> data ;
 	for (int i = 1500 ; i < 2000 ; i += 30)
-		data << specDataPoint(42, i, i/10, 1000) ;
+		data << specDataPoint(i, i/10, 1000) ;
 
 	testItem = new specDataItem(data, description) ;
 }
@@ -23,19 +23,16 @@ void tst_specMetaVariable::cleanup()
 
 void tst_specMetaVariable::setRange()
 {
-
-	//    QFETCH(QString, data);
-	//    QVERIFY2(false, "Failure");
 	QFETCH(QString, variableString) ;
 	QFETCH(int, min) ;
 	QFETCH(int, max) ;
 	QFETCH(int, inc) ;
-	int a,b,c ;
-	specMetaVariable testVar( & (specMetaVariable::factory(variableString))) ;
-	testVar.setIndexRange(a,b,c,10) ;
-	QCOMPARE(a,min) ;
-	QCOMPARE(b,max) ;
-	QCOMPARE(c,inc) ;
+	specMetaVariable *var = specMetaVariable::factory(variableString) ;
+	specMetaVariable::indexLimit limit = var->indexRange(10) ;
+	QCOMPARE(limit.begin, min) ;
+	QCOMPARE(limit.end, max) ;
+	QCOMPARE(limit.increment, inc) ;
+	delete var ;
 }
 
 void tst_specMetaVariable::setRange_data()
@@ -54,14 +51,15 @@ void tst_specMetaVariable::setRange_data()
 void tst_specMetaVariable::xValues()
 {
 	QFETCH(QString, variableString) ;
-	specMetaVariable var(&(specMetaVariable::factory(variableString))) ;
+	specMetaVariable* var(specMetaVariable::factory(variableString)) ;
 	QFETCH(QVector<double>, input) ;
 	QFETCH(QVector<double>, output) ;
 	QFETCH(bool, returns) ;
 
-	QCOMPARE(returns, var.xValues(testItem,input)) ;
+	QCOMPARE(returns, var->xValues(testItem,input)) ;
 	qDebug() << input ;
 	QCOMPARE(output, input) ;
+	delete var ;
 }
 
 void tst_specMetaVariable::xValues_data()
@@ -95,11 +93,14 @@ void tst_specMetaVariable::values()
 
 	qDebug() << "XVALUES (ITEM)" << testItem->dataSize() ;
 
-	specMetaVariable var(&(specMetaVariable::factory(variableString))) ;
-	qDebug() << "Soll:" << output << "Ist:" << var.values(testItem,xValues) << "Gleich:" ;
-	for (int i = 0 ; i < output.size() ; ++i)
-		qDebug() << QString().setNum(output[i],'g',18) << QString().setNum(var.values(testItem,xValues)[i],'g',18) << (output[i] == var.values(testItem,xValues)[i]) ;
-	QCOMPARE(output,var.values(testItem,xValues)) ;
+	specMetaVariable *var(specMetaVariable::factory(variableString)) ;
+	qDebug() << "Soll:" << output << "Ist:" << var->values(testItem,xValues) << "Gleich:" ;
+//	for (int i = 0 ; i < output.size() ; ++i)
+//		qDebug() << QString().setNum(output[i],'g',18)
+//			 << QString().setNum(var->values(testItem,xValues)[i],'g',18)
+//			 << (output[i] == var->values(testItem,xValues)[i]) ;
+	QCOMPARE(output,var->values(testItem,xValues)) ;
+	delete var ;
 }
 
 void tst_specMetaVariable::values_data()
@@ -109,19 +110,24 @@ void tst_specMetaVariable::values_data()
 	QTest::addColumn<QVector<double> >("output") ;
 
 	double integral = 15.*(162+2.*165+168) ;
-	QTest::newRow("integral") << "[::2]i1600-1700"
+	QTest::newRow("integral") << "[::2]i1600:1700"
 				  << (QVector<double>() << 1620 << 1650 << 1680)
 				  << (QVector<double>() << integral << integral << integral) ;
-	QTest::newRow("xValues") << "[::2]x1600-1700"
+	QTest::newRow("xValues") << "[::2]x1600:1700"
 				 << (QVector<double>() << 1650 << 1800)
 				 << (QVector<double>() << 1650 << 1800) ;
-	QTest::newRow("yValues") << "[::2]y1600-1700"
+	QTest::newRow("yValues") << "[::2]y1600:1700"
 				 << (QVector<double>() << 1650 << 1680)
 				 << (QVector<double>() << 165 << 168) ;
-	QTest::newRow("MaxSimple") << "[::2]u1600-1700"
+	QTest::newRow("MaxSimple") << "[::2]u1600:1700"
 				   << (QVector<double>() << 1650 << 1680)
 				   << (QVector<double>(2,168)) ;
-	QTest::newRow("MinSimple") << "[::2]l1600-1700"
+	QTest::newRow("MinSimple") << "[::2]l1600:1700"
 				   << (QVector<double>() << 1650 << 1680)
-				   << (QVector<double>(2,165)) ;
+				   << (QVector<double>(2,162)) ; // Disregards the given xValues
+}
+
+tst_specMetaVariable::tst_specMetaVariable()
+{
+	setObjectName("specMetaVariable") ;
 }

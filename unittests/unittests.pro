@@ -16,7 +16,8 @@ TEMPLATE = app
 SOURCES += \
     tst_specmetavariable.cpp \
     tst_specmetaparser.cpp \
-    tst_main.cpp
+    tst_main.cpp \
+    tst_moveplotcommand.cpp
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 INCLUDEPATH += ../ \
@@ -31,15 +32,22 @@ unix {
 INCLUDEPATH += . \
     /usr/include/qwt
 LIBS += -lqwt \
-    -lcln \
-    -lginac
+	-lmuparser \
+	-lbz2 \
+	-lgsl \
+	-lgslcblas
 }
 
 CONFIG += qwt
 
-OBJECTS += ../../build/objects/[^m]*.o
-OBJECTS += ../../build/objects/moc*.o
+OBJECTS += ../../build/objects/[^m]*.o \
+	../../build/objects/moc*.o \
+	../../build/objects/meta*.o
 
 HEADERS += \
     tst_specmetavariable.h \
-    tst_specmetaparser.h
+    tst_specmetaparser.h \
+    tst_moveplotcommand.h
+
+DEFINES += DOUBLEDEVIATIONCORRECTION=1
+DEFINES += NUMBEROFFRACTIONBITSINDOUBLE=52

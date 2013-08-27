@@ -1,20 +1,31 @@
 #include <QTest>
 #include "tst_specmetavariable.h"
 #include "tst_specmetaparser.h"
+#include "tst_moveplotcommand.h"
 
-//class tst_specMetaVariable ;
+typedef QPair<QString, int> stringIntPair ;
+
+template <class testclass>
+stringIntPair runTest()
+{
+	testclass test ;
+	qDebug() << "RUNNING" << test.objectName() << "TEST" ;
+	return qMakePair(test.objectName(), QTest::qExec(&test, QStringList())) ;
+}
 
 int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
-	qDebug() << "RUNNING specMetaVariable tests" ;
-	tst_specMetaVariable specMetaVariableTest ;
-	QTest::qExec(&specMetaVariableTest, argc, argv) ;
+	QVector<stringIntPair> results ;
+	results << runTest<tst_specMetaParser>()
+		<< runTest<tst_specMetaVariable>()
+		<< runTest<tst_movePlotCommand>() ;
+	qDebug() << "=========== All tests done. ===========" ;
+	foreach(const stringIntPair& result, results)
+		qDebug() << (result.second ? "!!" : "  ")
+			 << result.second
+			 << result.first ;
 
-	qDebug() << "RUNNING specMetaParser tests" ;
-	tst_specMetaParser specMetaParserTest ;
-	QTest::qExec(&specMetaParserTest, argc, argv) ;
-	qDebug() << "All tests done." ;
 	return 0 ;
 }
 

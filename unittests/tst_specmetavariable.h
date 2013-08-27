@@ -12,6 +12,7 @@ class tst_specMetaVariable : public QObject
 private:
 	specDataItem *testItem ;
 public:
+	tst_specMetaVariable() ;
 
 private Q_SLOTS:
 	void init() ;

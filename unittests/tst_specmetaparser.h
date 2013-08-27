@@ -14,6 +14,7 @@ private:
 	QVector<specModelItem *> testItems ;
 	specMetaParser *parser ;
 public:
+	tst_specMetaParser() ;
 
 private Q_SLOTS:
 	void init() ;

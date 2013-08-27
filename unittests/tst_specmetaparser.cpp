@@ -10,9 +10,9 @@ void tst_specMetaParser::init()
 	description["Zeit"] = specDescriptor(42) ;
 	description["Name"] = specDescriptor("testitem") ;
 
-	QList<specDataPoint> data ;
+	QVector<specDataPoint> data ;
 	for (int i = 1500 ; i < 2000 ; i += 30)
-		data << specDataPoint(42, i, i/10, 1000) ;
+		data << specDataPoint(i, i/10, 1000) ;
 
 	testItems << new specDataItem(data, description) << new specDataItem(data, description);
 
@@ -33,12 +33,12 @@ void tst_specMetaParser::evaluate()
 	QFETCH(QString,xExpression) ;
 	QFETCH(QString,yExpression) ;
 	QFETCH(QVector<QPointF>, result) ;
-	specMetaParser parser(variableDefinitions,xExpression,yExpression) ;
+	specMetaParser parser(variableDefinitions,xExpression,yExpression,0) ;
 	qDebug() << parser.warnings() ;
 	QwtSeriesData<QPointF> *data = parser.evaluate(testItems) ;
 	QwtPointSeriesData reference(result) ;
 	QCOMPARE(data->size(),reference.size()) ;
-	for (int i = 0 ; i < data->size() && i < reference.size() ; ++i)
+	for (size_t i = 0 ; i < data->size() && i < reference.size() ; ++i)
 		QCOMPARE(data->sample(i),reference.sample(i)) ;
 	delete data ;
 }
@@ -67,7 +67,7 @@ void tst_specMetaParser::ok()
 	QFETCH(QString,xExpression) ;
 	QFETCH(QString,yExpression) ;
 	QFETCH(bool, result) ;
-	specMetaParser parser(variableDefinitions,xExpression,yExpression) ;
+	specMetaParser parser(variableDefinitions,xExpression,yExpression,0) ;
 	qDebug() << parser.warnings() ;
 	QCOMPARE(parser.ok(), result) ;
 }
@@ -89,7 +89,7 @@ void tst_specMetaParser::warnings()
 	QFETCH(QString,xExpression) ;
 	QFETCH(QString,yExpression) ;
 	QFETCH(QString, result) ;
-	specMetaParser parser(variableDefinitions,xExpression,yExpression) ;
+	specMetaParser parser(variableDefinitions,xExpression,yExpression,0) ;
 	qDebug() << parser.warnings() ;
 	QCOMPARE(parser.warnings(), result) ;
 }
@@ -102,7 +102,11 @@ void tst_specMetaParser::warnings_data()
 
 	QTest::newRow("simple") << "x = x1600:1700\ny = i1600:1700" << "x" << "y" << "" ;
 	QTest::newRow("awrong") << "x = x1600\ny = i1600:1700" << "x" << "y" << "" ;
-	QTest::newRow("bwrong") << "x = a\ny = i1600:1700" << "x" << "y" << "Not an acceptable value:  a\nEvaluation of GiNaC-Expression \"x\" failed\nReason: find_or_insert_symbol: symbol \"x\" not found" ;
+	QTest::newRow("bwrong") << "x = a\ny = i1600:1700" << "x" << "y" << "Not an acceptable value:  a" ;
 }
 
 
+tst_specMetaParser::tst_specMetaParser()
+{
+	setObjectName("specMetaParser") ;
+}
