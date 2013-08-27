@@ -1,6 +1,10 @@
 #ifndef SPECUTILITIES_H
 #define SPECUTILITIES_H
 
+#ifdef DOUBLEDEVIATIONCORRECTION
+#include <cfloat>
+#endif
+
 #include <QList>
 #include <QVector>
 #include <QHash>
@@ -79,8 +83,7 @@ inline bool doubleComparison(const double& a, const double& b)
 {
 	// this is an evil hack to overcome double precision's limitations...
 #ifdef DOUBLEDEVIATIONCORRECTION
-	return fabs(a - b) <=
-			(1./(1L << (NUMBEROFFRACTIONBITSINDOUBLE-ilogb(a)))) ;
+	return fabs(a - b) <= 2 * DBL_EPSILON * qMax(qMax(1.0, fabs(a)), fabs(b)) ;
 #else
 	return a == b ;
 #endif
