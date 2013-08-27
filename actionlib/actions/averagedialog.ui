@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>241</width>
-    <height>209</height>
+    <width>249</width>
+    <height>214</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Average</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -89,7 +89,6 @@
        </widget>
       </item>
      </layout>
-     <zorder>rightToLeft</zorder>
      <zorder>byPointNumber</zorder>
      <zorder>byTolerance</zorder>
      <zorder>running</zorder>
