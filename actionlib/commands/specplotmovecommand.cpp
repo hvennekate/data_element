@@ -1,14 +1,29 @@
 #include "specplotmovecommand.h"
+#include "specexchangefiltercommand.h"
+#include "specmulticommand.h"
 
 specPlotMoveCommand::specPlotMoveCommand(specUndoCommand* parent)
-	: specSingleItemCommand<specModelItem>(parent)
+	: specSingleItemCommand<specModelItem>(parent),
+	  alternativeCommand(0)
 {
+}
+
+specStreamable::type specPlotMoveCommand::typeId() const
+{
+	if (alternativeCommand) return alternativeCommand->typeId() ;
+	return specStreamable::movePlotCommandId ;
 }
 
 void specPlotMoveCommand::doIt()
 {
+	if (alternativeCommand)
+	{
+		alternativeCommand->redo();
+		return ;
+	}
 	specModelItem* item = itemPointer() ;
 	if (!item) return ;
+	alternativeCommand = specExchangeFilterCommand::generateFilterExchanger(item) ;
 	item->moveXBy(shift) ;
 	item->scaleBy(scale) ; // TODO prevent scaling by zero.
 	item->moveYBy(offset) ;
@@ -17,42 +32,29 @@ void specPlotMoveCommand::doIt()
 
 void specPlotMoveCommand::undoIt()
 {
+	if (alternativeCommand)
+	{
+		alternativeCommand->undo();
+		return ;
+	}
 	specModelItem* item = itemPointer() ;
 	if (!item) return ;
+	alternativeCommand = specExchangeFilterCommand::generateFilterExchanger(item);
 	item->addToSlope(-slope) ;
 	item->moveYBy(-offset) ;
 	item->scaleBy(1./scale) ;
 	item->moveXBy(-shift) ;
 }
 
-
-bool specPlotMoveCommand::mergeWith(const QUndoCommand* ot)
-{
-	if (!parentObject()) return false ;
-	const specPlotMoveCommand *other = (const specPlotMoveCommand*) ot ;
-	if (!mergeable(other)) return false ;
-	if (!isfinite(other->scale) || !isfinite(scale)) return false ;
-	slope = slope  * other->scale + other->slope ;
-	offset= offset * other->scale + other->offset ;
-	scale *= other->scale ;
-	shift += other->shift ;
-	generateDescription();
-	return true ;
-}
-
-void specPlotMoveCommand::setCorrections(double xShift, double yOffset, double ySlope, double yScale)
-{
-	slope = isfinite(ySlope) ? ySlope : 0. ;
-	offset = isfinite(yOffset) ? yOffset : 0. ;
-	shift = isfinite(xShift) ? xShift : 0. ;
-	scale = isnormal(yScale) ? yScale : 1. ;
-	generateDescription();
-}
-
 void specPlotMoveCommand::writeCommand(QDataStream &out) const
 {
-	out << slope << offset << scale << shift ;
-	writeItem(out) ;
+	if (alternativeCommand)
+		alternativeCommand->writeCommand(out) ;
+	else
+	{
+		out << slope << offset << scale << shift ;
+		writeItem(out) ;
+	}
 }
 
 void specPlotMoveCommand::readCommand(QDataStream &in)
@@ -60,11 +62,6 @@ void specPlotMoveCommand::readCommand(QDataStream &in)
 	in >> slope >> offset >> scale >> shift ;
 	readItem(in) ;
 	generateDescription();
-}
-
-bool specPlotMoveCommand::mergeable(const specUndoCommand *other)
-{
-	return (((specPlotMoveCommand*) other)->itemPointer()) == itemPointer() ;
 }
 
 void specPlotMoveCommand::generateDescription()
