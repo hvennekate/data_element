@@ -257,7 +257,8 @@ specPlotWidget::~specPlotWidget()
 {
 	foreach (specDockWidget *subDock, subDocks)
 		delete subDock ; // No deleteLater here, otherwise we get in trouble with the mainPlot autodeleting/detaching metaRanges
-	qobject_cast<QMainWindow*>(parentWidget())->removeDockWidget(this) ;
+	QMainWindow* p = qobject_cast<QMainWindow*>(parentWidget()) ;
+	if (p) p->removeDockWidget(this) ;
 }
 
 void specPlotWidget::setConnections()

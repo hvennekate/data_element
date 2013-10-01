@@ -782,3 +782,12 @@ QList<specModelItem*> readXYFILE(QFile &file)
 	}
 	return newItems ;
 }
+
+QwtSymbol* cloneSymbol(const QwtSymbol *original)
+{
+	if (!original) return 0 ;
+	return new QwtSymbol(original->style(),
+			     original->brush(),
+			     original->pen(),
+			     original->size()) ;
+}

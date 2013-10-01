@@ -96,22 +96,29 @@ specPlot::specPlot(QWidget *parent)
 	zoom->changeZoomBase(QRectF(-10,-10,20,20));
 
 	// Standard legend
-	insertLegend(new QwtLegend(this)) ;
-	legend()->setItemMode(QwtLegend::CheckableItem) ;
-	connect(this, SIGNAL(legendChecked(QwtPlotItem*,bool)), SLOT(toggleItem(QwtPlotItem*,bool))) ;
 	showLegend(legendAction->isChecked()) ;
 }
 
 void specPlot::showLegend(bool l)
 {
-	if (!legend()) return ;
 	if (!plotLayout()) return ;
+	if (l)
+	{
+		QwtLegend *newLegend = new QwtLegend(this) ;
+		newLegend->setDefaultItemMode(QwtLegendData::Checkable) ;
+		insertLegend(newLegend) ;
+//		connect(this, SIGNAL(legendChecked(QwtPlotItem*,bool)), SLOT(toggleItem(QwtPlotItem*,bool))) ;
+		connect(newLegend, SIGNAL(checked(QVariant,bool,int)), this, SLOT(toggleItem(QVariant,bool))) ;
+	}
+	else
+		delete legend() ;
+	replot() ;
+}
 
-	// Sort of a hack to keep the plot from reenabling visibility
-	if (!l)	plotLayout()->setLegendPosition(QwtPlot::ExternalLegend) ;
-	else plotLayout()->setLegendPosition(QwtPlot::RightLegend) ;
-
-	legend()->setVisible(l) ;
+void specPlot::toggleItem(const QVariant &v, bool on)
+{
+	QwtPlotItem* item = infoToItem(v) ;
+	if (item) item->setVisible(!on) ;
 	replot() ;
 }
 
@@ -254,6 +261,8 @@ specPlot::~specPlot()
 	delete zeroXLine ;
 	MetaPicker->purgeSelectable();
 	SVGpicker->purgeSelectable();
+	delete MetaPicker ;
+	delete SVGpicker ;
 }
 
 QList<QAction*> specPlot::actions()

@@ -13,6 +13,7 @@
 #include <QBrush>
 #include <QColor>
 #include <QDoubleValidator>
+#include <qwt_plot_canvas.h>
 
 #include "speccanvasitem.h"
 #include <QGridLayout>
@@ -30,7 +31,7 @@ CanvasPicker::CanvasPicker ( specPlot *plot )
 	  highlighting(true)
 	//     mode(spec::none)
 {
-	QwtPlotCanvas *canvas = plot->canvas();
+	QwtPlotCanvas *canvas = qobject_cast<QwtPlotCanvas*>(plot->canvas());
 
 	canvas->installEventFilter ( this );
 
@@ -403,7 +404,6 @@ void CanvasPicker::switchHighlighting(bool on)
 	foreach(specCanvasItem* item, selectable)
 		item->highlight(on) ;
 	plot()->replot();
-
 }
 
 void CanvasPicker::addSelectable(specCanvasItem *item)

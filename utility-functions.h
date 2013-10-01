@@ -63,6 +63,8 @@ inline T average(forwardIterator& begin,const forwardIterator& end, binaryPredic
 //	return retVal /= (double) count ;
 //}
 
+QwtSymbol* cloneSymbol(const QwtSymbol* original) ;
+
 template<class forwardIterator, class outputIterator, typename binaryPredicate>
 inline void averageToNew(forwardIterator begin, forwardIterator end,
 			 binaryPredicate equal, outputIterator target)

@@ -15,7 +15,7 @@ unsigned int qHash(const double& d)
 #include "specview.h"
 #include "qwt_plot_renderer.h"
 #include "utility-functions.h"
-#include "specplotmovecommand.h"
+#include "specexchangefiltercommand.h"
 #include "specactionlibrary.h"
 #include "specexchangedatacommand.h"
 #include "QMessageBox"
@@ -218,7 +218,7 @@ void specSpectrumPlot::setReference()
 	QwtPlotRenderer renderer ;
 	renderer.setDiscardFlag(QwtPlotRenderer::DiscardBackground, true);
 	renderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground,true) ;
-	renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames, false);
+	renderer.setLayoutFlags(QwtPlotRenderer::DefaultLayout);
 	renderer.renderTo(&toolTipPlot,plotImage) ;
 
 	QByteArray byteArray ; // TODO extra function (c.f. svgItem)
@@ -234,10 +234,10 @@ void specSpectrumPlot::alignmentChanged(QAction *action)
 {
 	if (action == addRangeAction)
 	{
-		double min = axisScaleDiv(QwtPlot::xBottom)->lowerBound(), max = axisScaleDiv(QwtPlot::xBottom)->upperBound() ;
+		double min = axisScaleDiv(QwtPlot::xBottom).lowerBound(), max = axisScaleDiv(QwtPlot::xBottom).upperBound() ;
 		specRange *newRange = new specRange(min+.1*(max-min),max-.1*(max-min),
-							(axisScaleDiv(QwtPlot::yLeft)->lowerBound()+
-							 axisScaleDiv(QwtPlot::yLeft)->upperBound())/2.) ;
+							(axisScaleDiv(QwtPlot::yLeft).lowerBound()+
+							 axisScaleDiv(QwtPlot::yLeft).upperBound())/2.) ;
 		newRange->attach(this) ;
 		alignmentPicker->addSelectable(newRange) ;
 	}

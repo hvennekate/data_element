@@ -289,9 +289,9 @@ CONFIG += warn_on \
 
 unix {
 INCLUDEPATH += . \
-    /usr/include/qwt6 \
-    /usr/include/qwt
-LIBS += -lqwt \
+	/home/hendrik/Programme/qwt-6.1.0/include
+LIBS += -L/home/hendrik/Programme/qwt-6.1.0/lib \
+	-lqwt \
 	-lmuparser \
 	-lbz2 \
 	-lgsl \

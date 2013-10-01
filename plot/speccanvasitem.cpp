@@ -40,9 +40,13 @@ void specCanvasItem::highlight(bool highlight)
 	if (highlight)
 	{
 		if (!oldSymbol && symbol())
-			oldSymbol = new QwtSymbol(*(symbol())) ;
-		moveIndicator *indicator = new moveIndicator ;
-		indicator->setStyle(QwtSymbol::Cross);
+			oldSymbol = cloneSymbol(symbol()) ;
+		// Legacy code for Qwt 6.0
+//		moveIndicator *indicator = new moveIndicator ;
+//		indicator->setStyle(QwtSymbol::Cross);
+		QwtSymbol *indicator = new QwtSymbol ;
+		indicator->setPixmap(QPixmap(":/moveIndicator.png", "PNG"));
+		indicator->setPinPoint(QPointF(5.5,5.5));
 		setSymbol(indicator) ;
 	}
 	else
@@ -103,7 +107,7 @@ void specCanvasItem::setSymbolStyle(const int& newStyle)
 			setSymbol(0) ;
 		else
 		{
-			QwtSymbol *newSymbol = symbol() ? (new QwtSymbol(*symbol())) : (new QwtSymbol()) ;
+			QwtSymbol *newSymbol = symbol() ? cloneSymbol(symbol()) : (new QwtSymbol) ;
 			newSymbol->setStyle(QwtSymbol::Style(newStyle)) ;
 			setSymbol(newSymbol) ;
 		}
@@ -127,7 +131,7 @@ void specCanvasItem::setSymbolPenColor(const QColor& newColor)
 	}
 	else
 	{
-		QwtSymbol *newSymbol = symbol() ? (new QwtSymbol(*symbol())) : (new QwtSymbol()) ;
+		QwtSymbol *newSymbol = symbol() ? cloneSymbol(symbol()) : (new QwtSymbol) ;
 		QPen newPen = newSymbol->pen() ;
 		newPen.setColor(newColor) ;
 		newSymbol->setPen(newPen) ;
@@ -145,7 +149,7 @@ void specCanvasItem::setSymbolBrushColor(const QColor &newColor)
 	}
 	else
 	{
-		QwtSymbol *newSymbol = symbol() ? (new QwtSymbol(*symbol())) : (new QwtSymbol()) ;
+		QwtSymbol *newSymbol = symbol() ? cloneSymbol(symbol()) : (new QwtSymbol) ;
 		newSymbol->setBrush(newColor) ;
 		setSymbol(newSymbol) ;
 	}
@@ -179,23 +183,25 @@ void specCanvasItem::setSymbolSize(const QSize& s)
 	}
 	else
 	{
-		QwtSymbol *newSymbol = symbol() ? (new QwtSymbol(*symbol())) : (new QwtSymbol()) ;
+		QwtSymbol *newSymbol = symbol() ? cloneSymbol(symbol()) : (new QwtSymbol) ;
 		newSymbol->setSize(s) ;
 		setSymbol(newSymbol) ;
 	}
 }
 
-void specCanvasItem::moveIndicator::drawSymbols(QPainter *painter, const QPointF *points, int numPoints) const
+void specCanvasItem::moveIndicator::renderSymbols(QPainter *painter, const QPointF *points, int numPoints) const
 {
 	QPixmap pixmap(":/moveIndicator.png", "PNG") ;
-	QRectF frame(-5,-5,11,11) ;
 	for (int i = 0 ; i < numPoints ; ++i)
-	{
-		frame.moveCenter(points[i]) ;
-		painter->drawPixmap(frame,pixmap,pixmap.rect());
-	}
+		painter->drawPixmap(boundingRect(),pixmap,pixmap.rect());
 }
 
+QRect specCanvasItem::moveIndicator::boundingRect() const
+{
+	return QRect(-5,-5,11,11) ;
+}
+
+// Legacy code for Qwt 6.0
 QSize specCanvasItem::moveIndicator::boundingSize() const
 {
 	return QSize(11,11) ;

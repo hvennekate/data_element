@@ -78,7 +78,9 @@ void specPrintPlotAction::execute()
 
 		QwtPlotRenderer renderer ;
 		renderer.setDiscardFlag(QwtPlotRenderer::DiscardCanvasBackground,true) ;
-		renderer.setLayoutFlag(QwtPlotRenderer::KeepFrames,true) ;
+		renderer.setLayoutFlags(QwtPlotRenderer::FrameWithScales) ;
+		renderer.setDiscardFlags(QwtPlotRenderer::DiscardBackground
+					 | QwtPlotRenderer::DiscardCanvasBackground);
 		renderer.renderTo(plot,*printer) ;
 		printer->setPageMargins(left,top,right,bottom,QPrinter::Millimeter) ;
 	}

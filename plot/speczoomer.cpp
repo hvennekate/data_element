@@ -1,7 +1,7 @@
 #include "speczoomer.h"
 #include <QTextStream>
 
-specZoomer::specZoomer(QwtPlotCanvas *canvas)
+specZoomer::specZoomer(QWidget *canvas)
 	: QwtPlotZoomer(canvas,false)
 {
 	setTrackerMode(AlwaysOn);

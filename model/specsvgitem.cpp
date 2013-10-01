@@ -51,6 +51,7 @@ specSVGItem::specSVGItem(specFolderItem *par, QString description)
 	ownBounds.x=qMakePair<qint8,qreal>(QwtPlot::axisCnt,0) ;
 	ownBounds.y=qMakePair<qint8,qreal>(QwtPlot::axisCnt,0) ;
 	setStyle(QwtPlotCurve::NoCurve);
+	setItemAttribute(Legend, false) ;
 }
 
 void specSVGItem::setImage(const QByteArray &newData)
@@ -283,9 +284,4 @@ QString specSVGItem::toolTip(const QString &column) const
 	return QString("%1<br><img src=\"data:image/png;base64,%2\"></img>")
 			.arg(specModelItem::toolTip(column))
 			.arg(QString(buffer.data().toBase64())) ;
-}
-
-QWidget* specSVGItem::legendItem() const
-{
-	return 0 ;
 }

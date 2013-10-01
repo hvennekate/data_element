@@ -84,10 +84,10 @@ QList<specRange*> cutByIntensityDialog::ranges() // TODO create access function 
 
 void cutByIntensityDialog::addRange()
 {
-	double min = plot->axisScaleDiv(QwtPlot::xBottom)->lowerBound(), max = plot->axisScaleDiv(QwtPlot::xBottom)->upperBound() ;
+	double min = plot->axisScaleDiv(QwtPlot::xBottom).lowerBound(), max = plot->axisScaleDiv(QwtPlot::xBottom).upperBound() ;
 	specRange* range = new specRange(min+.1*(max-min),max-.1*(max-min),
-					 (plot->axisScaleDiv(QwtPlot::yLeft)->lowerBound() +
-					  plot->axisScaleDiv(QwtPlot::yLeft)->upperBound())/2.) ;
+					 (plot->axisScaleDiv(QwtPlot::yLeft).lowerBound() +
+					  plot->axisScaleDiv(QwtPlot::yLeft).upperBound())/2.) ;
 	range->attach(plot) ;
 	picker->addSelectable(range) ;
 }

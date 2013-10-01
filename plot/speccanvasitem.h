@@ -9,6 +9,7 @@
 #include <QMenu>
 #include <qwt_symbol.h>
 #include "specstreamable.h"
+#include "specdatapointfilter.h"
 
 class specCanvasItem : public QwtPlotCurve, public specStreamable
 {
@@ -19,7 +20,8 @@ private:
 	{
 	private:
 		QSize boundingSize() const ;
-		void drawSymbols(QPainter *, const QPointF *, int numPoints) const ;
+		void renderSymbols(QPainter *, const QPointF *, int numPoints) const ;
+		QRect boundingRect() const ;
 	};
 protected:
 	void writeToStream(QDataStream &out) const;
@@ -28,10 +30,7 @@ public:
 	specCanvasItem(QString description="");
 	virtual void pointMoved(const int&, const double&, const double&) {} ;
 	virtual void refreshPlotData() =0;
-	virtual void scaleBy(const double&) {}
-	virtual void addToSlope(const double&) {}
-	virtual void moveYBy(const double&) {}
-	virtual void moveXBy(const double&) {}
+	virtual void addDataFilter(const specDataPointFilter&) {}
 	virtual void attach(QwtPlot *plot) { QwtPlotCurve::attach(plot) ; }
 	virtual void detach() { QwtPlotCurve::detach() ; }
 	virtual QMenu* contextMenu() ;

@@ -160,8 +160,8 @@ void specMetaVariable::produceRanges(QSet<specPlot *> plots, QColor color)
 		clearRanges(); // TODO : consider replotting
 		foreach(specPlot* plot, plots)
 			ranges << new specMetaRange(minValue(),maxValue(),
-						    (plot->axisScaleDiv(QwtPlot::yLeft)->lowerBound()+
-						     plot->axisScaleDiv(QwtPlot::yLeft)->upperBound())/2.,this) ;
+						    (plot->axisScaleDiv(QwtPlot::yLeft).lowerBound()+
+						     plot->axisScaleDiv(QwtPlot::yLeft).upperBound())/2.,this) ;
 	}
 	int i = 0 ;
 	foreach(specPlot* plot, plots)
