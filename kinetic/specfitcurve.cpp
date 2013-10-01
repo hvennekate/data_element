@@ -1,8 +1,6 @@
 #include "specfitcurve.h"
 #include "lmmin.h"
 #include <algorithm>
-#include <gsl/gsl_linalg.h>
-#include <gsl/gsl_math.h>
 #include <gsl/gsl_cdf.h>
 
 specFitCurve::fitData::fitData(mu::Parser *p)
@@ -232,6 +230,50 @@ bool specFitCurve::acceptableVariable(const QString &s)
 	return re.exactMatch(s) ;
 }
 
+// Diagonale der inversen Matrix = Reziproke der Diagonalelemente der L-Matrix!
+void choleskyInversion(double* matrix, double *target, const int& size)
+{
+	// decomposition
+	for (int i = 0 ; i < size ; ++i)
+	{
+		double sumOfSquares = 0 ;
+		for (int j = 0 ; j < i ; ++j)
+		{
+			double sumOfProducts = 0 ;
+			for (int k = 0 ; k < j ; ++k)
+				sumOfProducts += target[i*size+k] * target[j*size+k] ;
+			double result = (matrix[i*size+j] - sumOfProducts) / target[j*size+j] ;
+			target[i*size+j] = result ;
+			sumOfSquares += result * result ;
+		}
+		target[i*size+i] = sqrt( matrix[i*size+i] - sumOfSquares) ;
+	}
+	// inversion
+	for (int i = 0 ; i < size ; ++i)
+	{
+		double diag = target[i*size+i] ;
+		target[i*size+i] = 1./diag ;
+		for (int j = 0 ; j < i ; ++j)
+		{
+			double sumOfProducts = 0 ;
+			for (int k = j ; k < i ; ++k)
+				sumOfProducts += target[i*size+k] * target[k*size+j] ;
+			target[i*size + j] = -sumOfProducts/diag ;
+		}
+	}
+	// computing inverse of original matrix
+	for (int i = 0 ; i < size ; ++i)
+	{
+		for (int j = 0 ; j <= i ; ++j)
+		{
+			double d = 0 ;
+			for (int k = i ; k < size ; ++k)
+				d += matrix[k*size + i] * matrix[k*size + j] ;
+			matrix[j*size+i] = d ;
+		}
+	}
+}
+
 void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 {
 	generateParser();
@@ -265,7 +307,7 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	lm_control_struct control = lm_control_double ;
 
 	lmcurve_data_struct fitParams = { x, y, parser, &variableNames} ;
-	gsl_matrix *covarianceMatrix = gsl_matrix_alloc(fitParameters.size(),fitParameters.size()) ;
+	double *covarianceMatrix = new double [fitParameters.size()*fitParameters.size()] ;
 	double sumOfSquaredResiduals = 0 ;
 	lmmin(fitParameters.size(),
 	      parameters,
@@ -275,7 +317,7 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	      &control,
 	      &status,
 	      0,
-	      covarianceMatrix->data,
+	      covarianceMatrix,
 	      &sumOfSquaredResiduals) ;
 
 	// get the fit parameters back out:
@@ -287,30 +329,27 @@ void specFitCurve::refit(QwtSeriesData<QPointF> *data)
 	}
 
 	// compute asymptotic standard error of fit parameters:
-	gsl_set_error_handler_off() ;
 	numericalErrors.clear();
-	if (GSL_EDOM != gsl_linalg_cholesky_decomp(covarianceMatrix))
+	choleskyInversion(covarianceMatrix, covarianceMatrix, fitParameters.size()) ;
+	for (int i = 0 ; i < fitParameters.size() ; ++i)
 	{
-		gsl_linalg_cholesky_invert(covarianceMatrix) ;
-		foreach(const variablePair& p, variables)
-		{
-			QString name = plainVariableName(p.first) ;
-			double confidence = confidenceInterval(p.first) ;
-			int j = fitParameters.indexOf(name) ;
-			int dof = data->size() - fitParameters.size() ;
-			numericalErrors << (j > -1 ?
-						    sqrt(gsl_matrix_get(covarianceMatrix,j,j)*sumOfSquaredResiduals / dof) *
-						    ((0 < confidence && 1 > confidence) ? gsl_cdf_tdist_Pinv(confidence, dof) : 1)
-						  : NAN) ;
-		}
+		for (int j = 0 ; j < fitParameters.size() ; ++j)
+			qDebug() << covarianceMatrix[i*fitParameters.size() + j] ;
+		qDebug() << ";" ;
 	}
-	else
+	foreach(const variablePair& p, variables)
 	{
-		errorString = QObject::tr("Covariance matrix not positive definite.") +
-				QObject::tr("Could not determine errors.") ;
+		QString name = plainVariableName(p.first) ;
+		double confidence = confidenceInterval(p.first) ;
+		int j = fitParameters.indexOf(name) ;
+		int dof = data->size() - fitParameters.size() ;
+		numericalErrors << (j > -1 ? sqrt(sumOfSquaredResiduals * covarianceMatrix[j*fitParameters.size()+j] / dof) *
+				   ((0 < confidence && 1 > confidence) ? gsl_cdf_tdist_Pinv(confidence, dof) : 1)
+				   : NAN) ;
 	}
-
-	gsl_matrix_free(covarianceMatrix) ;
+//		errorString = QObject::tr("Covariance matrix not positive definite.") +
+//				QObject::tr("Could not determine errors.") ;
+	delete [] covarianceMatrix ;
 
 	// set up the new parser
 	generateParser();
