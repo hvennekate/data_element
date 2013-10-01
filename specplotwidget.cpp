@@ -89,7 +89,7 @@ void specPlotWidget::read(QString fileName)
 		QMessageBox::critical(0,tr("File error"),
 					  tr("File ")
 					  + fileName
-					  + tr("does not seem to have the right format.")) ;
+					  + tr(" does not seem to have the right format.")) ;
 		return ;
 	}
 

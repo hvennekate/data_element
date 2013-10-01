@@ -3,7 +3,7 @@
 #include <QDoubleValidator>
 #include <QDialog>
 #include "specmulticommand.h"
-#include "specplotmovecommand.h"
+#include "specexchangefiltercommand.h"
 #include "specdataview.h"
 #include "specdataitem.h"
 
@@ -37,6 +37,7 @@ specUndoCommand* specNormalizeAction::generateUndoCommand()
 {
 	// Run dialog
 	if (uiDialog->exec() == QDialog::Rejected) return 0 ;
+	if (!ui->scaleYValue->isChecked() && !ui->shiftXValue->isChecked()) return 0 ;
 
 	// Prepare parent command
 	specMultiCommand* command = new specMultiCommand ;
@@ -64,13 +65,12 @@ specUndoCommand* specNormalizeAction::generateUndoCommand()
 					extremum = i, previousValue = item->sample(i).y() ;
 		}
 
-		specPlotMoveCommand* moveCommand = new specPlotMoveCommand(command) ;
-		moveCommand->setItem(item) ;
-		moveCommand->setCorrections(ui->shiftXValue->isChecked() ?
-							ui->xValue->text().toDouble() - item->sample(extremum).x() : 0,
-						0,0,
-						ui->scaleYValue->isChecked() && previousValue ? // Avoid div by 0
-							ui->yValue->text().toDouble() / previousValue : 0) ;
+		specExchangeFilterCommand *moveCommand = new specExchangeFilterCommand(command, true) ;
+		moveCommand->setRelativeFilter(
+					specDataPointFilter(0,0,
+							    ui->scaleYValue->isChecked() ? ui->yValue->text().toDouble() / previousValue : 1,
+							    ui->shiftXValue->isChecked() ? ui->xValue->text().toDouble() - item->sample(extremum).x() : 0));
+		moveCommand->setItem(item);
 	}
 
 	// Set description of command

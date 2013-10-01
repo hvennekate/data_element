@@ -2,7 +2,6 @@
 #include "specaddfoldercommand.h"
 #include "specdeletecommand.h"
 #include "specmovecommand.h"
-#include "specplotmovecommand.h"
 #include "specmulticommand.h"
 #include "specexchangedatacommand.h"
 #include "specresizesvgcommand.h"
@@ -17,6 +16,7 @@
 #include "specdescriptorflagscommand.h"
 #include "specdeletedescriptorcommand.h"
 #include "specrenamedescriptorcommand.h"
+#include "specexchangefiltercommand.h"
 
 specCommandGenerator::specCommandGenerator(specUndoCommand *p)
 	: parent(p)
@@ -37,8 +37,10 @@ specUndoCommand *specCommandGenerator::commandById(int id) const
 		return new specAddFolderCommand(parent) ;
 	case specStreamable::moveItemsCommandId :
 		return new specMoveCommand(parent) ;
+	case specStreamable::exchangeFilterCommandId :
+		return new specExchangeFilterCommand(parent) ;
 	case specStreamable::movePlotCommandId :
-		return new specPlotMoveCommand(parent) ;
+		return new specExchangeFilterCommand(parent, true) ;
 	case specStreamable::multiCommandId :
 		return new specMultiCommand(parent) ;
 	case specStreamable::exchangeDataCommandId:

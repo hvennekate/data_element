@@ -65,7 +65,6 @@ void specFolderItem::refreshPlotData()
 			y << item->sample(i).y() ;
 		}
 	}
-	processData(x,y) ;
 	setSamples(x,y) ;
 }
 
@@ -127,33 +126,11 @@ spec::descriptorFlags specFolderItem::descriptorProperties(const QString& key) c
 	return flags ;
 }
 
-void specFolderItem::scaleBy(const double& factor)
+void specFolderItem::addDataFilter(const specDataPointFilter &filter)
 {
 	foreach(specModelItem* child, ChildrenList)
-		child->scaleBy(factor) ;
+		child->addDataFilter(filter);
 	invalidate(); // TODO include this in child's function
-}
-
-void specFolderItem::addToSlope(const double& offset)
-{
-
-	foreach(specModelItem* child, ChildrenList)
-		child->addToSlope(offset) ;
-	invalidate();
-}
-
-void specFolderItem::moveYBy(const double& offset)
-{
-	foreach(specModelItem* child, ChildrenList)
-		child->moveYBy(offset) ;
-	invalidate();
-}
-
-void specFolderItem::moveXBy(const double& offset)
-{
-	foreach(specModelItem* child, ChildrenList)
-		child->moveXBy(offset) ;
-	invalidate();
 }
 
 void specFolderItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out)
@@ -174,13 +151,6 @@ void specFolderItem::exportData(const QList<QPair<bool,QString> >& headerFormat,
 	foreach(specModelItem* child, ChildrenList)
 		child->exportData(headerFormat, dataFormat, out) ;
 	// 	}
-}
-
-void specFolderItem::subMap(const QMap<double, double> & map)
-{
-	foreach(specModelItem *item, ChildrenList)
-		item->subMap(map) ;
-	invalidate();
 }
 
 void specFolderItem::deleteDescriptor(const QString &descriptorName)
@@ -212,4 +182,18 @@ void specFolderItem::restoreDescriptor(QListIterator<specDescriptor> &origin, co
 QList<specModelItem*> specFolderItem::childrenList() const
 {
 	return ChildrenList ;
+}
+
+template<typename T>
+QVector<T> specFolderItem::findDescendants()
+{
+	QVector<T> items = specModelItem::findDescendants<T>();
+	for (int i = 0 ; i < children() ; ++i)
+	{
+		specModelItem *item = child(i) ;
+		if (T value = dynamic_cast<T>(item))
+			items << value ;
+		items << item->findDescendants<T>() ;
+	}
+	return items ;
 }

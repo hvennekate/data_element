@@ -52,3 +52,8 @@ QDataStream& operator>>(QDataStream &in, legacyDatapoint& d)
 	double t ;
 	return in >> t >> d.nu >> d.sig >> d.mint ;
 }
+
+specDataPoint::operator QPointF() const
+{
+	return QPointF(nu, sig) ;
+}

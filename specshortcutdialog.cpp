@@ -64,7 +64,6 @@ shortcutModel::shortcutModel(QObject *parent)
 
 Qt::ItemFlags shortcutModel::flags(const QModelIndex &index) const
 {
-	qDebug() << "flags:" << index.column() << index.parent().isValid() ;
 	return QAbstractItemModel::flags(index) |
 			(index.column() == 1 && index.parent().isValid() ?
 				 Qt::ItemIsEditable :

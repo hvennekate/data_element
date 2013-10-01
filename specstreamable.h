@@ -72,7 +72,8 @@ public:
 		descriptorFlagsCommand = 66,
 		dataItem = 67,
 		deleteDescriptorCommandId = 68,
-		renameDescriptorCommandId = 69
+		renameDescriptorCommandId = 69,
+		exchangeFilterCommandId = 70
 	};
 	virtual type typeId() const = 0;
 protected:

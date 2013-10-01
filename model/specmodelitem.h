@@ -26,9 +26,8 @@ private:
 	bool dataValid ;
 	QSet<specMetaItem*> clients ;
 	specDescriptor description ;
+	void processData() ;
 protected:
-	void processData(QVector<double>&, QVector<double>&) const ;
-	QwtSeriesData<QPointF>* processData(QwtSeriesData<QPointF>* dat) const;
 	// selectedPoints (3 Punkte fuer Korrekturen)
 	virtual bool shortCircuit(specModelItem* server) ;
 	void readFromStream(QDataStream&) ;
@@ -83,10 +82,8 @@ public:
 	virtual void setDescriptorProperties(const QString& key, spec::descriptorFlags f) ;
 	virtual void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
 	virtual QVector<double> intensityData() const ;
-	virtual int removeData(QList<specRange*>*) { invalidate() ; return 0 ; }
 	virtual void movingAverage(int) {}
 	virtual void average(int) {}
-	virtual void subMap(const QMap<double,double>&) {}
 	virtual QString toolTip(const QString &column) const ;
 	virtual void renameDescriptors(const QMap<QString, QString>& map) ;
 	virtual void deleteDescriptor(const QString& key) ;
@@ -100,6 +97,8 @@ public:
 
 	static specModelItem* itemFactory(specStreamable::type) ;
 	virtual specUndoCommand* itemPropertiesAction(QObject *parentObject) { Q_UNUSED(parentObject) ; return 0 ; }
+	template <typename T>
+	QVector<T> findDescendants() ;
 
 	class descriptorComparison
 	{

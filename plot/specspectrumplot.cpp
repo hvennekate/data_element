@@ -367,10 +367,10 @@ void specSpectrumPlot::pointMoved(specCanvasItem *item, int no, double x, double
 				      tr("The following required alignment parameters were illegal:\n")
 				      + failedCorrections
 				      + tr("The parameters were disabled.")) ;
-	specPlotMoveCommand *command = new specPlotMoveCommand ;
+	specExchangeFilterCommand *command = new specExchangeFilterCommand ;
 	command->setParentObject(view->model()) ;
 	command->setItem(modelItem) ;
-	command->setCorrections(shift,offset,offline,scale) ;
+	command->setRelativeFilter(specDataPointFilter(offset, offline, scale, shift)) ;
 	undoPartner()->push(command) ;
 }
 
@@ -539,9 +539,9 @@ specMultiCommand * specSpectrumPlot::generateCorrectionCommand(const QwtPlotItem
 			}
 		}
 
-		specPlotMoveCommand *command = new specPlotMoveCommand(zeroCommand) ;
-		command->setItem(spectrum);
-		command->setCorrections(0, offset, slope, 1.) ;
+		specExchangeFilterCommand *command = new specExchangeFilterCommand(zeroCommand) ;
+		command->setItem(spectrum) ;
+		command->setRelativeFilter(specDataPointFilter(offset, slope)) ;
 	}
 	return zeroCommand ;
 }

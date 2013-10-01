@@ -95,47 +95,26 @@ int specModelItem::activeLine(const QString& key) const
 void specModelItem::refreshPlotData()
 { }
 
-void specModelItem::processData(QVector<double> &x, QVector<double> &y) const
+template<typename T>
+QVector<T> specModelItem::findDescendants()
 {
-	// TODO accelerate
-	if (sortPlotData)
-	{
-		QMultiMap<double,double> sortedValues;
-		for(int i = 0 ; i < x.size() ; i++)
-			sortedValues.insert(x[i],y[i]) ;
-		x = sortedValues.keys().toVector() ;
-		y = sortedValues.values().toVector() ;
-	}
-
-	if (mergePlotData)
-	{
-		QVector<double> xt, yt ;
-		int i = 0 ;
-		while(i < x.size())
-		{
-			int j = i ;
-			double ysum = 0, xtemplate = x[i] ;
-			while (i < x.size() && x[i] == xtemplate)
-				ysum += y[i++] ;
-			xt << xtemplate ;
-			yt << ysum/(i-j) ;
-		}
-		x.swap(xt) ;
-		y.swap(yt) ;
-	}
+	QVector<T> result ;
+	T self = dynamic_cast<T>(this) ;
+	if (self) result << self ;
+	return result ;
 }
 
-QwtSeriesData<QPointF>* specModelItem::processData(QwtSeriesData<QPointF>* dat) const
+void specModelItem::processData()
 {
 	if (!sortPlotData && !mergePlotData)
-		return dat ;
-	QVector<QPointF> newData(dat->size()) ;
-	for(size_t i = 0 ; i < dat->size() ; ++i)
-		newData[i] = dat->sample(i) ; // TODO quicker!
+		return ;
+	// Obtain data points
+	QVector<QPointF> newData(dataSize()) ;
+	for(size_t i = 0 ; i < dataSize() ; ++i)
+		newData[i] = sample(i) ; // TODO quicker!
 	if (sortPlotData)
 		qSort(newData.begin(), newData.end(), comparePoints) ;
 
-	QwtSeriesData<QPointF>* retVal = dat ;
 	typedef QVector<QPointF>::const_iterator vecit ;
 	if (mergePlotData)
 	{
@@ -148,12 +127,11 @@ QwtSeriesData<QPointF>* specModelItem::processData(QwtSeriesData<QPointF>* dat) 
 				y += j->y() ;
 			realData << QPointF(x,y/(j-i)) ; // TODO: Unit test!
 		}
-		retVal = new QwtPointSeriesData(realData) ;
+		setData(new QwtPointSeriesData(realData)) ;
 	}
 	else
-		retVal = new QwtPointSeriesData(newData);
-	delete dat ;
-	return retVal ;
+		setData(new QwtPointSeriesData(newData)) ;
+
 }
 
 QString specModelItem::descriptor(const QString &key, bool full) const
@@ -278,6 +256,7 @@ void specModelItem::revalidate()
 {
 	if (dataValid) return ;
 	refreshPlotData();
+	processData() ;
 	dataValid = true ;
 }
 
@@ -402,3 +381,7 @@ QString specModelItem::editDescriptor(const QString &key) const
 {
 	return descriptor(key, true) ;
 }
+
+
+// Force instantiation
+template QVector<specDataItem*> specModelItem::findDescendants() ;

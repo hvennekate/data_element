@@ -4,7 +4,7 @@
 #include <math.h>
 #include <QVector>
 #include "names.h"
-#include <QString>
+#include <QPointF>
 
 struct specDataPoint;
 struct legacyDatapoint ;
@@ -27,6 +27,7 @@ struct specDataPoint{
 	specDataPoint& operator+=(const specDataPoint&);
 	specDataPoint& operator/=(const double&) ;
 	specDataPoint& operator/(const double&) ;
+	operator QPointF() const ;
 
 	friend QDataStream& operator<<(QDataStream&, const specDataPoint&);
 	friend QDataStream& operator>>(QDataStream&, specDataPoint&);

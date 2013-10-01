@@ -43,7 +43,6 @@ SOURCES += main.cpp \
     actionlib/actions/specpasteaction.cpp \
     actionlib/actions/speccutaction.cpp \
     plot/specspectrumplot.cpp \
-    actionlib/commands/specplotmovecommand.cpp \
     textEditor/specsimpletextedit.cpp \
     actionlib/actions/changeplotstyleaction.cpp \
     actionlib/commands/specstylecommand.cpp \
@@ -132,7 +131,9 @@ SOURCES += main.cpp \
     model/textedit.cpp \
     actionlib/commands/specsingleitemcommand.cpp \
     actionlib/commands/specmultipleitemcommand.cpp \
-    specshortcutdialog.cpp
+    specshortcutdialog.cpp \
+    actionlib/commands/specexchangefiltercommand.cpp \
+    model/specdatapointfilter.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -177,7 +178,6 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/specpasteaction.h \
     actionlib/actions/speccutaction.h \
     plot/specspectrumplot.h \
-    actionlib/commands/specplotmovecommand.h \
     textEditor/specsimpletextedit.h \
     actionlib/actions/changeplotstyleaction.h \
     actionlib/commands/specstylecommand.h \
@@ -266,7 +266,9 @@ HEADERS += cutbyintensitydialog.h \
     model/textedit.h \
     actionlib/commands/specsingleitemcommand.h \
     actionlib/commands/specmultipleitemcommand.h \
-    specshortcutdialog.h
+    specshortcutdialog.h \
+    actionlib/commands/specexchangefiltercommand.h \
+    model/specdatapointfilter.h
 
 INCLUDEPATH += kinetic \
 	log \

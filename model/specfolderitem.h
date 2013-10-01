@@ -18,6 +18,9 @@ public:
 	/*! Standard destructor.*/
 	~specFolderItem();
 
+	/*! find all descendants */
+	template <typename T>
+	QVector<T> findDescendants() ;
 	/*! Add an item as child at index \a position.*/
 	bool addChild(specModelItem*, QList<specModelItem*>::size_type position) ;
 	/*! Add all elements of \a list as children at index \a position.*/
@@ -39,14 +42,8 @@ public:
 	int childNo(specModelItem* child) const ;
 	spec::descriptorFlags descriptorProperties(const QString& key) const ;
 	/*! Reimplementation from specCanvasItem -- passing on to all children */
-	void scaleBy(const double&) ;
-	/*! Reimplementation from specCanvasItem -- passing on to all children */
-	void addToSlope(const double&) ;
-	/*! Reimplementation from specCanvasItem -- passing on to all children */
-	void moveYBy(const double&) ;
-	void moveXBy(const double &) ;
+	void addDataFilter(const specDataPointFilter&) ;
 	void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
-	void subMap(const QMap<double,double>&) ;
 	void deleteDescriptor(const QString& key) ;
 	void renameDescriptors(const QMap<QString, QString> &map);
 	void dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const ;

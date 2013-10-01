@@ -1,9 +1,8 @@
 #include "dataitemproperties.h"
 #include "ui_dataitemproperties.h"
-#include <qwt_series_data.h>
 #include "specmulticommand.h"
 #include "specexchangedatacommand.h"
-#include "specplotmovecommand.h"
+#include "specexchangefiltercommand.h"
 
 dataItemProperties::dataItemProperties(specDataItem *i, QWidget *parent) :
 	QDialog(parent),
@@ -33,16 +32,16 @@ dataItemProperties::dataItemProperties(specDataItem *i, QWidget *parent) :
 						 QPen(Qt::NoPen),
 						 QSize(5,5)));
 	highlightCurrent.setStyle(QwtPlotCurve::NoCurve);
+	highlightCurrent.setZ(INFINITY);
 
 	ui->dataPreview->setAutoDelete(false) ;
 	item.attach(ui->dataPreview);
-	highlightSelected.attach(ui->dataPreview) ;
-	highlightCurrent.attach(ui->dataPreview) ;
 
-	ui->slopeValue->setValue(item.slope) ;
-	ui->offsetValue->setValue(item.offset) ;
-	ui->xShiftValue->setValue(item.xshift) ;
-	ui->scalingValue->setValue(item.factor) ;
+	specDataPointFilter filter = item.filter ;
+	ui->slopeValue->setValue(filter.getSlope()) ;
+	ui->offsetValue->setValue(filter.getOffset()) ;
+	ui->xShiftValue->setValue(filter.getXShift()) ;
+	ui->scalingValue->setValue(filter.getFactor()) ;
 
 
 	ui->dataWidget->setRowCount(item.data.size()) ;
@@ -70,11 +69,11 @@ void dataItemProperties::refreshPlot()
 {
 	if (!setupComplete) return ;
 	// get correction from ui
-	item.invalidate();
-	item.slope = ui->slopeValue->value() ;
-	item.xshift = ui->xShiftValue->value() ;
-	item.offset = ui->offsetValue->value() ;
-	item.factor = ui->scalingValue->value() ;
+	item.setDataFilter(specDataPointFilter(
+				   ui->offsetValue->value(),
+				   ui->slopeValue->value(),
+				   ui->scalingValue->value(),
+				   ui->xShiftValue->value()));
 
 	// get data from table
 
@@ -91,10 +90,19 @@ void dataItemProperties::refreshPlot()
 	foreach(QTableWidgetItem* selectedItem, ui->dataWidget->selectedItems())
 		selectedData << item.sample(selectedItem->row()) ;
 	highlightSelected.setSamples(selectedData) ;
-	highlightCurrent.setSamples(QVector<QPointF>() <<
-					item.sample(ui->dataWidget->currentRow())) ;
-
+	highlightCurrent.setSamples(
+					ui->dataWidget->currentItem() ?
+						QVector<QPointF>() << item.sample(ui->dataWidget->currentRow()) :
+						QVector<QPointF>()) ;
+	connectCurve(highlightSelected) ;
+	connectCurve(highlightCurrent) ;
 	ui->dataPreview->replot();
+}
+
+void dataItemProperties::connectCurve(QwtPlotCurve &c)
+{
+	if (c.dataSize()) c.attach(ui->dataPreview) ;
+	else c.detach();
 }
 
 specUndoCommand* dataItemProperties::changeCommands(QObject* parent)
@@ -106,10 +114,8 @@ specUndoCommand* dataItemProperties::changeCommands(QObject* parent)
 					item.data[i].exactlyEqual(originalItem->data[i]) ;
 	else dataUnchanged = false ;
 
-	correctionUnchanged = (item.slope == originalItem->slope &&
-				   item.offset == originalItem->offset &&
-				   item.xshift == originalItem->xshift &&
-				   item.factor == originalItem->factor) ;
+	correctionUnchanged =
+			(item.dataFilter() == originalItem->dataFilter()) ;
 
 	if (correctionUnchanged && dataUnchanged) return 0 ;
 
@@ -134,21 +140,12 @@ specUndoCommand* dataItemProperties::changeCommands(QObject* parent)
 
 	if (!correctionUnchanged)
 	{
-		specPlotMoveCommand *correctionCommand = new specPlotMoveCommand(parentMulti) ;
-		correctionCommand->setParentObject(parent) ; // Cave: noetig, da eventuell kein parent (parentMulti == 0)
-		correctionCommand->setItem(originalItem);
-
-		// TODO this gets ugly.  Make interface more direct!
-		double newFactor = item.factor/originalItem->factor ;
-		correctionCommand->setCorrections(item.xshift - originalItem->xshift,
-						  item.offset - originalItem->offset * newFactor,
-						  item.slope  - originalItem->slope  * newFactor,
-						  newFactor);
+		specExchangeFilterCommand *correctionCommand = new specExchangeFilterCommand(parentMulti) ;
+		correctionCommand->setParentObject(parent) ;
+		correctionCommand->setItem(originalItem) ;
+		correctionCommand->setAbsoluteFilter(item.filter) ;
 		if (dataUnchanged)
-		{
-			correctionCommand->setText(tr("Modify item correction")) ;
 			return correctionCommand ;
-		}
 	}
 	parentMulti->setText(tr("Modify item data and correction")) ;
 	return parentMulti ;

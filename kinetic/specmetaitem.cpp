@@ -224,7 +224,7 @@ void specMetaItem::refreshPlotData()
 	// TODO do some more checks on valid items etc.
 	foreach(specModelItem *item, items)
 		item->revalidate();
-	setData(processData(filter->evaluate(items.toVector()))) ; // TODO use vector
+	setData(filter->evaluate(items.toVector())) ; // TODO use vector
 	variables["errors"] = filter->warnings() ;
 	refreshOtherPlots() ;
 }

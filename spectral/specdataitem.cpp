@@ -5,91 +5,37 @@
 #include "dataitemproperties.h"
 #include "specplot.h"
 
-
-void specDataItem::applyCorrection(specDataPoint& point) const
-{
-	point.nu += xshift ;
-	point.sig = zeroMultiplications ? 0 : point.sig*factor+offset+slope*point.nu ;
-}
-
-void specDataItem::reverseCorrection(specDataPoint& point) const
-{
-	point.sig = (point.sig-offset-slope*point.nu)/factor ;
-	point.nu = point.nu - xshift ;
-}
-
-void specDataItem::subMap(const QMap<double, double> &toSub)
-{
-	for (int i = 0 ; i < data.size() ; i++)
-	{
-		specDataPoint point = data[i] ;
-		applyCorrection(point) ;
-		if (toSub.contains(point.nu))
-			point.sig -= toSub[point.nu] ;
-		reverseCorrection(point) ;
-		data[i] = point ;
-	}
-	invalidate() ;
-}
-
-QVector<double> specDataItem::wnums() const
-{
-	QVector<double> retval ;
-	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
-	{
-		specDataPoint point = data[i] ;
-		applyCorrection(point) ;
-		retval << point.nu ;
-	}
-	return retval ;
-}
-
 QVector<double> specDataItem::intensityData() const
 {
 	QVector<double> retval ;
-	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
-		retval << data[i].mint ;
-	return retval ;
-}
-
-QVector<double> specDataItem::ints() const
-{
-	QVector<double> retval ;
-	for (QVector<specDataPoint>::size_type i = 0 ; i < data.size() ; i++)
-	{
-		specDataPoint point = data[i] ;
-		applyCorrection(point) ;
-		retval << point.sig ;
-	}
+	foreach(const specDataPoint& dataPoint, data)
+		retval << dataPoint.mint ;
 	return retval ;
 }
 
 specDataItem::specDataItem(const QVector<specDataPoint>& dat, const QHash<QString,specDescriptor>& desc, specFolderItem* par, QString description)
 	: specLogEntryItem(desc, par, description),
-	  offset(0),
-	  slope(0),
-	  factor(1),
-	  xshift(0),
-	  zeroMultiplications(0),
 	  data(dat)
-{
-}
+{}
 
 specDataItem::specDataItem()
-	: specLogEntryItem(),
-	  offset(0),
-	  slope(0),
-	  factor(1),
-	  xshift(0),
-	  zeroMultiplications(0)
+	: specLogEntryItem()
+{}
+
+specDataItem::dataContainer specDataItem::correctedData() const
 {
+	dataContainer result(data) ;
+	for (int i = 0 ; i < result.size() ; ++i)
+		filter.applyCorrection(result[i]) ;
+	return result ;
 }
 
 void specDataItem::refreshPlotData()
 {
-	QVector<double> x=wnums(), y=ints();
-	processData(x,y) ;
-	setSamples(x,y) ; // TODO QPointF
+	QVector<QPointF> newData ;
+	foreach(const specDataPoint& dataPoint, correctedData())
+		newData << dataPoint ;
+	setSamples(newData) ; // TODO QPointF
 }
 
 QIcon specDataItem::decoration() const { return QIcon(":/data.png") ; }
@@ -98,22 +44,14 @@ void specDataItem::readFromStream(QDataStream &in)
 {
 	specLogEntryItem::readFromStream(in) ;
 	in >> data
-	   >> offset
-	   >> slope
-	   >> factor
-	   >> xshift
-	   >> zeroMultiplications ;
+	   >> filter ;
 }
 
 void specDataItem::writeToStream(QDataStream & out) const
 {
 	specLogEntryItem::writeToStream(out) ;
 	out << data
-	    << offset
-	    << slope
-	    << factor
-	    << xshift
-	    << zeroMultiplications ;
+	    << filter ;
 }
 
 specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
@@ -137,11 +75,9 @@ specDataItem& specDataItem::operator+=(const specDataItem& toAdd)
 	if (!descriptor("").contains(toAdd.descriptor("")) )
 		changeDescriptor("",toAdd.descriptor("").prepend(descriptor("").isEmpty() ?"" : descriptor("").append(", ")) ) ;
 	// merging actual data
-	for (QVector<double>::size_type i = 0 ; i < toAdd.data.size() ; i++)
+	foreach(specDataPoint point, toAdd.correctedData())
 	{
-		specDataPoint point = toAdd.data[i] ;
-		toAdd.applyCorrection(point) ;
-		reverseCorrection(point) ;
+		filter.reverseCorrection(point) ;
 		data << point ;
 	}
 	invalidate() ;
@@ -158,85 +94,32 @@ void specDataItem::flatten()
 	qSort(data) ;
 	QVector<specDataPoint> newData ;
 	averageToNew(data.begin(), data.end(), compareDataPoints, std::back_inserter(newData)) ;
-
 	data.swap(newData) ;
 	invalidate() ;
-}
-
-void specDataItem::scaleBy(const double& mul)
-{
-	if (0 == mul)
-		zeroMultiplications ++ ;
-	else if (INFINITY == mul)
-		zeroMultiplications = 0 ;
-	else if (isnan(mul)) return ;
-	else
-	{
-		slope  *= mul ;
-		factor *= mul ;
-		offset *= mul ;
-	}
-	invalidate();
-}
-
-void specDataItem::addToSlope(const double& off)
-{
-	slope += off ;
-	invalidate();
-}
-
-void specDataItem::moveYBy(const double& off)
-{
-	offset += off ;
-	invalidate();
-}
-
-void specDataItem::moveXBy(const double & value)
-{
-	xshift += value ;
-	invalidate();
 }
 
 void specDataItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out) // TODO split into two
 {
 	revalidate();
-	QVector<double> w = wnums(), s = ints(), m = intensityData() ;
-
 	for (int i = 0 ; i < headerFormat.size() ; i++)
 		out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
 	out << endl ;
-	for (size_t j = 0 ; j < dataSize() ; j++)
+
+	typedef QPair<spec::value, QString>  formatPair ;
+	foreach(const specDataPoint& point, correctedData())
 	{
-		for (int i = 0 ; i < dataFormat.size() ; i++)
+		foreach(const formatPair& format, dataFormat)
 		{
-			switch(dataFormat[i].first)
+			switch(format.first)
 			{
-			case spec::wavenumber: out << w[j] ; break ;
-			case spec::signal: out << s[j] ; break ;
-			case spec::maxInt: out << m[j] ; break ;
+			case spec::wavenumber: out << point.nu ; break ;
+			case spec::signal: out << point.sig ; break ;
+			case spec::maxInt: out << point.mint ; break ;
 			}
-			out << dataFormat[i].second ;
+			out << format.second ;
 		}
 	}
 	out << endl ;
-}
-
-int specDataItem::removeData(QList<specRange *> *listpointer)
-{
-	QVector<specDataPoint> newData ;
-	for (int i = 0 ; i < data.size() ; ++i)
-	{
-		specDataPoint point = data[i] ;
-		applyCorrection(point) ;
-		foreach(specRange* range, *listpointer)
-			if (range->contains(point.nu))
-				continue ;
-		newData << data[i] ;
-	}
-	int diff = data.size() - newData.size() ;
-	data.swap(newData) ;
-	invalidate() ;
-	return diff ;
 }
 
 QVector<specDataPoint> specDataItem::getDataExcept(const QList<specRange*>& ranges)
@@ -245,7 +128,7 @@ QVector<specDataPoint> specDataItem::getDataExcept(const QList<specRange*>& rang
 	for (int i = 0 ; i < data.size() ; ++i)
 	{
 		specDataPoint point = data[i] ;
-		applyCorrection(point) ;
+		filter.applyCorrection(point) ;
 		bool include = true ; // TODO std::copy_remove
 		foreach(specRange* range, ranges)
 		{
@@ -264,13 +147,13 @@ QVector<specDataPoint> specDataItem::getDataExcept(const QList<specRange*>& rang
 void specDataItem::applyCorrection(QVector<specDataPoint> &newData) const
 {
 	for (int i = 0 ; i < newData.size() ; ++i)
-		applyCorrection(newData[i]) ;
+		filter.applyCorrection(newData[i]) ;
 }
 
 void specDataItem::reverseCorrection(QVector<specDataPoint> &newData) const
 {
 	for (int i = 0 ; i < newData.size() ; ++i)
-		reverseCorrection(newData[i]) ;
+		filter.reverseCorrection(newData[i]) ;
 }
 
 void specDataItem::swapData(QVector<specDataPoint> &newData)
@@ -282,11 +165,7 @@ void specDataItem::swapData(QVector<specDataPoint> &newData)
 
 specDataItem::specDataItem(const specDataItem &other)
 	: specLogEntryItem(other),
-	  offset(other.offset),
-	  slope(other.slope),
-	  factor(other.factor),
-	  xshift(other.xshift),
-	  zeroMultiplications(other.zeroMultiplications),
+	  filter(other.filter),
 	  data(other.data)
 {
 }
@@ -326,11 +205,26 @@ void specLegacyDataItem::readFromStream(QDataStream &in)
 	specLogEntryItem::readFromStream(in) ;
 	QVector<legacyDatapoint>  legacyData ;
 	in >> legacyData
-	   >> offset
-	   >> slope
-	   >> factor
-	   >> xshift
-	   >> zeroMultiplications ;
+	   >> filter ;
 	foreach(legacyDatapoint point, legacyData)
 		data << point ;
 }
+
+
+void specDataItem::setDataFilter(const specDataPointFilter &f)
+{
+	filter = f ;
+	invalidate();
+}
+
+specDataPointFilter specDataItem::dataFilter() const
+{
+	return filter ;
+}
+
+void specDataItem::addDataFilter(const specDataPointFilter &other)
+{
+	filter += other ;
+	invalidate();
+}
+

@@ -23,6 +23,7 @@ private:
 	QwtPlotCurve highlightSelected, highlightCurrent ;
 	bool setupComplete ;
 	bool merge, sort ;
+	void connectCurve(QwtPlotCurve& c) ;
 private slots:
 	void refreshPlot() ;
 };
