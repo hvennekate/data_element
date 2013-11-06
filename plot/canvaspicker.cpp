@@ -53,7 +53,7 @@ CanvasPicker::CanvasPicker ( specPlot *plot )
 	canvas->setFocus();
 
 	const char *text =
-			"Points in this plot may be moved by dragging (if indicated) or positioned precisely by "
+			"Points in this plot may be moved by dragging (if indicated) or positioned explicitly by "
 			"double clicking on them.  If zooming is enabled, step-wise zoom may be performed using "
 			"the middle mouse button (click and drag the zoom region).  Clicking the right mouse "
 			"button will go back one zoom step, while clicking the middle mouse button while holding "

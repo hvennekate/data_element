@@ -1,2 +1,3 @@
 Makefile
-src.pro.user
+src.pro.user*
+unittests/unittests.pro.user*

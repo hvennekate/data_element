@@ -30,8 +30,9 @@ INCLUDEPATH += ../ \
 
 unix {
 INCLUDEPATH += . \
-    /usr/include/qwt
-LIBS += -lqwt \
+    /home/hendrik/Programme/qwt-6.1.0/include
+LIBS += -L/home/hendrik/Programme/qwt-6.1.0/lib \
+	-lqwt \
 	-lmuparser \
 	-lbz2 \
 	-lgsl \
@@ -51,3 +52,13 @@ HEADERS += \
 
 DEFINES += DOUBLEDEVIATIONCORRECTION=1
 DEFINES += NUMBEROFFRACTIONBITSINDOUBLE=52
+
+OBJECTS_DIR = ../../tests/objects
+MOC_DIR = ../../tests/moc
+DESTDIR = ../../tests/target
+DLLDESTDIR = ../../tests/target
+UI_DIR = ../../tests/uic
+UI_HEADERS_DIR = ../../tests/uic-headers
+UI_SOURCES_DIR = ../../tests/uic-src
+LIBS += -L../../tests/target
+RCC_DIR = ../../tests/resources
