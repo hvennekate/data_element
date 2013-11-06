@@ -24,6 +24,7 @@ shortcutModel::shortcutModel(QObject *parent)
 	QMap<QString, QList<QPair<
 			QPair<QString, QIcon>,
 			QStringList > > > premap ;
+	qDebug() << window.findChildren<specDockWidget*>() ;
 	foreach(QAction* action, window.findChildren<QAction*>())
 	{
 		if (action->text().isEmpty()) continue ;

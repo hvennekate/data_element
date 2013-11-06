@@ -25,6 +25,9 @@
 #include <QProgressDialog>
 #include <QLabel>
 
+#define STRINGIFYMACRO(x) MAKESTRINGMACRO(x)
+#define MAKESTRINGMACRO(x) #x
+
 specPlotWidget::specPlotWidget(QWidget *parent)
 	: specDockWidget(tr("Data"), parent, false),
 	  actions(new specActionLibrary(this)),
@@ -235,6 +238,9 @@ bool specPlotWidget::saveFile()
 	zipOut << visibility ;
 	zipDevice.close() ;
 	zipDevice.releaseDevice() ;
+	// Insert git hash as build number
+	buffer.buffer().append(QString("/") + STRINGIFYMACRO(GITSHA1HASH)) ;
+	qDebug() << QString("GITSHA1HASH") ;
 	buffer.close();
 	if (!file.open(QFile::WriteOnly))
 	{
