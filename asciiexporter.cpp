@@ -13,15 +13,15 @@ asciiExporter::asciiExporter(modelType m)
 	view.setModel(&itemModel) ;
 	kineticWidget.view()->assignDataView(&view);
 	new specMimeTextExporter(view.model()) ;
-	switch (m)
+	switch(m)
 	{
-	case data: modelPointer = view.model() ; break ;
-	case log:  modelPointer = logWidget.view()->model() ; break ;
-	case meta: modelPointer = kineticWidget.view()->model()  ; break ;
+		case data: modelPointer = view.model() ; break ;
+		case log:  modelPointer = logWidget.view()->model() ; break ;
+		case meta: modelPointer = kineticWidget.view()->model()  ; break ;
 	}
 }
 
-void asciiExporter::readFromStream(QDataStream &in)
+void asciiExporter::readFromStream(QDataStream& in)
 {
 	in >> plot
 	   >> view
@@ -37,11 +37,11 @@ asciiExporter::~asciiExporter()
 
 QString asciiExporter::content(QVector<int> h) const
 {
-	if (!modelPointer) return QString() ;
+	if(!modelPointer) return QString() ;
 	QVector<int> hierarchy(h.size()) ;
-	for (int i = 0 ; i < h.size() ; ++i)
-		hierarchy[i] = h[h.size()-1-i] ;
-	QMimeData *data = modelPointer->mimeData(QModelIndexList() << modelPointer->index(hierarchy)) ;
+	for(int i = 0 ; i < h.size() ; ++i)
+		hierarchy[i] = h[h.size() - 1 - i] ;
+	QMimeData* data = modelPointer->mimeData(QModelIndexList() << modelPointer->index(hierarchy)) ;
 	QString result = data->text() ;
 	delete data ;
 	return result ;

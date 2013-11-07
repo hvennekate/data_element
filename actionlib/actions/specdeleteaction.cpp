@@ -9,7 +9,7 @@
 #include "specmetaitem.h"
 #include "specdataview.h"
 
-specDeleteAction::specDeleteAction(QObject *parent) :
+specDeleteAction::specDeleteAction(QObject* parent) :
 	specRequiresItemAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("edit-delete"));
@@ -21,9 +21,9 @@ specDeleteAction::specDeleteAction(QObject *parent) :
 
 specUndoCommand* specDeleteAction::command(specModel* model, QList<specModelItem*>& selection, specUndoCommand* parentsParent)
 {
-	specMultiCommand *parentCommand = 0 ;
+	specMultiCommand* parentCommand = 0 ;
 	QString descriptionText = tr("Delete ") + QString::number(selection.size()) + tr(" items.") ;
-	if (!qobject_cast<specLogModel*>(model))
+	if(!qobject_cast<specLogModel*> (model))
 	{
 		parentCommand = new specMultiCommand(parentsParent) ;
 		parentCommand->setParentObject(model) ;
@@ -35,25 +35,25 @@ specUndoCommand* specDeleteAction::command(specModel* model, QList<specModelItem
 		selection = specModel::expandFolders(selection, true) ;
 
 		QMap<specMetaItem*, QList<specModelItem*> > toDisconnect ;
-		foreach(specModelItem* item, selection)
+		foreach(specModelItem * item, selection)
 		{
 			specMetaItem* metaItem = dynamic_cast<specMetaItem*>(item) ;
-			if (metaItem)
+			if(metaItem)
 				toDisconnect[metaItem] << metaItem->serverList() ;
-			foreach(specMetaItem* metaItem, item->clientList())
-				toDisconnect[metaItem] << item ;
+			foreach(specMetaItem * metaItem, item->clientList())
+			toDisconnect[metaItem] << item ;
 		}
 
-		foreach(specMetaItem* metaItem, toDisconnect.keys())
-			(new specDeleteConnectionsCommand(parentCommand))->
-				setItems(metaItem, toDisconnect[metaItem]) ;
+		foreach(specMetaItem * metaItem, toDisconnect.keys())
+		(new specDeleteConnectionsCommand(parentCommand))->
+		setItems(metaItem, toDisconnect[metaItem]) ;
 	}
 
-	specDeleteCommand *command = new specDeleteCommand(parentCommand) ;
+	specDeleteCommand* command = new specDeleteCommand(parentCommand) ;
 	command->setParentObject(model);
 	command->setItems(selection) ;
 
-	if (!parentCommand)
+	if(!parentCommand)
 	{
 		command->setText(descriptionText) ;
 		return command ;

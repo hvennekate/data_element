@@ -16,7 +16,7 @@ private:
 	void undoIt() ;
 	type typeId() const { return specStreamable::deleteCommandId; }
 public:
-	explicit specDeleteCommand(specUndoCommand *parent = 0);
+	explicit specDeleteCommand(specUndoCommand* parent = 0);
 };
 
 #endif // SPECDELETECOMMAND_H

@@ -8,7 +8,7 @@
 #include <QByteArray>
 #include <QtSvg>
 
-specAddSVGItemAction::specAddSVGItemAction(QObject *parent) :
+specAddSVGItemAction::specAddSVGItemAction(QObject* parent) :
 	specItemAction(parent)
 {
 	setIcon(QIcon::fromTheme("insert-image")) ;
@@ -21,29 +21,29 @@ specAddSVGItemAction::specAddSVGItemAction(QObject *parent) :
 specUndoCommand* specAddSVGItemAction::generateUndoCommand()
 {
 	QFile input(QFileDialog::getOpenFileName(parentWidget(),
-						 "Select SVG file",
-						 "",
-						 "SVG images (*.svg)")) ;
-	if (!(input.exists() && input.open(QIODevice::ReadOnly)))
+		    "Select SVG file",
+		    "",
+		    "SVG images (*.svg)")) ;
+	if(!(input.exists() && input.open(QIODevice::ReadOnly)))
 		return 0;
 	QByteArray fileContent(input.readAll()) ;
-	specSVGItem *newItem = new specSVGItem() ;
-	newItem->setImage(fileContent) ; // TODO remove
+	specSVGItem* newItem = new specSVGItem() ;
+	newItem->setImage(fileContent) ;  // TODO remove
 
 	int row = 0 ;
-	if (!currentItem->isFolder())
+	if(!currentItem->isFolder())
 	{
-		row = currentIndex.row()+1 ;
+		row = currentIndex.row() + 1 ;
 		currentIndex = currentIndex.parent() ;
 
 	}
-	if (! model->insertItems(QList<specModelItem*>() << newItem, currentIndex, row))
+	if(! model->insertItems(QList<specModelItem*>() << newItem, currentIndex, row))
 	{
 		delete newItem ;
 		return 0;
 	}
 
-	specAddFolderCommand *command = new specAddFolderCommand ;
+	specAddFolderCommand* command = new specAddFolderCommand ;
 	command->setParentObject(model) ;
 	command->setItem(newItem) ;
 	command->setText(tr("Add SVG item")) ;

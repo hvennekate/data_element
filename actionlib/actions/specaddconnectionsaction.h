@@ -7,7 +7,7 @@ class specAddConnectionsAction : public specConnectionsAction
 {
 	Q_OBJECT
 public:
-	explicit specAddConnectionsAction(QObject *parent = 0);
+	explicit specAddConnectionsAction(QObject* parent = 0);
 private:
 	specUndoCommand* generateUndoCommand() ;
 	bool dataViewRequirement, metaViewRequirement, changing ;

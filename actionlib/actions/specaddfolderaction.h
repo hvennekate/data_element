@@ -7,7 +7,7 @@ class specAddFolderAction : public specItemAction
 {
 	Q_OBJECT
 public:
-	explicit specAddFolderAction(QObject *parent = 0);
+	explicit specAddFolderAction(QObject* parent = 0);
 private:
 	specUndoCommand* generateUndoCommand() ;
 };

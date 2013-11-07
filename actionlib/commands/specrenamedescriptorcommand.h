@@ -8,8 +8,8 @@
 class specRenameDescriptorCommand : public specUndoCommand
 {
 	QMap<QString, QString> map ;
-	void writeCommand(QDataStream &out) const ;
-	void readCommand(QDataStream &in) ;
+	void writeCommand(QDataStream& out) const ;
+	void readCommand(QDataStream& in) ;
 	void doIt();
 	void undoIt() ;
 	type typeId() const { return specStreamable::renameDescriptorCommandId ; }

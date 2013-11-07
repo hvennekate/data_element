@@ -1,16 +1,16 @@
 #include "exportlayoutitem.h"
 #include <QTextStream>
 
-exportLayoutItem::exportLayoutItem (QStringList& descriptors, QWidget *parent )
-	: QWidget ( parent )
+exportLayoutItem::exportLayoutItem(QStringList& descriptors, QWidget* parent)
+	: QWidget(parent)
 {
 	isFreeForm = new QCheckBox("Free form string") ;
 	descriptor = new QComboBox() ;
 	freeText = new QLineEdit() ;
-	removeButton = new QPushButton(QIcon(":/remove.png"),"") ;
+	removeButton = new QPushButton(QIcon(":/remove.png"), "") ;
 	layout = new QHBoxLayout() ;
 
-	connect(isFreeForm,SIGNAL(stateChanged(int)),this,SLOT(freeFormMode(int))) ;
+	connect(isFreeForm, SIGNAL(stateChanged(int)), this, SLOT(freeFormMode(int))) ;
 
 	descriptor->addItems(descriptors) ;
 
@@ -18,7 +18,7 @@ exportLayoutItem::exportLayoutItem (QStringList& descriptors, QWidget *parent )
 	layout->addWidget(freeText) ;
 	layout->addWidget(isFreeForm) ;
 	layout->addWidget(removeButton) ;
-	layout->setContentsMargins(0,0,0,0) ;
+	layout->setContentsMargins(0, 0, 0, 0) ;
 	setLayout(layout) ;
 
 	// 	isFreeForm->resize() ;
@@ -27,40 +27,40 @@ exportLayoutItem::exportLayoutItem (QStringList& descriptors, QWidget *parent )
 	descriptor->setMaximumWidth(QWIDGETSIZE_MAX) ;
 	freeText->setFixedHeight(descriptor->sizeHint().height()) ;
 	freeText->setMaximumWidth(QWIDGETSIZE_MAX) ;
-	removeButton->setFixedHeight(16) ; //removeButton->sizeHint().height()) ;
-	removeButton->setFixedWidth(16) ; //removeButton->sizeHint().height()) ;
+	removeButton->setFixedHeight(16) ;  //removeButton->sizeHint().height()) ;
+	removeButton->setFixedWidth(16) ;  //removeButton->sizeHint().height()) ;
 
 	removeButton->setFlat(true) ;
 
 	freeFormMode(Qt::Unchecked) ;
 
-	connect(removeButton,SIGNAL(clicked()),this,SLOT(remove())) ;
+	connect(removeButton, SIGNAL(clicked()), this, SLOT(remove())) ;
 }
 
 void exportLayoutItem::freeFormMode(int on)
 {
-	(on==Qt::Checked ? (QWidget*) descriptor : (QWidget*) freeText)->hide() ;
-	(on==Qt::Checked ? (QWidget*) freeText : (QWidget*) descriptor)->show() ;
+	(on == Qt::Checked ? (QWidget*) descriptor : (QWidget*) freeText)->hide() ;
+	(on == Qt::Checked ? (QWidget*) freeText : (QWidget*) descriptor)->show() ;
 }
 
-void exportLayoutItem::setDescriptors(const QStringList &ds)
+void exportLayoutItem::setDescriptors(const QStringList& ds)
 {
 	QString currentText = descriptor->currentText() ;
-	if (!ds.contains(currentText) && !isFreeText())
+	if(!ds.contains(currentText) && !isFreeText())
 	{
 		remove();
 		return ;
 	}
 	descriptor->clear();
 	descriptor->addItems(ds) ;
-	if (ds.contains(currentText))
+	if(ds.contains(currentText))
 		descriptor->setCurrentIndex(ds.indexOf(currentText)) ;
 }
 
 void exportLayoutItem::remove()
 {
-//	if (parentWidget() && parentWidget()->layout())
-//		parentWidget()->layout()->removeWidget(this) ;
+	//	if (parentWidget() && parentWidget()->layout())
+	//		parentWidget()->layout()->removeWidget(this) ;
 	delete this ;
 }
 

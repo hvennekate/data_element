@@ -5,7 +5,7 @@
 class specMinPosVariable : public specMetaVariable
 {
 protected:
-	double processPoints(QVector<QPointF> &points) const ;
+	double processPoints(QVector<QPointF>& points) const ;
 };
 
 #endif // SPECMINPOSVARIABLE_H

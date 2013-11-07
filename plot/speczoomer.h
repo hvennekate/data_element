@@ -7,7 +7,7 @@ class specZoomer : public QwtPlotZoomer
 {
 public:
 	specZoomer(QWidget*);
-	virtual QwtText trackerText(const QPointF &pos) const ;
+	virtual QwtText trackerText(const QPointF& pos) const ;
 	void changeZoomBase(const QRectF&) ;
 	~specZoomer();
 

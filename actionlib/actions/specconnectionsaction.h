@@ -11,10 +11,10 @@ class specConnectionsAction : public specRequiresMetaItemAction
 private:
 	bool specificRequirements() ;
 protected:
-	specView *dataView ;
-	specMetaView *metaView ;
+	specView* dataView ;
+	specMetaView* metaView ;
 public:
-	explicit specConnectionsAction(QObject *parent = 0);
+	explicit specConnectionsAction(QObject* parent = 0);
 	const std::type_info& possibleParent() ;
 };
 

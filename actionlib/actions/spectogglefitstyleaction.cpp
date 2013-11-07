@@ -2,7 +2,7 @@
 #include "specmetaitem.h"
 #include "spectogglefitstylecommand.h"
 
-specToggleFitStyleAction::specToggleFitStyleAction(QObject *parent) :
+specToggleFitStyleAction::specToggleFitStyleAction(QObject* parent) :
 	specRequiresMetaItemAction(parent)
 {
 	setIcon(QIcon(":/styleFit.png")) ;
@@ -13,7 +13,7 @@ specToggleFitStyleAction::specToggleFitStyleAction(QObject *parent) :
 
 specUndoCommand* specToggleFitStyleAction::generateUndoCommand()
 {
-	specToggleFitStyleCommand *command = new specToggleFitStyleCommand ;
+	specToggleFitStyleCommand* command = new specToggleFitStyleCommand ;
 	command->setText(tr("Toggle styling to fit")) ;
 	command->setParentObject(model) ;
 	command->setItem(currentItem) ;

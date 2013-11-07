@@ -4,7 +4,8 @@
 #include "specrequiresitemaction.h"
 
 class QDialog ;
-namespace  Ui {
+namespace  Ui
+{
 	class specNormalizeActionDialog ;
 }
 
@@ -12,13 +13,13 @@ class specNormalizeAction : public specRequiresDataItemAction
 {
 	Q_OBJECT
 public:
-	explicit specNormalizeAction(QObject *parent = 0);
+	explicit specNormalizeAction(QObject* parent = 0);
 	~specNormalizeAction() ;
 	const std::type_info& possibleParent() ;
 protected:
 	specUndoCommand* generateUndoCommand() ;
 private:
-	QDialog *uiDialog ;
+	QDialog* uiDialog ;
 	Ui::specNormalizeActionDialog* ui ;
 };
 

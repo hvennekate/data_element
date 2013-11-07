@@ -7,10 +7,10 @@ class specRemoveFitAction : public specRequiresMetaItemAction
 {
 	Q_OBJECT
 public:
-	explicit specRemoveFitAction(QObject *parent = 0);
+	explicit specRemoveFitAction(QObject* parent = 0);
 
 private:
-	specUndoCommand *generateUndoCommand() ;
+	specUndoCommand* generateUndoCommand() ;
 };
 
 #endif // SPECREMOVEFITACTION_H

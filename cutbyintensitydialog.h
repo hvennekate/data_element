@@ -12,19 +12,19 @@ class cutByIntensityDialog : public QDialog
 {
 	Q_OBJECT
 private:
-	QVBoxLayout *layout ;
-	specPlot *plot ;
-	QPushButton *newRange, *deleteRange ;
+	QVBoxLayout* layout ;
+	specPlot* plot ;
+	QPushButton* newRange, *deleteRange ;
 	QList<specModelItem*> items ;
-	QDialogButtonBox *buttons ;
-	CanvasPicker *picker ;
+	QDialogButtonBox* buttons ;
+	CanvasPicker* picker ;
 	int huevalue ;
 private slots:
 	void addRange() ;
 	void removeRange() ;
 	void rangeModified(specCanvasItem* range, int point, double newX, double newY) ;
 public:
-	explicit cutByIntensityDialog(QWidget *parent = 0);
+	explicit cutByIntensityDialog(QWidget* parent = 0);
 	~cutByIntensityDialog() ;
 	void assignSpectra(QList<specModelItem*>) ;
 	QList<specRange*> ranges() ;

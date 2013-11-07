@@ -5,12 +5,12 @@
 #include <QDialogButtonBox>
 #include "specplotlabelcommand.h"
 
-specLabelAction::specLabelAction(QObject *parent)
+specLabelAction::specLabelAction(QObject* parent)
 	: specUndoAction(parent)
 {
 }
 
-specTitleAction::specTitleAction(QObject *parent)
+specTitleAction::specTitleAction(QObject* parent)
 	: specLabelAction(parent)
 {
 	setIcon(QIcon(":/changetitle.png")) ;
@@ -20,7 +20,7 @@ specTitleAction::specTitleAction(QObject *parent)
 	setShortcut(tr("Ctrl+T"));
 }
 
-specXLabelAction::specXLabelAction(QObject *parent)
+specXLabelAction::specXLabelAction(QObject* parent)
 	: specLabelAction(parent)
 {
 	setIcon(QIcon(":/changexlabel.png")) ;
@@ -30,7 +30,7 @@ specXLabelAction::specXLabelAction(QObject *parent)
 	setShortcut(tr("Ctrl+Alt+x"));
 }
 
-specYLabelAction::specYLabelAction(QObject *parent)
+specYLabelAction::specYLabelAction(QObject* parent)
 	: specLabelAction(parent)
 {
 	setIcon(QIcon(":/changeylabel.png")) ;
@@ -52,15 +52,15 @@ void specLabelAction::execute()
 	QDialog dialog ;
 	dialog.setWindowTitle(tr("Edit Label")) ;
 	dialog.setLayout(new QVBoxLayout) ;
-	specSimpleTextEdit *editor = new specSimpleTextEdit(&dialog) ;
+	specSimpleTextEdit* editor = new specSimpleTextEdit(&dialog) ;
 	editor->setText(text) ;
 	dialog.layout()->addWidget(editor) ;
-	QDialogButtonBox *buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel) ;
+	QDialogButtonBox* buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel) ;
 	dialog.layout()->addWidget(buttons);
-	connect(buttons,SIGNAL(accepted()),&dialog,SLOT(accept())) ;
-	connect(buttons,SIGNAL(rejected()),&dialog,SLOT(reject())) ;
+	connect(buttons, SIGNAL(accepted()), &dialog, SLOT(accept())) ;
+	connect(buttons, SIGNAL(rejected()), &dialog, SLOT(reject())) ;
 
-	if (QDialog::Accepted != dialog.exec() || editor->getText() == text) return ;
+	if(QDialog::Accepted != dialog.exec() || editor->getText() == text) return ;
 
 	text = editor->getText() ;
 	specPlotLabelCommand* command = generatePlotLabelCommand(commandId()) ;

@@ -4,27 +4,27 @@
 #include "specmetaitem.h"
 
 template <class itemType>
-specSingleItemCommand<itemType>::specSingleItemCommand(specUndoCommand *parent)
+specSingleItemCommand<itemType>::specSingleItemCommand(specUndoCommand* parent)
 	: specUndoCommand(parent)
 {
 }
 
 template <class itemType>
-void specSingleItemCommand<itemType>::setItem(specModelItem *pointer)
+void specSingleItemCommand<itemType>::setItem(specModelItem* pointer)
 {
-	if (!model()) return ;
-	if (dynamic_cast<itemType*>(pointer))
+	if(!model()) return ;
+	if(dynamic_cast<itemType*>(pointer))
 		item = specGenealogy(pointer, model()) ;
 }
 
 template <class itemType>
-void specSingleItemCommand<itemType>::readCommand(QDataStream &in)
+void specSingleItemCommand<itemType>::readCommand(QDataStream& in)
 {
 	readItem(in) ;
 }
 
 template <class itemType>
-void specSingleItemCommand<itemType>::writeCommand(QDataStream &out) const
+void specSingleItemCommand<itemType>::writeCommand(QDataStream& out) const
 {
 	writeItem(out) ;
 }
@@ -36,7 +36,7 @@ void specSingleItemCommand<itemType>::readItem(QDataStream& in)
 }
 
 template <class itemType>
-void specSingleItemCommand<itemType>::writeItem(QDataStream &out) const
+void specSingleItemCommand<itemType>::writeItem(QDataStream& out) const
 {
 	out << item ;
 }
@@ -52,7 +52,7 @@ void specSingleItemCommand<itemType>::parentAssigned()
 template <class itemType>
 itemType* specSingleItemCommand<itemType>::itemPointer()
 {
-	if (!item.valid() && !item.seekParent()) return 0 ;
+	if(!item.valid() && !item.seekParent()) return 0 ;
 	Q_ASSERT(item.firstItem()) ;
 	return const_cast<const specSingleItemCommand<itemType>* >(this)->itemPointer() ;
 }

@@ -20,22 +20,22 @@ class specPlotWidget : public specDockWidget
 {
 	Q_OBJECT
 private:
-	specActionLibrary *actions ;
+	specActionLibrary* actions ;
 	specDataView* items ;
-	specKineticWidget *kineticWidget ;
-	specLogWidget *logWidget ;
+	specKineticWidget* kineticWidget ;
+	specLogWidget* logWidget ;
 	specSpectrumPlot* plot ;
-	QAction *saveAction,
-	*kineticsAction,
-	*saveAsAction,
-	*logAction,
-	*undoViewAction,
-	*purgeUndoAction;
-	specDockWidget *undoViewWidget ;
+	QAction* saveAction,
+		 *kineticsAction,
+		 *saveAsAction,
+		 *logAction,
+		 *undoViewAction,
+		 *purgeUndoAction;
+	specDockWidget* undoViewWidget ;
 	void createWhatsThis() ;
 	void setConnections() ;
 	void changeFileName(const QString&) ;
-	void changeEvent(QEvent *event) ;
+	void changeEvent(QEvent* event) ;
 	QList<specDockWidget*> subDocks ;
 private slots:
 	void svgModification(bool) ;
@@ -43,11 +43,11 @@ protected :
 	void closeEvent(QCloseEvent*) ;
 	QList<QWidget*> mainWidgets() const ;
 public:
-	specPlotWidget(QWidget *parent = 0);
+	specPlotWidget(QWidget* parent = 0);
 	~specPlotWidget();
 	void read(QString fileName) ;
 	specView* mainView() ;
-	QToolBar *createToolbar();
+	QToolBar* createToolbar();
 public slots :
 	bool saveFile() ;
 };

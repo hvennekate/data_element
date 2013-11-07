@@ -22,10 +22,10 @@ public slots:
 	void hideAfterEditing(QWidget* old, QWidget* newW)
 	{
 		Q_UNUSED(old)
-		if (newW != (QWidget*) this)
+		if(newW != (QWidget*) this)
 		{
 			hide() ;
-			disconnect(0,0,this, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
+			disconnect(0, 0, this, SLOT(hideAfterEditing(QWidget*, QWidget*))) ;
 		}
 	}
 };
@@ -35,24 +35,24 @@ class specPlot : public QwtPlot, public specStreamable
 	Q_OBJECT
 private:
 	bool replotting ;
-	specZoomer *zoom ;
+	specZoomer* zoom ;
 	bool scaleX, scaleY ;
-	QAction *fixXAxisAction,
-	*fixYAxisAction,
-	*modifySVGs,
-	*printAction,
-	*legendAction ;
-	CanvasPicker *MetaPicker, *SVGpicker ; // TODO make pickers more prominent: accessible through
+	QAction* fixXAxisAction,
+		 *fixYAxisAction,
+		 *modifySVGs,
+		 *printAction,
+		 *legendAction ;
+	CanvasPicker* MetaPicker, *SVGpicker ; // TODO make pickers more prominent: accessible through
 	// function, attach metaRanges direktly to picker etc.
-	QwtPlotMarker *zeroYLine, *zeroXLine ;
+	QwtPlotMarker* zeroYLine, *zeroXLine ;
 	bool autoScaling ;
-	void readFromStream(QDataStream &in);
-	void writeToStream(QDataStream &out) const ;
+	void readFromStream(QDataStream& in);
+	void writeToStream(QDataStream& out) const ;
 	type typeId() const {return specStreamable::mainPlot ;}
-	specActionLibrary *undoP ;
-	void resizeEvent(QResizeEvent *e) ;
+	specActionLibrary* undoP ;
+	void resizeEvent(QResizeEvent* e) ;
 	void autoScale(const QwtPlotItemList& allItems) ;
-	void mouseDoubleClickEvent(QMouseEvent *e) ;
+	void mouseDoubleClickEvent(QMouseEvent* e) ;
 	plotAxisEdit xminEdit, xmaxEdit, yminEdit, ymaxEdit ;
 	QwtPlotMarker* initializeZeroLine() ;
 private slots:
@@ -61,14 +61,14 @@ private slots:
 	void toggleItem(QwtPlotItem*, bool) ;
 	void toggleItem(const QVariant&, bool) ;
 protected:
-	specView *view ;
+	specView* view ;
 	specActionLibrary* undoPartner() const ;
 public:
-	explicit specPlot ( QWidget *parent=NULL );
+	explicit specPlot(QWidget* parent = NULL);
 	~specPlot();
 	QAction* svgAction() const ;
-	CanvasPicker *metaPicker() ;
-	CanvasPicker *svgPicker() ;
+	CanvasPicker* metaPicker() ;
+	CanvasPicker* svgPicker() ;
 	virtual QList<QAction*> actions() ;
 	void setView(specView* mod) ;
 	void setUndoPartner(specActionLibrary* lib) ;
@@ -78,7 +78,7 @@ public:
 signals:
 	void startingReplot() ;
 	void replotted() ;
-	void metaRangeModified(specCanvasItem*,int,double,double) ;
+	void metaRangeModified(specCanvasItem*, int, double, double) ;
 public slots :
 	void replot() ;
 };

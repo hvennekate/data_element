@@ -28,7 +28,7 @@
 #define STRINGIFYMACRO(x) MAKESTRINGMACRO(x)
 #define MAKESTRINGMACRO(x) #x
 
-specPlotWidget::specPlotWidget(QWidget *parent)
+specPlotWidget::specPlotWidget(QWidget* parent)
 	: specDockWidget(tr("Data"), parent, false),
 	  actions(new specActionLibrary(this)),
 	  items(new specDataView(this)),
@@ -42,7 +42,7 @@ specPlotWidget::specPlotWidget(QWidget *parent)
 	  undoViewWidget(actions->undoWidget())
 {
 	setVisible(true) ;
-	items->setModel(new specModel(items)); // TODO redundant!  durchschleifen!
+	items->setModel(new specModel(items));   // TODO redundant!  durchschleifen!
 	plot->setView(items) ;
 
 	new specGenericMimeConverter(items->model()) ;
@@ -74,12 +74,12 @@ void specPlotWidget::read(QString fileName)
 {
 	// Checking for existence ought to have been done at this point
 	QFile file(fileName) ;
-	if (!file.open(QFile::ReadOnly))
+	if(!file.open(QFile::ReadOnly))
 	{
-		QMessageBox::critical(0,tr("Error opening"),
-					  tr("Cannot open file ")
-					  + fileName
-					  + tr(" for reading.")) ;
+		QMessageBox::critical(0, tr("Error opening"),
+				      tr("Cannot open file ")
+				      + fileName
+				      + tr(" for reading.")) ;
 		return ;
 	}
 
@@ -87,22 +87,22 @@ void specPlotWidget::read(QString fileName)
 	quint64 check ;
 	QDataStream inStream(&file) ;
 	inStream >> check ;
-	if (check != FILECHECKRANDOMNUMBER && check != FILECHECKCOMPRESSNUMBER)
+	if(check != FILECHECKRANDOMNUMBER && check != FILECHECKCOMPRESSNUMBER)
 	{
-		QMessageBox::critical(0,tr("File error"),
-					  tr("File ")
-					  + fileName
-					  + tr(" does not seem to have the right format.")) ;
+		QMessageBox::critical(0, tr("File error"),
+				      tr("File ")
+				      + fileName
+				      + tr(" does not seem to have the right format.")) ;
 		return ;
 	}
 
 	QByteArray fileContent = file.readAll() ;
 	file.close();
-	bzipIODevice *zipDevice = 0 ;
-	QBuffer buffer(&fileContent) ; // does not take ownership of byteArray
-	if (FILECHECKCOMPRESSNUMBER == check)
+	bzipIODevice* zipDevice = 0 ;
+	QBuffer buffer(&fileContent) ;  // does not take ownership of byteArray
+	if(FILECHECKCOMPRESSNUMBER == check)
 	{
-		zipDevice = new bzipIODevice(&buffer) ; // takes ownership of buffer
+		zipDevice = new bzipIODevice(&buffer) ;  // takes ownership of buffer
 		zipDevice->open(bzipIODevice::ReadOnly) ;
 		inStream.setDevice(zipDevice);
 	}
@@ -137,12 +137,12 @@ void specPlotWidget::read(QString fileName)
 	progress.setValue(5);
 	qint8 visibility = 0 ;
 	inStream >> visibility ;
-	if (zipDevice) zipDevice->releaseDevice(); // release ownership of buffer
+	if(zipDevice) zipDevice->releaseDevice();  // release ownership of buffer
 	delete zipDevice ;
 
 	changeFileName(fileName);
 	qint8 i = 1 ;
-	foreach (specDockWidget* subDock, subDocks)
+	foreach(specDockWidget * subDock, subDocks)
 	{
 		subDock->setVisible(visibility & i);
 		i *= 2 ;
@@ -151,7 +151,7 @@ void specPlotWidget::read(QString fileName)
 
 QToolBar* specPlotWidget::createToolbar()
 {
-	QToolBar *toolbar = new QToolBar(tr("Main"), this) ;
+	QToolBar* toolbar = new QToolBar(tr("Main"), this) ;
 	toolbar-> addAction(saveAction) ;
 	toolbar-> addAction(saveAsAction) ;
 	toolbar-> addSeparator() ;
@@ -163,7 +163,7 @@ QToolBar* specPlotWidget::createToolbar()
 
 void specPlotWidget::closeEvent(QCloseEvent* event)
 {
-	if (!isWindowModified()) // Pruefe, ob Aenderungsindikator gesetzt.  Wenn ja, fragen ob speichern.
+	if(!isWindowModified())  // Pruefe, ob Aenderungsindikator gesetzt.  Wenn ja, fragen ob speichern.
 	{
 		event->accept() ;
 		deleteLater();
@@ -176,14 +176,14 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 	wantToSave.setEscapeButton(QMessageBox::Cancel) ;
 	wantToSave.setWindowTitle("Save data?") ;
 	wantToSave.setText(QString("Do you want to save changes made to ")
-			   + windowFilePath() + tr("?") ) ;
+			   + windowFilePath() + tr("?")) ;
 	wantToSave.setIcon(QMessageBox::Warning) ;
 	int wantToSaveResult = wantToSave.exec() ;
 
 	event->ignore();
-	if (QMessageBox::No == wantToSaveResult ||
-			(QMessageBox::Yes == wantToSaveResult
-			 && saveFile()))
+	if(QMessageBox::No == wantToSaveResult ||
+		(QMessageBox::Yes == wantToSaveResult
+		 && saveFile()))
 	{
 		event->accept();
 		deleteLater();
@@ -193,15 +193,15 @@ void specPlotWidget::closeEvent(QCloseEvent* event)
 bool specPlotWidget::saveFile()
 {
 	QFile file(windowFilePath() == tr("untitled") || sender() == saveAsAction ?
-			   QFileDialog::getSaveFileName(this,"Name?","","spec-Dateien (*.spec)") :
-			   windowFilePath()) ;
-	if (file.fileName().isEmpty()) return false ;
+		   QFileDialog::getSaveFileName(this, "Name?", "", "spec-Dateien (*.spec)") :
+		   windowFilePath()) ;
+	if(file.fileName().isEmpty()) return false ;
 
 	QBuffer buffer ;
 	buffer.open(QBuffer::WriteOnly) ;
 	QDataStream out(&buffer) ;
 	out << quint64(FILECHECKCOMPRESSNUMBER) ;
-	out.setDevice(0); // safety
+	out.setDevice(0);  // safety
 	bzipIODevice zipDevice(&buffer) ;
 	zipDevice.open(bzipIODevice::WriteOnly) ;
 	QDataStream zipOut(&zipDevice) ;
@@ -217,20 +217,20 @@ bool specPlotWidget::saveFile()
 	zipOut << *plot ;
 	progress.setLabel(new QLabel(tr("Saving data items"))) ;
 	progress.setValue(1);
-	zipOut<< *items ;
+	zipOut << *items ;
 	progress.setLabel(new QLabel(tr("Saving log data"))) ;
 	progress.setValue(2);
-	zipOut<< *logWidget ;
+	zipOut << *logWidget ;
 	progress.setLabel(new QLabel(tr("Saving meta data"))) ;
 	progress.setValue(3) ;
 	zipOut << *kineticWidget ;
 	progress.setLabel(new QLabel(tr("Saving undo history"))) ;
 	progress.setValue(4);
 	actions->setProgressDialog(&progress) ;
-	zipOut<< *actions ;
+	zipOut << *actions ;
 	progress.setValue(progress.maximum());
 	qint8 visibility = 0, i = 1 ;
-	foreach(specDockWidget *subDock, subDocks)
+	foreach(specDockWidget * subDock, subDocks)
 	{
 		visibility += i * subDock->isVisible() ;
 		i *= 2 ;
@@ -242,14 +242,14 @@ bool specPlotWidget::saveFile()
 	buffer.buffer().append(QString("/") + STRINGIFYMACRO(GITSHA1HASH)) ;
 	qDebug() << QString("GITSHA1HASH") ;
 	buffer.close();
-	if (!file.open(QFile::WriteOnly))
+	if(!file.open(QFile::WriteOnly))
 	{
 		QMessageBox::critical(0, tr("Write error"), tr("Could not open file ")
-					  + file.fileName()
-					  + tr("for writing.")) ;
+				      + file.fileName()
+				      + tr("for writing.")) ;
 		return false ;
 	}
-	if (file.write(buffer.data()) == -1)
+	if(file.write(buffer.data()) == -1)
 	{
 		QMessageBox::critical(0, tr("Severe error!"), tr("Error writing file!  Data could not be saved!")) ;
 		return false ;
@@ -261,27 +261,27 @@ bool specPlotWidget::saveFile()
 
 specPlotWidget::~specPlotWidget()
 {
-	foreach (specDockWidget *subDock, subDocks)
-		delete subDock ; // No deleteLater here, otherwise we get in trouble with the mainPlot autodeleting/detaching metaRanges
-	QMainWindow* p = qobject_cast<QMainWindow*>(parentWidget()) ;
-	if (p) p->removeDockWidget(this) ;
+	foreach(specDockWidget * subDock, subDocks)
+	delete subDock ; // No deleteLater here, otherwise we get in trouble with the mainPlot autodeleting/detaching metaRanges
+	QMainWindow* p = qobject_cast<QMainWindow*> (parentWidget()) ;
+	if(p) p->removeDockWidget(this) ;
 }
 
 void specPlotWidget::setConnections()
 {
 	connect(saveAction, SIGNAL(triggered()), this, SLOT(saveFile()));
 	connect(saveAsAction, SIGNAL(triggered()), this, SLOT(saveFile()));
-	connect(kineticWidget->internalPlot(),SIGNAL(replotted()),plot,SLOT(replot())) ;
-	connect(kineticWidget->internalPlot(), SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(), SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
-	connect(plot, SIGNAL(metaRangeModified(specCanvasItem*,int,double,double)), kineticWidget->view(),SLOT(rangeModified(specCanvasItem*,int,double,double))) ;
-	connect(plot->svgAction(),SIGNAL(toggled(bool)),this,SLOT(svgModification(bool))) ;
+	connect(kineticWidget->internalPlot(), SIGNAL(replotted()), plot, SLOT(replot())) ;
+	connect(kineticWidget->internalPlot(), SIGNAL(metaRangeModified(specCanvasItem*, int, double, double)), kineticWidget->view(), SLOT(rangeModified(specCanvasItem*, int, double, double))) ;
+	connect(plot, SIGNAL(metaRangeModified(specCanvasItem*, int, double, double)), kineticWidget->view(), SLOT(rangeModified(specCanvasItem*, int, double, double))) ;
+	connect(plot->svgAction(), SIGNAL(toggled(bool)), this, SLOT(svgModification(bool))) ;
 	connect(actions, SIGNAL(stackModified(bool)), this, SLOT(setWindowModified(bool))) ;
 }
 
 void specPlotWidget::svgModification(bool mod)
 {
-	if (mod) connect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
-	else disconnect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
+	if(mod) connect(plot->svgPicker(), SIGNAL(pointMoved(specCanvasItem*, int, double, double)), items->model(), SLOT(svgMoved(specCanvasItem*, int, double, double))) ;
+	else disconnect(plot->svgPicker(), SIGNAL(pointMoved(specCanvasItem*, int, double, double)), items->model(), SLOT(svgMoved(specCanvasItem*, int, double, double))) ;
 
 	plot->svgPicker()->highlightSelectable(mod) ;
 }
@@ -297,17 +297,17 @@ void specPlotWidget::changeFileName(const QString& name)
 	event(new QEvent(QEvent::WindowTitleChange)) ;
 }
 
-void specPlotWidget::changeEvent(QEvent *event)
+void specPlotWidget::changeEvent(QEvent* event)
 {
-	if (event->type() == QEvent::ModifiedChange)
-		foreach(specDockWidget* subDock, subDocks)
-			subDock->setWindowModified(isWindowModified());
-	if (event->type() == QEvent::WindowTitleChange)
+	if(event->type() == QEvent::ModifiedChange)
+		foreach(specDockWidget * subDock, subDocks)
+		subDock->setWindowModified(isWindowModified());
+	if(event->type() == QEvent::WindowTitleChange)
 	{
-		foreach(specDockWidget* subDock, subDocks)
+		foreach(specDockWidget * subDock, subDocks)
 		{
 			subDock->setWindowFilePath(windowFilePath()) ;
-			subDock->setWindowTitle(QString()) ; // just to invoke the event
+			subDock->setWindowTitle(QString()) ;  // just to invoke the event
 		}
 	}
 	specDockWidget::changeEvent(event) ;

@@ -7,10 +7,10 @@ class specNewMetaItemAction : public specItemAction
 {
 	Q_OBJECT
 public:
-	explicit specNewMetaItemAction(QObject *parent = 0);
-	const std::type_info &possibleParent() ;
+	explicit specNewMetaItemAction(QObject* parent = 0);
+	const std::type_info& possibleParent() ;
 protected:
-	specUndoCommand *generateUndoCommand() ;
+	specUndoCommand* generateUndoCommand() ;
 };
 
 #endif // SPECNEWMETAITEMACTION_H

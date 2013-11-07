@@ -10,14 +10,14 @@ private:
 	int rangeNo, pointNo, variableNo ;
 	void undoIt() ;
 	void doIt() ;
-	void writeCommand(QDataStream &out) const ;
-	void readCommand(QDataStream &in) ;
+	void writeCommand(QDataStream& out) const ;
+	void readCommand(QDataStream& in) ;
 	type typeId() const { return specStreamable::metaRangeCommand ; }
 public:
 	specMetaRangeCommand(specUndoCommand* parent = 0);
-	bool mergeWith(const QUndoCommand *other) ;
+	bool mergeWith(const QUndoCommand* other) ;
 	void setItem(specMetaItem*, int VariableIndex, int rangeIndex, int pointNo, double newX, double newY) ;
-	bool mergeable(const specUndoCommand *other) ;
+	bool mergeable(const specUndoCommand* other) ;
 };
 
 #endif // SPECMETARANGECOMMAND_H

@@ -11,12 +11,12 @@
 
 inline double modulo(double a, double b)
 {
-	return int(a) % int(b) ;
+	return int (a) % int (b) ;
 }
 
 QString specSpectrumCalculatorAction::parameterName(int i)
 {
-	return "p"+QString::number(i) ;
+	return "p" + QString::number(i) ;
 }
 
 QStringList specSpectrumCalculatorAction::descriptorNames(QString& teststring)
@@ -27,14 +27,14 @@ QStringList specSpectrumCalculatorAction::descriptorNames(QString& teststring)
 	int index = 0 ;
 	while((index = re.indexIn(teststring)) != -1)
 	{
-		descriptorNames << re.cap().mid(1,re.cap().length()-2) ;
+		descriptorNames << re.cap().mid(1, re.cap().length() - 2) ;
 		teststring.remove(index, re.matchedLength()) ;
 		teststring.insert(index, parameterName(i++)) ;
 	}
 	return descriptorNames ;
 }
 
-specSpectrumCalculatorAction::specSpectrumCalculatorAction(QObject *parent) :
+specSpectrumCalculatorAction::specSpectrumCalculatorAction(QObject* parent) :
 	specRequiresDataItemAction(parent),
 	dialog(new spectrumCalculatorDialog)
 {
@@ -59,13 +59,13 @@ specUndoCommand* specSpectrumCalculatorAction::generateUndoCommand()
 	// prepare items
 	QList<specModelItem*> items, folders ;
 	expandSelectedFolders(items, folders);
-	if (items.isEmpty()) return 0 ; // TODO include this in requirements
+	if(items.isEmpty()) return 0 ;  // TODO include this in requirements
 
 	// get formulae
-	if (!dialog->exec()) return 0 ;
+	if(!dialog->exec()) return 0 ;
 
 	// prepare multi command
-	specMultiCommand *parentCommand = new specMultiCommand ;
+	specMultiCommand* parentCommand = new specMultiCommand ;
 	parentCommand->setParentObject(model) ;
 	parentCommand->setMergeable(false) ;
 
@@ -88,15 +88,15 @@ specUndoCommand* specSpectrumCalculatorAction::generateUndoCommand()
 
 	// generate new data
 	int failCount = 0 ;
-	foreach (specModelItem* item, items)
+	foreach(specModelItem * item, items)
 	{
 		size_t count = item->dataSize() ;
-		double *oldX = new double[count],
-				*oldY = new double[count],
-				*newX = new double[count],
-				*newY = new double[count];
+		double* oldX = new double[count],
+		*oldY = new double[count],
+		*newX = new double[count],
+		*newY = new double[count];
 
-		for (size_t i = 0 ; i < count ; ++i)
+		for(size_t i = 0 ; i < count ; ++i)
 		{
 			QPointF point = item->sample(i) ;
 			oldX[i] = point.x() ;
@@ -124,11 +124,11 @@ specUndoCommand* specSpectrumCalculatorAction::generateUndoCommand()
 			xParser.Eval(newX, count) ;
 			yParser.Eval(newY, count) ;
 
-			for (size_t i = 0 ; i < count ; ++i)
+			for(size_t i = 0 ; i < count ; ++i)
 				newData << specDataPoint(newX[i], newY[i], 0.) ;
 			evaluationOk = true ;
 		}
-		catch (...) {}
+		catch(...) {}
 
 		delete[] oldX ;
 		delete[] oldY ;
@@ -138,25 +138,25 @@ specUndoCommand* specSpectrumCalculatorAction::generateUndoCommand()
 		failCount += !evaluationOk ;
 
 		// prepare the command
-		if (evaluationOk)
+		if(evaluationOk)
 		{
-			if (specDataItem* dataItem = dynamic_cast<specDataItem*>(item))
+			if(specDataItem* dataItem = dynamic_cast<specDataItem*>(item))
 				dataItem->reverseCorrection(newData) ;
-			specExchangeDataCommand *command = new specExchangeDataCommand(parentCommand) ;
+			specExchangeDataCommand* command = new specExchangeDataCommand(parentCommand) ;
 			command->setParentObject(model) ;
 			command->setItem(item, newData);
 		}
 	}
 
-	if (failCount)
-		QMessageBox::warning(0,tr("Failed to evaluate"), tr("Failed to evaluate new data for ")
-					 + QString::number(failCount)
-					 + tr(" items. These items remained unchanged.")) ;
+	if(failCount)
+		QMessageBox::warning(0, tr("Failed to evaluate"), tr("Failed to evaluate new data for ")
+				     + QString::number(failCount)
+				     + tr(" items. These items remained unchanged.")) ;
 
 	// return command
 	parentCommand->setText(tr("Arithmetic operation on data. New x: ")
-				   + dialog->xFormula() + ". New y: "
-				   + dialog->yFormula() + "." );
+			       + dialog->xFormula() + ". New y: "
+			       + dialog->yFormula() + ".");
 	return parentCommand ;
 }
 

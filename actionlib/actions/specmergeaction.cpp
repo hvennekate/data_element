@@ -15,20 +15,20 @@
 class sortItemsByDescriptionFunctor
 {
 private:
-	const QStringList *comparisons ;
+	const QStringList* comparisons ;
 public:
-	sortItemsByDescriptionFunctor(const QStringList *c) : comparisons(c) {}
-	bool operator() (specModelItem const* a, specModelItem const* b)
+	sortItemsByDescriptionFunctor(const QStringList* c) : comparisons(c) {}
+	bool operator()(specModelItem const* a, specModelItem const* b)
 	{
 		foreach(QString value, *comparisons)
 		{
-			if (a->descriptor(value, true) == b->descriptor(value, true)) continue ;
-			if (a->descriptorProperties(value) & spec::numeric)
-				return a->descriptor(value).toDouble() <b->descriptor(value).toDouble() ;
+			if(a->descriptor(value, true) == b->descriptor(value, true)) continue ;
+			if(a->descriptorProperties(value) & spec::numeric)
+				return a->descriptor(value).toDouble() < b->descriptor(value).toDouble() ;
 			return a->descriptor(value, true) < b->descriptor(value, true) ;
 		}
-		if (!b->dataSize()) return false ;
-		if (!a->dataSize()) return true ;
+		if(!b->dataSize()) return false ;
+		if(!a->dataSize()) return true ;
 		return a->sample(0).x() < b->sample(0).x() ;
 	}
 };
@@ -36,7 +36,7 @@ public:
 class mergeActionThread : public specWorkerThread
 {
 private:
-	specMultiCommand *Command ;
+	specMultiCommand* Command ;
 	specModel* model ;
 	QList<stringDoublePair > criteria ;
 	bool spectralAdaptation ;
@@ -46,7 +46,7 @@ private:
 
 	bool cleanUp() // TODO parentClass
 	{
-		if (!toTerminate) return false ;
+		if(!toTerminate) return false ;
 		items.clear();
 		delete Command ;
 		return true ;
@@ -58,7 +58,7 @@ private:
 
 public:
 	mergeActionThread(specModel* Model, QList<specModelItem*> itms, QList<stringDoublePair> crit, bool sadap)
-		: specWorkerThread(itms.size()+offset),
+		: specWorkerThread(itms.size() + offset),
 		  Command(0),
 		  model(Model),
 		  criteria(crit),
@@ -67,9 +67,9 @@ public:
 	{
 	}
 
-	specUndoCommand *command()
+	specUndoCommand* command()
 	{
-		specUndoCommand *oc = Command ;
+		specUndoCommand* oc = Command ;
 		Command = 0 ;
 		return oc ;
 	}
@@ -85,51 +85,51 @@ public:
 		int total = items.size() ;
 		QStringList comparisons ;
 		foreach(stringDoublePair pair, criteria)
-			comparisons << pair.first ;
+		comparisons << pair.first ;
 		sortItemsByDescriptionFunctor sorter(&comparisons) ;
-		while (!items.isEmpty())
+		while(!items.isEmpty())
 		{
-			int progress = total-items.size() ;
+			int progress = total - items.size() ;
 			emit progressValue(progress);
 			// form chunk -> only merge if same parent! (new logic)
 			QList<specModelItem*> chunk ;
-			specFolderItem * const parent = items.first()->parent() ;
+			specFolderItem* const parent = items.first()->parent() ;
 			const int row = parent->childNo(items.first()) ;
-			while (!items.isEmpty() && items.first()->parent() == parent && parent->childNo(items.first()) == row + chunk.size())
+			while(!items.isEmpty() && items.first()->parent() == parent && parent->childNo(items.first()) == row + chunk.size())
 				chunk << items.takeFirst() ;
 
 			QList<specModelItem*> toInsert ;
-			int chunkSize =chunk.size() ;
+			int chunkSize = chunk.size() ;
 			qSort(chunk.begin(), chunk.end(), sorter) ;
-			while (!chunk.isEmpty())
+			while(!chunk.isEmpty())
 			{
-				emit progressValue(progress+chunkSize-chunk.size()) ;
-				if (cleanUp()) return ;
-				specDataItem *newItem = new specDataItem(QVector<specDataPoint>(),QHash<QString,specDescriptor>()) ;
+				emit progressValue(progress + chunkSize - chunk.size()) ;
+				if(cleanUp()) return ;
+				specDataItem* newItem = new specDataItem(QVector<specDataPoint>(), QHash<QString, specDescriptor>()) ;
 				QList<specModelItem*> toMergeWith ;
 				// look for items to merge with
 				do toMergeWith << chunk.takeFirst() ;
-				while (!chunk.isEmpty() && itemsAreEqual(toMergeWith.first(), chunk.first(), criteria)) ;
+				while(!chunk.isEmpty() && itemsAreEqual(toMergeWith.first(), chunk.first(), criteria)) ;
 
 				toBeDeleted << toMergeWith ;
 				// if there are others, do the merge
-				if (!toMergeWith.isEmpty())
+				if(!toMergeWith.isEmpty())
 				{
-					if (spectralAdaptation)
+					if(spectralAdaptation)
 					{
-						foreach(specModelItem* other,toMergeWith)
+						foreach(specModelItem * other, toMergeWith)
 						{
 							// generate reference spectrum
-							QMap<double,double> reference ;
+							QMap<double, double> reference ;
 							newItem->revalidate();
-							for (size_t i = 0 ; i < newItem->dataSize() ; ++i)
+							for(size_t i = 0 ; i < newItem->dataSize() ; ++i)
 							{
 								const QPointF point = newItem->sample(i) ;
 								reference[point.x()] = point.y() ;
 							}
 
 							// define spectral ranges
-							specRange *range = new specRange(reference.begin().key(), (reference.end() -1).key()) ;
+							specRange* range = new specRange(reference.begin().key(), (reference.end() - 1).key()) ;
 							QwtPlotItemList ranges ;
 							ranges << range ; // DANGER
 							// protection against nan values (make sure spectra do indeed overlap)
@@ -137,31 +137,31 @@ public:
 							for(size_t i = 0 ; i < other->dataSize() ; ++i)
 							{
 								overlappingCount += range->contains(other->sample(i).x()) ;
-								if (overlappingCount == 2) break ;
+								if(overlappingCount == 2) break ;
 							}
-							if (overlappingCount == 2)
+							if(overlappingCount == 2)
 							{
 								// perform spectral adaptation
 								// TODO NAN protection
-								specMultiCommand *correctionCommand= specSpectrumPlot::generateCorrectionCommand(ranges, QwtPlotItemList() << (QwtPlotItem*) other, reference, model, true, true) ;
+								specMultiCommand* correctionCommand = specSpectrumPlot::generateCorrectionCommand(ranges, QwtPlotItemList() << (QwtPlotItem*) other, reference, model, true, true) ;
 								correctionCommand->redo();
-								*newItem += *((specDataItem*) other) ;
+								*newItem += * ((specDataItem*) other) ;
 								correctionCommand->undo();
 								delete correctionCommand ;
 							}
 							else
-								*newItem += *((specDataItem*) other) ;
+								*newItem += * ((specDataItem*) other) ;
 							delete range ;
 						}
 					}
 					else
-						foreach(specModelItem* other, toMergeWith)
-							*newItem += *((specDataItem*) other) ; // TODO check this cast
+						foreach(specModelItem * other, toMergeWith)
+						*newItem += * ((specDataItem*) other) ;  // TODO check this cast
 					newItem->flatten();
 				}
 				toInsert << newItem ; // this creates overhead if  there are many items not to be merged...
 			}
-			if (model->insertItems(toInsert, model->index(parent), row))
+			if(model->insertItems(toInsert, model->index(parent), row))
 				newlyInserted << toInsert ; // TODO else...
 		}
 		emit progressValue(total) ;
@@ -172,36 +172,36 @@ public:
 
 		// compile description
 		QStringList criteriaDescription ;
-		foreach(const stringDoublePair& comparison, criteria)
-			criteriaDescription << comparison.first + " (" + QString::number(comparison.second) + ")" ;
+		foreach(const stringDoublePair & comparison, criteria)
+		criteriaDescription << comparison.first + " (" + QString::number(comparison.second) + ")" ;
 		QString description = tr("Merge ")
-				+ QString::number(toBeDeleted.size())
-				+ tr(" items to ")
-				+ QString::number(newlyInserted.size())
-				+ tr(" items.") ;
-		if (spectralAdaptation)
+				      + QString::number(toBeDeleted.size())
+				      + tr(" items to ")
+				      + QString::number(newlyInserted.size())
+				      + tr(" items.") ;
+		if(spectralAdaptation)
 			description += tr(" Items aligned prior to merging.") ;
-		if (!criteriaDescription.isEmpty())
+		if(!criteriaDescription.isEmpty())
 			(description += tr(" Criteria (Tolerance): ")) += criteriaDescription.join(", ") ;
 		Command->setText(description) ;
 
 		// preparing insertion command
-		specAddFolderCommand *insertionCommand = new specAddFolderCommand(Command) ;
+		specAddFolderCommand* insertionCommand = new specAddFolderCommand(Command) ;
 		insertionCommand->setParentObject(model) ;
 		insertionCommand->setItems(newlyInserted) ;
 
 
 		// prepare to delete the old items
-		specDeleteCommand *deletionCommand = new specDeleteCommand(Command) ;
+		specDeleteCommand* deletionCommand = new specDeleteCommand(Command) ;
 		deletionCommand->setParentObject(model) ;
 		deletionCommand->setItems(toBeDeleted) ;
 
 		cleanUp() ;
-		emit progressValue(total+offset);
+		emit progressValue(total + offset);
 	}
 };
 
-specMergeAction::specMergeAction(QObject *parent)
+specMergeAction::specMergeAction(QObject* parent)
 	: specRequiresDataItemAction(parent),
 	  dialog(new specMergeDialog(0))
 {
@@ -220,35 +220,35 @@ specMergeAction::~specMergeAction()
 specUndoCommand* specMergeAction::generateUndoCommand()
 {
 	specProfiler profiler("Prepare merge commands:") ;
-	if (selection.size() < 2) return 0 ;
+	if(selection.size() < 2) return 0 ;
 	qSort(pointers.begin(), pointers.end(), specModel::lessThanItemPointer) ;
 
 	// let user define similarities
 	QList<stringDoublePair > criteria ;
 	bool spectralAdaptation ;
 	dialog->setDescriptors(model->descriptors(), model->descriptorProperties()) ;
-	if (dialog->exec() != QDialog::Accepted) return 0 ;
+	if(dialog->exec() != QDialog::Accepted) return 0 ;
 	dialog->getMergeCriteria(criteria, spectralAdaptation);
 	mergeActionThread mat(model, pointers, criteria, spectralAdaptation) ;
 	mat.run();
 	return mat.command() ;
 }
 
-bool mergeActionThread::itemsAreEqual(specModelItem* first, specModelItem* second, const QList<stringDoublePair>& criteria) // TODO insert actual strings into merge criteria
+bool mergeActionThread::itemsAreEqual(specModelItem* first, specModelItem* second, const QList<stringDoublePair>& criteria)  // TODO insert actual strings into merge criteria
 {
-	if (!first || !second)
+	if(!first || !second)
 		return false ;
 	// TODO may need to be revised if descriptor contains actual numeric value, not QString
 	foreach(stringDoublePair criterion, criteria)
 	{
 		double tolerance = criterion.second ;
-		if (tolerance != -1)
+		if(tolerance != -1)
 		{
 			double a = first->descriptor(criterion.first).toDouble(),
-					b = second->descriptor(criterion.first).toDouble() ;
-			if (!(b-tolerance <= a && a <= b+tolerance)) return false ;
+			       b = second->descriptor(criterion.first).toDouble() ;
+			if(!(b - tolerance <= a && a <= b + tolerance)) return false ;
 		}
-		else if (first->descriptor(criterion.first,true) != second->descriptor(criterion.first,true))
+		else if(first->descriptor(criterion.first, true) != second->descriptor(criterion.first, true))
 			return false ;
 	}
 	return true ;

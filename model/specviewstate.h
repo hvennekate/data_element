@@ -11,7 +11,7 @@ class specModel ;
 class specViewState : public specStreamable
 {
 private:
-	specView *parent ;
+	specView* parent ;
 	QVector<specFolderItem*> openFolders ;
 	QVector<specModelItem*> selectedItems ;
 	specModelItem* currentTopItem ;
@@ -22,8 +22,8 @@ private:
 	void purgeLists() ;
 	inline specModel* model() const { return parent ? parent->model() : 0 ; }
 	specModelItem* hierarchyPointer(const QVector<int>&) ;
-	void writeToStream(QDataStream &out) const ;
-	void readFromStream(QDataStream &in) ;
+	void writeToStream(QDataStream& out) const ;
+	void readFromStream(QDataStream& in) ;
 	type typeId() const { return specStreamable::viewState ; }
 public:
 	explicit specViewState(specView* Parent) ;

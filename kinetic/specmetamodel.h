@@ -13,13 +13,13 @@ private:
 	void setModels(specModelItem*) ;
 	QStringList dataTypes() const ;
 public:
-	explicit specMetaModel(QObject *parent = 0);
+	explicit specMetaModel(QObject* parent = 0);
 	void setDataModel(specModel*) ;
 	specModel* getDataModel() const ;
 	~specMetaModel() ;
 	QList<specFileImportFunction> acceptableImportFunctions() const ;
 
-	bool insertItems(QList<specModelItem *> list, QModelIndex parent, int row) ;
+	bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row) ;
 	// TODO reimplement read/insert mime.
 };
 

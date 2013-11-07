@@ -6,7 +6,7 @@
 #include <QApplication>
 #include <QClipboard>
 
-specPasteAction::specPasteAction(QObject *parent) :
+specPasteAction::specPasteAction(QObject* parent) :
 	specItemAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("edit-paste")) ;
@@ -31,9 +31,9 @@ bool specPasteAction::specificRequirements()
 specUndoCommand* specPasteAction::generateUndoCommand()
 {
 	specFolderItem* parentFolder = dynamic_cast<specFolderItem*>(model->itemPointer(insertionIndex)) ;
-	if (!parentFolder) return 0 ;
+	if(!parentFolder) return 0 ;
 	QList<specModelItem*> oldChildren = parentFolder->childrenList() ;
-	if (!model->dropMimeData(QApplication::clipboard()->mimeData(),Qt::CopyAction,insertionRow,0,insertionIndex))
-		QMessageBox::critical(0,tr("Paste error"), tr("Could not paste correctly."));
+	if(!model->dropMimeData(QApplication::clipboard()->mimeData(), Qt::CopyAction, insertionRow, 0, insertionIndex))
+		QMessageBox::critical(0, tr("Paste error"), tr("Could not paste correctly."));
 	return 0 ;
 }

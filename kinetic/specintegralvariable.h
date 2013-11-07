@@ -5,7 +5,7 @@
 class specIntegralVariable : public specMetaVariable
 {
 protected:
-	double processPoints(QVector<QPointF> &points) const ;
+	double processPoints(QVector<QPointF>& points) const ;
 };
 
 #endif // SPECINTEGRALVARIABLE_H

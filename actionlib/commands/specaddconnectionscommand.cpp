@@ -1,7 +1,7 @@
 #include "specaddconnectionscommand.h"
 #include "specmetaitem.h"
 
-specAddConnectionsCommand::specAddConnectionsCommand(specUndoCommand *parent)
+specAddConnectionsCommand::specAddConnectionsCommand(specUndoCommand* parent)
 	: specManageConnectionsCommand(parent)
 {
 }
@@ -16,7 +16,7 @@ void specAddConnectionsCommand::undoIt()
 	take();
 }
 
-void specAddConnectionsCommand::processServers(specMetaItem *client, QList<specModelItem *> &servers) const
+void specAddConnectionsCommand::processServers(specMetaItem* client, QList<specModelItem*>& servers) const
 {
 	servers = (servers.toSet() - client->serverList().toSet()).toList() ;
 }

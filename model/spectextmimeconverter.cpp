@@ -6,12 +6,12 @@
 #include "specdataitem.h"
 #include <QDoubleValidator>
 
-specTextMimeConverter::specTextMimeConverter(QObject *parent)
+specTextMimeConverter::specTextMimeConverter(QObject* parent)
 	: specMimeTextExporter(parent)
 {
 }
 
-QList<specModelItem*> specTextMimeConverter::importData(const QMimeData *data)
+QList<specModelItem*> specTextMimeConverter::importData(const QMimeData* data)
 {
 	QStringList lines = data->text().split("\n") ;
 	QDoubleValidator validator ;
@@ -19,18 +19,18 @@ QList<specModelItem*> specTextMimeConverter::importData(const QMimeData *data)
 	foreach(QString line, lines)
 	{
 		QStringList values = line.split(QRegExp("\\s+"), QString::SkipEmptyParts) ;
-		if (values.size() < 2) continue ;
+		if(values.size() < 2) continue ;
 		int pos = 0 ;
-		if (validator.validate(values[0],pos) != QValidator::Acceptable) continue ;
+		if(validator.validate(values[0], pos) != QValidator::Acceptable) continue ;
 		pos = 0 ; // TODO check if changed!
-		if (validator.validate(values[1],pos) != QValidator::Acceptable) continue ;
-		dataPoints << specDataPoint(values[0].toDouble(), values[1].toDouble(),0) ;
+		if(validator.validate(values[1], pos) != QValidator::Acceptable) continue ;
+		dataPoints << specDataPoint(values[0].toDouble(), values[1].toDouble(), 0) ;
 	}
-	if (dataPoints.isEmpty()) return QList<specModelItem*>() ;
+	if(dataPoints.isEmpty()) return QList<specModelItem*>() ;
 	return QList<specModelItem*>() << new specDataItem(dataPoints, QHash<QString, specDescriptor>()) ;
 }
 
-bool specTextMimeConverter::canImport(const QStringList &types)
+bool specTextMimeConverter::canImport(const QStringList& types)
 {
 	return types.contains("text/plain") ;
 }

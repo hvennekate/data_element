@@ -1,8 +1,8 @@
 #include "speczoomer.h"
 #include <QTextStream>
 
-specZoomer::specZoomer(QWidget *canvas)
-	: QwtPlotZoomer(canvas,false)
+specZoomer::specZoomer(QWidget* canvas)
+	: QwtPlotZoomer(canvas, false)
 {
 	setTrackerMode(AlwaysOn);
 
@@ -21,21 +21,21 @@ void specZoomer::changeZoomBase(const QRectF& rect)
 	QStack<QRectF> stack = zoomStack() ; // TODO ueberarbeiten!
 	stack.remove(0) ;
 	for(QStack<QRectF>::size_type i = 0 ; i < stack.size() ; i++)
-		if (! rect.contains(stack[i]))
+		if(! rect.contains(stack[i]))
 			stack.remove(i--) ;
 	stack.prepend(rect) ;
 	setZoomStack(stack, stack.indexOf(zoomRect())) ;
 }
 
-QwtText specZoomer::trackerText(const QPointF &pos) const
+QwtText specZoomer::trackerText(const QPointF& pos) const
 {
 	QColor bg(Qt::white);
 #if QT_VERSION >= 0x040300
 	bg.setAlpha(200);
 #endif
 	QwtText text ; //alt: = QwtPlotZoomer::trackerText(pos);
-	text.setText(QString("%1, %2").arg(pos.x(),0,'f',2).arg(pos.y(),0,'f',3)) ;
-	text.setBackgroundBrush( QBrush( bg ));
+	text.setText(QString("%1, %2").arg(pos.x(), 0, 'f', 2).arg(pos.y(), 0, 'f', 3)) ;
+	text.setBackgroundBrush(QBrush(bg));
 	return text;
 }
 

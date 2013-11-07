@@ -28,15 +28,15 @@ class specActionLibrary : public QObject, public specStreamable
 {
 	Q_OBJECT
 public:
-	explicit specActionLibrary(QObject *parent = 0);
+	explicit specActionLibrary(QObject* parent = 0);
 	~specActionLibrary() ;
 	//	QMenuBar *menuBar(QObject*) ;
-	QToolBar *toolBar(QWidget*) ;
-	QMenu *contextMenu(QWidget*) ; // actionLibrary bekommt Clients in fester Reihenfolge; speichert diese mit den Commands und restauriert so deren Referenz.
+	QToolBar* toolBar(QWidget*) ;
+	QMenu* contextMenu(QWidget*) ;  // actionLibrary bekommt Clients in fester Reihenfolge; speichert diese mit den Commands und restauriert so deren Referenz.
 	QObject* parentId(int) ;
 	void addDragDropPartner(specModel*) ;
 	void setLastRequested(const QModelIndexList&) ;
-	int moveInternally(const QModelIndex&, int row, specModel *) ;
+	int moveInternally(const QModelIndex&, int row, specModel*) ;
 	int deleteInternally(specModel*) ;
 	void addPlot(specPlot*) ;
 	QAction* undoAction(QObject*) ;
@@ -53,19 +53,19 @@ private slots:
 	void stackClean(const bool&) ;
 	void purgeUndo() ;
 private:
-	void writeToStream(QDataStream &out) const;
-	void readFromStream(QDataStream &in) ;
+	void writeToStream(QDataStream& out) const;
+	void readFromStream(QDataStream& in) ;
 	type typeId() const { return specStreamable::actionLibrary ; }
-	QUndoStack *undoStack ;
+	QUndoStack* undoStack ;
 	QVector<QObject*> parents ;
 	QVector<specModel*> partners;
 	QModelIndexList lastRequested ;
 	void addParent(QObject*) ;
 	void addNewAction(QToolBar*, specUndoAction*) ;
-	specStreamable* factory(const type &t) const ;
-	QProgressDialog *progress ;
+	specStreamable* factory(const type& t) const ;
+	QProgressDialog* progress ;
 	QAction* purgeUndoAction ;
-	specDockWidget *dockWidget ;
+	specDockWidget* dockWidget ;
 };
 
 class specHistoryWidget : public specDockWidget
@@ -74,7 +74,7 @@ class specHistoryWidget : public specDockWidget
 	QList<QWidget*> mainWidgets() const ;
 	QUndoView* undoView ;
 public:
-	explicit specHistoryWidget(QUndoStack* stack = 0, QWidget *parent = 0) ;
+	explicit specHistoryWidget(QUndoStack* stack = 0, QWidget* parent = 0) ;
 } ;
 
 #endif // SPECACTIONLIBRARY_H

@@ -11,7 +11,7 @@ private:
 	void undoIt() ;
 	type typeId() const { return specStreamable::toggleFitStyleCommand ; }
 public:
-	explicit specToggleFitStyleCommand(specUndoCommand *parent = 0);
+	explicit specToggleFitStyleCommand(specUndoCommand* parent = 0);
 };
 
 #endif // SPECTOGGLEFITSTYLECOMMAND_H

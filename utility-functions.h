@@ -23,11 +23,11 @@ QList<specModelItem*> readPEBinary(QFile&) ;
 QList<specModelItem*> readJCAMPFile(QFile&) ;
 QList<specModelItem*> readSKHIFile(QFile&) ;
 QList<specModelItem*> readXYFILE(QFile&) ;
-QPair<QString,specDescriptor> readJCAMPldr(QString &first,QTextStream &in) ;
+QPair<QString, specDescriptor> readJCAMPldr(QString& first, QTextStream& in) ;
 specModelItem* readJCAMPBlock(QTextStream& in) ;
 void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, double xfactor, double yfactor) ;
 QVector<double> waveNumbers(QTextStream&) ;
-QHash<QString,specDescriptor> fileHeader(QTextStream&) ;
+QHash<QString, specDescriptor> fileHeader(QTextStream&) ;
 specFileImportFunction fileFilter(const QString& fileName);
 QVector<double> gaussjinv(QVector<QVector<double> >&, QVector<double>&) ;
 
@@ -36,12 +36,12 @@ bool comparePoints(const QPointF&, const QPointF&) ;
 /*! Accumulate items equal to begin and average them in return value.
     begin will be changed to past the last accumulated item.*/
 template<typename T, class forwardIterator, typename binaryPredicate> // TODO mehr benutzen!
-inline T average(forwardIterator& begin,const forwardIterator& end, binaryPredicate equal, const T first)
+inline T average(forwardIterator& begin, const forwardIterator& end, binaryPredicate equal, const T first)
 {
 	begin++ ;
 	T retVal = first ;
 	int count = 1 ;
-	while (begin != end && equal(*begin,first))
+	while(begin != end && equal(*begin, first))
 	{
 		retVal += *begin++ ;
 		++ count ;
@@ -69,7 +69,7 @@ template<class forwardIterator, class outputIterator, typename binaryPredicate>
 inline void averageToNew(forwardIterator begin, forwardIterator end,
 			 binaryPredicate equal, outputIterator target)
 {
-	while (begin != end)
+	while(begin != end)
 		*target++ = average(begin, end, equal, *begin) ;
 }
 

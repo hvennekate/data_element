@@ -9,7 +9,7 @@ class specMultipleItemCommand : public specUndoCommand
 private:
 	QVector<specGenealogy> items ;
 	void writeCommand(QDataStream& out) const ;
-	void readCommand(QDataStream &in);
+	void readCommand(QDataStream& in);
 protected:
 	void writeItems(QDataStream&) const ;
 	void readItems(QDataStream&, qint32 = -1) ;

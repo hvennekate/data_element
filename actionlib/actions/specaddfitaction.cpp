@@ -4,7 +4,7 @@
 #include "specexchangefitcurvecommand.h"
 #include "specmulticommand.h"
 
-specAddFitAction::specAddFitAction(QObject *parent) :
+specAddFitAction::specAddFitAction(QObject* parent) :
 	specRequiresMetaItemAction(parent)
 {
 	setIcon(QIcon(":/addFit.png")) ;
@@ -16,19 +16,19 @@ specAddFitAction::specAddFitAction(QObject *parent) :
 
 specUndoCommand* specAddFitAction::generateUndoCommand()
 {
-	specMultiCommand *parentCommand = new specMultiCommand ;
+	specMultiCommand* parentCommand = new specMultiCommand ;
 	parentCommand->setText(tr("Add fit curve")) ;
 	parentCommand->setParentObject(model) ;
-	foreach(specModelItem* pointer, pointers)
+	foreach(specModelItem * pointer, pointers)
 	{
-		specMetaItem *item = (specMetaItem*) pointer ; // TODO template itemAction
-		if (item->getFitCurve()) continue ;
+		specMetaItem* item = (specMetaItem*) pointer ; // TODO template itemAction
+		if(item->getFitCurve()) continue ;
 		(new specExchangeFitCurveCommand(parentCommand))
-				->setup(pointer, new specFitCurve) ;
+		->setup(pointer, new specFitCurve) ;
 		// TODO changed this to inherit parentObject from parent -> check other places for redundancy: command->setParentObject(model) ;
 	}
 
-	if (!parentCommand->childCount())
+	if(!parentCommand->childCount())
 	{
 		delete parentCommand ;
 		return 0 ;

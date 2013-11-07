@@ -10,12 +10,12 @@
 #include "specdeletedescriptorcommand.h"
 #include "specrenamedescriptorcommand.h"
 
-stringListEntryValidator::stringListEntryValidator(QList<stringListEntryWidget *> aW, stringListEntryWidget *parent)
+stringListEntryValidator::stringListEntryValidator(QList<stringListEntryWidget*> aW, stringListEntryWidget* parent)
 	: stringListValidator(parent),
 	  allWidgets(aW)
 {}
 
-stringListValidator::stringListValidator(QWidget *parent)
+stringListValidator::stringListValidator(QWidget* parent)
 	: QValidator(parent),
 	  forbiddenList(new QStringList)
 {}
@@ -25,46 +25,46 @@ stringListValidator::~stringListValidator()
 	delete forbiddenList ;
 }
 
-QValidator::State stringListValidator::validate(QString &s, int &pos) const
+QValidator::State stringListValidator::validate(QString& s, int& pos) const
 {
 	Q_UNUSED(pos)
 	return forbiddenList->contains(s) ? Intermediate : Acceptable ;
 }
 
-void stringListValidator::setForbidden(const QStringList &fl) const
+void stringListValidator::setForbidden(const QStringList& fl) const
 {
 	*forbiddenList = fl ;
 }
 
-QValidator::State stringListEntryValidator::validate(QString &s, int &pos) const
+QValidator::State stringListEntryValidator::validate(QString& s, int& pos) const
 {
 	Q_UNUSED(pos)
-	stringListEntryWidget* parentPointer = qobject_cast<stringListEntryWidget*>(parent()) ;
-	if (!parentPointer || !parentPointer->active()) return Acceptable ;
+	stringListEntryWidget* parentPointer = qobject_cast<stringListEntryWidget*> (parent()) ;
+	if(!parentPointer || !parentPointer->active()) return Acceptable ;
 
 	QStringList forbiddenStrings ;
 	forbiddenStrings << QString() ;
-	foreach(stringListEntryWidget* widget, allWidgets)
-		if (widget != parentPointer &&
-				widget->active())
-			forbiddenStrings << widget->content() ;
+	foreach(stringListEntryWidget * widget, allWidgets)
+	if(widget != parentPointer &&
+		widget->active())
+		forbiddenStrings << widget->content() ;
 	setForbidden(forbiddenStrings);
 	return stringListValidator::validate(s, pos) ;
 }
 
-void stringListValidator::fixup(QString &s) const
+void stringListValidator::fixup(QString& s) const
 {
 	int n = 0 ;
 	int count = 0 ;
 	QString original = s ;
-	while (validate(s,n) != Acceptable)
+	while(validate(s, n) != Acceptable)
 		s = original + QString::number(count++) ;
 }
 
-stringListEntryWidget::stringListEntryWidget(QString content, QWidget *parent)
+stringListEntryWidget::stringListEntryWidget(QString content, QWidget* parent)
 	: QWidget(parent)
 {
-	QHBoxLayout *layout = new QHBoxLayout(this) ;
+	QHBoxLayout* layout = new QHBoxLayout(this) ;
 	Active = new QCheckBox(content, this) ;
 	Active->setChecked(true) ;
 	newValue = new QLineEdit(content, this) ;
@@ -72,7 +72,7 @@ stringListEntryWidget::stringListEntryWidget(QString content, QWidget *parent)
 	layout->addWidget(Active) ;
 	layout->addStretch();
 	layout->addWidget(newValue) ;
-	connect(Active,SIGNAL(stateChanged(int)),this,SLOT(checkStateChanged(int))) ;
+	connect(Active, SIGNAL(stateChanged(int)), this, SLOT(checkStateChanged(int))) ;
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 }
 
@@ -91,21 +91,21 @@ QString stringListEntryWidget::content() const
 	return newValue->text() ;
 }
 
-void stringListEntryWidget::setAllWidgets(QList<stringListEntryWidget *> widgets)
+void stringListEntryWidget::setAllWidgets(QList<stringListEntryWidget*> widgets)
 {
-	disconnect(0,0,this,SLOT(verify())) ;
-	newValue->setValidator(new stringListEntryValidator(widgets,this)) ;
+	disconnect(0, 0, this, SLOT(verify())) ;
+	newValue->setValidator(new stringListEntryValidator(widgets, this)) ;
 }
 
 void stringListEntryWidget::checkStateChanged(int s)
 {
 	newValue->setEnabled(Qt::Checked == s);
-	if (newValue->isEnabled())
+	if(newValue->isEnabled())
 	{
 		QString content = newValue->text() ;
-		if (newValue->validator())
+		if(newValue->validator())
 			newValue->validator()->fixup(content) ;
-		if (newValue->text() != content)
+		if(newValue->text() != content)
 		{
 			newValue->selectAll();
 			newValue->insert(content);
@@ -113,21 +113,21 @@ void stringListEntryWidget::checkStateChanged(int s)
 	}
 }
 
-stringListChangeDialog::stringListChangeDialog(QStringList strings, QWidget *parent) :
+stringListChangeDialog::stringListChangeDialog(QStringList strings, QWidget* parent) :
 	QDialog(parent)
 {
-	QScrollArea *scrollArea = new QScrollArea(this) ;
-	QWidget *areaWidget = new QWidget(scrollArea) ;
-	QVBoxLayout *layout = new QVBoxLayout(this), *scrollLayout = new QVBoxLayout(areaWidget) ;
+	QScrollArea* scrollArea = new QScrollArea(this) ;
+	QWidget* areaWidget = new QWidget(scrollArea) ;
+	QVBoxLayout* layout = new QVBoxLayout(this), *scrollLayout = new QVBoxLayout(areaWidget) ;
 	layout->addWidget(scrollArea) ;
 	foreach(QString string, strings)
 	{
-		stringListEntryWidget *widget = new stringListEntryWidget(string,this) ;
+		stringListEntryWidget* widget = new stringListEntryWidget(string, this) ;
 		widgets << widget ;
 		scrollLayout->addWidget(widget) ;
 	}
-	foreach(stringListEntryWidget *widget, widgets)
-		widget->setAllWidgets(widgets);
+	foreach(stringListEntryWidget * widget, widgets)
+	widget->setAllWidgets(widgets);
 	QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this) ;
 	scrollArea->setWidget(areaWidget);
 	layout->addWidget(buttonBox) ;
@@ -138,22 +138,22 @@ stringListChangeDialog::stringListChangeDialog(QStringList strings, QWidget *par
 QStringList stringListChangeDialog::inactive() const
 {
 	QStringList result ;
-	foreach(stringListEntryWidget* widget, widgets)
-		if (!widget->active())
-			result << widget->content() ;
+	foreach(stringListEntryWidget * widget, widgets)
+	if(!widget->active())
+		result << widget->content() ;
 	return result ;
 }
 
 QMap<QString, QString> stringListChangeDialog::active() const
 {
 	QMap<QString, QString> map ;
-	foreach(stringListEntryWidget* widget, widgets)
-		if (widget->active())
-			map[widget->oldContent()] = widget->content() ;
+	foreach(stringListEntryWidget * widget, widgets)
+	if(widget->active())
+		map[widget->oldContent()] = widget->content() ;
 	return map ;
 }
 
-specDescriptorEditAction::specDescriptorEditAction(QObject *parent)
+specDescriptorEditAction::specDescriptorEditAction(QObject* parent)
 	: specUndoAction(parent)
 {
 	setIcon(QIcon(":/editDescriptors.png")) ;
@@ -165,35 +165,35 @@ specDescriptorEditAction::specDescriptorEditAction(QObject *parent)
 
 void specDescriptorEditAction::execute()
 {
-	specView *view = qobject_cast<specView*>(parent()) ;
-	if (!view) return ;
-	specModel *model = view->model() ;
-	if (!model) return ;
+	specView* view = qobject_cast<specView*> (parent()) ;
+	if(!view) return ;
+	specModel* model = view->model() ;
+	if(!model) return ;
 	QStringList descriptors = model->descriptors() ;
 	descriptors.removeAll("") ;
 	stringListChangeDialog dialog(descriptors) ;
 	dialog.exec() ;
-	if (dialog.result() != QDialog::Accepted) return ;
+	if(dialog.result() != QDialog::Accepted) return ;
 	QStringList toDelete = dialog.inactive() ;
 	QMap<QString, QString> toExchange = dialog.active() ;
-	foreach(const QString& key, toExchange.keys())
-		if (toExchange[key] == key)
-			toExchange.remove(key) ;
+	foreach(const QString & key, toExchange.keys())
+	if(toExchange[key] == key)
+		toExchange.remove(key) ;
 
 	// TODO check for actual changes
 
-	specMultiCommand *command = new specMultiCommand ;
+	specMultiCommand* command = new specMultiCommand ;
 	command->setText(tr("Modify column heads")) ;
 	command->setParentObject(model);
-	foreach(const QString& key, toDelete)
+	foreach(const QString & key, toDelete)
 	{
-		specDeleteDescriptorCommand *deleteCommand = new specDeleteDescriptorCommand(command,key) ;
+		specDeleteDescriptorCommand* deleteCommand = new specDeleteDescriptorCommand(command, key) ;
 		deleteCommand->setParentObject(model) ;
 	}
-	specRenameDescriptorCommand *renameCommand = new specRenameDescriptorCommand(command) ;
+	specRenameDescriptorCommand* renameCommand = new specRenameDescriptorCommand(command) ;
 	renameCommand->setRenamingMap(toExchange) ;
 	renameCommand->setParentObject(model) ;
-	if (!library)
+	if(!library)
 	{
 		command->redo();
 		delete command ;

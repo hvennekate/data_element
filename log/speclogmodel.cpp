@@ -3,7 +3,7 @@
 #include <QFileDialog>
 #include "utility-functions.h"
 
-specLogModel::specLogModel(QObject *parent)
+specLogModel::specLogModel(QObject* parent)
 	: specModel(parent)
 {
 	setObjectName("logModel");

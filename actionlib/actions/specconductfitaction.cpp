@@ -4,7 +4,7 @@
 #include "speceditdescriptorcommand.h"
 #include "specmulticommand.h"
 
-specConductFitAction::specConductFitAction(QObject *parent) :
+specConductFitAction::specConductFitAction(QObject* parent) :
 	specRequiresMetaItemAction(parent)
 {
 	setIcon(QIcon(":/doFit.png")) ;
@@ -16,20 +16,20 @@ specConductFitAction::specConductFitAction(QObject *parent) :
 
 specUndoCommand* specConductFitAction::generateUndoCommand()
 {
-	specMultiCommand *parentCommand = new specMultiCommand ;
+	specMultiCommand* parentCommand = new specMultiCommand ;
 	parentCommand->setText(tr("Conduct fitting")) ;
 	parentCommand->setParentObject(model);
-	foreach(specModelItem* modelItem, pointers)
+	foreach(specModelItem * modelItem, pointers)
 	{
 		specMetaItem* item = dynamic_cast<specMetaItem*>(modelItem) ;
-		if (!item) continue;
+		if(!item) continue;
 		if(!(item->getFitCurve())) continue ;
 		QString oldDescriptor = item->descriptor(tr("Fit variables"), true) ;
 		int oldActiveLine = item->activeLine(tr("Fit variables")) ;
 		item->conductFit();
 		QString newDescriptor = item->descriptor(tr("Fit variables"), true) ;
-		specEditDescriptorCommand *editCommand = new specEditDescriptorCommand(parentCommand) ;
-		editCommand->setItem(item,tr("Fit variables"), newDescriptor, item->activeLine(tr("Fit variables"))) ;
+		specEditDescriptorCommand* editCommand = new specEditDescriptorCommand(parentCommand) ;
+		editCommand->setItem(item, tr("Fit variables"), newDescriptor, item->activeLine(tr("Fit variables"))) ;
 		item->changeDescriptor(tr("Fit variables"), oldDescriptor) ;
 		item->setActiveLine(tr("Fit variables"), oldActiveLine) ;
 	}

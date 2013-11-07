@@ -20,13 +20,13 @@ private:
 	specPlot* Plot ;
 	bool changingTitle ;
 private slots:
-	void selectionChanged(const QItemSelection & selected, const QItemSelection & deselected) ;
+	void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) ;
 protected:
-	void changeEvent(QEvent *event) ;
+	void changeEvent(QEvent* event) ;
 	virtual QList<QWidget*> mainWidgets() const = 0 ;
 public:
 	void setupWindow(specActionLibrary* actions) ;
-	explicit specDockWidget(QString type, QWidget *parent = 0, bool floating = true);
+	explicit specDockWidget(QString type, QWidget* parent = 0, bool floating = true);
 };
 
 #endif // SPECDOCKWIDGET_H

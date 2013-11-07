@@ -11,7 +11,7 @@ private:
 private slots:
 	void checkClipboard() ;
 public:
-	explicit specPasteAction(QObject *parent = 0);
+	explicit specPasteAction(QObject* parent = 0);
 protected:
 	specUndoCommand* generateUndoCommand() ;
 };

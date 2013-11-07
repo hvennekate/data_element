@@ -15,15 +15,15 @@ protected:
 	virtual QString labelText() const = 0 ;
 	virtual specStreamable::type commandId() = 0 ;
 public:
-	explicit specLabelAction(QObject *parent = 0) ;
-	const std::type_info &possibleParent() ;
+	explicit specLabelAction(QObject* parent = 0) ;
+	const std::type_info& possibleParent() ;
 };
 
 class specTitleAction : public specLabelAction
 {
 	Q_OBJECT
 public:
-	explicit specTitleAction(QObject *parent = 0) ;
+	explicit specTitleAction(QObject* parent = 0) ;
 private:
 	QString textToEdit() ;
 	specStreamable::type commandId() ;

@@ -10,12 +10,12 @@ class stringListEntryWidget : public QWidget
 {
 	Q_OBJECT
 private:
-	QLineEdit *newValue ;
-	QCheckBox *Active ;
+	QLineEdit* newValue ;
+	QCheckBox* Active ;
 private slots:
 	void checkStateChanged(int) ;
 public:
-	explicit stringListEntryWidget(QString content, QWidget *parent = 0) ;
+	explicit stringListEntryWidget(QString content, QWidget* parent = 0) ;
 	void setAllWidgets(QList<stringListEntryWidget*> widgets) ;
 	QString content() const ;
 	QString oldContent() const ;
@@ -27,11 +27,11 @@ signals:
 class stringListValidator : public QValidator
 {
 private:
-	QStringList *forbiddenList ;
+	QStringList* forbiddenList ;
 public:
 	stringListValidator(QWidget* parent = 0) ;
 	void fixup(QString&) const ;
-	State validate(QString &, int &) const ;
+	State validate(QString&, int&) const ;
 	void setForbidden(const QStringList& fl) const ;
 	~stringListValidator() ;
 };
@@ -42,7 +42,7 @@ class stringListEntryValidator : public stringListValidator
 	QList<stringListEntryWidget*> allWidgets ;
 public:
 	stringListEntryValidator(QList<stringListEntryWidget*> allWidgets, stringListEntryWidget* parent = 0) ;
-	State validate(QString &, int &) const ;
+	State validate(QString&, int&) const ;
 };
 
 class stringListChangeDialog : public QDialog
@@ -50,9 +50,9 @@ class stringListChangeDialog : public QDialog
 	Q_OBJECT
 	QList<stringListEntryWidget*> widgets ;
 public:
-	explicit stringListChangeDialog(QStringList strings, QWidget *parent = 0);
+	explicit stringListChangeDialog(QStringList strings, QWidget* parent = 0);
 	QStringList inactive() const ;
-	QMap<QString,QString> active() const ;
+	QMap<QString, QString> active() const ;
 };
 
 /* ============== Former Header ============== */

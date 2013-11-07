@@ -3,7 +3,7 @@
 #include "specgenealogy.h"
 #include "specaddfoldercommand.h"
 
-specAddFolderAction::specAddFolderAction(QObject *parent)
+specAddFolderAction::specAddFolderAction(QObject* parent)
 	: specItemAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("folder-new"));
@@ -16,12 +16,12 @@ specAddFolderAction::specAddFolderAction(QObject *parent)
 specUndoCommand* specAddFolderAction::generateUndoCommand()
 {
 	specFolderItem* newItem = new specFolderItem ;
-	if (! model->insertItems(QList<specModelItem*>() << newItem, insertionIndex, insertionRow))
+	if(! model->insertItems(QList<specModelItem*>() << newItem, insertionIndex, insertionRow))
 	{
 		delete newItem ;
 		return 0 ;
 	}
-	specAddFolderCommand *command = new specAddFolderCommand ;
+	specAddFolderCommand* command = new specAddFolderCommand ;
 	command->setParentObject(model) ;
 	command->setItem(newItem) ;
 	command->setText(tr("Add folder")) ;

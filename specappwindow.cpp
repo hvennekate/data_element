@@ -19,10 +19,10 @@ specAppWindow::specAppWindow()
 	setWindowFlags(windowFlags() | Qt::WindowContextHelpButtonHint);
 
 	setWhatsThis("This is the main application window.  It can be used for docking data windows, log windows, and kinetic windows to it. to it.\nStart by creating a new file or by opening a saved file. Use the \"What's this?\" help from the title bar for further hints.");
-	setMinimumSize(300,300);
-	if (restoreSessionAction->isChecked())
+	setMinimumSize(300, 300);
+	if(restoreSessionAction->isChecked())
 		foreach(QString fileName, settings.value("mainWindow/previousSessionFiles").toStringList())
-			openFile(fileName) ;
+		openFile(fileName) ;
 }
 
 
@@ -34,15 +34,15 @@ void specAppWindow::closeEvent(QCloseEvent* event)
 {
 	event->ignore() ;
 	QStringList openFileNames ;
-	foreach(specPlotWidget* plotWidget, findChildren<specPlotWidget*>())
+	foreach(specPlotWidget * plotWidget, findChildren<specPlotWidget*>())
 	{
 		openFileNames << plotWidget->windowFilePath() ;
-		if (!plotWidget->close()) return ;
+		if(!plotWidget->close()) return ;
 	}
 	settings.setValue("mainWindow/previousSessionFiles",
 			  restoreSessionAction->isChecked() ?
-				  openFileNames: QVariant()); // remove empty filenames?
-	settings.setValue("mainWindow/geometry",saveGeometry()) ;
+			  openFileNames : QVariant()); // remove empty filenames?
+	settings.setValue("mainWindow/geometry", saveGeometry()) ;
 	settings.setValue("mainWindow/sessionRestoration", restoreSessionAction->isChecked()) ;
 	event->accept();
 }
@@ -52,27 +52,27 @@ void specAppWindow::newFile()
 	addDock(new specPlotWidget(this)) ;
 }
 
-void specAppWindow::addDock(specPlotWidget *newDock)
+void specAppWindow::addDock(specPlotWidget* newDock)
 {
-	specPlotWidget *inAreaWidget = 0 ;
-	foreach(specPlotWidget* widget, findChildren<specPlotWidget*>())
-		if (dockWidgetArea(widget) == Qt::LeftDockWidgetArea)
-			inAreaWidget = widget ;
+	specPlotWidget* inAreaWidget = 0 ;
+	foreach(specPlotWidget * widget, findChildren<specPlotWidget*>())
+	if(dockWidgetArea(widget) == Qt::LeftDockWidgetArea)
+		inAreaWidget = widget ;
 	addDockWidget(Qt::LeftDockWidgetArea, newDock) ;
-	if (inAreaWidget)
+	if(inAreaWidget)
 		tabifyDockWidget(inAreaWidget, newDock);
 }
 
 void specAppWindow::openFile()
 {
-	openFile(QFileDialog::getOpenFileName(this,"Name?","","spec-Dateien (*.spec)"));
+	openFile(QFileDialog::getOpenFileName(this, "Name?", "", "spec-Dateien (*.spec)"));
 }
 
-void specAppWindow::openFile(const QString &fileName)
+void specAppWindow::openFile(const QString& fileName)
 {
-	if (fileName != "" && QFile::exists(fileName))
+	if(fileName != "" && QFile::exists(fileName))
 	{
-		specPlotWidget *newWidget = new specPlotWidget(this) ;
+		specPlotWidget* newWidget = new specPlotWidget(this) ;
 		newWidget->read(fileName) ;
 		addDock(newWidget) ;
 	}
@@ -93,7 +93,7 @@ void specAppWindow::createActions()
 	restoreSessionAction = new QAction(QIcon::fromTheme("document-revert"), tr("Session &restoration"), this) ;
 	restoreSessionAction->setStatusTip(tr("Toggle saving of session information")) ;
 	restoreSessionAction->setCheckable(true) ;
-	restoreSessionAction->setChecked(settings.value("mainWindow/sessionRestoration",false).toBool()) ;
+	restoreSessionAction->setChecked(settings.value("mainWindow/sessionRestoration", false).toBool()) ;
 
 	shortCutAction = new QAction(QIcon::fromTheme("input-keyboard"), tr("Shortcuts..."), this) ;
 	connect(shortCutAction, SIGNAL(triggered()), this, SLOT(editShortcuts())) ;
@@ -134,11 +134,11 @@ void specAppWindow::createMenus()
 
 	helpMenu = menuBar()->addMenu(tr("&Help")) ;
 	helpMenu->addAction(whatsThisAction) ;
-	QAction *aboutQtAction = new QAction(tr("About &Qt..."),helpMenu) ;
+	QAction* aboutQtAction = new QAction(tr("About &Qt..."), helpMenu) ;
 	helpMenu->addAction(aboutQtAction) ;
-	QAction *aboutAction = new QAction(tr("&About..."),helpMenu) ;
+	QAction* aboutAction = new QAction(tr("&About..."), helpMenu) ;
 	helpMenu->addAction(aboutAction) ;
-	connect(aboutQtAction, SIGNAL(triggered()),qApp,SLOT(aboutQt())) ;
+	connect(aboutQtAction, SIGNAL(triggered()), qApp, SLOT(aboutQt())) ;
 	connect(aboutAction, SIGNAL(triggered()), this, SLOT(about())) ;
 }
 

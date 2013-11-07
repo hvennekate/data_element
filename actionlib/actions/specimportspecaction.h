@@ -10,7 +10,7 @@ class specImportSpecAction : public specItemAction
 	Q_OBJECT
 	QStringList filters ;
 public:
-	explicit specImportSpecAction(QObject *parent = 0);
+	explicit specImportSpecAction(QObject* parent = 0);
 	void setFilters(const QStringList& f) ;
 protected:
 	specUndoCommand* generateUndoCommand() ;

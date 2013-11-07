@@ -21,14 +21,14 @@ private:
 	specDataPointFilter filter ;
 	dataContainer data ;
 	dataContainer correctedData() const ;
-	void readFromStream(QDataStream &) ;
-	void writeToStream(QDataStream &) const ;
+	void readFromStream(QDataStream&) ;
+	void writeToStream(QDataStream&) const ;
 	type typeId() const { return specStreamable::dataItem ; }
 public:
 	/*! Standard constructor.*/
-	specDataItem(const dataContainer &data, // TODO change to reference/pointer
-		     const QHash<QString,specDescriptor> &description, // TODO change to reference/pointer
-		     specFolderItem* par=0, QString tag="");
+	specDataItem(const dataContainer& data,  // TODO change to reference/pointer
+		     const QHash<QString, specDescriptor>& description, // TODO change to reference/pointer
+		     specFolderItem* par = 0, QString tag = "");
 	specDataItem(const specDataItem&) ;
 	specDataItem() ;
 	/*! Copy constructor necessary because it is disabled in QwtPlotItem */
@@ -46,7 +46,7 @@ public:
 	QIcon decoration() const ;
 
 	/* Data operations */
-	specDataItem& operator+=(const specDataItem& toAdd) ;
+	specDataItem& operator+= (const specDataItem& toAdd) ;
 	void flatten() ;
 	QVector<double> intensityData() const ;
 	void refreshPlotData() ;
@@ -55,13 +55,13 @@ public:
 	void addDataFilter(const specDataPointFilter&) ;
 
 	/* for plot picker*/
-	void attach(QwtPlot *plot) ;
+	void attach(QwtPlot* plot) ;
 	void detach() ;
 
 	/* not reviewed */
-	void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
+	void exportData(const QList<QPair<bool, QString> >&, const QList<QPair<spec::value, QString> >&, QTextStream&) ;
 
-	specUndoCommand *itemPropertiesAction(QObject *parentObject) ;
+	specUndoCommand* itemPropertiesAction(QObject* parentObject) ;
 };
 
 class specLegacyDataItem : public specDataItem
@@ -69,7 +69,7 @@ class specLegacyDataItem : public specDataItem
 private:
 	type myType ;
 	type typeId() const { return myType; }
-	void readFromStream(QDataStream & in) ;
+	void readFromStream(QDataStream& in) ;
 public:
 	specLegacyDataItem() ;
 };

@@ -11,7 +11,7 @@ class specItemAction : public specUndoAction
 {
 	Q_OBJECT
 public:
-	explicit specItemAction(QObject *parent = 0) ;
+	explicit specItemAction(QObject* parent = 0) ;
 	virtual const std::type_info& possibleParent() ;
 	virtual QList<specStreamable::type> requiredTypes() const ;
 	bool requirements() ;

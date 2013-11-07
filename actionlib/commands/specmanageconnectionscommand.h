@@ -13,15 +13,15 @@ private:
 	specMetaItem* targetPointer() ;
 	specMetaModel* targetModel ;
 	bool sameModel ;
-	void writeCommand(QDataStream &out) const;
-	void readCommand(QDataStream &in) ;
+	void writeCommand(QDataStream& out) const;
+	void readCommand(QDataStream& in) ;
 	void parentAssigned();
 protected:
 	virtual void processServers(specMetaItem* client, QList<specModelItem*>& servers) const = 0 ;
 	void take() ;
 	void restore() ;
 public:
-	explicit specManageConnectionsCommand(specUndoCommand *parent = 0);
+	explicit specManageConnectionsCommand(specUndoCommand* parent = 0);
 	virtual void setItems(specMetaItem* client, QList<specModelItem*> servers) ;
 };
 

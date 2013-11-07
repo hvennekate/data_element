@@ -6,7 +6,8 @@
 class specSVGItem ;
 class specUndoCommand ;
 
-namespace Ui {
+namespace Ui
+{
 	class svgItemProperties;
 }
 
@@ -15,17 +16,17 @@ class svgItemProperties : public QDialog
 	Q_OBJECT
 
 public:
-	explicit svgItemProperties(specSVGItem* item, QWidget *parent = 0);
+	explicit svgItemProperties(specSVGItem* item, QWidget* parent = 0);
 	~svgItemProperties();
-	specUndoCommand *generateCommand(QObject* parent) ;
+	specUndoCommand* generateCommand(QObject* parent) ;
 private slots:
 	void on_widthOriginalAspect_clicked();
 
 	void on_heightOriginalAspect_clicked();
 
 private:
-	Ui::svgItemProperties *ui;
-	specSVGItem *item ;
+	Ui::svgItemProperties* ui;
+	specSVGItem* item ;
 	double originalAspectRatio ;
 };
 

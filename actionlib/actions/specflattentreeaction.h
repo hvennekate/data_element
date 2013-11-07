@@ -7,7 +7,7 @@ class specFlattenTreeAction : public specRequiresItemAction
 {
 	Q_OBJECT
 public:
-	explicit specFlattenTreeAction(QObject *parent = 0);
+	explicit specFlattenTreeAction(QObject* parent = 0);
 protected:
 	specUndoCommand* generateUndoCommand() ;
 	QList<specStreamable::type> requiredTypes() const ;

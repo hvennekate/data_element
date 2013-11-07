@@ -11,13 +11,13 @@ class specLogWidget : public specDockWidget, public specStreamable
 	Q_OBJECT
 private:
 	specLogView* logView ;
-	void writeToStream(QDataStream &out) const ;
-	void readFromStream(QDataStream &in) ;
+	void writeToStream(QDataStream& out) const ;
+	void readFromStream(QDataStream& in) ;
 	type typeId() const { return specStreamable::logWidget ; }
 protected:
 	QList<QWidget*> mainWidgets() const ;
 public:
-	explicit specLogWidget(QWidget *parent = 0);
+	explicit specLogWidget(QWidget* parent = 0);
 	specView* view() { return logView ; }
 };
 

@@ -13,7 +13,7 @@ private:
 	void undoIt() ;
 	type typeId() const { return specStreamable::newFolderCommandId ;}
 public:
-	specAddFolderCommand(specUndoCommand *parent = 0);
+	specAddFolderCommand(specUndoCommand* parent = 0);
 };
 
 #endif // SPECADDFOLDERCOMMAND_H

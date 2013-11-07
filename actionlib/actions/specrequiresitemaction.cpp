@@ -1,15 +1,15 @@
 #include "specrequiresitemaction.h"
 
-specRequiresItemAction::specRequiresItemAction(QObject *parent) :
+specRequiresItemAction::specRequiresItemAction(QObject* parent) :
 	specItemAction(parent)
 {
 }
 
-specRequiresDataItemAction::specRequiresDataItemAction(QObject *parent)
+specRequiresDataItemAction::specRequiresDataItemAction(QObject* parent)
 	: specRequiresItemAction(parent)
 {}
 
-specRequiresMetaItemAction::specRequiresMetaItemAction(QObject *parent)
+specRequiresMetaItemAction::specRequiresMetaItemAction(QObject* parent)
 	: specRequiresItemAction(parent)
 {}
 
@@ -26,22 +26,22 @@ bool specRequiresItemAction::postProcessingRequirements() const
 QList<specStreamable::type> specRequiresItemAction::requiredTypes() const
 {
 	return QList<specStreamable::type>()
-			<< specStreamable::dataItem
-			<< specStreamable::folder
-			<< specStreamable::logEntry
-			<< specStreamable::sysEntry
-			<< specStreamable::metaItem
-			<< specStreamable::svgItem ;
+	       << specStreamable::dataItem
+	       << specStreamable::folder
+	       << specStreamable::logEntry
+	       << specStreamable::sysEntry
+	       << specStreamable::metaItem
+	       << specStreamable::svgItem ;
 }
 
 QList<specStreamable::type> specRequiresDataItemAction::requiredTypes() const
 {
 	return QList<specStreamable::type>()
-			<< specStreamable::dataItem ;
+	       << specStreamable::dataItem ;
 }
 
 QList<specStreamable::type> specRequiresMetaItemAction::requiredTypes() const
 {
 	return QList<specStreamable::type>()
-			<< specStreamable::metaItem ;
+	       << specStreamable::metaItem ;
 }

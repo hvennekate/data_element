@@ -17,11 +17,11 @@ class exportDialog : public QDialog
 {
 	Q_OBJECT
 private:
-	QPushButton *addButton, *addDataButton ;
-	QBoxLayout *layout, *inLayout, *dataLayout ;
+	QPushButton* addButton, *addDataButton ;
+	QBoxLayout* layout, *inLayout, *dataLayout ;
 	QStringList descriptors ;
 	QStringList dataTypes ;
-	QScrollArea *scrollHeader, *scrollData ;
+	QScrollArea* scrollHeader, *scrollData ;
 	void prepareHeader() ;
 	void prepareData() ;
 	template<class itemType> QList<itemType*> getItems() const ;
@@ -29,11 +29,11 @@ private slots :
 	void addHeaderItem() ;
 	void addDataItem() ;
 public:
-	explicit exportDialog (QWidget *parent = 0 );
+	explicit exportDialog(QWidget* parent = 0);
 	void setDataTypes(const QStringList& dataTypes) ;
 	void setDescriptors(const QStringList& descriptors) ;
-	QList<QPair<bool,QString> > headerFormat() const ;
-	QList<QPair<spec::value,QString> > dataFormat() const ;
+	QList<QPair<bool, QString> > headerFormat() const ;
+	QList<QPair<spec::value, QString> > dataFormat() const ;
 	~exportDialog();
 };
 

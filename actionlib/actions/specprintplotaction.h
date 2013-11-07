@@ -9,12 +9,12 @@ class specPrintPlotAction : public specUndoAction
 {
 	Q_OBJECT
 public:
-	explicit specPrintPlotAction(QObject *parent = 0);
+	explicit specPrintPlotAction(QObject* parent = 0);
 	~specPrintPlotAction() ;
-	const std::type_info &possibleParent() ;
+	const std::type_info& possibleParent() ;
 private:
 	void execute() ;
-	QPrinter *printer ;
+	QPrinter* printer ;
 };
 
 #endif // SPECPRINTPLOTACTION_H

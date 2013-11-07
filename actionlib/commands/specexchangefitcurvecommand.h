@@ -10,13 +10,13 @@ class specExchangeFitCurveCommand : public specSingleItemCommand<specMetaItem>
 {
 private:
 	specFitCurve* curve ;
-	void writeCommand(QDataStream &out) const ;
-	void readCommand(QDataStream &in) ;
+	void writeCommand(QDataStream& out) const ;
+	void readCommand(QDataStream& in) ;
 	void doIt() ;
 	void undoIt() ;
 	type typeId() const { return specStreamable::exchangeFitCommand ; }
 public:
-	explicit specExchangeFitCurveCommand(specUndoCommand *parent = 0) ;
+	explicit specExchangeFitCurveCommand(specUndoCommand* parent = 0) ;
 	void setup(specModelItem*, specFitCurve*) ;
 	~specExchangeFitCurveCommand() ;
 };

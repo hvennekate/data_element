@@ -5,7 +5,7 @@
 #include <QCompleter>
 #include <QStringListModel>
 
-spectrumCalculatorDialog::spectrumCalculatorDialog(QWidget *parent) :
+spectrumCalculatorDialog::spectrumCalculatorDialog(QWidget* parent) :
 	QDialog(parent),
 	ui(new Ui::spectrumCalculatorDialog),
 	xFormulae(new QStringListModel(this)),
@@ -13,8 +13,8 @@ spectrumCalculatorDialog::spectrumCalculatorDialog(QWidget *parent) :
 {
 	ui->setupUi(this);
 	QRegExp xy("(x|y|p\\d+)") ;
-	specFormulaValidator *xValidator = new specFormulaValidator(xy, ui->formulaX) ;
-	specFormulaValidator *yValidator = new specFormulaValidator(xy, ui->formulaY) ;
+	specFormulaValidator* xValidator = new specFormulaValidator(xy, ui->formulaX) ;
+	specFormulaValidator* yValidator = new specFormulaValidator(xy, ui->formulaY) ;
 	ui->formulaX->setValidator(xValidator);
 	ui->formulaY->setValidator(yValidator) ;
 	connect(xValidator, SIGNAL(evaluationError(QString)), ui->errorsX, SLOT(setText(QString))) ;
@@ -36,10 +36,10 @@ void spectrumCalculatorDialog::syncFormulae() const
 	syncFormula(ui->formulaY->text(), yFormulae) ;
 }
 
-void spectrumCalculatorDialog::syncFormula(const QString &formula, QStringListModel *model) const
+void spectrumCalculatorDialog::syncFormula(const QString& formula, QStringListModel* model) const
 {
 	QStringList formulae = model->stringList() ;
-	if (formulae.contains(formula)) return ;
+	if(formulae.contains(formula)) return ;
 	formulae << formula ;
 	model->setStringList(formulae) ;
 }
@@ -74,7 +74,7 @@ QString spectrumCalculatorDialog::yFormula() const
 	return ui->formulaY->text() ;
 }
 
-void spectrumCalculatorDialog::errorChanged(const QString &error)
+void spectrumCalculatorDialog::errorChanged(const QString& error)
 {
 	ui->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(error.isEmpty());
 }

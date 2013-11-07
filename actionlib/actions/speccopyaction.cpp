@@ -3,7 +3,7 @@
 #include <QApplication>
 #include <QClipboard>
 
-specCopyAction::specCopyAction(QObject *parent) :
+specCopyAction::specCopyAction(QObject* parent) :
 	specRequiresItemAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("edit-copy")) ;
@@ -15,11 +15,11 @@ specCopyAction::specCopyAction(QObject *parent) :
 
 specUndoCommand* specCopyAction::generateUndoCommand()
 {
-	copyToClipboard(model,selection) ;
+	copyToClipboard(model, selection) ;
 	return 0 ;
 }
 
-void specCopyAction::copyToClipboard(specModel *model, const QModelIndexList& selection)
+void specCopyAction::copyToClipboard(specModel* model, const QModelIndexList& selection)
 {
 	QApplication::clipboard()->setMimeData(model->mimeData(selection));
 }

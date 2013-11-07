@@ -1,6 +1,6 @@
 #include "specdeletecommand.h"
 
-specDeleteCommand::specDeleteCommand(specUndoCommand *parent)
+specDeleteCommand::specDeleteCommand(specUndoCommand* parent)
 	: specManageItemsCommand(parent)
 {
 }

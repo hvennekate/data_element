@@ -1,7 +1,7 @@
 #include "speclogentryitem.h"
 
 
-specLogEntryItem::specLogEntryItem ( QHash<QString,specDescriptor> desc, specFolderItem* par, QString tag)
+specLogEntryItem::specLogEntryItem(QHash<QString, specDescriptor> desc, specFolderItem* par, QString tag)
 	: specModelItem(par, tag),
 	  description(desc)
 {
@@ -15,23 +15,23 @@ specLogEntryItem::~specLogEntryItem()
 
 bool specLogEntryItem::isEditable(QString key) const
 {
-	if (description.contains(key)) return description[key].isEditable() ;
+	if(description.contains(key)) return description[key].isEditable() ;
 	return specModelItem::isEditable(key);
 }
 
-bool specLogEntryItem::isNumeric(const QString &key) const
+bool specLogEntryItem::isNumeric(const QString& key) const
 {
-	if (description.contains(key)) return description[key].isNumeric() ;
+	if(description.contains(key)) return description[key].isNumeric() ;
 	return specModelItem::isNumeric(key);
 }
 
 bool specLogEntryItem::changeDescriptor(QString key, QString value)
 {
-	if (description.contains(key))
+	if(description.contains(key))
 		return description[key].setContent(value) ;
-	if (specModelItem::descriptorKeys().contains(key))
-		return specModelItem::changeDescriptor(key,value) ;
-	description[key] = specDescriptor(value,spec::editable) ;
+	if(specModelItem::descriptorKeys().contains(key))
+		return specModelItem::changeDescriptor(key, value) ;
+	description[key] = specDescriptor(value, spec::editable) ;
 	return true ;
 }
 
@@ -44,29 +44,29 @@ QIcon specLogEntryItem::decoration() const { return QIcon(":/log_message.png") ;
 
 spec::descriptorFlags specLogEntryItem::descriptorProperties(const QString& key) const
 {
-	if (description.contains(key)) return description[key].flags() ;
+	if(description.contains(key)) return description[key].flags() ;
 	return specModelItem::descriptorProperties(key) ;
 }
 
-void specLogEntryItem::setDescriptorProperties(const QString &key, spec::descriptorFlags f)
+void specLogEntryItem::setDescriptorProperties(const QString& key, spec::descriptorFlags f)
 {
-	if (description.contains(key)) description[key].setFlags(f) ;
+	if(description.contains(key)) description[key].setFlags(f) ;
 	else specModelItem::setDescriptorProperties(key, f) ;
 }
 
-QString specLogEntryItem::descriptor(const QString &key, bool full) const
+QString specLogEntryItem::descriptor(const QString& key, bool full) const
 {
-	if (description.contains(key)) return description[key].content(full) ;
+	if(description.contains(key)) return description[key].content(full) ;
 	return specModelItem::descriptor(key, full) ;
 }
 
-void specLogEntryItem::readFromStream ( QDataStream& in)
+void specLogEntryItem::readFromStream(QDataStream& in)
 {
 	specModelItem::readFromStream(in) ;
 	in >> description ;
 }
 
-void specLogEntryItem::writeToStream ( QDataStream& out) const
+void specLogEntryItem::writeToStream(QDataStream& out) const
 {
 	specModelItem::writeToStream(out) ;
 	out << description ;
@@ -74,60 +74,60 @@ void specLogEntryItem::writeToStream ( QDataStream& out) const
 
 bool specLogEntryItem::setActiveLine(const QString& key, int line)
 {
-	if (description.contains(key)) return description[key].setActiveLine(line) ;
-	return specModelItem::setActiveLine(key,line) ;
+	if(description.contains(key)) return description[key].setActiveLine(line) ;
+	return specModelItem::setActiveLine(key, line) ;
 }
 
 int specLogEntryItem::activeLine(const QString& key) const
 {
-	if (description.contains(key)) return description[key].activeLine() ;
+	if(description.contains(key)) return description[key].activeLine() ;
 	return specModelItem::activeLine(key) ;
 }
 
-specLogEntryItem::specLogEntryItem(const specLogEntryItem & other)
+specLogEntryItem::specLogEntryItem(const specLogEntryItem& other)
 	: specModelItem(other),
 	  description(other.description)
 {}
 
-double specLogEntryItem::numericalValue(const QString &key) const
+double specLogEntryItem::numericalValue(const QString& key) const
 {
-	if (description.contains(key)) return description[key].numericValue() ;
+	if(description.contains(key)) return description[key].numericValue() ;
 	return NAN ;
 }
 
-void specLogEntryItem::renameDescriptors(const QMap<QString, QString> &map)
+void specLogEntryItem::renameDescriptors(const QMap<QString, QString>& map)
 {
 	QHash<QString, specDescriptor> newDescription ;
-	foreach(const QString& key, map.keys())
-		newDescription[map[key]] = description[key] ;
-	foreach(const QString& key, description.keys())
-		if (!map.contains(key))
-			newDescription[key] = description[key] ;
+	foreach(const QString & key, map.keys())
+	newDescription[map[key]] = description[key] ;
+	foreach(const QString & key, description.keys())
+	if(!map.contains(key))
+		newDescription[key] = description[key] ;
 	description.swap(newDescription) ;
 }
 
-void specLogEntryItem::deleteDescriptor(const QString &key)
+void specLogEntryItem::deleteDescriptor(const QString& key)
 {
 	description.remove(key) ;
 }
 
-void specLogEntryItem::dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const
+void specLogEntryItem::dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const
 {
-	if (description.contains(key))
+	if(description.contains(key))
 		destination << description[key] ;
 	else
 		specModelItem::dumpDescriptor(destination, key) ;
 }
 
-void specLogEntryItem::restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key)
+void specLogEntryItem::restoreDescriptor(QListIterator<specDescriptor>& origin, const QString& key)
 {
-	if (!origin.hasNext()) return ;
-	if (key == "") specModelItem::restoreDescriptor(origin, key) ;
+	if(!origin.hasNext()) return ;
+	if(key == "") specModelItem::restoreDescriptor(origin, key) ;
 	else description[key] = origin.next() ;
 }
 
-double specLogEntryItem::descriptorValue(const QString &key) const // TODO more elegant with a protected worker function!
+double specLogEntryItem::descriptorValue(const QString& key) const  // TODO more elegant with a protected worker function!
 {
-	if (description.contains(key)) return description[key].numericValue() ;
+	if(description.contains(key)) return description[key].numericValue() ;
 	return specModelItem::descriptorValue(key) ;
 }

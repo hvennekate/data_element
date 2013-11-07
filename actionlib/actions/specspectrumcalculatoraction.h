@@ -10,13 +10,13 @@ class specSpectrumCalculatorAction : public specRequiresDataItemAction
 private:
 	spectrumCalculatorDialog* dialog ;
 public:
-	explicit specSpectrumCalculatorAction(QObject *parent = 0);
+	explicit specSpectrumCalculatorAction(QObject* parent = 0);
 	~specSpectrumCalculatorAction() ;
 	const std::type_info& possibleParent() ;
 protected:
 	specUndoCommand* generateUndoCommand() ;
 public:
-	static QStringList descriptorNames(QString &expression) ;
+	static QStringList descriptorNames(QString& expression) ;
 	static QString parameterName(int i) ;
 };
 

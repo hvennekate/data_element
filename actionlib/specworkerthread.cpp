@@ -1,9 +1,9 @@
 #include "specworkerthread.h"
 
-specWorkerThread::specWorkerThread(int maxVal, QObject *parent) :
+specWorkerThread::specWorkerThread(int maxVal, QObject* parent) :
 	QThread(parent),
 	toTerminate(false),
-	dialog("Progress","Cancel",0,maxVal)
+	dialog("Progress", "Cancel", 0, maxVal)
 {
 	dialog.setMinimumDuration(10) ;
 	connect(this, SIGNAL(progressValue(int)), &dialog, SLOT(setValue(int))) ;

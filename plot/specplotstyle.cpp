@@ -11,28 +11,28 @@
 specPlotStyle::specPlotStyle()
 	: PLOTSTYLEINITIALIZER
 {
-		  }
+}
 
-	specPlotStyle::specPlotStyle(QDataStream& in)
+specPlotStyle::specPlotStyle(QDataStream& in)
 	: PLOTSTYLEINITIALIZER
 
 {
 	readFromStream(in) ;
 }
 
-specPlotStyle::specPlotStyle(const specCanvasItem *c)
+specPlotStyle::specPlotStyle(const specCanvasItem* c)
 	: PLOTSTYLEINITIALIZER
 {
-		  initialize(c) ;
+	initialize(c) ;
 }
 
-void specPlotStyle::initialize(const specCanvasItem *curve)
+void specPlotStyle::initialize(const specCanvasItem* curve)
 {
 	lineWidth = curve->lineWidth() ;
 	penColor = curve->penColor() ;
 	symbolStyle = curve->symbolStyle() ;
 	penStyle = curve->penStyle() ;
-	if (symbolStyle != noSymbol)
+	if(symbolStyle != noSymbol)
 	{
 		symbolSize = curve->symbolSize() ;
 		symbolPenColor = curve->symbolPenColor() ;
@@ -40,31 +40,31 @@ void specPlotStyle::initialize(const specCanvasItem *curve)
 	}
 }
 
-void specPlotStyle::writeToStream(QDataStream &out) const
+void specPlotStyle::writeToStream(QDataStream& out) const
 {
 	out << lineWidth
 	    << penColor
 	    << symbolStyle
 	    << penStyle ;
-	if (symbolStyle != noSymbol)
+	if(symbolStyle != noSymbol)
 		out << symbolSize
 		    << symbolPenColor
 		    << symbolBrushColor ;
 }
 
-void specPlotStyle::readFromStream(QDataStream &in)
+void specPlotStyle::readFromStream(QDataStream& in)
 {
 	in >> lineWidth
 	   >> penColor
 	   >> symbolStyle
 	   >> penStyle ;
-	if (symbolStyle != noSymbol)
+	if(symbolStyle != noSymbol)
 		in >> symbolSize
 		   >> symbolPenColor
 		   >> symbolBrushColor ;
 }
 
-void specPlotStyle::apply(specCanvasItem *c) const
+void specPlotStyle::apply(specCanvasItem* c) const
 {
 	c->setLineWidth(lineWidth) ;
 	c->setPenColor(penColor) ;
@@ -75,7 +75,7 @@ void specPlotStyle::apply(specCanvasItem *c) const
 	c->setSymbolSize(symbolSize) ;
 }
 
-void specPlotStyle::retrieve(specCanvasItem *c)
+void specPlotStyle::retrieve(specCanvasItem* c)
 {
 	initialize(c) ;
 }

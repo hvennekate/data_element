@@ -3,7 +3,7 @@
 #include "specsvgitem.h"
 #include "specmetaitem.h"
 
-specItemPropertiesAction::specItemPropertiesAction(QObject *parent) :
+specItemPropertiesAction::specItemPropertiesAction(QObject* parent) :
 	specItemAction(parent)
 {
 	setIcon(QIcon::fromTheme("document-properties")) ;
@@ -15,13 +15,13 @@ specItemPropertiesAction::specItemPropertiesAction(QObject *parent) :
 
 specUndoCommand* specItemPropertiesAction::generateUndoCommand()
 {
-	if (!currentItem) return 0 ;
+	if(!currentItem) return 0 ;
 	return currentItem->itemPropertiesAction(model) ;
 }
 
 bool specItemPropertiesAction::specificRequirements()
 {
 	return (dynamic_cast<specDataItem*>(currentItem)
-			|| dynamic_cast<specMetaItem*>(currentItem)
-			|| dynamic_cast<specSVGItem*>(currentItem)) ;
+		|| dynamic_cast<specMetaItem*>(currentItem)
+		|| dynamic_cast<specSVGItem*>(currentItem)) ;
 }

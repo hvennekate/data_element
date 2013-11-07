@@ -10,15 +10,15 @@ class treeActionThread : public specWorkerThread
 private:
 	typedef QList<specModelItem*> itemPointerList ;
 
-	specUndoCommand *Command ;
-	specFolderItem *treeRoot ;
+	specUndoCommand* Command ;
+	specFolderItem* treeRoot ;
 	specModel* model ;
-	specModelItem *currentItem ;
+	specModelItem* currentItem ;
 	itemPointerList items, toBeDeletedFolders ;
 
 	bool cleanUp()
 	{
-		if (!toTerminate) return false ;
+		if(!toTerminate) return false ;
 		delete Command ;
 		Command = 0 ;
 		delete treeRoot ;
@@ -40,24 +40,24 @@ public:
 		// getting header strings
 		int columnCount = model->columnCount(QModelIndex()) ;
 		QStringList descriptors ;
-		for (int i = 0 ; i < columnCount ; ++i)
-			descriptors << model->headerData(i,Qt::Horizontal).toString() ;
+		for(int i = 0 ; i < columnCount ; ++i)
+			descriptors << model->headerData(i, Qt::Horizontal).toString() ;
 
 		destinationList folderQueue, finalPositions ;
 		folderQueue << qMakePair(treeRoot, items) ;
 		emit progressValue(5);
-		foreach(QString descriptor, descriptors) // process descriptors
+		foreach(QString descriptor, descriptors)  // process descriptors
 		{
-			if (cleanUp()) return ;
+			if(cleanUp()) return ;
 			destinationList nextQueue ; // prepare queue for next descriptor round
-			foreach(destination folder, folderQueue) // work through current queue
+			foreach(destination folder, folderQueue)  // work through current queue
 			{
 				// create list of new categories
-				QMap<QString,itemPointerList > newCategories ;
-				foreach (specModelItem* item, folder.second)
-					newCategories[item->descriptor(descriptor,true)] += item ;
+				QMap<QString, itemPointerList > newCategories ;
+				foreach(specModelItem * item, folder.second)
+				newCategories[item->descriptor(descriptor, true)] += item ;
 				// examine new categories
-				if (newCategories.size() < 2) // "all items the same" case -> dispose of single new category
+				if(newCategories.size() < 2)  // "all items the same" case -> dispose of single new category
 					nextQueue << folder ;
 				else
 				{
@@ -65,16 +65,16 @@ public:
 					destination thisParentsDirectChildren ;
 					thisParentsDirectChildren.first = folder.first ;
 					itemPointerList thisParentsFolderChildren ;
-					foreach(const QString& newCategory, newCategories.keys())
+					foreach(const QString & newCategory, newCategories.keys())
 					{
-						if (newCategories[newCategory].size() == 1) // lonely item case -> no new category but retain with current parent:
+						if(newCategories[newCategory].size() == 1)  // lonely item case -> no new category but retain with current parent:
 						{
 							// retain lonely children:
 							thisParentsDirectChildren.second << newCategories[newCategory] ;
 							continue ;
 						}
 						// otherwise:  really create new category
-						specFolderItem *newFolder = new specFolderItem(0, newCategory) ;
+						specFolderItem* newFolder = new specFolderItem(0, newCategory) ;
 						// and add it to the next round:
 						nextQueue << qMakePair(newFolder, newCategories[newCategory]) ;
 						thisParentsFolderChildren << newFolder ;
@@ -86,7 +86,7 @@ public:
 			}
 			// get set for the next round
 			folderQueue.swap(nextQueue) ;
-			emit progressValue(85*descriptors.indexOf(descriptor)/descriptors.size());
+			emit progressValue(85 * descriptors.indexOf(descriptor) / descriptors.size());
 		}
 		// append final round's outcome to move list
 		finalPositions << folderQueue ;
@@ -99,48 +99,48 @@ public:
 
 		// add the new tree:
 		int row = 0 ;
-		while (toBeDeletedFolders.contains(currentItem) || !currentItem->isFolder()) // make sure tree won't be removed accidentally
+		while(toBeDeletedFolders.contains(currentItem) || !currentItem->isFolder())   // make sure tree won't be removed accidentally
 		{
 			row = currentItem->parent()->childNo(currentItem) ;
 			currentItem = currentItem->parent() ;
 		}
-		if (! model->insertItems(QList<specModelItem*>() << treeRoot, model->index(currentItem), row))
+		if(! model->insertItems(QList<specModelItem*>() << treeRoot, model->index(currentItem), row))
 		{
 			cleanUp();
 			return ;
 		}
 
-		specAddFolderCommand *insertTree = new specAddFolderCommand(Command) ;
+		specAddFolderCommand* insertTree = new specAddFolderCommand(Command) ;
 		insertTree->setParentObject(model) ;
 		insertTree->setItem(treeRoot);
 		treeRoot = 0 ;
 
 		// move items into the new tree:
-		specMoveCommand *moveCommand = new specMoveCommand(Command) ;
+		specMoveCommand* moveCommand = new specMoveCommand(Command) ;
 		moveCommand->setParentObject(model) ;
 		foreach(destination d, finalPositions)
 		{
-			if (d.second.isEmpty()) continue ;
+			if(d.second.isEmpty()) continue ;
 			QModelIndexList indexes = model->indexList(d.second) ;
 			moveCommand->setItems(indexes, model->index(d.first), d.first->children());
 		}
 
 		// delete superfluous folders:  TODO: connections???
-		specDeleteCommand *deleteOldFolders = new specDeleteCommand(Command) ;
+		specDeleteCommand* deleteOldFolders = new specDeleteCommand(Command) ;
 		deleteOldFolders->setParentObject(model) ;
 		deleteOldFolders->setItems(toBeDeletedFolders) ;
-		if (cleanUp()) return ;
+		if(cleanUp()) return ;
 		emit progressValue(100);
 	}
 
 	specUndoCommand* command()
 	{
-		specUndoCommand *c = Command ;
+		specUndoCommand* c = Command ;
 		Command = 0 ;
 		return c ;
 	}
 
-	treeActionThread(specModel* Model, const itemPointerList& Items, const itemPointerList& Folders, specModelItem *CurrentItem)
+	treeActionThread(specModel* Model, const itemPointerList& Items, const itemPointerList& Folders, specModelItem* CurrentItem)
 		: specWorkerThread(100),
 		  Command(0),
 		  treeRoot(0),
@@ -152,7 +152,7 @@ public:
 	}
 };
 
-specTreeAction::specTreeAction(QObject *parent) :
+specTreeAction::specTreeAction(QObject* parent) :
 	specRequiresItemAction(parent)
 {
 	setIcon(QIcon(":/tree.png")) ;
@@ -163,11 +163,11 @@ specTreeAction::specTreeAction(QObject *parent) :
 }
 
 
-specUndoCommand *specTreeAction::generateUndoCommand()
+specUndoCommand* specTreeAction::generateUndoCommand()
 {
 	QList<specModelItem*> items, folders ;
 	expandSelectedFolders(items, folders) ;
-	treeActionThread tat(model,items, folders,currentItem) ;
+	treeActionThread tat(model, items, folders, currentItem) ;
 	tat.run();
 	return tat.command() ;
 }

@@ -11,7 +11,7 @@ class specSelectConnectedAction : public specConnectionsAction
 private:
 	specUndoCommand* generateUndoCommand() ;
 public:
-	explicit specSelectConnectedAction(QObject *parent = 0);
+	explicit specSelectConnectedAction(QObject* parent = 0);
 };
 
 #endif // SPECSELECTCONNECTEDACTION_H

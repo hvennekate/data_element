@@ -6,16 +6,17 @@
 #include "specstreamable.h"
 
 class specDescriptor : public specStreamable
-{ //make inline
+{
+	//make inline
 private:
 	QString contentValue ;
 	int currentLine ;
 	spec::descriptorFlags properties ;
-	void writeToStream(QDataStream &out) const ;
-	void readFromStream(QDataStream &in) ;
+	void writeToStream(QDataStream& out) const ;
+	void readFromStream(QDataStream& in) ;
 	type typeId() const { return specStreamable::descriptor ; }
 public:
-	specDescriptor(QString cont="", spec::descriptorFlags prop = spec::def) ;
+	specDescriptor(QString cont = "", spec::descriptorFlags prop = spec::def) ;
 	specDescriptor(double d) ;
 	double numericValue() const ;
 	QString content(bool full = false) const;
@@ -28,8 +29,8 @@ public:
 	void setFlags(spec::descriptorFlags) ;
 	int activeLine() const ;
 
-	specDescriptor& operator=(const double&) ;
-	specDescriptor& operator=(const QString&) ;
+	specDescriptor& operator= (const double&) ;
+	specDescriptor& operator= (const QString&) ;
 
 };
 

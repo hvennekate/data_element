@@ -7,7 +7,7 @@
 #include "specmimefileimporter.h"
 #include "specactionlibrary.h"
 
-specLogWidget::specLogWidget(QWidget *parent)
+specLogWidget::specLogWidget(QWidget* parent)
 	: specDockWidget(tr("Log"), parent),
 	  logView(new specLogView(this))
 {
@@ -22,12 +22,12 @@ specLogWidget::specLogWidget(QWidget *parent)
 	toggleViewAction()->setText(tr("Toggle log window")) ;
 }
 
-void specLogWidget::writeToStream(QDataStream &out) const
+void specLogWidget::writeToStream(QDataStream& out) const
 {
 	out << *logView ;
 }
 
-void specLogWidget::readFromStream(QDataStream &in)
+void specLogWidget::readFromStream(QDataStream& in)
 {
 	in >> *logView ;
 }

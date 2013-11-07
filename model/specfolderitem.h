@@ -14,7 +14,7 @@ private:
 	type typeId() const { return specStreamable::folder ; }
 public:
 	/*! Standard constructor (cf. specModelItem).*/
-	specFolderItem(specFolderItem* par=0, QString description="");
+	specFolderItem(specFolderItem* par = 0, QString description = "");
 	/*! Standard destructor.*/
 	~specFolderItem();
 
@@ -43,11 +43,11 @@ public:
 	spec::descriptorFlags descriptorProperties(const QString& key) const ;
 	/*! Reimplementation from specCanvasItem -- passing on to all children */
 	void addDataFilter(const specDataPointFilter&) ;
-	void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
+	void exportData(const QList<QPair<bool, QString> >&, const QList<QPair<spec::value, QString> >&, QTextStream&) ;
 	void deleteDescriptor(const QString& key) ;
-	void renameDescriptors(const QMap<QString, QString> &map);
-	void dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const ;
-	void restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key) ;
+	void renameDescriptors(const QMap<QString, QString>& map);
+	void dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const ;
+	void restoreDescriptor(QListIterator<specDescriptor>& origin, const QString& key) ;
 	QList<specModelItem*> childrenList() const ;
 };
 

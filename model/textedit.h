@@ -55,24 +55,24 @@ class TextEdit : public QTextEdit
 	Q_OBJECT
 
 public:
-	TextEdit(QWidget *parent = 0);
+	TextEdit(QWidget* parent = 0);
 	~TextEdit();
 
-	void setCompleter(QCompleter *c);
-	QCompleter *completer() const;
+	void setCompleter(QCompleter* c);
+	QCompleter* completer() const;
 
 protected:
-	void keyPressEvent(QKeyEvent *e);
-	void focusInEvent(QFocusEvent *e);
+	void keyPressEvent(QKeyEvent* e);
+	void focusInEvent(QFocusEvent* e);
 
 private slots:
-	void insertCompletion(const QString &completion);
+	void insertCompletion(const QString& completion);
 
 private:
 	QString textUnderCursor() const;
 
 private:
-	QCompleter *c;
+	QCompleter* c;
 };
 //! [0]
 

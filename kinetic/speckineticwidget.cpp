@@ -11,7 +11,7 @@
 specMetaView* specKineticWidget::view()
 { return items ; }
 
-specKineticWidget::specKineticWidget(QWidget *parent)
+specKineticWidget::specKineticWidget(QWidget* parent)
 	: specDockWidget(tr("Meta"), parent)
 {
 	setWhatsThis(tr("Meta dock widget - In this widget, further processing of the primary data can be done (integration, max, min, etc.)"));
@@ -26,19 +26,19 @@ specKineticWidget::specKineticWidget(QWidget *parent)
 	new specGenericMimeConverter(items->model());
 	new specMimeTextExporter(items->model()) ;
 
-	connect(plot->svgAction(),SIGNAL(toggled(bool)),this,SLOT(svgModification(bool))) ;
+	connect(plot->svgAction(), SIGNAL(toggled(bool)), this, SLOT(svgModification(bool))) ;
 	svgModification(false) ;
 	setObjectName(tr("Meta window")) ;
 	toggleViewAction()->setText(tr("Toggle meta window"));
 	plot->setObjectName("metaPlot");
 }
 
-void specKineticWidget::writeToStream(QDataStream &out) const
+void specKineticWidget::writeToStream(QDataStream& out) const
 {
 	out << *plot << *items ;
 }
 
-void specKineticWidget::readFromStream(QDataStream &in)
+void specKineticWidget::readFromStream(QDataStream& in)
 {
 	in >> *plot >> *items ;
 }
@@ -47,8 +47,8 @@ void specKineticWidget::readFromStream(QDataStream &in)
 // TODO shift to parent class of kineticWidget and plotWidget
 void specKineticWidget::svgModification(bool mod)
 {
-	if (mod) connect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
-	else disconnect(plot->svgPicker(),SIGNAL(pointMoved(specCanvasItem*,int,double,double)),items->model(), SLOT(svgMoved(specCanvasItem*,int,double,double))) ;
+	if(mod) connect(plot->svgPicker(), SIGNAL(pointMoved(specCanvasItem*, int, double, double)), items->model(), SLOT(svgMoved(specCanvasItem*, int, double, double))) ;
+	else disconnect(plot->svgPicker(), SIGNAL(pointMoved(specCanvasItem*, int, double, double)), items->model(), SLOT(svgMoved(specCanvasItem*, int, double, double))) ;
 
 	plot->svgPicker()->highlightSelectable(mod) ;
 }

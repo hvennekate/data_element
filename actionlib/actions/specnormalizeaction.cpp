@@ -7,7 +7,7 @@
 #include "specdataview.h"
 #include "specdataitem.h"
 
-specNormalizeAction::specNormalizeAction(QObject *parent) :
+specNormalizeAction::specNormalizeAction(QObject* parent) :
 	specRequiresDataItemAction(parent),
 	uiDialog(new QDialog),
 	ui(new Ui::specNormalizeActionDialog)
@@ -36,40 +36,40 @@ const std::type_info& specNormalizeAction::possibleParent()
 specUndoCommand* specNormalizeAction::generateUndoCommand()
 {
 	// Run dialog
-	if (uiDialog->exec() == QDialog::Rejected) return 0 ;
-	if (!ui->scaleYValue->isChecked() && !ui->shiftXValue->isChecked()) return 0 ;
+	if(uiDialog->exec() == QDialog::Rejected) return 0 ;
+	if(!ui->scaleYValue->isChecked() && !ui->shiftXValue->isChecked()) return 0 ;
 
 	// Prepare parent command
 	specMultiCommand* command = new specMultiCommand ;
 	command->setParentObject(model) ;
 
 	// Compute corrections and prepare item commands
-	foreach(specModelItem* item, pointers)
+	foreach(specModelItem * item, pointers)
 	{
-		if (!item->dataSize()) continue ;
-		if (!dynamic_cast<specDataItem*>(item)) continue ;
+		if(!item->dataSize()) continue ;
+		if(!dynamic_cast<specDataItem*>(item)) continue ;
 
 		// find extremum
 		size_t extremum = 0 ;
 		double previousValue = item->sample(0).y() ;
-		if (ui->minimum->isChecked())
+		if(ui->minimum->isChecked())
 		{
-			for (size_t i = 0 ; i < item->dataSize() ; ++i)
-				if (previousValue > item->sample(i).y())
+			for(size_t i = 0 ; i < item->dataSize() ; ++i)
+				if(previousValue > item->sample(i).y())
 					extremum = i, previousValue = item->sample(i).y() ;
 		}
 		else
 		{
-			for (size_t i = 0 ; i < item->dataSize() ; ++i)
-				if (previousValue < item->sample(i).y())
+			for(size_t i = 0 ; i < item->dataSize() ; ++i)
+				if(previousValue < item->sample(i).y())
 					extremum = i, previousValue = item->sample(i).y() ;
 		}
 
-		specExchangeFilterCommand *moveCommand = new specExchangeFilterCommand(command, true) ;
+		specExchangeFilterCommand* moveCommand = new specExchangeFilterCommand(command, true) ;
 		moveCommand->setRelativeFilter(
-					specDataPointFilter(0,0,
-							    ui->scaleYValue->isChecked() ? ui->yValue->text().toDouble() / previousValue : 1,
-							    ui->shiftXValue->isChecked() ? ui->xValue->text().toDouble() - item->sample(extremum).x() : 0));
+		    specDataPointFilter(0, 0,
+					ui->scaleYValue->isChecked() ? ui->yValue->text().toDouble() / previousValue : 1,
+					ui->shiftXValue->isChecked() ? ui->xValue->text().toDouble() - item->sample(extremum).x() : 0));
 		moveCommand->setItem(item);
 	}
 

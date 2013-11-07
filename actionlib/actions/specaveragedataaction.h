@@ -4,7 +4,8 @@
 #include "specrequiresitemaction.h"
 class QDialog ;
 
-namespace Ui {
+namespace Ui
+{
 	class averageDialog ;
 }
 
@@ -12,14 +13,14 @@ class specAverageDataAction : public specRequiresDataItemAction
 {
 	Q_OBJECT
 public:
-	explicit specAverageDataAction(QObject *parent = 0);
+	explicit specAverageDataAction(QObject* parent = 0);
 	~specAverageDataAction() ;
 	const std::type_info& possibleParent() ;
 protected:
 	specUndoCommand* generateUndoCommand() ;
 private:
 	QDialog* dialog ;
-	Ui::averageDialog *ui ;
+	Ui::averageDialog* ui ;
 private slots:
 	void runningToggled() ;
 };

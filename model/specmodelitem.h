@@ -32,7 +32,7 @@ protected:
 	virtual bool shortCircuit(specModelItem* server) ;
 	void readFromStream(QDataStream&) ;
 	void writeToStream(QDataStream&) const ;
-	specModelItem* factory(const type &) const ;
+	specModelItem* factory(const type&) const ;
 public:
 	void revalidate() ;
 	void invalidate() ;
@@ -46,14 +46,14 @@ public:
 	bool mergePlotData, sortPlotData ;
 
 	/*! Standard constructor.  Expects pointer to parent (zero for root item) and possibly an initial value for the descriptive tag (default: empty string). */
-	specModelItem(specFolderItem* par=0, QString description="");
+	specModelItem(specFolderItem* par = 0, QString description = "");
 	specModelItem(const specModelItem&) ;
 	/*! Standard destructor.*/
 	virtual ~specModelItem();
 	/*! Returns a collection of data points (normally empty, needs to be reimplemented in subclasses). The format is time, signal.*/
 
 	/*! Assign parent. */
-	void setParent(specFolderItem*) ; // TODO make private and friend of folder class
+	void setParent(specFolderItem*) ;  // TODO make private and friend of folder class
 	/*! Returns pointer to currently assigned parent. */
 	specFolderItem* parent() const;
 	/*! Returns number of children.  Normally none, so this function needs to be reimplemented if the item is to be a folder or similar type. */
@@ -61,13 +61,13 @@ public:
 	/*! Is this item a folder? */
 	virtual bool isFolder() const ;
 	/*! Return value of descriptor \a key */
-	virtual QString descriptor(const QString &key, bool full=false) const ;
+	virtual QString descriptor(const QString& key, bool full = false) const ;
 	virtual double descriptorValue(const QString& key) const { Q_UNUSED(key) ; return NAN ; }
 	/*! Is the descriptor \a key editable?*/
 	virtual bool isEditable(QString key) const ;
 	virtual bool isNumeric(const QString& key) const ;
 	/*! Set descriptor \a key 's value to  \a value. */
-	virtual bool changeDescriptor(QString key, QString value) ; // TODO add changeDescriptor(key,specDescriptor)
+	virtual bool changeDescriptor(QString key, QString value) ;  // TODO add changeDescriptor(key,specDescriptor)
 	virtual bool setActiveLine(const QString&, int) ;
 	virtual int activeLine(const QString& key) const ;
 	/*! Regenerate data used for plotting. */
@@ -75,16 +75,16 @@ public:
 	/*! Try to set data whose \f$\nu\f$ value is in \a ranges to zero by applying some correction (preferrably by subtracting a linear function previously fit to the data concerned).*/
 	virtual QIcon decoration() const ;
 	QIcon indicator(const QString&) const ;
-	virtual bool addChild(specModelItem *child, QList<specModelItem*>::size_type position) ;
+	virtual bool addChild(specModelItem* child, QList<specModelItem*>::size_type position) ;
 	virtual bool addChildren(QList<specModelItem*> list, QList<specModelItem*>::size_type position) ;
 	virtual QStringList descriptorKeys() const ;
 	virtual spec::descriptorFlags descriptorProperties(const QString& key) const ;
 	virtual void setDescriptorProperties(const QString& key, spec::descriptorFlags f) ;
-	virtual void exportData(const QList<QPair<bool,QString> >&, const QList<QPair<spec::value,QString> >&, QTextStream&) ;
+	virtual void exportData(const QList<QPair<bool, QString> >&, const QList<QPair<spec::value, QString> >&, QTextStream&) ;
 	virtual QVector<double> intensityData() const ;
 	virtual void movingAverage(int) {}
 	virtual void average(int) {}
-	virtual QString toolTip(const QString &column) const ;
+	virtual QString toolTip(const QString& column) const ;
 	virtual void renameDescriptors(const QMap<QString, QString>& map) ;
 	virtual void deleteDescriptor(const QString& key) ;
 	virtual void dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const ;
@@ -92,11 +92,11 @@ public:
 	virtual QString editDescriptor(const QString& key) const ;
 
 	int rtti() const { return spec::spectrum ; }
-	void attach(QwtPlot *plot) ;
+	void attach(QwtPlot* plot) ;
 	void detach();
 
 	static specModelItem* itemFactory(specStreamable::type) ;
-	virtual specUndoCommand* itemPropertiesAction(QObject *parentObject) { Q_UNUSED(parentObject) ; return 0 ; }
+	virtual specUndoCommand* itemPropertiesAction(QObject* parentObject) { Q_UNUSED(parentObject) ; return 0 ; }
 	template <typename T>
 	QVector<T> findDescendants() ;
 
@@ -106,7 +106,7 @@ public:
 		const QStringList* description ;
 	public:
 		descriptorComparison(const QStringList* description) ;
-		bool operator() (specModelItem *&, specModelItem *&) ;
+		bool operator()(specModelItem*&, specModelItem*&) ;
 	};
 };
 

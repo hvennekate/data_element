@@ -3,13 +3,13 @@
 #include "specgenealogy.h"
 #include "qwt_plot.h"
 
-specResizeSVGcommand::specResizeSVGcommand(specUndoCommand *parent)
+specResizeSVGcommand::specResizeSVGcommand(specUndoCommand* parent)
 	: specSingleItemCommand(parent),
 	  anchor(specSVGItem::undefined)
 {
 }
 
-void specResizeSVGcommand::setItem(specModelItem *item, const specSVGItem::bounds &bounds, specSVGItem::SVGCornerPoint a)
+void specResizeSVGcommand::setItem(specModelItem* item, const specSVGItem::bounds& bounds, specSVGItem::SVGCornerPoint a)
 {
 	specSingleItemCommand::setItem(item) ;
 	other = bounds ;
@@ -17,14 +17,14 @@ void specResizeSVGcommand::setItem(specModelItem *item, const specSVGItem::bound
 	doIt() ;
 }
 
-void specResizeSVGcommand::writeCommand(QDataStream &out) const
+void specResizeSVGcommand::writeCommand(QDataStream& out) const
 {
 	out << other ;
 	writeItem(out) ;
 	out << (qint8) anchor ;
 }
 
-void specResizeSVGcommand::readCommand(QDataStream &in)
+void specResizeSVGcommand::readCommand(QDataStream& in)
 {
 	qint8 newAnchor ;
 	in >> other ;
@@ -35,13 +35,13 @@ void specResizeSVGcommand::readCommand(QDataStream &in)
 
 void specResizeSVGcommand::doIt()
 {
-	specSVGItem *pointer = itemPointer() ;
+	specSVGItem* pointer = itemPointer() ;
 	specSVGItem::bounds oldBounds = pointer->getBounds() ;
 	pointer->setBounds(other);
-	if (anchor != specSVGItem::undefined)
+	if(anchor != specSVGItem::undefined)
 		anchor = pointer->setAnchor(anchor) ;
 	other = oldBounds ;
-	if (pointer->plot())
+	if(pointer->plot())
 		pointer->plot()->replot();
 }
 
@@ -50,14 +50,14 @@ void specResizeSVGcommand::undoIt()
 	doIt() ;
 }
 
-bool specResizeSVGcommand::mergeable(const specUndoCommand *other)
+bool specResizeSVGcommand::mergeable(const specUndoCommand* other)
 {
 	return (itemPointer() == ((specResizeSVGcommand*) other)->itemPointer()) ;
 }
 
-bool specResizeSVGcommand::mergeWith(const QUndoCommand *other)
+bool specResizeSVGcommand::mergeWith(const QUndoCommand* other)
 {
-	if (!parentObject()) return false ;
+	if(!parentObject()) return false ;
 	return mergeable((specUndoCommand*) other) ;
 }
 

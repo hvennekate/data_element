@@ -7,9 +7,9 @@ class specAddFitAction : public specRequiresMetaItemAction
 {
 	Q_OBJECT
 public:
-	explicit specAddFitAction(QObject *parent = 0);
+	explicit specAddFitAction(QObject* parent = 0);
 private:
-	specUndoCommand *generateUndoCommand() ;
+	specUndoCommand* generateUndoCommand() ;
 };
 
 #endif // SPECADDFITACTION_H

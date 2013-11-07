@@ -7,7 +7,7 @@
 
 class specGenealogy : public specStreamable
 {
-	friend QTextStream& operator<<(QTextStream& out, const specGenealogy& g) ;
+	friend QTextStream& operator<< (QTextStream& out, const specGenealogy& g) ;
 private:
 	specModel* Model ;
 	QVector<int> indexes ;
@@ -15,10 +15,10 @@ private:
 	QVector<specModelItem*> Items ;
 	bool owning ;
 	void getItemPointers() ;
-	void writeToStream(QDataStream &out) const ;
-	void readFromStream(QDataStream &in) ;
+	void writeToStream(QDataStream& out) const ;
+	void readFromStream(QDataStream& in) ;
 	type typeId() const { return specStreamable::genealogyId ; }
-	specModelItem* factory(const type &t) const ;
+	specModelItem* factory(const type& t) const ;
 	void clear() ;
 public:
 	specGenealogy(specModelItem* p, specModel* m) ;
@@ -40,12 +40,12 @@ public:
 	specModelItem* firstItem() const ;
 	QModelIndex firstIndex() ;
 
-	bool operator==(const specGenealogy& other) ;
-	bool operator!=(const specGenealogy& other) ;
-	specGenealogy& operator=(specGenealogy& other) ;
-	specGenealogy& operator=(const specGenealogy& other) ;
+	bool operator== (const specGenealogy& other) ;
+	bool operator!= (const specGenealogy& other) ;
+	specGenealogy& operator= (specGenealogy& other) ;
+	specGenealogy& operator= (const specGenealogy& other) ;
 };
 
-QTextStream& operator<<(QTextStream& out, const specGenealogy& g) ;
+QTextStream& operator<< (QTextStream& out, const specGenealogy& g) ;
 
 #endif // SPECGENEALOGY_H

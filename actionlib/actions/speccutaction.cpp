@@ -3,7 +3,7 @@
 #include <QClipboard>
 #include "speccopyaction.h"
 
-specCutAction::specCutAction(QObject *parent) :
+specCutAction::specCutAction(QObject* parent) :
 	specDeleteAction(parent)
 {
 	this->setIcon(QIcon::fromTheme("edit-cut")) ;
@@ -15,6 +15,6 @@ specCutAction::specCutAction(QObject *parent) :
 
 specUndoCommand* specCutAction::generateUndoCommand()
 {
-	specCopyAction::copyToClipboard(model,selection) ;
+	specCopyAction::copyToClipboard(model, selection) ;
 	return specDeleteAction::generateUndoCommand() ;
 }

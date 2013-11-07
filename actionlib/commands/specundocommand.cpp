@@ -1,13 +1,13 @@
 #include "specundocommand.h"
 #include "specmodel.h"
 
-specUndoCommand::specUndoCommand(specUndoCommand *parent) :
+specUndoCommand::specUndoCommand(specUndoCommand* parent) :
 	QUndoCommand(parent),
 	pO(parent ? parent->parentObject() : 0)
 {
 }
 
-void specUndoCommand::setParentObject(QObject * par)
+void specUndoCommand::setParentObject(QObject* par)
 {
 	pO = par ;
 	parentAssigned();
@@ -20,21 +20,21 @@ QObject* specUndoCommand::parentObject() const
 
 void specUndoCommand::redo()
 {
-	if (pO) doIt() ;
+	if(pO) doIt() ;
 }
 
 void specUndoCommand::undo()
 {
-	if (pO) undoIt();
+	if(pO) undoIt();
 }
 
-void specUndoCommand::writeToStream(QDataStream &out) const
+void specUndoCommand::writeToStream(QDataStream& out) const
 {
 	out << description() ;
 	writeCommand(out) ;
 }
 
-void specUndoCommand::readFromStream(QDataStream &in)
+void specUndoCommand::readFromStream(QDataStream& in)
 {
 	QString d ;
 	in >> d ;

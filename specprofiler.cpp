@@ -1,7 +1,7 @@
 #include "specprofiler.h"
 #include <QDebug>
 
-specProfiler::specProfiler(const QString &s)
+specProfiler::specProfiler(const QString& s)
 	: description(s)
 {
 	start();

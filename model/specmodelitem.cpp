@@ -30,8 +30,8 @@ specModelItem::specModelItem(specFolderItem* par, QString desc)
 specModelItem::~specModelItem()
 {
 	detach();
-	foreach (specMetaItem* client, clients)
-		disconnectClient(client) ;
+	foreach(specMetaItem * client, clients)
+	disconnectClient(client) ;
 	setParent(0) ;
 }
 
@@ -39,17 +39,17 @@ void specModelItem::setParent(specFolderItem* par)
 {
 	//	if (par == iparent)
 	//		return ;
-	if (iparent)
+	if(iparent)
 		iparent->removeChild(this) ;
-	if (!par) // TODO review and maybe find better place
+	if(!par)  // TODO review and maybe find better place
 		detachChild(this) ;
 	iparent = par ;
 }
 
-void specModelItem::detachChild(specModelItem* child) // TODO review and maybe find better place
+void specModelItem::detachChild(specModelItem* child)  // TODO review and maybe find better place
 {
 	child->detach();
-	for (int i = 0 ; i < child->children() ; ++i)
+	for(int i = 0 ; i < child->children() ; ++i)
 		detachChild(((specFolderItem*) child)->child(i)) ;
 }
 
@@ -61,14 +61,14 @@ QList<specModelItem*>::size_type specModelItem::children() const
 
 bool specModelItem::isEditable(QString key) const
 {
-	if (key == "")
+	if(key == "")
 		return true ;
 	return descriptorProperties(key) & spec::editable ;
 }
 
 bool specModelItem::changeDescriptor(QString key, QString value)
 {
-	if (key == "" && description.isEditable())
+	if(key == "" && description.isEditable())
 	{
 		description.setContent(value) ;
 		setTitle(value) ;
@@ -80,14 +80,14 @@ bool specModelItem::changeDescriptor(QString key, QString value)
 
 bool specModelItem::setActiveLine(const QString& key, int line)
 {
-	if (key == "")
+	if(key == "")
 		return description.setActiveLine(line) ;
 	return false ;
 }
 
 int specModelItem::activeLine(const QString& key) const
 {
-	if (key == "")
+	if(key == "")
 		return description.activeLine() ;
 	return -1 ;
 }
@@ -100,32 +100,32 @@ QVector<T> specModelItem::findDescendants()
 {
 	QVector<T> result ;
 	T self = dynamic_cast<T>(this) ;
-	if (self) result << self ;
+	if(self) result << self ;
 	return result ;
 }
 
 void specModelItem::processData()
 {
-	if (!sortPlotData && !mergePlotData)
+	if(!sortPlotData && !mergePlotData)
 		return ;
 	// Obtain data points
 	QVector<QPointF> newData(dataSize()) ;
 	for(size_t i = 0 ; i < dataSize() ; ++i)
-		newData[i] = sample(i) ; // TODO quicker!
-	if (sortPlotData)
+		newData[i] = sample(i) ;  // TODO quicker!
+	if(sortPlotData)
 		qSort(newData.begin(), newData.end(), comparePoints) ;
 
 	typedef QVector<QPointF>::const_iterator vecit ;
-	if (mergePlotData)
+	if(mergePlotData)
 	{
 		QVector<QPointF> realData ;
 		for(vecit i = newData.begin() ; i != newData.end() ; ++i)
 		{
 			double x = i->x(), y = i->y() ;
 			vecit j ;
-			for (j = i+1 ; j != newData.end() && j->x() == x; ++j)
+			for(j = i + 1 ; j != newData.end() && j->x() == x; ++j)
 				y += j->y() ;
-			realData << QPointF(x,y/(j-i)) ; // TODO: Unit test!
+			realData << QPointF(x, y / (j - i)) ;  // TODO: Unit test!
 		}
 		setData(new QwtPointSeriesData(realData)) ;
 	}
@@ -134,9 +134,9 @@ void specModelItem::processData()
 
 }
 
-QString specModelItem::descriptor(const QString &key, bool full) const
+QString specModelItem::descriptor(const QString& key, bool full) const
 {
-	if (key == "") return description.content(full) ;
+	if(key == "") return description.content(full) ;
 	return QString() ;
 }
 
@@ -144,13 +144,13 @@ bool specModelItem::isFolder() const { return false ;}
 
 QIcon specModelItem::indicator(const QString& Descriptor) const
 {
-	if (descriptor(Descriptor,true).contains(QRegExp("\n")))
+	if(descriptor(Descriptor, true).contains(QRegExp("\n")))
 	{
-		if (Descriptor == "")
+		if(Descriptor == "")
 		{
 			QIcon def = decoration(), arrow = QIcon::fromTheme("go-down") ;
 			const QSize size = def.availableSizes().first() ; // TODO unsafe!
-			const QSize small = size/2. ;
+			const QSize small = size / 2. ;
 			QPixmap map = def.pixmap(size) ;
 			QPainter painter(&map) ;
 			painter.drawPixmap(small.width(), small.height(), small.width(), small.height(), arrow.pixmap(small)) ;
@@ -158,14 +158,14 @@ QIcon specModelItem::indicator(const QString& Descriptor) const
 		}
 		else return QIcon::fromTheme("go-down") ;
 	}
-	if (Descriptor == "")
+	if(Descriptor == "")
 		return decoration() ;
 	return QIcon() ;
 }
 
 QIcon specModelItem::decoration() const { return QIcon() ; }
 
-bool specModelItem::addChild(specModelItem *child, QList<specModelItem*>::size_type position)
+bool specModelItem::addChild(specModelItem* child, QList<specModelItem*>::size_type position)
 {
 	Q_UNUSED(child) ;
 	Q_UNUSED(position) ;
@@ -182,41 +182,41 @@ bool specModelItem::addChildren(QList<specModelItem*> list, QList<specModelItem*
 QStringList specModelItem::descriptorKeys() const
 { return QStringList(QString("")) ;}
 
-void specModelItem::writeToStream(QDataStream &out) const
+void specModelItem::writeToStream(QDataStream& out) const
 {
 	specCanvasItem::writeToStream(out) ;
 	out << mergePlotData << sortPlotData
 	    << description ;
 }
 
-void specModelItem::readFromStream(QDataStream & in)
+void specModelItem::readFromStream(QDataStream& in)
 {
 	specCanvasItem::readFromStream(in) ;
 	in >> mergePlotData >> sortPlotData
 	   >> description ;
-	setTitle(descriptor("",true));
+	setTitle(descriptor("", true));
 	invalidate() ;
 }
 
 spec::descriptorFlags specModelItem::descriptorProperties(const QString& key) const
 {
-	if(key=="") return description.flags() ;
+	if(key == "") return description.flags() ;
 	return spec::def ;
 }
 
-void specModelItem::setDescriptorProperties(const QString &key, spec::descriptorFlags f)
+void specModelItem::setDescriptorProperties(const QString& key, spec::descriptorFlags f)
 {
-	if (key == "") description.setFlags(f) ;
+	if(key == "") description.setFlags(f) ;
 }
 
-void specModelItem::exportData(const QList<QPair<bool,QString> >& headerFormat, const QList<QPair<spec::value,QString> >& dataFormat, QTextStream& out)
+void specModelItem::exportData(const QList<QPair<bool, QString> >& headerFormat, const QList<QPair<spec::value, QString> >& dataFormat, QTextStream& out)
 {
-	for (int i = 0 ; i < headerFormat.size() ; i++)
+	for(int i = 0 ; i < headerFormat.size() ; i++)
 		out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
 	out << endl ;
-	for (size_t j = 0 ; j < dataSize() ; j++)
-		for (int i = 0 ; i < dataFormat.size() ; i++)
-			out << (dataFormat[i].first ? sample(j).x() :sample(j).y()) << dataFormat[i].second ;
+	for(size_t j = 0 ; j < dataSize() ; j++)
+		for(int i = 0 ; i < dataFormat.size() ; i++)
+			out << (dataFormat[i].first ? sample(j).x() : sample(j).y()) << dataFormat[i].second ;
 	out << endl ;
 }
 
@@ -225,21 +225,21 @@ QVector<double> specModelItem::intensityData() const
 	return QVector<double>() ;
 }
 
-bool specModelItem::connectClient(specMetaItem *clnt)
+bool specModelItem::connectClient(specMetaItem* clnt)
 {
-	if (clients.contains(clnt))
+	if(clients.contains(clnt))
 		return false ;
-	if (!clnt->connectServer(this))
+	if(!clnt->connectServer(this))
 		return false ;
 	clients << clnt ;
 	return true ;
 }
 
-bool specModelItem::disconnectClient(specMetaItem *clnt) // TODO template
+bool specModelItem::disconnectClient(specMetaItem* clnt)  // TODO template
 {
-	if (!clients.contains(clnt))
+	if(!clients.contains(clnt))
 		return false ;
-	if (!clnt->disconnectServer(this))
+	if(!clnt->disconnectServer(this))
 		return false ;
 	return clients.remove(clnt) ;
 }
@@ -247,34 +247,34 @@ bool specModelItem::disconnectClient(specMetaItem *clnt) // TODO template
 void specModelItem::invalidate()
 {
 	dataValid = false ;
-	foreach(specMetaItem *client, clients) // TODO consider tying to the condition that item has been valid before
-		client->invalidate();
+	foreach(specMetaItem * client, clients)  // TODO consider tying to the condition that item has been valid before
+	client->invalidate();
 	if(iparent) iparent->invalidate();
 }
 
 void specModelItem::revalidate()
 {
-	if (dataValid) return ;
+	if(dataValid) return ;
 	refreshPlotData();
 	processData() ;
 	dataValid = true ;
 }
 
-bool specModelItem::shortCircuit(specModelItem *server)
+bool specModelItem::shortCircuit(specModelItem* server)
 {
-	if (server == this) return true ;
-	foreach(specMetaItem* client, clients)
-		if (client->shortCircuit(server)) return true ;
+	if(server == this) return true ;
+	foreach(specMetaItem * client, clients)
+	if(client->shortCircuit(server)) return true ;
 	return false;
 }
 
-bool specModelItem::connectServer(specModelItem *itm)
+bool specModelItem::connectServer(specModelItem* itm)
 {
 	Q_UNUSED(itm)
 	return false ;
 }
 
-bool specModelItem::disconnectServer(specModelItem *itm)
+bool specModelItem::disconnectServer(specModelItem* itm)
 {
 	Q_UNUSED(itm)
 	return false ;
@@ -284,100 +284,100 @@ specModelItem* specModelItem::itemFactory(specStreamable::type t)
 {
 	switch(t)
 	{
-	case specStreamable::dataItem : return new specDataItem ;
-	case specStreamable::folder : return new specFolderItem ;
-	case specStreamable::logEntry : return new specLogEntryItem ;
-	case specStreamable::sysEntry : return new specLogMessage ;
-	case specStreamable::svgItem : return new specSVGItem ;
-	case specStreamable::metaItem : return new specMetaItem ;
-	case specStreamable::legacyDataItem : return new specLegacyDataItem ;
-	default: return 0 ;
+		case specStreamable::dataItem : return new specDataItem ;
+		case specStreamable::folder : return new specFolderItem ;
+		case specStreamable::logEntry : return new specLogEntryItem ;
+		case specStreamable::sysEntry : return new specLogMessage ;
+		case specStreamable::svgItem : return new specSVGItem ;
+		case specStreamable::metaItem : return new specMetaItem ;
+		case specStreamable::legacyDataItem : return new specLegacyDataItem ;
+		default: return 0 ;
 	}
 }
 
-specModelItem* specModelItem::factory(const type &t) const
+specModelItem* specModelItem::factory(const type& t) const
 {
 	return itemFactory(t) ;
 }
 
-specModelItem::descriptorComparison::descriptorComparison(const QStringList *d)
+specModelItem::descriptorComparison::descriptorComparison(const QStringList* d)
 	: description(d)
 {
 }
 
-bool specModelItem::descriptorComparison::operator ()(specModelItem *& a, specModelItem *& b)
+bool specModelItem::descriptorComparison::operator()(specModelItem*& a, specModelItem*& b)
 {
-	if (!description) return false ;
+	if(!description) return false ;
 	foreach(QString criterion, *description)
 	{
-		QString aDescriptor = a->descriptor(criterion,true),
-				bDescriptor = b->descriptor(criterion, true) ;
-		if (aDescriptor != bDescriptor)
+		QString aDescriptor = a->descriptor(criterion, true),
+			bDescriptor = b->descriptor(criterion, true) ;
+		if(aDescriptor != bDescriptor)
 			return aDescriptor < bDescriptor ;
 	}
 	return false ;
 }
 
-void specModelItem::attach(QwtPlot *plot)
+void specModelItem::attach(QwtPlot* plot)
 {
 	specCanvasItem::attach(plot) ;
-	foreach(specMetaItem* client, clients)
-		client->refreshOtherPlots();
+	foreach(specMetaItem * client, clients)
+	client->refreshOtherPlots();
 }
 
 void specModelItem::detach()
 {
 	specCanvasItem::detach() ;
-	foreach(specMetaItem* client, clients)
-		client->refreshOtherPlots();
+	foreach(specMetaItem * client, clients)
+	client->refreshOtherPlots();
 }
 
-QString specModelItem::toolTip(const QString &column) const
+QString specModelItem::toolTip(const QString& column) const
 {
-	return descriptor(column,true) ;
+	return descriptor(column, true) ;
 }
 
-specModelItem::specModelItem(const specModelItem &other)
-	: specCanvasItem(other.description.content()), // TODO hm...
+specModelItem::specModelItem(const specModelItem& other)
+	: specCanvasItem(other.description.content()),  // TODO hm...
 	  iparent(0),
 	  dataValid(false),
 	  description(other.description)
 {}
 
-bool specModelItem::isNumeric(const QString &key) const
+bool specModelItem::isNumeric(const QString& key) const
 {
 	Q_UNUSED(key)
 	return false ;
 }
 
-void specModelItem::renameDescriptors(const QMap<QString, QString> &map)
+void specModelItem::renameDescriptors(const QMap<QString, QString>& map)
 {
 	Q_UNUSED(map) ;
 }
 
-void specModelItem::deleteDescriptor(const QString &descriptors)
+void specModelItem::deleteDescriptor(const QString& descriptors)
 {
 	Q_UNUSED(descriptors) ;
 }
 
-void specModelItem::dumpDescriptor(QList<specDescriptor> &destination, const QString &key) const
+void specModelItem::dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const
 {
-	if (key == "")
+	if(key == "")
 		destination << description ;
 	else
 		destination << specDescriptor() ;
 }
 
-void specModelItem::restoreDescriptor(QListIterator<specDescriptor> &origin, const QString &key)
+void specModelItem::restoreDescriptor(QListIterator<specDescriptor>& origin, const QString& key)
 {
-	if (!origin.hasNext()) return ;
-	if (key == "")
+	if(!origin.hasNext()) return ;
+	if(key == "")
 		description = origin.next() ;
 	else
 		origin.next() ;
 }
 
-QString specModelItem::editDescriptor(const QString &key) const
+QString specModelItem::editDescriptor(const QString& key) const
 {
 	return descriptor(key, true) ;
 }

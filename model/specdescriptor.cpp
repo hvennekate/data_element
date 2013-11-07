@@ -2,13 +2,13 @@
 #include <QRegExp>
 #include <QStringList>
 
-void specDescriptor::writeToStream(QDataStream &out) const
+void specDescriptor::writeToStream(QDataStream& out) const
 {
 	// TODO bad legacy...
-	out << contentValue << contentValue.split("\n")[currentLine] << (qint8) properties ;
+	out << contentValue << contentValue.split("\n") [currentLine] << (qint8) properties ;
 }
 
-void specDescriptor::readFromStream(QDataStream &in)
+void specDescriptor::readFromStream(QDataStream& in)
 {
 	qint8 prop ;
 	QString cline ;
@@ -36,15 +36,15 @@ double specDescriptor::numericValue() const
 
 QString specDescriptor::content(bool full) const
 {
-	if (full || (properties & spec::multiline))
+	if(full || (properties & spec::multiline))
 		return contentValue ;
 	else
-		return contentValue.split("\n")[currentLine] ;
+		return contentValue.split("\n") [currentLine] ;
 }
 
 bool specDescriptor::setContent(const QString& string)
 {
-	if (isEditable())
+	if(isEditable())
 	{
 		(*this) = string ;
 		return true ;
@@ -54,7 +54,7 @@ bool specDescriptor::setContent(const QString& string)
 
 bool specDescriptor::setActiveLine(int line)
 {
-	currentLine = qBound(0,line,contentValue.count("\n")) ;
+	currentLine = qBound(0, line, contentValue.count("\n")) ;
 	return true ;
 }
 
@@ -65,7 +65,7 @@ int specDescriptor::activeLine() const
 
 bool specDescriptor::setContent(const double& number)
 {
-	if (isNumeric() && isEditable())
+	if(isNumeric() && isEditable())
 	{
 		(*this) = number ;
 		return true ;
@@ -88,7 +88,7 @@ spec::descriptorFlags specDescriptor::flags() const
 	return properties ;
 }
 
-specDescriptor& specDescriptor::operator=(const double& val)
+specDescriptor& specDescriptor::operator= (const double& val)
 {
 	(*this) = QString::number(val) ;
 	properties |= spec::numeric ;
@@ -96,7 +96,7 @@ specDescriptor& specDescriptor::operator=(const double& val)
 }
 
 
-specDescriptor& specDescriptor::operator=(const QString& val)
+specDescriptor& specDescriptor::operator= (const QString& val)
 {
 	contentValue = val ;
 	setActiveLine(currentLine) ;

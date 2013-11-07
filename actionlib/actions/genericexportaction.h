@@ -8,11 +8,11 @@ class genericExportAction : public specRequiresItemAction
 {
 	Q_OBJECT
 public:
-	explicit genericExportAction(QObject *parent = 0);
+	explicit genericExportAction(QObject* parent = 0);
 	~genericExportAction() ;
 private:
 	specUndoCommand* generateUndoCommand() ;
-	exportDialog *exportFormat ;
+	exportDialog* exportFormat ;
 };
 
 #endif // GENERICEXPORTACTION_H

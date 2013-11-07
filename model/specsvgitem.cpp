@@ -6,21 +6,21 @@
 #include <QBuffer>
 #include <QPainter>
 
-void specSVGItem::attach(QwtPlot *newPlot)
+void specSVGItem::attach(QwtPlot* newPlot)
 {
 	detach() ;
 	image.attach(newPlot) ;
 	specCanvasItem::attach(newPlot) ;
-	specPlot* nPlot = qobject_cast<specPlot*>(newPlot) ;
-	if (nPlot && nPlot->svgPicker())
+	specPlot* nPlot = qobject_cast<specPlot*> (newPlot) ;
+	if(nPlot && nPlot->svgPicker())
 		nPlot->svgPicker()->addSelectable(this) ;
 }
 
 void specSVGItem::detach()
 {
-	if (!plot()) return ;
-	specPlot* oldPlot = qobject_cast<specPlot*>(plot()) ;
-	if (oldPlot && oldPlot->svgPicker())
+	if(!plot()) return ;
+	specPlot* oldPlot = qobject_cast<specPlot*> (plot()) ;
+	if(oldPlot && oldPlot->svgPicker())
 		oldPlot->svgPicker()->removeSelectable(this);
 	image.detach();
 	specModelItem::detach() ;
@@ -31,145 +31,145 @@ void specSVGItem::highlight(bool highlight)
 	highlighting = highlight ;
 	QVector<QPointF> points(specSVGItem::size) ;
 	QRectF br = boundRect() ;
-	for (int i = 0 ; i < specSVGItem::size ; ++i)
-		points[i] = getPoint((SVGCornerPoint) i,br) ;
+	for(int i = 0 ; i < specSVGItem::size ; ++i)
+		points[i] = getPoint((SVGCornerPoint) i, br) ;
 	setSamples(points) ;
-	if (!highlight)
+	if(!highlight)
 		setSymbol(0) ;
 	else
-		setSymbol(new QwtSymbol(QwtSymbol::Ellipse,QBrush(Qt::black),QPen(Qt::white),QSize(5,5))) ;
+		setSymbol(new QwtSymbol(QwtSymbol::Ellipse, QBrush(Qt::black), QPen(Qt::white), QSize(5, 5))) ;
 
 }
 
-specSVGItem::specSVGItem(specFolderItem *par, QString description)
-	: specModelItem(par,description),
+specSVGItem::specSVGItem(specFolderItem* par, QString description)
+	: specModelItem(par, description),
 	  highlighting(false),
 	  anchor(topLeft)
 {
-	ownBounds.width=qMakePair<qint8,qreal>(QwtPlot::axisCnt,0) ;
-	ownBounds.height=qMakePair<qint8,qreal>(QwtPlot::axisCnt,0) ;
-	ownBounds.x=qMakePair<qint8,qreal>(QwtPlot::axisCnt,0) ;
-	ownBounds.y=qMakePair<qint8,qreal>(QwtPlot::axisCnt,0) ;
+	ownBounds.width = qMakePair<qint8, qreal> (QwtPlot::axisCnt, 0) ;
+	ownBounds.height = qMakePair<qint8, qreal> (QwtPlot::axisCnt, 0) ;
+	ownBounds.x = qMakePair<qint8, qreal> (QwtPlot::axisCnt, 0) ;
+	ownBounds.y = qMakePair<qint8, qreal> (QwtPlot::axisCnt, 0) ;
 	setStyle(QwtPlotCurve::NoCurve);
 	setItemAttribute(Legend, false) ;
 }
 
-void specSVGItem::setImage(const QByteArray &newData)
+void specSVGItem::setImage(const QByteArray& newData)
 {
 	QSize defaultSize(QSvgRenderer(newData).defaultSize()) ;
-	ownBounds.width = qMakePair<qint8,qreal>(QwtPlot::xBottom,defaultSize.width()) ;
-	ownBounds.height = qMakePair<qint8,qreal>(QwtPlot::yLeft, defaultSize.height()) ;
-	ownBounds.x = qMakePair<qint8,qreal>(QwtPlot::xBottom, 0) ;
-	ownBounds.y = qMakePair<qint8,qreal>(QwtPlot::yLeft, 0) ;
+	ownBounds.width = qMakePair<qint8, qreal> (QwtPlot::xBottom, defaultSize.width()) ;
+	ownBounds.height = qMakePair<qint8, qreal> (QwtPlot::yLeft, defaultSize.height()) ;
+	ownBounds.x = qMakePair<qint8, qreal> (QwtPlot::xBottom, 0) ;
+	ownBounds.y = qMakePair<qint8, qreal> (QwtPlot::yLeft, 0) ;
 	anchor = topLeft ;
 	data = newData ;
 }
 
 QRectF specSVGItem::boundRect() const
 {
-	if (!plot()) return QRectF() ;
+	if(!plot()) return QRectF() ;
 	qreal px = (ownBounds.x.first == QwtPlot::axisCnt) ? ownBounds.x.second :
-							     plot()->invTransform(ownBounds.x.first, ownBounds.x.second),
-			py = (ownBounds.y.first == QwtPlot::axisCnt) ? ownBounds.y.second :
-								       plot()->invTransform(ownBounds.y.first, ownBounds.y.second),
+		   plot()->invTransform(ownBounds.x.first, ownBounds.x.second),
+		   py = (ownBounds.y.first == QwtPlot::axisCnt) ? ownBounds.y.second :
+			plot()->invTransform(ownBounds.y.first, ownBounds.y.second),
 			w = (ownBounds.width.first == QwtPlot::axisCnt) ? ownBounds.width.second :
-									  (plot()->invTransform(ownBounds.width.first, ownBounds.width.second)
-									   - plot()->invTransform(ownBounds.width.first,0)),
-			// TODO find out what the convention really is
-			h = (ownBounds.height.first == QwtPlot::axisCnt) ? ownBounds.height.second :
-									   (plot()->invTransform(ownBounds.height.first,0)
-									    - plot()->invTransform(ownBounds.height.first, ownBounds.height.second)) ;
+			    (plot()->invTransform(ownBounds.width.first, ownBounds.width.second)
+			     - plot()->invTransform(ownBounds.width.first, 0)),
+			    // TODO find out what the convention really is
+			    h = (ownBounds.height.first == QwtPlot::axisCnt) ? ownBounds.height.second :
+				(plot()->invTransform(ownBounds.height.first, 0)
+				 - plot()->invTransform(ownBounds.height.first, ownBounds.height.second)) ;
 
 	// shift x
-	switch (anchor)
+	switch(anchor)
 	{
-	case topRight:
-	case right:
-	case bottomRight:
-		px -= w / 2 ;
-	case center:
-	case top:
-	case bottom:
-		px -= w / 2 ;
-	default: ;
+		case topRight:
+		case right:
+		case bottomRight:
+			px -= w / 2 ;
+		case center:
+		case top:
+		case bottom:
+			px -= w / 2 ;
+		default: ;
 	}
 
 	// shift y
 	switch(anchor)
 	{
-	case top:
-	case topLeft:
-	case topRight:
-		py -= h / 2 ;
-	case center:
-	case left:
-	case right:
-		py -= h / 2 ;
-	default: ;
+		case top:
+		case topLeft:
+		case topRight:
+			py -= h / 2 ;
+		case center:
+		case left:
+		case right:
+			py -= h / 2 ;
+		default: ;
 	}
 
-	return QRectF(px,py,w,h) ;
+	return QRectF(px, py, w, h) ;
 }
 
-void specSVGItem::setBoundRect(const QRectF &br)
+void specSVGItem::setBoundRect(const QRectF& br)
 {
-	if (!plot()) return ;
-	QPointF anchorPoint = getPoint(anchor,br) ;
+	if(!plot()) return ;
+	QPointF anchorPoint = getPoint(anchor, br) ;
 	ownBounds.width.second = (ownBounds.width.first == QwtPlot::axisCnt) ?  br.width() :
-										(plot()->transform(ownBounds.width.first, br.width())
-										 - plot()->transform(ownBounds.width.first, 0));
+				 (plot()->transform(ownBounds.width.first, br.width())
+				  - plot()->transform(ownBounds.width.first, 0));
 	// TODO find out convention
 	ownBounds.height.second = (ownBounds.height.first == QwtPlot::axisCnt) ?  br.height() :
-										  (plot()->transform(ownBounds.height.first, 0)
-										   - plot()->transform(ownBounds.height.first, br.height()));
+				  (plot()->transform(ownBounds.height.first, 0)
+				   - plot()->transform(ownBounds.height.first, br.height()));
 	ownBounds.x.second = (ownBounds.x.first == QwtPlot::axisCnt) ? anchorPoint.x() :
-								       plot()->transform(ownBounds.x.first, anchorPoint.x()) ;
+			     plot()->transform(ownBounds.x.first, anchorPoint.x()) ;
 	ownBounds.y.second = (ownBounds.y.first == QwtPlot::axisCnt) ? anchorPoint.y() :
-								       plot()->transform(ownBounds.y.first, anchorPoint.y()) ;
+			     plot()->transform(ownBounds.y.first, anchorPoint.y()) ;
 	highlight(highlighting) ;
 }
 
 QPointF specSVGItem::getPoint(SVGCornerPoint point, const QRectF& br) const
 {
-	switch (point)
+	switch(point)
 	{
-	case top:
-		return QPointF(br.center().x(),br.bottom()) ;
-	case bottom:
-		return QPointF(br.center().x(),br.top()) ;
-	case left:
-		return QPointF(br.left(),br.center().y()) ;
-	case right:
-		return QPointF(br.right(),br.center().y()) ;
-	case topLeft:
-		return br.bottomLeft() ;
-	case topRight:
-		return br.bottomRight() ;
-	case bottomLeft:
-		return br.topLeft() ;
-	case bottomRight:
-		return br.topRight() ;
-	case center:
-		return br.center() ;
-	default: ;
+		case top:
+			return QPointF(br.center().x(), br.bottom()) ;
+		case bottom:
+			return QPointF(br.center().x(), br.top()) ;
+		case left:
+			return QPointF(br.left(), br.center().y()) ;
+		case right:
+			return QPointF(br.right(), br.center().y()) ;
+		case topLeft:
+			return br.bottomLeft() ;
+		case topRight:
+			return br.bottomRight() ;
+		case bottomLeft:
+			return br.topLeft() ;
+		case bottomRight:
+			return br.topRight() ;
+		case center:
+			return br.center() ;
+		default: ;
 	}
 	return QPointF() ;
 }
 
 void specSVGItem::refreshSVG()
 {
-	if (!plot()) return ;
+	if(!plot()) return ;
 	highlight(highlighting) ;
-	image.loadData(boundRect(),data) ;
+	image.loadData(boundRect(), data) ;
 }
 
-void specSVGItem::writeToStream(QDataStream &out) const
+void specSVGItem::writeToStream(QDataStream& out) const
 {
 	specModelItem::writeToStream(out) ;
 	out << data << ownBounds << qint8(anchor) ;
 }
 
-void specSVGItem::readFromStream(QDataStream &in)
+void specSVGItem::readFromStream(QDataStream& in)
 {
 	qint8 anc ;
 	specModelItem::readFromStream(in) ;
@@ -177,45 +177,45 @@ void specSVGItem::readFromStream(QDataStream &in)
 	anchor = (SVGCornerPoint) anc ;
 }
 
-void specSVGItem::pointMoved(const int & p, const double &x, const double &y)
+void specSVGItem::pointMoved(const int& p, const double& x, const double& y)
 {
 	SVGCornerPoint point((SVGCornerPoint) p) ;
-	if (point == undefined) return ;
-	if (!plot()) return ;
+	if(point == undefined) return ;
+	if(!plot()) return ;
 	QRectF br = boundRect() ;
-	QPointF newPoint(x,y) ;
+	QPointF newPoint(x, y) ;
 
-	if ((point == topLeft ||
-	     point == topRight ||
-	     point == bottomLeft ||
-	     point == bottomRight) &&
-			br.width() && br.height())
+	if((point == topLeft ||
+		point == topRight ||
+		point == bottomLeft ||
+		point == bottomRight) &&
+		br.width() && br.height())
 	{
-		QPointF oldPoint(getPoint(point,br)) ;
+		QPointF oldPoint(getPoint(point, br)) ;
 		QPointF diff(newPoint - oldPoint) ;
-		if (point == bottomRight || point == topLeft)
+		if(point == bottomRight || point == topLeft)
 			diff.setY(-diff.y()) ;
-		if (br.height()*diff.x() < br.width()*diff.y())
-			diff.setX(diff.y()*br.width()/br.height());
+		if(br.height() *diff.x() < br.width() *diff.y())
+			diff.setX(diff.y() *br.width() / br.height());
 		else
-			diff.setY(diff.x()*br.height()/br.width());
-		if (point == bottomRight || point == topLeft)
+			diff.setY(diff.x() *br.height() / br.width());
+		if(point == bottomRight || point == topLeft)
 			diff.setY(-diff.y()) ;
 		newPoint = oldPoint + diff ;
 	}
 
-	switch (point)
+	switch(point)
 	{
-	case center:	br.moveCenter(newPoint); break ;
-	case left:	br.setLeft(x); break ;
-	case right:	br.setRight(x); break ;
-	case top:	br.setBottom(y) ; break ;
-	case bottom:	br.setTop(y) ; break ;
-	case topLeft:	br.setBottomLeft(newPoint) ; break ;
-	case topRight:	br.setBottomRight(newPoint) ; break ;
-	case bottomLeft:	br.setTopLeft(newPoint) ; break ;
-	case bottomRight:	br.setTopRight(newPoint) ; break ;
-	default: ;
+		case center:	br.moveCenter(newPoint); break ;
+		case left:	br.setLeft(x); break ;
+		case right:	br.setRight(x); break ;
+		case top:	br.setBottom(y) ; break ;
+		case bottom:	br.setTop(y) ; break ;
+		case topLeft:	br.setBottomLeft(newPoint) ; break ;
+		case topRight:	br.setBottomRight(newPoint) ; break ;
+		case bottomLeft:	br.setTopLeft(newPoint) ; break ;
+		case bottomRight:	br.setTopRight(newPoint) ; break ;
+		default: ;
 	}
 	setBoundRect(br.normalized()) ;
 }
@@ -225,17 +225,17 @@ specSVGItem::bounds specSVGItem::getBounds() const
 	return ownBounds ;
 }
 
-void specSVGItem::setBounds(const bounds &b)
+void specSVGItem::setBounds(const bounds& b)
 {
 	ownBounds = b ;
 }
 
-QDataStream& operator<<(QDataStream& out, const specSVGItem::bounds& b)
+QDataStream& operator<< (QDataStream& out, const specSVGItem::bounds& b)
 {
 	return out << b.x << b.y << b.width << b.height ;
 }
 
-QDataStream& operator>>(QDataStream& in, specSVGItem::bounds& b)
+QDataStream& operator>> (QDataStream& in, specSVGItem::bounds& b)
 {
 	return in >> b.x >> b.y >> b.width >> b.height ;
 }
@@ -245,36 +245,36 @@ QIcon specSVGItem::decoration() const
 	return QIcon::fromTheme("image-x-generic") ;
 }
 
-specUndoCommand* specSVGItem::itemPropertiesAction(QObject *parentObject)
+specUndoCommand* specSVGItem::itemPropertiesAction(QObject* parentObject)
 {
 	svgItemProperties propertiesDialog(this) ;
-	if (propertiesDialog.exec() != QDialog::Accepted) return 0 ;
+	if(propertiesDialog.exec() != QDialog::Accepted) return 0 ;
 	return propertiesDialog.generateCommand(parentObject) ;
 }
 
-specSVGItem::SVGCornerPoint specSVGItem::setAnchor(const SVGCornerPoint & p)
+specSVGItem::SVGCornerPoint specSVGItem::setAnchor(const SVGCornerPoint& p)
 {
 	SVGCornerPoint old = anchor ;
 	anchor = p ;
 	return old ;
 }
 
-bool specSVGItem::bounds::operator ==(const specSVGItem::bounds& other) const
+bool specSVGItem::bounds::operator == (const specSVGItem::bounds& other) const
 {
 	return x      == other.x     &&
-			y      == other.y     &&
-			width  == other.width &&
-			height == other.height ;
+	       y      == other.y     &&
+	       width  == other.width &&
+	       height == other.height ;
 }
 
-QString specSVGItem::toolTip(const QString &column) const
+QString specSVGItem::toolTip(const QString& column) const
 {
 	QByteArray byteArray ;
 	QBuffer buffer(&byteArray) ;
 	QSvgRenderer renderer(data) ;
 	QSize defaultSize = renderer.defaultSize() ;
-	defaultSize.scale(150,150, Qt::KeepAspectRatio);
-	QImage image(defaultSize.width(),defaultSize.height(), QImage::Format_ARGB32) ;
+	defaultSize.scale(150, 150, Qt::KeepAspectRatio);
+	QImage image(defaultSize.width(), defaultSize.height(), QImage::Format_ARGB32) ;
 	image.fill(Qt::transparent);
 	QPainter painter(&image) ;
 	renderer.render(&painter);
@@ -282,6 +282,6 @@ QString specSVGItem::toolTip(const QString &column) const
 	image.save(&buffer, "PNG") ;
 
 	return QString("%1<br><img src=\"data:image/png;base64,%2\"></img>")
-			.arg(specModelItem::toolTip(column))
-			.arg(QString(buffer.data().toBase64())) ;
+	       .arg(specModelItem::toolTip(column))
+	       .arg(QString(buffer.data().toBase64())) ;
 }

@@ -16,8 +16,8 @@ class specMimeConverter ;
 class specCanvasItem ;
 class QValidator ;
 
-QDataStream& operator<<(QDataStream&, specModel&);
-QDataStream& operator>>(QDataStream& in, specModel& model) ;
+QDataStream& operator<< (QDataStream&, specModel&);
+QDataStream& operator>> (QDataStream& in, specModel& model) ;
 
 class specModel : public QAbstractItemModel, public specStreamable
 {
@@ -30,12 +30,12 @@ private:
 	bool itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria) ;
 	QModelIndexList merge(QModelIndexList& list, const QList<QPair<QStringList::size_type, double> >& criteria) ;
 	QModelIndexList allChildren(const QModelIndex&) const ;
-	QMap<double,double> subMap ;
+	QMap<double, double> subMap ;
 	bool internalDrop ;
 	specActionLibrary* dropBuddy ;
 	int dontDelete ;
-	void writeToStream(QDataStream &out) const ;
-	void readFromStream(QDataStream &in) ;
+	void writeToStream(QDataStream& out) const ;
+	void readFromStream(QDataStream& in) ;
 	type typeId() const { return specStreamable::model ; }
 	QList<specMimeConverter*> mimeConverters() const ;
 	specMetaModel* metaModel ;
@@ -43,7 +43,7 @@ private:
 	bool resetPending ;
 public:
 	virtual QStringList dataTypes() const ;
-	specModel(QObject *par = 0) ;
+	specModel(QObject* par = 0) ;
 	~specModel() ;
 	QStringList mimeTypes() const ;
 	void setMetaModel(specMetaModel*) ;
@@ -55,7 +55,7 @@ public:
 	QModelIndex index(specModelItem*, int column = 0) const ;
 	static QVector<int> hierarchy(specModelItem*) ;
 	static QVector<int> hierarchy(const QModelIndex&) ;
-	static bool lessThanItemPointer(specModelItem *, specModelItem *) ;
+	static bool lessThanItemPointer(specModelItem*, specModelItem*) ;
 	static bool lessThanIndex(const QModelIndex&, const QModelIndex&) ;
 	QList<specModelItem*> pointerList(const QModelIndexList&) const ;
 	QModelIndexList indexList(const QList<specModelItem*>&) const ;
@@ -64,10 +64,10 @@ public:
 	QModelIndexList indexList(const QList<T*>& pointers) const
 	{
 		QModelIndexList returnList ;
-		foreach(T* tpointer, pointers)
+		foreach(T * tpointer, pointers)
 		{
-			specModelItem *pointer = dynamic_cast<specModelItem*>(tpointer) ;
-			if (pointer)
+			specModelItem* pointer = dynamic_cast<specModelItem*>(tpointer) ;
+			if(pointer)
 				returnList << index(pointer) ;
 		}
 		return returnList ;
@@ -77,11 +77,11 @@ public:
 	static void eliminateChildren(QModelIndexList&);
 	static void eliminateChildren(QList<specModelItem*>&);
 	static QList<specModelItem*> expandFolders(const QList<specModelItem*>&, bool retain = false) ;
-	virtual bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row=0) ;
+	virtual bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row = 0) ;
 	void fillSubMap(const QModelIndexList&) ;
 	void applySubMap(const QModelIndexList&) ;
 	const QStringList& descriptors() const ;
-	const QList<spec::descriptorFlags> & descriptorProperties() const;
+	const QList<spec::descriptorFlags>& descriptorProperties() const;
 	void setDescriptorProperties(spec::descriptorFlags flags, const QString& key) ;
 	void renameDescriptors(const QMap<QString, QString>&) ;
 	void deleteDescriptor(const QString&) ;
@@ -90,33 +90,33 @@ public:
 
 	// QAbstractItemModel virtual functions:
 
-	int columnCount(const QModelIndex &parent) const ;
+	int columnCount(const QModelIndex& parent) const ;
 	int rowCount(const QModelIndex&) const ;
-	bool removeRows(int position, int rows, const QModelIndex &parent = QModelIndex());
+	bool removeRows(int position, int rows, const QModelIndex& parent = QModelIndex());
 
-	bool setHeaderData (int section,Qt::Orientation orientation,const QVariant & value,int role = Qt::EditRole);
-	bool insertColumns (int column,int count,const QModelIndex & parent = QModelIndex() );
-	bool removeColumns (int column,int count,const QModelIndex & parent = QModelIndex() );
+	bool setHeaderData(int section, Qt::Orientation orientation, const QVariant& value, int role = Qt::EditRole);
+	bool insertColumns(int column, int count, const QModelIndex& parent = QModelIndex());
+	bool removeColumns(int column, int count, const QModelIndex& parent = QModelIndex());
 
-	QModelIndex parent(const QModelIndex & index) const ;
-	QModelIndex index(int row, int column, const QModelIndex & parent = QModelIndex() ) const ;
-	Qt::ItemFlags flags(const QModelIndex &index) const;
+	QModelIndex parent(const QModelIndex& index) const ;
+	QModelIndex index(int row, int column, const QModelIndex& parent = QModelIndex()) const ;
+	Qt::ItemFlags flags(const QModelIndex& index) const;
 
-	QVariant data(const QModelIndex &index, int role) const;
-	bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole);
+	QVariant data(const QModelIndex& index, int role) const;
+	bool setData(const QModelIndex& index, const QVariant& value, int role = Qt::EditRole);
 	QVariant headerData(int section, Qt::Orientation orientation,
-				int role = Qt::DisplayRole) const;
+			    int role = Qt::DisplayRole) const;
 
 	// 	// Drag and drop:
 	void setInternalDrop(bool) ;
 	void setDropBuddy(specActionLibrary*) ;
 	Qt::DropActions supportedDropActions() const ;
-	QMimeData *mimeData(const QModelIndexList &) const;
-	bool dropMimeData(const QMimeData*, Qt::DropAction, int row, int column, const QModelIndex &parent) ;
+	QMimeData* mimeData(const QModelIndexList&) const;
+	bool dropMimeData(const QMimeData*, Qt::DropAction, int row, int column, const QModelIndex& parent) ;
 	bool mimeAcceptable(const QMimeData*) const ;
 
-	friend QDataStream& operator<<(QDataStream&, specModel&);
-	friend QDataStream& operator>>(QDataStream&, specModel&);
+	friend QDataStream& operator<< (QDataStream&, specModel&);
+	friend QDataStream& operator>> (QDataStream&, specModel&);
 
 	void signalBeginReset() ;
 	void signalChanged(const QModelIndex& index) ;

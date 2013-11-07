@@ -7,7 +7,7 @@ class specTreeAction : public specRequiresItemAction
 {
 	Q_OBJECT
 public:
-	explicit specTreeAction(QObject *parent = 0);
+	explicit specTreeAction(QObject* parent = 0);
 protected:
 	specUndoCommand* generateUndoCommand() ;
 };

@@ -2,20 +2,20 @@
 #include "specmulticommand.h"
 #include "specdataitem.h"
 
-specExchangeFilterCommand::specExchangeFilterCommand(specUndoCommand *parent, bool rel)
-	: specSingleItemCommand<specModelItem>(parent),
+specExchangeFilterCommand::specExchangeFilterCommand(specUndoCommand* parent, bool rel)
+	: specSingleItemCommand<specModelItem> (parent),
 	  relative(rel)
 {}
 
-QVector<specDataPointFilter> specExchangeFilterCommand::collectFilters(const QVector<specDataItem *> &items) const
+QVector<specDataPointFilter> specExchangeFilterCommand::collectFilters(const QVector<specDataItem*>& items) const
 {
 	QVector<specDataPointFilter> filters ;
-	foreach(specDataItem* item, items)
-		filters << item->dataFilter() ;
+	foreach(specDataItem * item, items)
+	filters << item->dataFilter() ;
 	return filters ;
 }
 
-void specExchangeFilterCommand::applyAbsoluteFilters(const QVector<specDataItem *> &items) const
+void specExchangeFilterCommand::applyAbsoluteFilters(const QVector<specDataItem*>& items) const
 {
 	for(int i = 0 ; i < qMin(absoluteFilters.size(), items.size()) ; ++i)
 		items[i]->setDataFilter(absoluteFilters[i]) ;
@@ -23,11 +23,11 @@ void specExchangeFilterCommand::applyAbsoluteFilters(const QVector<specDataItem 
 
 void specExchangeFilterCommand::doIt()
 {
-	specModelItem *item = itemPointer() ;
-	if (!item) return ;
+	specModelItem* item = itemPointer() ;
+	if(!item) return ;
 	QVector<specDataItem*> items = item->findDescendants<specDataItem*>() ;
 	QVector<specDataPointFilter> oldFilters = collectFilters(items) ;
-	if (relative)
+	if(relative)
 		item->addDataFilter(relativeFilter) ;
 	else
 		applyAbsoluteFilters(items);
@@ -38,14 +38,14 @@ void specExchangeFilterCommand::doIt()
 
 void specExchangeFilterCommand::undoIt()
 {
-	if (relative)
+	if(relative)
 		relativeFilter = -relativeFilter ;
 	doIt() ;
 }
 
-void specExchangeFilterCommand::writeCommand(QDataStream &out) const
+void specExchangeFilterCommand::writeCommand(QDataStream& out) const
 {
-	if (relative)
+	if(relative)
 		out << relativeFilter.getSlope()
 		    << relativeFilter.getOffset()
 		    << relativeFilter.getFactor()
@@ -55,9 +55,9 @@ void specExchangeFilterCommand::writeCommand(QDataStream &out) const
 	writeItem(out) ;
 }
 
-void specExchangeFilterCommand::readCommand(QDataStream &in)
+void specExchangeFilterCommand::readCommand(QDataStream& in)
 {
-	if (relative)
+	if(relative)
 	{
 		double slope = 0, offset = 0, scale = 1, shift = 0 ;
 		in >> slope >> offset >> scale >> shift ;
@@ -74,44 +74,44 @@ QString specExchangeFilterCommand::description() const
 	return QString() ;
 }
 
-bool specExchangeFilterCommand::mergeable(const specUndoCommand *other)
+bool specExchangeFilterCommand::mergeable(const specUndoCommand* other)
 {
 	return !relative
-			&& !(((specExchangeFilterCommand*) other)->relative)
-			&& (((specExchangeFilterCommand*) other)->itemPointer()) == itemPointer() ;
+	       && !(((specExchangeFilterCommand*) other)->relative)
+	       && (((specExchangeFilterCommand*) other)->itemPointer()) == itemPointer() ;
 }
 
-bool specExchangeFilterCommand::mergeWith(const QUndoCommand *ot)
+bool specExchangeFilterCommand::mergeWith(const QUndoCommand* ot)
 {
-	if (!parentObject()) return false ;
+	if(!parentObject()) return false ;
 	const specExchangeFilterCommand* other = (const specExchangeFilterCommand*) ot ;
-	if (!mergeable(other)) return false ;
+	if(!mergeable(other)) return false ;
 	generateDescription();
 	return true ;
 }
 
-void specExchangeFilterCommand::setRelativeFilter(const specDataPointFilter &f)
+void specExchangeFilterCommand::setRelativeFilter(const specDataPointFilter& f)
 {
 	relative = true ;
 	relativeFilter = f ;
 }
 
-void specExchangeFilterCommand::setAbsoluteFilter(const specDataPointFilter &filter)
+void specExchangeFilterCommand::setAbsoluteFilter(const specDataPointFilter& filter)
 {
 	relative = false ;
-	specModelItem *item = itemPointer() ;
+	specModelItem* item = itemPointer() ;
 	absoluteFilters = (item ?
-				   QVector<specDataPointFilter>(item->findDescendants<specDataItem*>().size(), filter)
-				 : QVector<specDataPointFilter>(1,filter)) ;
+			   QVector<specDataPointFilter> (item->findDescendants<specDataItem*>().size(), filter)
+			   : QVector<specDataPointFilter> (1, filter)) ;
 }
 
 void specExchangeFilterCommand::generateDescription()
 {
-	if (relative)
+	if(relative)
 		setText(QObject::tr("Add filter.") + relativeFilter.description()) ;
 	else
 	{
-		if (absoluteFilters.size() == 1)
+		if(absoluteFilters.size() == 1)
 			setText(QObject::tr("Exchange filter.") + absoluteFilters.first().description()) ;
 		else
 			setText(QObject::tr("Exchange ") + QString::number(absoluteFilters.size()) + QObject::tr(" filters.")) ;
@@ -121,6 +121,6 @@ void specExchangeFilterCommand::generateDescription()
 specStreamable::type specExchangeFilterCommand::typeId() const
 {
 	return relative ?
-				specStreamable::movePlotCommandId
-			      : specStreamable::exchangeFilterCommandId ;
+	       specStreamable::movePlotCommandId
+	       : specStreamable::exchangeFilterCommandId ;
 }

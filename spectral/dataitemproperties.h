@@ -4,7 +4,8 @@
 #include <QDialog>
 #include "specdataitem.h"
 
-namespace Ui {
+namespace Ui
+{
 	class dataItemProperties;
 }
 
@@ -13,13 +14,13 @@ class dataItemProperties : public QDialog
 	Q_OBJECT
 
 public:
-	dataItemProperties(specDataItem*, QWidget *parent = 0);
+	dataItemProperties(specDataItem*, QWidget* parent = 0);
 	~dataItemProperties();
-	specUndoCommand *changeCommands(QObject*) ;
+	specUndoCommand* changeCommands(QObject*) ;
 private:
-	Ui::dataItemProperties *ui;
+	Ui::dataItemProperties* ui;
 	specDataItem item ;
-	specDataItem *originalItem ;
+	specDataItem* originalItem ;
 	QwtPlotCurve highlightSelected, highlightCurrent ;
 	bool setupComplete ;
 	bool merge, sort ;

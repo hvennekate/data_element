@@ -6,7 +6,7 @@
 class specManageItemsCommand : public specMultipleItemCommand
 {
 public:
-	explicit specManageItemsCommand(specUndoCommand *parent = 0);
+	explicit specManageItemsCommand(specUndoCommand* parent = 0);
 	void setItems(QList<specModelItem*>&) ;
 	void setItem(specModelItem* pointer) ;
 };

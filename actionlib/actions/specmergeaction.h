@@ -12,7 +12,7 @@ class specMergeAction : public specRequiresDataItemAction
 private:
 	QModelIndexList allChildren(const QModelIndex& parent) const ;
 public:
-	explicit specMergeAction(QObject *parent = 0);
+	explicit specMergeAction(QObject* parent = 0);
 	~specMergeAction() ;
 	const std::type_info& possibleParent() { return typeid(specDataView) ; }
 private:

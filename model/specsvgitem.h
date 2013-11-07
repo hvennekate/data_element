@@ -10,7 +10,7 @@ class specSVGItem : public specModelItem
 {
 	friend class svgItemProperties ;
 public:
-	typedef QPair<qint8,qreal> dimension ;
+	typedef QPair<qint8, qreal> dimension ;
 	enum SVGCornerPoint { undefined = -1,
 			      center      = 0,
 			      left        = 1,
@@ -21,7 +21,8 @@ public:
 			      bottomLeft  = 6,
 			      topRight    = 7,
 			      bottomRight = 8,
-			      size        = 9 } ;
+			      size        = 9
+			    } ;
 private:
 	QwtPlotSvgItem image ;
 	QByteArray data ;
@@ -32,36 +33,36 @@ private:
 	void setDimension(dimension&, double) ;
 
 	type typeId() const { return specStreamable::svgItem ; }
-	void readFromStream(QDataStream &in) ;
-	void writeToStream(QDataStream &out) const;
+	void readFromStream(QDataStream& in) ;
+	void writeToStream(QDataStream& out) const;
 	QRectF boundRect() const ;
 	QPointF getPoint(SVGCornerPoint, const QRectF&) const ;
 	void setBoundRect(const QRectF&) ;
 public:
-	specSVGItem(specFolderItem* par=0, QString description="") ;
+	specSVGItem(specFolderItem* par = 0, QString description = "") ;
 	int rtti() const { return spec::SVGItem ; }
-	void attach(QwtPlot *plot) ;
+	void attach(QwtPlot* plot) ;
 	void detach() ;
 	void setImage(const QByteArray&) ;
 	void highlight(bool highlight) ;
 	void refreshSVG();
-	void pointMoved(const int &, const double &, const double &);
+	void pointMoved(const int&, const double&, const double&);
 	struct bounds
 	{
 		dimension x, y, width, height ;
-		bool operator==(const bounds&) const ;
+		bool operator== (const bounds&) const ;
 	};
 	bounds getBounds() const ;
 	void setBounds(const bounds&) ;
 	SVGCornerPoint setAnchor(const SVGCornerPoint&) ;
 	QIcon decoration() const ;
-	specUndoCommand *itemPropertiesAction(QObject *parentObject) ;
-	QString toolTip(const QString &column) const ;
+	specUndoCommand* itemPropertiesAction(QObject* parentObject) ;
+	QString toolTip(const QString& column) const ;
 private:
 	bounds ownBounds ;
 };
 
-QDataStream& operator<<(QDataStream& out, const specSVGItem::bounds& b) ;
-QDataStream& operator>>(QDataStream& in, specSVGItem::bounds& b) ;
+QDataStream& operator<< (QDataStream& out, const specSVGItem::bounds& b) ;
+QDataStream& operator>> (QDataStream& in, specSVGItem::bounds& b) ;
 
 #endif // SPECSVGITEM_H

@@ -1,15 +1,15 @@
 #include "specexchangefitcurvecommand.h"
 #include "specfitcurve.h"
 
-specExchangeFitCurveCommand::specExchangeFitCurveCommand(specUndoCommand *parent)
+specExchangeFitCurveCommand::specExchangeFitCurveCommand(specUndoCommand* parent)
 	: specSingleItemCommand(parent),
 	  curve(0)
 {
 }
 
-void specExchangeFitCurveCommand::setup(specModelItem *i, specFitCurve *c)
+void specExchangeFitCurveCommand::setup(specModelItem* i, specFitCurve* c)
 {
-	if (curve) delete curve ;
+	if(curve) delete curve ;
 	curve = c ;
 	setItem(i) ;
 }
@@ -21,22 +21,22 @@ void specExchangeFitCurveCommand::undoIt()
 
 void specExchangeFitCurveCommand::doIt()
 {
-	specMetaItem *pointer = itemPointer() ;
-	if (!pointer) return ;
+	specMetaItem* pointer = itemPointer() ;
+	if(!pointer) return ;
 	model()->signalBeginReset(); // to get the selection right // TODO improve!
 	curve = pointer->setFitCurve(curve);
-	if (curve) curve->detach();
+	if(curve) curve->detach();
 	model()->signalChanged(model()->index(itemPointer()));
 }
 
-void specExchangeFitCurveCommand::writeCommand(QDataStream &out) const
+void specExchangeFitCurveCommand::writeCommand(QDataStream& out) const
 {
 	out << quint8((bool) curve) ;
 	writeItem(out);
-	if (curve) out << *curve ;
+	if(curve) out << *curve ;
 }
 
-void specExchangeFitCurveCommand::readCommand(QDataStream &in)
+void specExchangeFitCurveCommand::readCommand(QDataStream& in)
 {
 	delete curve ;
 	quint8 hasCurve(0) ;

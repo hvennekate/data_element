@@ -10,7 +10,7 @@ class specSingleItemCommand : public specUndoCommand
 private:
 	specGenealogy item ;
 	void writeCommand(QDataStream& out) const ;
-	void readCommand(QDataStream &in) ;
+	void readCommand(QDataStream& in) ;
 protected:
 	void writeItem(QDataStream& out) const ;
 	void readItem(QDataStream& in) ;
@@ -18,7 +18,7 @@ protected:
 	itemType* itemPointer() ;
 	itemType* itemPointer() const ;
 public:
-	specSingleItemCommand(specUndoCommand *parent = 0);
+	specSingleItemCommand(specUndoCommand* parent = 0);
 	virtual void setItem(specModelItem*) ;
 };
 

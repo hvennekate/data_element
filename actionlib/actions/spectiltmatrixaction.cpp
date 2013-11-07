@@ -13,7 +13,7 @@ specTiltMatrixAction::~specTiltMatrixAction()
 	delete dialog ;
 }
 
-specTiltMatrixAction::specTiltMatrixAction(QObject *parent) :
+specTiltMatrixAction::specTiltMatrixAction(QObject* parent) :
 	specRequiresDataItemAction(parent),
 	dialog(new specExchangeDescriptorXDialog)
 {
@@ -51,7 +51,7 @@ class dataItemPreparationObject
 	QVector<specDataPoint> dataPoints ;
 	QMap<QString, descriptorPreparationObject> description ;
 public:
-	void addDataPoint(double x, double y) { dataPoints << specDataPoint(x,y,0) ; }
+	void addDataPoint(double x, double y) { dataPoints << specDataPoint(x, y, 0) ; }
 
 	void addDescriptor(const QString& key, const QString& value, const spec::descriptorFlags& flags)
 	{
@@ -60,16 +60,16 @@ public:
 
 	void addItem(const specModelItem* item, double x, double y)
 	{
-		addDataPoint(x,y) ;
-		foreach(const QString& key, item->descriptorKeys())
-			addDescriptor(key, item->descriptor(key, true), item->descriptorProperties(key));
+		addDataPoint(x, y) ;
+		foreach(const QString & key, item->descriptorKeys())
+		addDescriptor(key, item->descriptor(key, true), item->descriptorProperties(key));
 	}
 
-	specDataItem *dataItem() const
+	specDataItem* dataItem() const
 	{
 		QHash<QString, specDescriptor> descriptionHash ;
-		foreach(const QString& key, description.keys())
-			descriptionHash[key] = description[key].descriptor() ;
+		foreach(const QString & key, description.keys())
+		descriptionHash[key] = description[key].descriptor() ;
 		return new specDataItem(dataPoints, descriptionHash) ;
 	}
 };
@@ -82,27 +82,27 @@ specUndoCommand* specTiltMatrixAction::generateUndoCommand()
 	expandSelectedFolders(items, toBeDeletedFolders);
 
 	// bail out if only empty folders were selected
-	if (items.isEmpty()) return 0 ;
+	if(items.isEmpty()) return 0 ;
 
 	// Get input from user
 	dialog->setDescriptors(model->descriptors()) ;
 	if(QDialog::Accepted != dialog->exec()) return 0 ;
 	QString newDescriptor = dialog->newDescriptor(),
-			conversionDescriptor = dialog->descriptorToConvert() ;
+		conversionDescriptor = dialog->descriptorToConvert() ;
 
 	// collect the data
 	QMap<double, dataItemPreparationObject> newData ;
 	// xValue, data, descriptor, descriptions, flags
-	foreach(specModelItem* item, items)
+	foreach(specModelItem * item, items)
 	{
 		item->revalidate();
-		for (size_t i = 0 ; i < item->dataSize() ; ++i)
-			newData[item->sample(i).x()].addItem(item, item->descriptorValue(conversionDescriptor),item->sample(i).y()) ;
+		for(size_t i = 0 ; i < item->dataSize() ; ++i)
+			newData[item->sample(i).x()].addItem(item, item->descriptorValue(conversionDescriptor), item->sample(i).y()) ;
 	}
 
 	// collect new items
 	QList<specModelItem*> newItems ;
-	foreach(const double& key, newData.keys())
+	foreach(const double & key, newData.keys())
 	{
 		// TODO avoid back and forth conversions double <-> string!!
 		newData[key].addDescriptor(newDescriptor,
@@ -111,15 +111,15 @@ specUndoCommand* specTiltMatrixAction::generateUndoCommand()
 		newItems << newData[key].dataItem() ;
 	}
 	// remove descriptor exchanged for x value
-	foreach(specModelItem* item, newItems)
-		item->deleteDescriptor(conversionDescriptor) ;
+	foreach(specModelItem * item, newItems)
+	item->deleteDescriptor(conversionDescriptor) ;
 
 	// insert new items
 	// find safe parent index
 	specModelItem* parent = currentItem ;
-	while (parent->parent())
+	while(parent->parent())
 	{
-		if (toBeDeletedFolders.contains(parent))
+		if(toBeDeletedFolders.contains(parent))
 		{
 			insertionRow = parent->parent()->childNo(parent) ;
 			insertionIndex = model->index(parent->parent()) ;
@@ -128,25 +128,25 @@ specUndoCommand* specTiltMatrixAction::generateUndoCommand()
 	}
 
 
-	if (!model->insertItems(newItems, insertionIndex, insertionRow)) return 0 ;
+	if(!model->insertItems(newItems, insertionIndex, insertionRow)) return 0 ;
 
 	// command generation
 	specMultiCommand* parentCommand = new specMultiCommand ;
 	parentCommand->setParentObject(model) ;
 	parentCommand->setMergeable(false) ;
-	specAddFolderCommand *insertionCommand = new specAddFolderCommand(parentCommand) ;
-	insertionCommand->setItems(newItems); // TODO integrate into command constructor
+	specAddFolderCommand* insertionCommand = new specAddFolderCommand(parentCommand) ;
+	insertionCommand->setItems(newItems);  // TODO integrate into command constructor
 
 	// delete old items
 	items << toBeDeletedFolders ;
 	specDeleteAction::command(model, items, parentCommand) ;
 
-	parentCommand->setText(tr("Exchange \"")+
-				   conversionDescriptor+
-				   tr("\" and \"")+
-				   newDescriptor+
-				   tr("\" in ")+
-				   QString::number(newItems.size())+
-				   tr(" items.")) ;
+	parentCommand->setText(tr("Exchange \"") +
+			       conversionDescriptor +
+			       tr("\" and \"") +
+			       newDescriptor +
+			       tr("\" in ") +
+			       QString::number(newItems.size()) +
+			       tr(" items.")) ;
 	return parentCommand ;
 }

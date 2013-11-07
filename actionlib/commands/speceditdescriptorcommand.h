@@ -11,15 +11,15 @@ private:
 	QVector<int> previousActiveLine ;
 	void doIt() ;
 	void undoIt() ;
-	void writeCommand(QDataStream &out) const ;
-	void readCommand(QDataStream &in) ;
+	void writeCommand(QDataStream& out) const ;
+	void readCommand(QDataStream& in) ;
 	type typeId() const {return specStreamable::editDescriptorCommandId ;}
 	QString description() const ;
 	void generateDescription() ;
 public:
 	explicit specEditDescriptorCommand(specUndoCommand* parent = 0) ;
 	void setItem(specModelItem*, QString descriptor,
-			 QString newContent, int activeLine= 0) ;
+		     QString newContent, int activeLine = 0) ;
 	//	bool mergeWith(const QUndoCommand *other) ;
 	//	bool mergeable(const specUndoCommand *other) ;
 };

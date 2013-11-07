@@ -29,14 +29,14 @@ private:
 	void createToolBars() ;
 	void addDock(specPlotWidget*) ;
 
-	QMenu *fileMenu;
-	QMenu *helpMenu;
-	QToolBar *fileToolBar;
-	QAction *newAction;
-	QAction *openAction;
-	QAction *whatsThisAction ;
-	QAction *restoreSessionAction ;
-	QAction *shortCutAction ;
+	QMenu* fileMenu;
+	QMenu* helpMenu;
+	QToolBar* fileToolBar;
+	QAction* newAction;
+	QAction* openAction;
+	QAction* whatsThisAction ;
+	QAction* restoreSessionAction ;
+	QAction* shortCutAction ;
 private slots:
 	void about() ;
 	void whatsThisMode() ;

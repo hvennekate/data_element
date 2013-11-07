@@ -5,7 +5,7 @@
 class specDescriptorVariable : public specMetaVariable
 {
 public:
-	QVector<double> values(specModelItem *, const QVector<double> &) const ;
+	QVector<double> values(specModelItem*, const QVector<double>&) const ;
 };
 
 #endif // SPECDESCRIPTORVARIABLE_H

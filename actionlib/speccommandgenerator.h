@@ -6,10 +6,10 @@ class specUndoCommand ;
 class specCommandGenerator
 {
 private:
-	specUndoCommand *parent ;
+	specUndoCommand* parent ;
 public:
 	specCommandGenerator(specUndoCommand* parent = 0) ;
-	specUndoCommand *commandById(int id) const ;
+	specUndoCommand* commandById(int id) const ;
 };
 
 #endif // SPECCOMMANDGENERATOR_H

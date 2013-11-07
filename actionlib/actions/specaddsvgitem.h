@@ -7,9 +7,9 @@ class specAddSVGItemAction : public specItemAction
 {
 	Q_OBJECT
 public:
-	explicit specAddSVGItemAction(QObject *parent = 0);
+	explicit specAddSVGItemAction(QObject* parent = 0);
 private:
-	specUndoCommand *generateUndoCommand() ;
+	specUndoCommand* generateUndoCommand() ;
 };
 
 #endif // SPECADDSVGITEMACTION_H

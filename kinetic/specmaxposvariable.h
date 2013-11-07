@@ -5,7 +5,7 @@
 class specMaxPosVariable : public specMetaVariable
 {
 protected:
-	double processPoints(QVector<QPointF> &points) const ;
+	double processPoints(QVector<QPointF>& points) const ;
 };
 
 #endif // SPECMAXPOSVARIABLE_H

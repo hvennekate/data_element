@@ -10,7 +10,7 @@ private:
 private slots:
 	void stateChanged() ;
 public:
-	explicit specSvgUnitButton(QWidget *parent = 0);
+	explicit specSvgUnitButton(QWidget* parent = 0);
 };
 
 #endif // SPECSVGUNITBUTTON_H

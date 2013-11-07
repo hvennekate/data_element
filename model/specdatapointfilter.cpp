@@ -1,31 +1,31 @@
 #include "specdatapointfilter.h"
 
-QDataStream& operator <<(QDataStream& out, const specDataPointFilter& f)
+QDataStream& operator << (QDataStream& out, const specDataPointFilter& f)
 {
 	return out << f.offset
-		   << f.slope
-		   << f.factor
-		   << f.xshift
-		   << f.zeroMultiplications ;
+	       << f.slope
+	       << f.factor
+	       << f.xshift
+	       << f.zeroMultiplications ;
 }
 
-QDataStream& operator >>(QDataStream& in, specDataPointFilter& f)
+QDataStream& operator >> (QDataStream& in, specDataPointFilter& f)
 {
 	return in >> f.offset
-		  >> f.slope
-		  >> f.factor
-		  >> f.xshift
-		  << f.zeroMultiplications ;
+	       >> f.slope
+	       >> f.factor
+	       >> f.xshift
+	       << f.zeroMultiplications ;
 }
 
-specDataPointFilter& specDataPointFilter::operator +=(const specDataPointFilter& other)
+specDataPointFilter& specDataPointFilter::operator += (const specDataPointFilter& other)
 {
 	xshift += other.xshift ;
-	if (0 == other.factor)
+	if(0 == other.factor)
 		zeroMultiplications ++ ;
-	else if (INFINITY == other.factor)
+	else if(INFINITY == other.factor)
 		zeroMultiplications = 0 ;
-	else if (!isnan(other.factor))
+	else if(!isnan(other.factor))
 	{
 		slope  *= other.factor ;
 		factor *= other.factor ;
@@ -39,29 +39,29 @@ specDataPointFilter& specDataPointFilter::operator +=(const specDataPointFilter&
 
 specDataPointFilter specDataPointFilter::operator -() const
 {
-	if (factor == 0) return specDataPointFilter(offset,
-						    slope,
-						    INFINITY,
-						    -xshift) ;
-	if (factor == INFINITY) return specDataPointFilter(offset,
-							   slope,
-							   0,
-							   -xshift) ;
-	return specDataPointFilter(-factor/offset,
-				   -factor/slope,
-				   1/factor,
+	if(factor == 0) return specDataPointFilter(offset,
+				       slope,
+				       INFINITY,
+				       -xshift) ;
+	if(factor == INFINITY) return specDataPointFilter(offset,
+					      slope,
+					      0,
+					      -xshift) ;
+	return specDataPointFilter(-factor / offset,
+				   -factor / slope,
+				   1 / factor,
 				   -xshift) ;
 }
 
 void specDataPointFilter::applyCorrection(specDataPoint& point) const
 {
 	point.nu += xshift ;
-	point.sig = zeroMultiplications ? 0 : point.sig*factor+offset+slope*point.nu ;
+	point.sig = zeroMultiplications ? 0 : point.sig * factor + offset + slope * point.nu ;
 }
 
 void specDataPointFilter::reverseCorrection(specDataPoint& point) const
 {
-	point.sig = (point.sig-offset-slope*point.nu)/factor ;
+	point.sig = (point.sig - offset - slope * point.nu) / factor ;
 	point.nu = point.nu - xshift ;
 }
 
@@ -76,12 +76,12 @@ specDataPointFilter::specDataPointFilter(double off, double sl, double scale, do
 QString specDataPointFilter::description() const
 {
 	return QObject::tr("Offset: ") + QString::number(offset)
-			+ QObject::tr(", slope: ") + QString::number(slope)
-			+ QObject::tr(", scaling: ") + QString::number(factor)
-			+ QObject::tr(", x shift:") + QString::number(xshift) ;
+	       + QObject::tr(", slope: ") + QString::number(slope)
+	       + QObject::tr(", scaling: ") + QString::number(factor)
+	       + QObject::tr(", x shift:") + QString::number(xshift) ;
 }
 
-bool specDataPointFilter::operator ==(const specDataPointFilter& other) const
+bool specDataPointFilter::operator == (const specDataPointFilter& other) const
 {
 	return (factor == other.factor &&
 		xshift == other.xshift &&

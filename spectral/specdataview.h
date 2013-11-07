@@ -10,7 +10,7 @@ class specDataView : public specView
 private:
 	type typeId() const { return specStreamable::dataView ;}
 public:
-	specDataView (QWidget* parent=0 );
+	specDataView(QWidget* parent = 0);
 	~specDataView();
 
 };

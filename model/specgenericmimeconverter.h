@@ -8,15 +8,15 @@ class specGenericMimeConverter : public specMimeConverter, private specStreamabl
 {
 	Q_OBJECT
 private:
-	specModelItem* factory(const type &t) const ;
-	void writeToStream(QDataStream &out) const { Q_UNUSED(out) }
-	void readFromStream(QDataStream &in) { Q_UNUSED(in) }
+	specModelItem* factory(const type& t) const ;
+	void writeToStream(QDataStream& out) const { Q_UNUSED(out) }
+	void readFromStream(QDataStream& in) { Q_UNUSED(in) }
 	specStreamable::type typeId() const { return specStreamable::none ;}
 	QString ownType() const ;
 public:
-	explicit specGenericMimeConverter(QObject *parent = 0);
-	QList<specModelItem*> importData(const QMimeData *);
-	void exportData(QList<specModelItem *> &, QMimeData*) ;
+	explicit specGenericMimeConverter(QObject* parent = 0);
+	QList<specModelItem*> importData(const QMimeData*);
+	void exportData(QList<specModelItem*>&, QMimeData*) ;
 	QStringList importableTypes() const ;
 };
 

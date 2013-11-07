@@ -6,7 +6,7 @@
 #include "specresizesvgcommand.h"
 #include "specmodel.h"
 
-svgItemProperties::svgItemProperties(specSVGItem* i, QWidget *parent) :
+svgItemProperties::svgItemProperties(specSVGItem* i, QWidget* parent) :
 	QDialog(parent),
 	ui(new Ui::svgItemProperties),
 	item(i)
@@ -15,8 +15,8 @@ svgItemProperties::svgItemProperties(specSVGItem* i, QWidget *parent) :
 
 	ui->itemPreview->load(i->data);
 	QSize svgSize = QSvgRenderer(item->data).defaultSize() ;
-	originalAspectRatio = (double) svgSize.width()/svgSize.height() ;
-	svgSize.scale(300,300,Qt::KeepAspectRatio);
+	originalAspectRatio = (double) svgSize.width() / svgSize.height() ;
+	svgSize.scale(300, 300, Qt::KeepAspectRatio);
 	ui->itemPreview->setFixedSize(svgSize) ;
 	//	ui->itemPreview
 
@@ -32,10 +32,10 @@ svgItemProperties::svgItemProperties(specSVGItem* i, QWidget *parent) :
 
 	ui->anchorRadioButtons->button(item->anchor)->setChecked(true) ;
 
-	ui->xValue->setRange(-INFINITY,INFINITY);
-	ui->yValue->setRange(-INFINITY,INFINITY);
-	ui->widthValue->setRange(0,INFINITY);
-	ui->heightValue->setRange(0,INFINITY);
+	ui->xValue->setRange(-INFINITY, INFINITY);
+	ui->yValue->setRange(-INFINITY, INFINITY);
+	ui->widthValue->setRange(0, INFINITY);
+	ui->heightValue->setRange(0, INFINITY);
 
 	ui->xValue->setValue(item->ownBounds.x.second) ;
 	ui->yValue->setValue(item->ownBounds.y.second) ;
@@ -53,42 +53,43 @@ svgItemProperties::~svgItemProperties()
 	delete ui;
 }
 
-specUndoCommand* svgItemProperties::generateCommand(QObject *parent)
+specUndoCommand* svgItemProperties::generateCommand(QObject* parent)
 {
 	specSVGItem::SVGCornerPoint newAnchor =
-			(specSVGItem::SVGCornerPoint) ui->anchorRadioButtons->checkedId() ;
+	    (specSVGItem::SVGCornerPoint) ui->anchorRadioButtons->checkedId() ;
 	specSVGItem::SVGCornerPoint oldAnchor = item->setAnchor(newAnchor) ;
 	specSVGItem::bounds newBounds =
-	{ specSVGItem::dimension(ui->xPixelsButton->isChecked() ?
-	  QwtPlot::xBottom : QwtPlot::axisCnt,
-	  ui->xValue->value()),
-	  specSVGItem::dimension(ui->yPixelsButton->isChecked() ?
-	  QwtPlot::yLeft   : QwtPlot::axisCnt,
-	  ui->yValue->value()),
-	  specSVGItem::dimension(ui->widthPixelsButton->isChecked()?
-	  QwtPlot::xBottom : QwtPlot::axisCnt,
-	  ui->widthValue->value()),
-	  specSVGItem::dimension(ui->heightPixelsButton->isChecked()?
-	  QwtPlot::yLeft   : QwtPlot::axisCnt,
-	  ui->heightValue->value())
+	{
+		specSVGItem::dimension(ui->xPixelsButton->isChecked() ?
+		QwtPlot::xBottom : QwtPlot::axisCnt,
+		ui->xValue->value()),
+		specSVGItem::dimension(ui->yPixelsButton->isChecked() ?
+		QwtPlot::yLeft   : QwtPlot::axisCnt,
+		ui->yValue->value()),
+		specSVGItem::dimension(ui->widthPixelsButton->isChecked() ?
+		QwtPlot::xBottom : QwtPlot::axisCnt,
+		ui->widthValue->value()),
+		specSVGItem::dimension(ui->heightPixelsButton->isChecked() ?
+		QwtPlot::yLeft   : QwtPlot::axisCnt,
+		ui->heightValue->value())
 	},
-			oldBounds = item->getBounds() ;
-	if (newAnchor == oldAnchor && newBounds == oldBounds) return 0 ;
+	oldBounds = item->getBounds() ;
+	if(newAnchor == oldAnchor && newBounds == oldBounds) return 0 ;
 
-	specResizeSVGcommand *command = new specResizeSVGcommand ;
+	specResizeSVGcommand* command = new specResizeSVGcommand ;
 	command->setParentObject(parent) ;
 	item->setBounds(newBounds) ;
-	command->setItem(item,oldBounds,oldAnchor) ;
+	command->setItem(item, oldBounds, oldAnchor) ;
 	command->setText(tr("Modify SVG item"));
 	return command ;
 }
 
 void svgItemProperties::on_widthOriginalAspect_clicked()
 {
-	ui->widthValue->setValue(ui->heightValue->value()*originalAspectRatio) ;
+	ui->widthValue->setValue(ui->heightValue->value() *originalAspectRatio) ;
 }
 
 void svgItemProperties::on_heightOriginalAspect_clicked()
 {
-	ui->heightValue->setValue(ui->widthValue->value()/originalAspectRatio);
+	ui->heightValue->setValue(ui->widthValue->value() / originalAspectRatio);
 }

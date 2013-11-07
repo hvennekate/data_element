@@ -7,7 +7,7 @@
 #include <QSet>
 #include "specmodel.h"
 
-specDelegate::specDelegate(QObject *parent)
+specDelegate::specDelegate(QObject* parent)
 	: QItemDelegate(parent),
 	  completerMap(new QMap<QString, QStringList*>())
 {
@@ -15,36 +15,36 @@ specDelegate::specDelegate(QObject *parent)
 
 specDelegate::~specDelegate()
 {
-	foreach(QStringList* list, completerMap->values())
-		delete list ;
+	foreach(QStringList * list, completerMap->values())
+	delete list ;
 	delete completerMap ;
 }
 
-bool specDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
+bool specDelegate::editorEvent(QEvent* event, QAbstractItemModel* model, const QStyleOptionViewItem& option, const QModelIndex& index)
 {
-	return QItemDelegate::editorEvent(event,model,option,index) ;
+	return QItemDelegate::editorEvent(event, model, option, index) ;
 }
 
-void specDelegate::syncCompleterMap(const QStringList &descriptors) const
+void specDelegate::syncCompleterMap(const QStringList& descriptors) const
 {
 	QSet<QString> newDescriptors(descriptors.toSet()),
-			currentDescriptors(completerMap->keys().toSet()) ;
-	foreach(const QString& descriptor, currentDescriptors - newDescriptors)
-		delete completerMap->take(descriptor) ;
-	foreach(const QString& descriptor, newDescriptors - currentDescriptors)
-		completerMap->insert(descriptor, new QStringList()) ;
+	     currentDescriptors(completerMap->keys().toSet()) ;
+	foreach(const QString & descriptor, currentDescriptors - newDescriptors)
+	delete completerMap->take(descriptor) ;
+	foreach(const QString & descriptor, newDescriptors - currentDescriptors)
+	completerMap->insert(descriptor, new QStringList()) ;
 }
 
-QWidget* specDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
+QWidget* specDelegate::createEditor(QWidget* parent, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
 	Q_UNUSED(option)
-	TextEdit *editor = new TextEdit(parent) ;
+	TextEdit* editor = new TextEdit(parent) ;
 
-	const specModel *model = qobject_cast<const specModel*>(index.model()) ;
-	if (model)
+	const specModel* model = qobject_cast<const specModel*> (index.model()) ;
+	if(model)
 	{
 		syncCompleterMap(model->descriptors()) ;
-		QCompleter *completer = new QCompleter(*(completerMap->value(model->descriptors()[index.column()])), editor) ; // TODO use parent instead
+		QCompleter* completer = new QCompleter(* (completerMap->value(model->descriptors() [index.column()])), editor) ;   // TODO use parent instead
 		completer->setModelSorting(QCompleter::CaseSensitivelySortedModel);
 		editor->setCompleter(completer);
 	}
@@ -52,29 +52,29 @@ QWidget* specDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem 
 	return editor ;
 }
 
-void specDelegate::setEditorData(QWidget *e, const QModelIndex &index) const
+void specDelegate::setEditorData(QWidget* e, const QModelIndex& index) const
 {
-	QTextEdit *editor = qobject_cast<QTextEdit*>(e) ;
-	if (!editor) return ;
+	QTextEdit* editor = qobject_cast<QTextEdit*> (e) ;
+	if(!editor) return ;
 	editor->setText(index.model()->data(index, Qt::EditRole).toString()) ;
 }
 
-void specDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+void specDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
 {
-	QTextEdit *ed = (QTextEdit*) editor ;
+	QTextEdit* ed = (QTextEdit*) editor ;
 	QString text = ed->toPlainText() ;
 	model->setData(index,
 		       QList<QVariant>() << text << ed->textCursor().blockNumber(),
 		       Qt::EditRole) ;
-	specModel* sm = qobject_cast<specModel*>(model) ;
-	if (sm)
+	specModel* sm = qobject_cast<specModel*> (model) ;
+	if(sm)
 	{
-		QString descriptor = sm->descriptors()[index.column()] ;
-		if (completerMap->contains(descriptor))
+		QString descriptor = sm->descriptors() [index.column()] ;
+		if(completerMap->contains(descriptor))
 		{
 			QSet<QString> newWords = completerMap->value(descriptor)->toSet() ;
-			foreach(const QString& word, text.split(QRegExp("\\s+")))
-				newWords << word ;
+			foreach(const QString & word, text.split(QRegExp("\\s+")))
+			newWords << word ;
 			QStringList newList = newWords.toList() ;
 			qSort(newList) ;
 			completerMap->value(descriptor)->swap(newList) ;
@@ -82,10 +82,10 @@ void specDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, cons
 	}
 }
 
-void specDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void specDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
 	QRect geom = option.rect ;
-	if(!index.column()) // TODO :  Improve!!
-		geom.setX(geom.x()+option.decorationSize.width()+3) ;
+	if(!index.column())  // TODO :  Improve!!
+		geom.setX(geom.x() + option.decorationSize.width() + 3) ;
 	editor->setGeometry(geom);
 }

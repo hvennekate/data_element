@@ -1,15 +1,15 @@
 #include "specintegralvariable.h"
 #include "utility-functions.h"
 
-double specIntegralVariable::processPoints(QVector<QPointF> &points) const
+double specIntegralVariable::processPoints(QVector<QPointF>& points) const
 {
 	double r = 0 ;
-	qSort(points.begin(),points.end(),comparePoints) ;
+	qSort(points.begin(), points.end(), comparePoints) ;
 	QPointF previous = points.first() ; // (ought to contain at least one element at this point)
-	foreach (const QPointF point, points)
+	foreach(const QPointF point, points)
 	{
 		QPointF diff = point - previous ;
-		r += diff.x()*(diff.y()/2.+previous.y()) ;
+		r += diff.x() * (diff.y() / 2. + previous.y()) ;
 		previous = point ;
 	}
 	return r ;

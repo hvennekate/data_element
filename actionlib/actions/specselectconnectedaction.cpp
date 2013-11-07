@@ -3,7 +3,7 @@
 #include "specmetaitem.h"
 #include "specviewstate.h"
 
-specSelectConnectedAction::specSelectConnectedAction(QObject *parent) :
+specSelectConnectedAction::specSelectConnectedAction(QObject* parent) :
 	specConnectionsAction(parent)
 {
 	setIcon(QIcon(":/fromKinetic.png"));
@@ -14,14 +14,14 @@ specSelectConnectedAction::specSelectConnectedAction(QObject *parent) :
 }
 
 
-specUndoCommand *specSelectConnectedAction::generateUndoCommand()
+specUndoCommand* specSelectConnectedAction::generateUndoCommand()
 {
-	foreach(specModelItem* pointer, pointers)
+	foreach(specModelItem * pointer, pointers)
 	{
 		specMetaItem* metaPointer = (specMetaItem*) pointer ;
 		QModelIndexList dataItems, metaItems ;
 		metaPointer->connectedItems(dataItems, metaItems) ;
-		metaView->selectionModel()->select(specViewState::indexesToSelection(metaItems,(specModel*) metaView->model()), QItemSelectionModel::Select) ;
+		metaView->selectionModel()->select(specViewState::indexesToSelection(metaItems, (specModel*) metaView->model()), QItemSelectionModel::Select) ;
 		dataView->selectionModel()->select(specViewState::indexesToSelection(dataItems, metaView->getDataView()->model()), QItemSelectionModel::ClearAndSelect) ;
 	}
 	return 0 ;

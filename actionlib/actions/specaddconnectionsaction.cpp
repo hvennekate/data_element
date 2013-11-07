@@ -5,7 +5,7 @@
 #include "specmulticommand.h"
 #include "specmetaitem.h"
 
-specAddConnectionsAction::specAddConnectionsAction(QObject *parent) :
+specAddConnectionsAction::specAddConnectionsAction(QObject* parent) :
 	specConnectionsAction(parent),
 	dataViewRequirement(false),
 	metaViewRequirement(false),
@@ -20,21 +20,21 @@ specAddConnectionsAction::specAddConnectionsAction(QObject *parent) :
 	specMetaView* view = dynamic_cast<specMetaView*>(parent) ;
 	connect(this, SIGNAL(changed()), this, SLOT(changedByMetaView())) ;
 
-	if (view && view->getDataView() && view->getDataView()->selectionModel())
-		connect(view->getDataView()->selectionModel(), SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
-				this, SLOT(changeByDataView())) ;
+	if(view && view->getDataView() && view->getDataView()->selectionModel())
+		connect(view->getDataView()->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
+			this, SLOT(changeByDataView())) ;
 }
 
 void specAddConnectionsAction::changedByMetaView()
 {
-	if (changing) return ;
+	if(changing) return ;
 	metaViewRequirement = isEnabled() ;
 	checkRequirements() ;
 }
 
 void specAddConnectionsAction::changeByDataView()
 {
-	if (!dataView) return ;
+	if(!dataView) return ;
 	dataViewRequirement = dataView->model() && !dataView->getSelection().isEmpty() ;
 	checkRequirements() ;
 }
@@ -48,18 +48,18 @@ void specAddConnectionsAction::checkRequirements()
 
 specUndoCommand* specAddConnectionsAction::generateUndoCommand()
 {
-	specMultiCommand *command = new specMultiCommand ;
+	specMultiCommand* command = new specMultiCommand ;
 	command->setParentObject(model);
 	QList<specModelItem*> originalSelection = dataView->model()->pointerList(dataView->getSelection()) ;
-	foreach(specModelItem* item, pointers)
-		(new specAddConnectionsCommand(command))
-			->setItems(dynamic_cast<specMetaItem*>(item), originalSelection) ;
+	foreach(specModelItem * item, pointers)
+	(new specAddConnectionsCommand(command))
+	->setItems(dynamic_cast<specMetaItem*>(item), originalSelection) ;
 
 	command->setText(tr("Connected ")
-					 + QString::number(pointers.size())
-					 + tr(" meta items to ")
-					 + QString::number(originalSelection.size())
-					 + tr(" data items")) ;
+			 + QString::number(pointers.size())
+			 + tr(" meta items to ")
+			 + QString::number(originalSelection.size())
+			 + tr(" data items")) ;
 	return command ;
 }
 

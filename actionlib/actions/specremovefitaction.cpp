@@ -4,7 +4,7 @@
 #include "specexchangefitcurvecommand.h"
 #include "specmulticommand.h"
 
-specRemoveFitAction::specRemoveFitAction(QObject *parent) :
+specRemoveFitAction::specRemoveFitAction(QObject* parent) :
 	specRequiresMetaItemAction(parent)
 {
 	setIcon(QIcon(":/removeFit.png")) ;
@@ -16,19 +16,19 @@ specRemoveFitAction::specRemoveFitAction(QObject *parent) :
 
 specUndoCommand* specRemoveFitAction::generateUndoCommand()
 {
-	specMultiCommand *parentCommand = new specMultiCommand ;
+	specMultiCommand* parentCommand = new specMultiCommand ;
 	parentCommand->setText(tr("Remove fit curve"));
 	parentCommand->setParentObject(model) ;
-	foreach(specModelItem* modelItem, pointers)
+	foreach(specModelItem * modelItem, pointers)
 	{
-		specMetaItem *item = dynamic_cast<specMetaItem*>(modelItem) ;
-		if (!item) continue ;
-		if (!item->getFitCurve()) continue;
+		specMetaItem* item = dynamic_cast<specMetaItem*>(modelItem) ;
+		if(!item) continue ;
+		if(!item->getFitCurve()) continue;
 		(new specExchangeFitCurveCommand(parentCommand))
-				->setup(item, 0) ;
+		->setup(item, 0) ;
 	}
 
-	if (!parentCommand->childCount()) // TODO per virtual functions in parent Klasse unterbringen
+	if(!parentCommand->childCount())  // TODO per virtual functions in parent Klasse unterbringen
 	{
 		delete parentCommand ;
 		return 0 ;

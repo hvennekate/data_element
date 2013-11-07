@@ -13,15 +13,15 @@ private:
 	specSVGItem::SVGCornerPoint anchor ;
 	void doIt() ;
 	void undoIt() ;
-	void writeCommand(QDataStream &out) const;
-	void readCommand(QDataStream &in) ;
+	void writeCommand(QDataStream& out) const;
+	void readCommand(QDataStream& in) ;
 	type typeId() const { return specStreamable::resizeSVGCommandId ; }
 public:
-	explicit specResizeSVGcommand(specUndoCommand *parent = 0) ;
+	explicit specResizeSVGcommand(specUndoCommand* parent = 0) ;
 	void setItem(specModelItem* item, const specSVGItem::bounds&,
-			 specSVGItem::SVGCornerPoint anchor = specSVGItem::undefined) ;
-	bool mergeable(const specUndoCommand *other) ;
-	bool mergeWith(const QUndoCommand *other) ;
+		     specSVGItem::SVGCornerPoint anchor = specSVGItem::undefined) ;
+	bool mergeable(const specUndoCommand* other) ;
+	bool mergeWith(const QUndoCommand* other) ;
 };
 
 #endif // SPECRESIZESVGCOMMAND_H

@@ -8,7 +8,8 @@
 class QListWidgetItem ;
 class QTableWidgetItem ;
 
-namespace Ui {
+namespace Ui
+{
 	class metaItemProperties;
 }
 
@@ -17,7 +18,7 @@ class metaItemProperties : public QDialog
 	Q_OBJECT
 
 public:
-	explicit metaItemProperties(specMetaItem*, QWidget *parent = 0);
+	explicit metaItemProperties(specMetaItem*, QWidget* parent = 0);
 	~metaItemProperties();
 	specUndoCommand* changedConnections(QObject* parent) ;
 private slots:
@@ -27,7 +28,7 @@ private slots:
 	void on_dataTable_itemSelectionChanged();
 
 private:
-	Ui::metaItemProperties *ui;
+	Ui::metaItemProperties* ui;
 	specMetaItem* originalItem ;
 	void moveSelection(bool) ;
 	QwtPlotCurve metaCurve, currentCurve, selectedCurve ;
@@ -38,7 +39,7 @@ private:
 		QVector<QTableWidgetItem*> points ;
 		QwtPlotCurve* curve ;
 	};
-	QMap<QListWidgetItem*,itemLink> itemInfo ;
+	QMap<QListWidgetItem*, itemLink> itemInfo ;
 
 	struct pointLink
 	{
@@ -49,7 +50,7 @@ private:
 
 	QMap<specModelItem*, QListWidgetItem*> modelItemInfo ;
 
-	void buildAssignments(const QList<specModelItem *> &items) ;
+	void buildAssignments(const QList<specModelItem*>& items) ;
 	void buildPoints() ;
 	void refreshPlots() ;
 	void clearItemInfo() ;
@@ -59,7 +60,7 @@ private:
 	void checkSelection(Qt::CheckState) ;
 private slots:
 
-	void on_connectedItemsList_itemChanged(QListWidgetItem *item);
+	void on_connectedItemsList_itemChanged(QListWidgetItem* item);
 	void on_removeSelectedConnections_clicked();
 	void on_addSelectedConnections_clicked();
 };

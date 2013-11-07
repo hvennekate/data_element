@@ -20,18 +20,18 @@ private:
 	{
 	private:
 		QSize boundingSize() const ;
-		void renderSymbols(QPainter *, const QPointF *, int numPoints) const ;
+		void renderSymbols(QPainter*, const QPointF*, int numPoints) const ;
 		QRect boundingRect() const ;
 	};
 protected:
-	void writeToStream(QDataStream &out) const;
-	void readFromStream(QDataStream &in) ;
+	void writeToStream(QDataStream& out) const;
+	void readFromStream(QDataStream& in) ;
 public:
-	specCanvasItem(QString description="");
+	specCanvasItem(QString description = "");
 	virtual void pointMoved(const int&, const double&, const double&) {} ;
-	virtual void refreshPlotData() =0;
+	virtual void refreshPlotData() = 0;
 	virtual void addDataFilter(const specDataPointFilter&) {}
-	virtual void attach(QwtPlot *plot) { QwtPlotCurve::attach(plot) ; }
+	virtual void attach(QwtPlot* plot) { QwtPlotCurve::attach(plot) ; }
 	virtual void detach() { QwtPlotCurve::detach() ; }
 	virtual QMenu* contextMenu() ;
 	~specCanvasItem();

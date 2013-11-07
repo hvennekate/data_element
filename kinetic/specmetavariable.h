@@ -31,9 +31,9 @@ private:
 protected:
 	virtual double processPoints(QVector<QPointF>& points) const { Q_UNUSED(points) return 0 ;}
 	QString descriptor ;
-	bool extractXs(specModelItem *item, QVector<double> & xvals) const ;
+	bool extractXs(specModelItem* item, QVector<double>& xvals) const ;
 public:
-	explicit specMetaVariable(specMetaParser *parent = 0);
+	explicit specMetaVariable(specMetaParser* parent = 0);
 	virtual ~specMetaVariable() ;
 	virtual bool xValues(specModelItem*, QVector<double>&) const;
 	virtual QVector<double> values(specModelItem*, const QVector<double>&) const ;

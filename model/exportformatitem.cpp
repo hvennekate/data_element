@@ -1,12 +1,12 @@
 #include "exportformatitem.h"
 #include <QLabel>
 
-exportFormatItem::exportFormatItem ( const QStringList& values, QWidget *parent )
-	: QWidget ( parent )
+exportFormatItem::exportFormatItem(const QStringList& values, QWidget* parent)
+	: QWidget(parent)
 {
 	Value = new QComboBox() ;
 	Separator = new QComboBox() ;
-	removeButton = new QPushButton(QIcon(":/remove.png"),"") ;
+	removeButton = new QPushButton(QIcon(":/remove.png"), "") ;
 	layout = new QHBoxLayout() ;
 
 	QStringList separators ;
@@ -20,21 +20,21 @@ exportFormatItem::exportFormatItem ( const QStringList& values, QWidget *parent 
 	layout->addWidget(Separator) ;
 	layout->addStretch() ;
 	layout->addWidget(removeButton) ;
-	layout->setContentsMargins(0,0,0,0) ;
+	layout->setContentsMargins(0, 0, 0, 0) ;
 	setLayout(layout) ;
 
 	removeButton->setFixedHeight(16) ;
 	removeButton->setFixedWidth(16) ;
 	removeButton->setFlat(true) ;
 
-	connect(removeButton,SIGNAL(clicked()),this,SLOT(remove())) ;
+	connect(removeButton, SIGNAL(clicked()), this, SLOT(remove())) ;
 
 }
 
 void exportFormatItem::remove()
 {
-//	if (parentWidget() && parentWidget()->layout())
-//		parentWidget()->layout()->removeWidget(this) ;
+	//	if (parentWidget() && parentWidget()->layout())
+	//		parentWidget()->layout()->removeWidget(this) ;
 	delete this ;
 }
 
@@ -47,13 +47,13 @@ QString exportFormatItem::separator()
 	QString retString ;
 	switch((spec::separator) Separator->currentIndex())
 	{
-	case spec::space:
-		retString = " " ; break ;
-	case spec::tab:
-		retString = '\t' ; break ;
-	case spec::newline:
-		retString = '\n'; break ;
-	default: ;
+		case spec::space:
+			retString = " " ; break ;
+		case spec::tab:
+			retString = '\t' ; break ;
+		case spec::newline:
+			retString = '\n'; break ;
+		default: ;
 	}
 	return retString ;
 }
@@ -73,10 +73,10 @@ void exportFormatItem::setSeparator(spec::separator s)
 	Separator->setCurrentIndex(s) ;
 }
 
-void exportFormatItem::setDataTypes(const QStringList &ds)
+void exportFormatItem::setDataTypes(const QStringList& ds)
 {
 	QString currentText = Value->currentText() ;
-	if (!ds.contains(currentText))
+	if(!ds.contains(currentText))
 	{
 		remove() ;
 		return ;

@@ -6,7 +6,7 @@ class specRequiresItemAction : public specItemAction
 {
 	Q_OBJECT
 public:
-	explicit specRequiresItemAction(QObject *parent = 0);
+	explicit specRequiresItemAction(QObject* parent = 0);
 protected:
 	bool specificRequirements() ;
 	bool postProcessingRequirements() const ;

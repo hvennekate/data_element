@@ -7,9 +7,9 @@ class specToggleFitStyleAction : public specRequiresMetaItemAction
 {
 	Q_OBJECT
 public:
-	explicit specToggleFitStyleAction(QObject *parent = 0);
+	explicit specToggleFitStyleAction(QObject* parent = 0);
 private:
-	specUndoCommand * generateUndoCommand() ;
+	specUndoCommand* generateUndoCommand() ;
 };
 
 #endif // SPECTOGGLEFITSTYLEACTION_H

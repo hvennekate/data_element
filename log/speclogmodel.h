@@ -9,7 +9,7 @@ private:
 	type typeId() const { return specStreamable::logModel ; }
 	QStringList dataTypes() const ;
 public:
-	explicit specLogModel(QObject *parent = 0);
+	explicit specLogModel(QObject* parent = 0);
 	QList<specFileImportFunction> acceptableImportFunctions() const ;
 };
 

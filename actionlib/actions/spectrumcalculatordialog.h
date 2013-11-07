@@ -5,7 +5,8 @@
 
 class QStringListModel ;
 
-namespace Ui {
+namespace Ui
+{
 	class spectrumCalculatorDialog;
 }
 
@@ -14,7 +15,7 @@ class spectrumCalculatorDialog : public QDialog
 	Q_OBJECT
 
 public:
-	explicit spectrumCalculatorDialog(QWidget *parent = 0);
+	explicit spectrumCalculatorDialog(QWidget* parent = 0);
 	~spectrumCalculatorDialog();
 
 	QString xFormula() const ;
@@ -31,8 +32,8 @@ private slots:
 	void syncFormulae() const ;
 
 private:
-	Ui::spectrumCalculatorDialog *ui;
-	QStringListModel *xFormulae, *yFormulae ;
+	Ui::spectrumCalculatorDialog* ui;
+	QStringListModel* xFormulae, *yFormulae ;
 	void syncFormula(const QString& formula, QStringListModel* model) const ;
 };
 

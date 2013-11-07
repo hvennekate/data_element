@@ -11,7 +11,7 @@ protected:
 	bool toTerminate ;
 	QProgressDialog dialog ;
 public:
-	explicit specWorkerThread(int maxVal, QObject *parent = 0);
+	explicit specWorkerThread(int maxVal, QObject* parent = 0);
 signals:
 	void progressValue(int) ;
 public slots:
