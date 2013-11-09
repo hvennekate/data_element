@@ -287,19 +287,23 @@ void specActionLibrary::readFromStream(QDataStream& in)
 			delete streamable ;
 			continue ;
 		}
-		qDebug() << "Reading item:" << i << "total count:" << undoStack->count() << "/" << num ;
 		////// For manually discarding corrupted undo commands:
-		//		if (QMessageBox::question(0,tr("Really read?"),
-		//					  tr("Really read command no. ")
-		//					  + QString::number(i)
-		//					  + tr("?  Description is:\n")
-		//					  + command->text(),
-		//					  QMessageBox::Yes | QMessageBox::No,
-		//					  QMessageBox::Yes)
-		//				== QMessageBox::Yes)
-		undoStack->push(command) ;
-		//		else
-		//			delete command ;
+#ifdef DEBUGCOMMANDREADER
+		qDebug() << "Reading item:" << i << "total count:" << undoStack->count() << "/" << num ;
+		if (QMessageBox::question(0,tr("Really read?"),
+					  tr("Really read command no. ")
+					  + QString::number(i)
+					  + tr("?  Description is:\n")
+					  + command->text(),
+					  QMessageBox::Yes | QMessageBox::No,
+					  QMessageBox::Yes)
+				== QMessageBox::Yes)
+#endif
+			undoStack->push(command) ;
+#ifdef DEBUGCOMMANDREADER
+		else
+			delete command ;
+#endif
 	}
 
 	undoStack->setIndex(position) ;

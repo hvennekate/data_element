@@ -15,7 +15,7 @@ QDataStream& operator >> (QDataStream& in, specDataPointFilter& f)
 	       >> f.slope
 	       >> f.factor
 	       >> f.xshift
-	       << f.zeroMultiplications ;
+	       >> f.zeroMultiplications ;
 }
 
 specDataPointFilter& specDataPointFilter::operator += (const specDataPointFilter& other)
