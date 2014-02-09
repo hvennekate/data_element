@@ -6,9 +6,13 @@
 #include <QContextMenuEvent>
 #include <QHeaderView>
 
-QModelIndexList specView::getSelection()
+QModelIndexList specView::getSelection() const
 {
-	QModelIndexList list = selectionModel()->selectedRows() ;
+	QModelIndexList l = selectedIndexes() ;
+	QModelIndexList list ;
+	foreach(QModelIndex index, l)
+		if (!index.column())
+			list << index ;
 	qSort(list) ;
 	return list ;
 }

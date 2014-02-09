@@ -42,7 +42,7 @@ public:
 	specModel* model() const ;
 	void setModel(specModel*) ;  // TODO make virtual or find better solution!
 	//	QList<specModelItem*> currentlySelected() ;
-	QModelIndexList getSelection() ;
+	QModelIndexList getSelection() const ;
 	void setActionLibrary(specActionLibrary*) ;
 
 signals:

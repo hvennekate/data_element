@@ -43,7 +43,7 @@ void specViewState::getState(const specView* view)
 	for(int i = 0 ; i < columnCount ; ++i)
 		widths << view->columnWidth(i) ;
 
-	QModelIndexList selectionList = view->selectionModel()->selectedRows() ; // TODO: Performance
+	QModelIndexList selectionList = view->getSelection() ; // TODO: Performance
 	for(int i = 0 ; i < selectionList.size() ; ++i)
 		selectedItems << model->itemPointer(selectionList[i]) ;
 
