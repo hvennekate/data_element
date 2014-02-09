@@ -5,7 +5,7 @@
 #include "specmulticommand.h"
 
 specRemoveFitAction::specRemoveFitAction(QObject* parent) :
-	specRequiresMetaItemAction(parent)
+	specFitAction(parent)
 {
 	setIcon(QIcon(":/removeFit.png")) ;
 	setToolTip(tr("Remove fit")) ;
