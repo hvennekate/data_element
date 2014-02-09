@@ -34,6 +34,7 @@ void specAddConnectionsAction::changedByMetaView()
 
 void specAddConnectionsAction::changeByDataView()
 {
+	if (!requirements()) return ;
 	if(!dataView) return ;
 	dataViewRequirement = dataView->model() && !dataView->getSelection().isEmpty() ;
 	checkRequirements() ;
