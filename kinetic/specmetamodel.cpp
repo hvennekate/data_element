@@ -50,3 +50,17 @@ QList<specFileImportFunction> specMetaModel::acceptableImportFunctions() const
 {
 	return QList<specFileImportFunction>() ;
 }
+
+QVariant specMetaModel::data(const QModelIndex& index, int role) const
+{
+	specModelItem* pointer = itemPointer(index) ;
+	if (pointer
+			&& Qt::BackgroundRole == role
+			&& index.column() >= 0
+			&& index.column() < descriptors().size()
+			&& !pointer-> descriptorKeys().contains(descriptors().at(index.column())))
+	{
+		return QBrush(Qt::gray) ;
+	}
+	return specModel::data(index, role) ;
+}

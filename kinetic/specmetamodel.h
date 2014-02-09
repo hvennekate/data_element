@@ -18,7 +18,7 @@ public:
 	specModel* getDataModel() const ;
 	~specMetaModel() ;
 	QList<specFileImportFunction> acceptableImportFunctions() const ;
-
+	QVariant data(const QModelIndex& index, int role) const;
 	bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row) ;
 	// TODO reimplement read/insert mime.
 };
