@@ -3,7 +3,7 @@
 #include "spectogglefitstylecommand.h"
 
 specToggleFitStyleAction::specToggleFitStyleAction(QObject* parent) :
-	specRequiresMetaItemAction(parent)
+	specFitAction(parent)
 {
 	setIcon(QIcon(":/styleFit.png")) ;
 	setToolTip(tr("Switch styling to/from fit")) ;

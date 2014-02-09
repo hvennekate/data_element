@@ -1,9 +1,9 @@
 #ifndef SPECTOGGLEFITSTYLEACTION_H
 #define SPECTOGGLEFITSTYLEACTION_H
 
-#include "specrequiresitemaction.h"
+#include "specfitaction.h"
 
-class specToggleFitStyleAction : public specRequiresMetaItemAction
+class specToggleFitStyleAction : public specFitAction
 {
 	Q_OBJECT
 public:

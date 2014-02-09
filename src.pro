@@ -133,7 +133,8 @@ SOURCES += main.cpp \
     actionlib/commands/specmultipleitemcommand.cpp \
     specshortcutdialog.cpp \
     actionlib/commands/specexchangefiltercommand.cpp \
-    model/specdatapointfilter.cpp
+    model/specdatapointfilter.cpp \
+    actionlib/actions/specfitaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -268,7 +269,8 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/commands/specmultipleitemcommand.h \
     specshortcutdialog.h \
     actionlib/commands/specexchangefiltercommand.h \
-    model/specdatapointfilter.h
+    model/specdatapointfilter.h \
+    actionlib/actions/specfitaction.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -338,4 +340,4 @@ CODECFORTR = UTF-8
 
 DEFINES += DOUBLEDEVIATIONCORRECTION=1
 DEFINES += NUMBEROFFRACTIONBITSINDOUBLE=52
-DEFINES += DEBUGCOMMANDREADER
+#DEFINES += DEBUGCOMMANDREADER

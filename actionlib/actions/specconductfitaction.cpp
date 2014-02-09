@@ -5,7 +5,7 @@
 #include "specmulticommand.h"
 
 specConductFitAction::specConductFitAction(QObject* parent) :
-	specRequiresMetaItemAction(parent)
+	specFitAction(parent)
 {
 	setIcon(QIcon(":/doFit.png")) ;
 	setToolTip(tr("Conduct fit")) ;

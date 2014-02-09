@@ -5,7 +5,7 @@
 #include "specmulticommand.h"
 
 specAddFitAction::specAddFitAction(QObject* parent) :
-	specRequiresMetaItemAction(parent)
+	specFitAction(parent)
 {
 	setIcon(QIcon(":/addFit.png")) ;
 	setToolTip(tr("Add fit")) ;
@@ -34,4 +34,9 @@ specUndoCommand* specAddFitAction::generateUndoCommand()
 		return 0 ;
 	}
 	return parentCommand ;
+}
+
+bool specAddFitAction::negateFitRequirement() const
+{
+	return true ;
 }
