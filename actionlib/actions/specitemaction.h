@@ -27,8 +27,9 @@ protected:
 	specModelItem* currentItem ;
 	int insertionRow ;
 	void expandSelectedFolders(QList<specModelItem*>& items, QList<specModelItem*>& folders) ;
-protected:
 	virtual specUndoCommand* generateUndoCommand() = 0 ;
+	void assembleSelection() ;
+	void getInsertionIndex() ;
 };
 
 #endif // SPECITEMACTION_H

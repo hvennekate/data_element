@@ -17,10 +17,8 @@ const std::type_info& specItemAction::possibleParent()
 	return typeid(specView) ;
 }
 
-void specItemAction::execute()
+void specItemAction::assembleSelection()
 {
-	if(!requirements()) return ;
-
 	QList<specStreamable::type> types = requiredTypes() ;
 	selection = view->getSelection() ;
 	pointers.clear();
@@ -35,7 +33,10 @@ void specItemAction::execute()
 		if(types.contains(item->typeId()))
 			pointers << item ;
 	}
+}
 
+void specItemAction::getInsertionIndex()
+{
 	if(currentItem && !currentItem->isFolder())
 	{
 		insertionRow = currentIndex.row() + 1 ;
@@ -47,6 +48,14 @@ void specItemAction::execute()
 		insertionRow = 0 ;
 		insertionIndex = currentIndex ;
 	}
+}
+
+void specItemAction::execute()
+{
+	if(!requirements()) return ;
+
+	assembleSelection();
+	getInsertionIndex();
 
 	if(!postProcessingRequirements()) return ;
 

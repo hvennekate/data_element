@@ -20,6 +20,7 @@ specPasteAction::specPasteAction(QObject* parent) :
 
 void specPasteAction::checkClipboard()
 {
+	if (!requirements()) return ;
 	setEnabled(model->mimeAcceptable(QApplication::clipboard()->mimeData())) ;
 }
 
