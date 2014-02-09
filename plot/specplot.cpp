@@ -111,8 +111,13 @@ void specPlot::showLegend(bool l)
 		connect(newLegend, SIGNAL(checked(QVariant, bool, int)), this, SLOT(toggleItem(QVariant, bool))) ;
 	}
 	else
-		delete legend() ;
-	replot() ;
+		insertLegend(0);
+}
+
+void specPlot::updateLegend()
+{
+	if (!legend()) return ;
+	showLegend(true) ;
 }
 
 void specPlot::toggleItem(const QVariant& v, bool on)
@@ -303,7 +308,11 @@ specActionLibrary* specPlot::undoPartner() const
 
 void specPlot::setView(specView* mod)
 {
+	if (view && view->model())
+		disconnect(view->model(), 0, this, 0) ;
 	view = mod ;
+	if (view && view->model())
+		connect(view->model(), SIGNAL(dataChanged(QModelIndex,QModelIndex)), this, SLOT(updateLegend())) ;
 }
 
 CanvasPicker* specPlot::metaPicker()

@@ -81,6 +81,7 @@ signals:
 	void metaRangeModified(specCanvasItem*, int, double, double) ;
 public slots :
 	void replot() ;
+	void updateLegend() ;
 };
 
 #endif
