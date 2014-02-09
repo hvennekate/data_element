@@ -191,6 +191,7 @@ void specCanvasItem::setSymbolSize(const QSize& s)
 
 void specCanvasItem::moveIndicator::renderSymbols(QPainter* painter, const QPointF* points, int numPoints) const
 {
+	Q_UNUSED(points)
 	QPixmap pixmap(":/moveIndicator.png", "PNG") ;
 	for(int i = 0 ; i < numPoints ; ++i)
 		painter->drawPixmap(boundingRect(), pixmap, pixmap.rect());

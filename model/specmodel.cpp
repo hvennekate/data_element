@@ -166,6 +166,7 @@ bool specModel::setHeaderData(int section, Qt::Orientation orientation, const QV
 
 bool specModel::insertColumns(int column, int count, const QModelIndex& parent)
 {
+	if (!count) return true ;
 	emit beginInsertColumns(parent, column, column + count - 1) ;
 	for(QStringList::size_type i = 0 ; i < count ; i++)
 	{
@@ -191,26 +192,30 @@ void specModel::checkForNewDescriptors(const QList<specModelItem*>& list, const 
 {
 	// TODO: check if descriptors were removed... hm...
 	// Check for possible new column headers
+	typedef QPair<QString, spec::descriptorFlags> descriptorPropertyPair ;
+	QVector<descriptorPropertyPair> newDescriptors ;
 	foreach(specModelItem * pointer, list)
-	{
 		foreach(const QString & descriptor, pointer->descriptorKeys())
-		{
 			if(!Descriptors.contains(descriptor))
-			{
-				insertColumns(columnCount(parent), 1, parent) ;
-				setHeaderData(columnCount(parent) - 1, Qt::Horizontal, descriptor) ;
-				setHeaderData(columnCount(parent) - 1, Qt::Horizontal, (int) pointer->descriptorProperties(descriptor), spec::descriptorPropertyRole) ;
-			}
-		}
+				newDescriptors << descriptorPropertyPair(descriptor, pointer->descriptorProperties(descriptor)) ;
+
+	insertColumns(columnCount(parent), newDescriptors.size(), parent) ;
+	for (int i = 0 ; i < newDescriptors.size() ; ++i)
+	{
+		int col = columnCount(parent) - newDescriptors.size() + i ;
+
+		setHeaderData(col, Qt::Horizontal, newDescriptors[i].first) ;
+		setHeaderData(col, Qt::Horizontal, (int) newDescriptors[i].second, spec::descriptorPropertyRole) ;
 	}
 }
 
 bool specModel::insertItems(QList<specModelItem*> list, QModelIndex parent, int row)  // TODO
 {
-	checkForNewDescriptors(list, parent) ;
 	row = row < rowCount(parent) ? row : rowCount(parent) ;
 
 	emit layoutAboutToBeChanged() ;
+
+	checkForNewDescriptors(list, parent) ;
 	beginInsertRows(parent, row, row + list.size() - 1);
 	bool retVal = itemPointer(parent)->addChildren(list, row) ;
 	endInsertRows();
@@ -490,7 +495,7 @@ void printModelContentSummary(specFolderItem* folder, QString indent)
 specModelItem* specModel::itemPointer(const QVector<int>& indexes) const
 {
 	specModelItem* pointer = root ;
-#ifdef QT_DEBUG
+#ifdef MODEL_DEBUG
 	qDebug() << "seeking pointer for item" << indexes ;
 	qDebug() << "============ Model summary: ============" ;
 	printModelContentSummary((specFolderItem*) root, "");
