@@ -24,9 +24,7 @@
 #include <QBuffer>
 #include <QProgressDialog>
 #include <QLabel>
-
-#define STRINGIFYMACRO(x) MAKESTRINGMACRO(x)
-#define MAKESTRINGMACRO(x) #x
+#include "names.h"
 
 specPlotWidget::specPlotWidget(QWidget* parent)
 	: specDockWidget(tr("Data"), parent, false),
@@ -89,10 +87,23 @@ void specPlotWidget::read(QString fileName)
 	inStream >> check ;
 	if(check != FILECHECKRANDOMNUMBER && check != FILECHECKCOMPRESSNUMBER)
 	{
+		QString version(file.readAll().right(versionString().size())) ;
+		version = version.left(version.size()-1) ;
+		QString refVersion = versionString().mid(1) ;
 		QMessageBox::critical(0, tr("File error"),
 				      tr("File ")
 				      + fileName
-				      + tr(" does not seem to have the right format.")) ;
+				      + tr(" does not seem to have the right format. or might be damaged.")
+				      + tr("\nIf it is indeed a spec-file, it might have been created by a different version of this program.  The file's version ID is: ")
+				      + version
+				      + "\n"
+				      + (version == refVersion ?
+						 tr("Since your program version is the same, it is likely the file is broken.  You can still send the complete file in for recovery, if possible.")
+					       : tr("Your program's version ID is: ")
+						 + refVersion
+				      + tr("\nPlease try to obtain the appropriate version of the program."))
+				      + tr("\nFor support e-mail HVennekate@gmx.de \n\n")
+				      ) ;
 		return ;
 	}
 
@@ -239,7 +250,7 @@ bool specPlotWidget::saveFile()
 	zipDevice.close() ;
 	zipDevice.releaseDevice() ;
 	// Insert git hash as build number
-	buffer.buffer().append(QString("/") + STRINGIFYMACRO(GITSHA1HASH)) ;
+	buffer.buffer().append(versionString()) ;
 	qDebug() << QString("GITSHA1HASH") ;
 	buffer.close();
 	if(!file.open(QFile::WriteOnly))
@@ -257,6 +268,11 @@ bool specPlotWidget::saveFile()
 	file.close();
 	changeFileName(file.fileName());
 	return true ;
+}
+
+QString specPlotWidget::versionString() const
+{
+	return QString("/") + STRINGIFYMACRO(GITSHA1HASH) ;
 }
 
 specPlotWidget::~specPlotWidget()

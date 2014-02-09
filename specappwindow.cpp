@@ -1,6 +1,7 @@
 #include "specappwindow.h"
 #include <QFile>
 #include "specshortcutdialog.h"
+#include "names.h"
 
 specAppWindow::specAppWindow()
 	: QMainWindow(), settings()
@@ -150,6 +151,7 @@ void specAppWindow::about()
 			      "- Qt 4.8 (qt.digia.com)\n"
 			      "- Qwt 6 (qwt.sourceforge.net)\n"
 			      "- muParser 2.2 (muparser.sourceforge.net)\n"
-			      "- lmfit 3.3 (joachimwuttke.de/lmfit)")) ;
+			      "- lmfit 3.3 (joachimwuttke.de/lmfit)")
+			   + tr("\n\nVersion ID is: ") + QString(STRINGIFYMACRO(GITSHA1HASH))) ;
 }
 

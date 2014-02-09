@@ -37,6 +37,7 @@ private:
 	void changeFileName(const QString&) ;
 	void changeEvent(QEvent* event) ;
 	QList<specDockWidget*> subDocks ;
+	QString versionString() const ;
 private slots:
 	void svgModification(bool) ;
 protected :

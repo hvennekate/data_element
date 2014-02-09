@@ -1,6 +1,9 @@
 #ifndef NAMES_H
 #define NAMES_H
 
+#define STRINGIFYMACRO(x) MAKESTRINGMACRO(x)
+#define MAKESTRINGMACRO(x) #x
+
 class specModelItem ;
 class QFile ;
 
