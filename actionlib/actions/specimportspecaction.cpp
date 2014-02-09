@@ -41,7 +41,12 @@ specUndoCommand* specImportSpecAction::generateUndoCommand()
 	}
 	if(importedItems.isEmpty()) return 0 ;
 
-	if(! model->insertItems(importedItems, currentIndex, row)) return 0 ;
+	if(! model->insertItems(importedItems, currentIndex, row))
+	{
+		foreach(specModelItem* item, importedItems)
+			delete item ;
+		return 0 ;
+	}
 	specAddFolderCommand* command = new specAddFolderCommand ;
 	command->setParentObject(model) ;
 	command->setItems(importedItems) ;
