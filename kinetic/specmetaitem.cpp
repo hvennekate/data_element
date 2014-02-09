@@ -231,8 +231,15 @@ void specMetaItem::refreshPlotData()
 
 QStringList specMetaItem::descriptorKeys() const
 {
-	QStringList keys = specModelItem::descriptorKeys() << "variables" << "x" << "y" << "errors" ; // TODO change to get from variables
+	QStringList keys = genericDescriptorKeys() ;
 	if(fitCurve) keys << fitCurve->descriptorKeys() ;
+	return keys ;
+}
+
+QStringList specMetaItem::genericDescriptorKeys()
+{
+	QStringList keys ;
+	keys << "" << "variables" << "x" << "y" << "errors" ; // TODO change to get from variables
 	return keys ;
 }
 
@@ -340,6 +347,11 @@ specFitCurve* specMetaItem::setFitCurve(specFitCurve* fc)
 }
 
 specFitCurve* specMetaItem::getFitCurve() const
+{
+	return fitCurve ;
+}
+
+bool specMetaItem::hasFitCurve() const
 {
 	return fitCurve ;
 }

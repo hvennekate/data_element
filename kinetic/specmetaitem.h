@@ -40,6 +40,7 @@ public:
 	void detach();
 	void refreshPlotData();
 	QStringList descriptorKeys() const ;
+	static QStringList genericDescriptorKeys() ;
 	QString descriptor(const QString& key, bool full = false) const ;
 	QString editDescriptor(const QString& key) const ;
 	bool changeDescriptor(QString key, QString value) ;  // TODO add changeDescriptor(key,specDescriptor)
@@ -56,6 +57,7 @@ public:
 	// for fitting:
 	specFitCurve* setFitCurve(specFitCurve*) ;
 	specFitCurve* getFitCurve() const ;
+	bool hasFitCurve() const ;
 	void conductFit() ;
 	void toggleFitStyle() ;
 	bool getFitStyleState() const ;

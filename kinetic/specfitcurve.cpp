@@ -84,6 +84,11 @@ specFitCurve::specFitCurve()
 
 QStringList specFitCurve::descriptorKeys()
 {
+	return genericDescriptorKeys() ;
+}
+
+QStringList specFitCurve::genericDescriptorKeys()
+{
 	return QStringList() << QObject::tr("Fit variables") <<
 	       QObject::tr("Fit parameters") <<
 	       QObject::tr("Fit expression") <<
@@ -146,11 +151,6 @@ QString specFitCurve::descriptor(const QString& key, bool full)
 		}
 	}
 	return QString() ;
-}
-
-double specFitCurve::coerce(double val, double min, double max)
-{
-	return qMax(min, qMin(max, val)) ;
 }
 
 bool specFitCurve::changeDescriptor(QString key, QString value)
@@ -320,6 +320,9 @@ void specFitCurve::refit(QwtSeriesData<QPointF>* data)
 	      covarianceMatrix,
 	      &sumOfSquaredResiduals) ;
 
+	// if not success -> display error message
+	if (status.info > 3)
+		errorString = lm_infmsg[status.info] ;
 	// get the fit parameters back out:
 	for(QList<variablePair>::iterator i = variables.begin() ; i != variables.end() ; ++i)
 	{

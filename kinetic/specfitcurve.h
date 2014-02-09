@@ -37,7 +37,6 @@ private:
 	specDescriptor expression ;
 	mu::Parser* parser ;
 	QString errorString ;
-	double coerce(double val, double min, double max) ;
 	static bool acceptableVariable(const QString&) ;
 	inline static bool inacceptableVariable(const QString& s) { return !acceptableVariable(s) ; }
 	void writeToStream(QDataStream& out) const ;
@@ -51,6 +50,7 @@ public:
 	specFitCurve();
 	~specFitCurve() ;
 	QStringList descriptorKeys() ;
+	static QStringList genericDescriptorKeys() ;
 	QString descriptor(const QString& key, bool full = false) ;
 	QString editDescriptor(const QString& key) ;
 	bool changeDescriptor(QString key, QString value) ;
