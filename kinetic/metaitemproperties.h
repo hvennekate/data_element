@@ -55,7 +55,7 @@ private:
 	void refreshPlots() ;
 	void clearItemInfo() ;
 	QTableWidgetItem* firstEntry(QTableWidgetItem*) ;
-	bool reselecting ;
+	bool reselectingDataPoints, reselectingItems ;
 
 	void checkSelection(Qt::CheckState) ;
 private slots:

@@ -10,7 +10,8 @@ metaItemProperties::metaItemProperties(specMetaItem* i, QWidget* parent) :
 	QDialog(parent),
 	ui(new Ui::metaItemProperties),
 	originalItem(i),
-	reselecting(false)
+	reselectingDataPoints(false),
+	reselectingItems(false)
 {
 	ui->setupUi(this);
 	ui->moveUpButton->setIcon(QIcon::fromTheme("go-up"));
@@ -78,20 +79,23 @@ metaItemProperties::~metaItemProperties()
 
 void metaItemProperties::on_connectedItemsList_itemSelectionChanged()
 {
-	if(reselecting) return ;
-	reselecting = true ;
+	if(reselectingItems) return ;
+	reselectingItems = true ;
 	//    ui->dataTable->clearSelection();
 	QItemSelection selection ;
-	foreach(QListWidgetItem * item, ui->connectedItemsList->selectedItems())
+	if (!reselectingDataPoints)
 	{
-		foreach(QTableWidgetItem * point, itemInfo[item].points)
+		foreach(QListWidgetItem * item, ui->connectedItemsList->selectedItems())
 		{
-			QModelIndex index = ui->dataTable->model()->index(ui->dataTable->row(point), 0) ;
-			selection.append(QItemSelection(index, ui->dataTable->model()->index(index.row(), ui->dataTable->columnCount() - 1)));
+			foreach(QTableWidgetItem * point, itemInfo[item].points)
+			{
+				QModelIndex index = ui->dataTable->model()->index(ui->dataTable->row(point), 0) ;
+				selection.append(QItemSelection(index, ui->dataTable->model()->index(index.row(), ui->dataTable->columnCount() - 1)));
+			}
 		}
+		ui->dataTable->selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
+		refreshPlots();
 	}
-	ui->dataTable->selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
-	refreshPlots();
 	QModelIndexList selectionList = ui->connectedItemsList->selectionModel()->selectedIndexes() ;
 	if(!selectionList.isEmpty())
 	{
@@ -108,7 +112,7 @@ void metaItemProperties::on_connectedItemsList_itemSelectionChanged()
 		ui->addSelectedConnections->setDisabled(true) ;
 		ui->removeSelectedConnections->setDisabled(true);
 	}
-	reselecting = false ;
+	reselectingItems = false ;
 }
 
 void metaItemProperties::on_moveUpButton_clicked()
@@ -314,8 +318,8 @@ specUndoCommand* metaItemProperties::changedConnections(QObject* parent)
 
 void metaItemProperties::on_dataTable_itemSelectionChanged()
 {
-	if(reselecting) return ;
-	reselecting = true ;
+	if(reselectingDataPoints) return ;
+	reselectingDataPoints = true ;
 	//    ui->connectedItemsList->clearSelection();
 	QItemSelection selection ;
 	foreach(QTableWidgetItem * point, ui->dataTable->selectedItems())
@@ -328,7 +332,7 @@ void metaItemProperties::on_dataTable_itemSelectionChanged()
 	}
 	ui->connectedItemsList->selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
 	refreshPlots();
-	reselecting = false ;
+	reselectingDataPoints = false ;
 }
 
 void metaItemProperties::on_connectedItemsList_itemChanged(QListWidgetItem* item)
