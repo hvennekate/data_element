@@ -40,7 +40,7 @@ QStringList specLogEntryItem::descriptorKeys() const
 	return (specModelItem::descriptorKeys() << description.keys()) ;
 }
 
-QIcon specLogEntryItem::decoration() const { return QIcon(":/log_message.png") ; }
+QIcon specLogEntryItem::decoration() const { return QIcon(":/logs.png") ; }
 
 spec::descriptorFlags specLogEntryItem::descriptorProperties(const QString& key) const
 {

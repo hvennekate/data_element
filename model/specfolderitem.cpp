@@ -39,7 +39,7 @@ QList<specModelItem*>::size_type specFolderItem::children() const
 
 bool specFolderItem::isFolder() const { return true ;}
 
-QIcon specFolderItem::decoration() const { return QIcon(":/folder.png") ; }
+QIcon specFolderItem::decoration() const { return QIcon::fromTheme("folder") ; }
 
 bool specFolderItem::isEditable(QString key) const
 {

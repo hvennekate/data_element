@@ -65,7 +65,7 @@ void exportDialog::prepareHeader()
 	QWidget* add = new QWidget() ;
 	QHBoxLayout* addButtonLayout = new QHBoxLayout() ;
 	addButtonLayout->addStretch() ;
-	addButton = new QPushButton(QIcon(":/add.png"), "");
+	addButton = new QPushButton(QIcon::fromTheme("list-add"),"");
 	addButton->setFixedHeight(16) ;
 	addButton->setFixedWidth(16) ;
 	addButton->setFlat(true) ;
@@ -101,7 +101,7 @@ void exportDialog::prepareData()
 	QWidget* add = new QWidget() ;
 	QHBoxLayout* addButtonLayout = new QHBoxLayout() ;
 	addButtonLayout->addStretch() ;
-	addDataButton = new QPushButton(QIcon(":/add.png"), "");
+	addDataButton = new QPushButton(QIcon::fromTheme("list-add"),"") ;
 	addDataButton->setFixedHeight(16) ;
 	addDataButton->setFixedWidth(16) ;
 	addDataButton->setFlat(true) ;

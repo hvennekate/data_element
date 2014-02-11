@@ -6,7 +6,7 @@ exportFormatItem::exportFormatItem(const QStringList& values, QWidget* parent)
 {
 	Value = new QComboBox() ;
 	Separator = new QComboBox() ;
-	removeButton = new QPushButton(QIcon(":/remove.png"), "") ;
+	removeButton = new QPushButton(QIcon::fromTheme("list-remove"), "") ;
 	layout = new QHBoxLayout() ;
 
 	QStringList separators ;

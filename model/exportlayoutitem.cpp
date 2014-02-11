@@ -7,7 +7,7 @@ exportLayoutItem::exportLayoutItem(QStringList& descriptors, QWidget* parent)
 	isFreeForm = new QCheckBox("Free form string") ;
 	descriptor = new QComboBox() ;
 	freeText = new QLineEdit() ;
-	removeButton = new QPushButton(QIcon(":/remove.png"), "") ;
+	removeButton = new QPushButton(QIcon::fromTheme("list-remove"), "") ;
 	layout = new QHBoxLayout() ;
 
 	connect(isFreeForm, SIGNAL(stateChanged(int)), this, SLOT(freeFormMode(int))) ;

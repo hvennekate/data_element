@@ -1,4 +1,5 @@
 #include "specstreamable.h"
+#include <QDebug>
 
 specStreamable::type specStreamable::effectiveId() const
 {
@@ -38,6 +39,7 @@ specStreamable* specStreamable::produceItem(QDataStream& in) const
 	QDataStream stream(ba) ;
 	quint32 t ;
 	stream >> t ;
+	qDebug() << "reading type:" << t ;
 	specStreamable* item = factory(t) ;
 	if(item) item->readFromStream(stream);
 	return item ;

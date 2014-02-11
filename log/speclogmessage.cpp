@@ -16,7 +16,7 @@ bool specLogMessage::isEditable(QString key) const
 	return false ;
 }
 
-QIcon specLogMessage::decoration() const { return QIcon(":/sys_message.png") ; }
+QIcon specLogMessage::decoration() const { return QIcon::fromTheme("dialog-warning") ; }
 
 bool specLogMessage::changeDescriptor(QString key, QString value)
 {

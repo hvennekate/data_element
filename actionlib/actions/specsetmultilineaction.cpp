@@ -4,7 +4,7 @@
 specSetMultilineAction::specSetMultilineAction(QObject* parent) :
 	specRequiresItemAction(parent)
 {
-	setIcon(QIcon(":/multilineOn.png")) ;
+	setIcon(QIcon(":/multiline.png")) ;
 	setToolTip(tr("Toggle showing all lines"));
 	setWhatsThis(tr("Switches showing all lines of this descriptor on or off."));
 	setText(tr("Show all lines"));

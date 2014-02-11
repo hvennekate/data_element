@@ -57,7 +57,7 @@ specHistoryWidget::specHistoryWidget(QUndoStack* stack, QWidget* parent)
 	  undoView(new QUndoView(stack, this))
 {
 	setWhatsThis("Undo history.  Click on any command to forward/rewind to that particular state.");
-	toggleViewAction()->setIcon(QIcon(":/undoView.png")) ;
+	toggleViewAction()->setIcon(QIcon::fromTheme("view-history")) ;
 	toggleViewAction()->setWhatsThis(tr("Shows and hides the undo history."));
 	setObjectName(tr("History window"));
 	toggleViewAction()->setText(tr("Toggle undo window"));

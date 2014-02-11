@@ -6,7 +6,10 @@
 specFlattenTreeAction::specFlattenTreeAction(QObject* parent) :
 	specRequiresItemAction(parent)
 {
-	setIcon(QIcon(":/notree.png")) ;
+	QPixmap base(QIcon::fromTheme("view-list-tree").pixmap(32,32)) ;
+	QPainter painter(&base) ;
+	painter.drawPixmap(5,5,20,20,QIcon::fromTheme("edit-delete").pixmap(20,20));
+	setIcon(QIcon(base)) ;
 	setToolTip(tr("Flatten directories")) ;
 	setWhatsThis(tr("Flattens all selected directories (one level) and places the actual data items in their places."));
 }
