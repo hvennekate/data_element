@@ -1,4 +1,5 @@
 #include "specundoaction.h"
+#include <QEvent>
 
 specUndoAction::specUndoAction(QObject* parent) :
 	QAction(parent)
@@ -21,4 +22,16 @@ void specUndoAction::setLibrary(specActionLibrary* lib)
 	else
 		connect(this, SIGNAL(triggered()), this, SLOT(gotTrigger())) ;
 	library = lib ;
+}
+
+bool specUndoAction::event(QEvent *e)
+{
+	if (e->type() == QEvent::ActionChanged)
+	{
+		QString description = toolTip().section("\t",0,0) ;
+		if (!shortcut().isEmpty())
+			description += QString("\t\t<br><small>") + shortcut().toString() + "</small>";
+		setToolTip(description) ;
+	}
+	return QAction::event(e) ;
 }

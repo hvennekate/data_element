@@ -86,6 +86,7 @@ void specDockWidget::changeEvent(QEvent* event)
 		event->accept();
 	}
 	QDockWidget::changeEvent(event) ;
+	toggleViewAction()->setText(tr("Show \"") + widgetTypeName + tr("\" window"));
 }
 
 void specDockWidget::selectionChanged(const QItemSelection& selected, const QItemSelection& deselected)

@@ -9,10 +9,25 @@ class shortcutModel : public QAbstractItemModel
 {
 	Q_OBJECT
 private:
-	QList < QPair < QString,
-	      QList < QPair <
-	      QPair<QString, QIcon >,
-	      QStringList > > > > dataList ;
+	struct actionItem {
+		QIcon icon ;
+		QString title ;
+		QList<QKeySequence> shortCuts ;
+		void init(const QAction&) ;
+		actionItem(const QAction&) ;
+		actionItem(const QAction*) ;
+		QString shortCutString() const ;
+		QStringList shortCutList() const ;
+		void setShortcuts(const QStringList&) ;
+		void setShortcuts(const QString&) ;
+		bool operator<(const actionItem&) const;
+	};
+	typedef QList<actionItem> actionItemContainer ;
+	typedef QMap<QString, actionItemContainer> modelDataType ;
+	modelDataType modelContent ;
+	QString settingsKey(const QString& category, const QString& command) const ;
+	const actionItem *fromIndex(const QModelIndex&) const ;
+	actionItem *fromIndex(const QModelIndex&) ;
 public:
 	explicit shortcutModel(QObject* parent = 0) ;
 	QModelIndex index(int row, int column, const QModelIndex& parent) const ;
@@ -24,7 +39,7 @@ public:
 	bool setData(const QModelIndex& index, const QVariant& value, int role) ;
 	Qt::ItemFlags flags(const QModelIndex& index) const ;
 
-	void applyShortcutsToSettings() const ;
+	void applyShortcutsToSettings() ;
 };
 
 

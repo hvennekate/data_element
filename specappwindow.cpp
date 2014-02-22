@@ -117,7 +117,7 @@ void specAppWindow::whatsThisMode()
 
 void specAppWindow::createToolBars()
 {
-	fileToolBar = addToolBar(tr("File"));
+	fileToolBar = addToolBar(tr("File toolbar"));
 	fileToolBar->addAction(newAction);
 	fileToolBar->addAction(openAction);
 	fileToolBar->addAction(shortCutAction) ;

@@ -58,14 +58,14 @@ specPlot::specPlot(QWidget* parent)
 	setAutoReplot(false) ;
 	zoom  = new specZoomer(this->canvas()) ;
 
-	fixYAxisAction = new QAction(QIcon(":/fixyaxis.png"), tr("fixate &y axis"), this);
+	fixYAxisAction = new QAction(QIcon(":/fixyaxis.png"), tr("Fixate &y axis"), this);
 	fixYAxisAction->setShortcut(tr("Ctrl+Shift+y"));
 	fixYAxisAction->setWhatsThis(tr("Disables auto scaling for the y axis and fixates the current axis range."));
 	fixYAxisAction->setIcon(QIcon(":/fixYAxis.png")) ;
 	fixYAxisAction->setCheckable(true) ;
 	fixYAxisAction->setChecked(false) ;
 
-	fixXAxisAction = new QAction(QIcon(":/fixxaxis.png"), tr("fixate &x axis"), this);
+	fixXAxisAction = new QAction(QIcon(":/fixxaxis.png"), tr("Fixate &x axis"), this);
 	fixXAxisAction->setShortcut(tr("Ctrl+Shift+x"));
 	fixXAxisAction->setWhatsThis(tr("Disables auto scaling for the y axis and fixates the current axis range.")) ;
 	fixXAxisAction->setIcon(QIcon(":/fixXAxis.png")) ;

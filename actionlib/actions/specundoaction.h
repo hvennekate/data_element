@@ -17,6 +17,7 @@ public:
 protected:
 	specActionLibrary* library ;
 	virtual void execute() = 0 ;
+	bool event(QEvent *) ;
 private slots:
 	void gotTrigger() ;
 };

@@ -4,15 +4,67 @@
 #include "specplotwidget.h"
 #include <QSettings>
 
-void shortcutModel::applyShortcutsToSettings() const
+shortcutModel::actionItem::actionItem(const QAction & a)
+{
+	init(a) ;
+}
+
+shortcutModel::actionItem::actionItem(const QAction * a)
+{
+	init(*a) ;
+}
+
+void shortcutModel::actionItem::init(const QAction & a)
+{
+	icon = a.icon() ;
+	shortCuts = a.shortcuts() ;
+	title = a.iconText() ;
+}
+
+bool shortcutModel::actionItem::operator <(const shortcutModel::actionItem& other) const
+{
+	return title < other.title ;
+}
+
+QString shortcutModel::actionItem::shortCutString() const
+{
+	return shortCutList().join(", ") ;
+}
+
+QStringList shortcutModel::actionItem::shortCutList() const
+{
+	QStringList result ;
+	foreach (const QKeySequence shortcut, shortCuts)
+		result << shortcut ;
+	return result ;
+}
+
+void shortcutModel::actionItem::setShortcuts(const QString & s)
+{
+	setShortcuts(s.split(QRegExp("\\s*,\\s*")));
+}
+
+void shortcutModel::actionItem::setShortcuts(const QStringList & l)
+{
+	shortCuts.clear();
+	foreach(const QString& s, l)
+		shortCuts << s ;
+}
+
+QString shortcutModel::settingsKey(const QString &category, const QString &command) const
+{
+	return "shortcuts/" + category + "/" + command ;
+}
+
+#define ITERATEOVERALLACTIONS(DOWITHACTIONS) \
+	for (modelDataType::iterator i = modelContent.begin() ; i != modelContent.end() ; ++i) { \
+		for(actionItemContainer::iterator a = i.value().begin() ; a != i.value().end() ; ++a) { \
+	DOWITHACTIONS }}
+
+void shortcutModel::applyShortcutsToSettings()
 {
 	QSettings settings ;
-	for(int i = 0 ; i < dataList.size() ; ++i)
-		for(int j = 0 ; j < dataList[i].second.size() ; ++j)
-			settings.setValue("shortcuts/"
-					  + dataList[i].first + "/"
-					  + dataList[i].second[j].first.first,
-					  dataList[i].second[j].second) ;
+	ITERATEOVERALLACTIONS(settings.setValue(settingsKey(i.key(), a->title), a->shortCutList());)
 }
 
 shortcutModel::shortcutModel(QObject* parent)
@@ -21,10 +73,6 @@ shortcutModel::shortcutModel(QObject* parent)
 	specAppWindow window ;
 	specPlotWidget plotWidget(&window) ;
 
-	QMap < QString, QList < QPair <
-	QPair<QString, QIcon>,
-	      QStringList > > > premap ;
-	qDebug() << window.findChildren<specDockWidget*>() ;
 	foreach(QAction * action, window.findChildren<QAction*>())
 	{
 		if(action->text().isEmpty()) continue ;
@@ -36,31 +84,22 @@ shortcutModel::shortcutModel(QObject* parent)
 			parent = parent->parent() ;
 		if(!parent) continue ;
 
-		QStringList seqs ;
-		foreach(const QKeySequence & seq, action->shortcuts())
-		seqs << seq ;
-		premap[parent->objectName()] << qMakePair(
-						 qMakePair(action->text(), action->icon()),
-						 seqs) ;
+		modelContent[parent->objectName()] << action ;
 	}
 
 	// User settings override defaults
 	QSettings settings ;
-	foreach(const QString & category, premap.keys())
-	{
-		for(int i = 0 ; i < premap[category].size() ; ++i)
-		{
-			QString key = "shortcuts/"
-				      + category
-				      + "/"
-				      + premap[category][i].first.first ;
-			if(settings.contains(key))
-				premap[category][i].second = settings.value(key).toStringList() ;
-		}
-	}
+	ITERATEOVERALLACTIONS(
+		// Compose key TODO outsource to function
+		QString key = settingsKey(i.key(), a->title) ;
+		// Get user settings, if they exist
+		if(settings.contains(key))
+			a->setShortcuts(settings.value(key).toStringList());
+	)
 
-	foreach(const QString & category, premap.keys())
-	dataList << qMakePair(category, premap[category]) ;
+	// Sort actions alphabetically
+	foreach(const QString& key, modelContent.keys())
+		qSort(modelContent[key]) ;
 }
 
 Qt::ItemFlags shortcutModel::flags(const QModelIndex& index) const
@@ -91,36 +130,43 @@ QModelIndex shortcutModel::parent(const QModelIndex& child) const
 
 int shortcutModel::rowCount(const QModelIndex& parent) const
 {
-	if(!parent.isValid()) return dataList.size() ;  // root item
+	if(!parent.isValid()) return modelContent.size() ;  // root item
 	if(parent.parent().isValid()) return 0 ;  // child of a folder
-	return dataList[parent.row()].second.size() ;
+	return modelContent[parent.data().toString()].size() ;
+}
+
+const shortcutModel::actionItem* shortcutModel::fromIndex(const QModelIndex & index) const
+{
+	if (!index.parent().isValid()) return 0 ;
+	return &(modelContent[index.parent().data().toString()][index.row()]) ;
+}
+
+shortcutModel::actionItem* shortcutModel::fromIndex(const QModelIndex & i)
+{
+	return const_cast<actionItem*>(fromIndex(i)) ;
 }
 
 QVariant shortcutModel::data(const QModelIndex& index, int role) const
 {
+	const actionItem *ai = fromIndex(index) ;
 	if(!index.column())
 	{
 		if(Qt::DecorationRole == role)
 		{
-			if(index.parent().isValid())
-				return dataList[index.parent().row()].
-				       second[index.row()].first.second ;
+			if(ai) return ai->icon ;
 			return QIcon::fromTheme("folder") ;
 		}
 		else if(Qt::DisplayRole == role)
 		{
-			if(index.parent().isValid())
-				return dataList[index.parent().row()].
-				       second[index.row()].first.first ;
-			return dataList[index.row()].first ;
+			if(ai) return ai->title ;
+			return modelContent.keys()[index.row()];
 		}
 	}
 
 	if(!index.parent().isValid()) return QVariant() ;
 
-	if(Qt::DisplayRole == role || Qt::EditRole == role)
-		return dataList[index.parent().row()].
-		       second[index.row()].second.join(", ") ;
+	if(ai && (Qt::DisplayRole == role || Qt::EditRole == role))
+		return ai->shortCutString() ;
 
 	return QVariant() ;
 }
@@ -134,41 +180,49 @@ QVariant shortcutModel::headerData(int section, Qt::Orientation orientation, int
 
 bool shortcutModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
+	actionItem* ai = fromIndex(index) ;
 	if(Qt::EditRole != role) return false ;
 	if(!index.parent().isValid()) return false ;
 	if(!index.column()) return false ;
+	if(!ai) return false ;
 
-	QStringList seqList ;
-	int parentRow = index.parent().row() ;
-	foreach(const QString & seq, value.toString().split(", "))
+	QList<QKeySequence> sequences ;
+	foreach(const QString & seq, value.toString().split(QRegExp("\\s*,\\s*")))
 	{
-		bool assignable = true ;
-		for(int i = 0 ; i < dataList[parentRow].second.size() ; ++i)
-		{
-			if(index.row() == i) continue ;
-			if(dataList[parentRow].second[i].second.contains(seq))
-			{
-				if(QMessageBox::Yes ==
-					QMessageBox::question(0,
-							      tr("Shortcut already assigned"),
-							      tr("The shortcut ")
-							      + seq
-							      + tr("is already assigned to ")
-							      + dataList[parentRow].second[i].first.first
-							      + tr(". Reassign?"),
-							      QMessageBox::Yes | QMessageBox::No,
-							      QMessageBox::No))
-					dataList[parentRow].second[i].second.removeAll(seq) ;
-				else
-					assignable = false ;
-			}
-		}
-		if(assignable)
-			seqList << seq ;
+		if (sequences.contains(seq)) continue ;
+		sequences << seq ;
 	}
-	dataList[index.parent().row()].
-	second[index.row()].second
-	    = seqList ;
+
+	QMap<QKeySequence, actionItem*> assignment ;
+	ITERATEOVERALLACTIONS(foreach(QKeySequence seq, a->shortCuts) assignment[seq] = a.operator ->() ;) ;
+
+	QList<QKeySequence>::iterator i = sequences.begin() ;
+	while (i != sequences.end())
+	{
+		if (!assignment.contains(*i) || assignment[*i] == ai)
+		{
+			++i ;
+			continue ;
+		}
+		if (QMessageBox::Yes ==
+				QMessageBox::question(0,
+						      tr("Shortcut already assigned"),
+						      tr("The shortcut ")
+						      + i->toString()
+						      + tr("is already assigned to ")
+						      + assignment[*i]->title
+						      + tr(". Reassign?"),
+						      QMessageBox::Yes | QMessageBox::No,
+						      QMessageBox::No))
+		{
+			assignment[*i]->shortCuts.removeAll(*i) ;
+			++i ;
+		}
+		else
+			i = sequences.erase(i) ;
+	}
+
+	ai->shortCuts = sequences ;
 	return true ;
 }
 

@@ -183,7 +183,7 @@ QToolBar* specActionLibrary::toolBar(QWidget* target)
 		bar->addSeparator() ;
 		if(dataView || metaView)
 			addNewAction(bar, new changePlotStyleAction(target)) ;
-		bar->setWindowTitle(tr("Items"));
+		bar->setWindowTitle(tr("Items toolbar"));
 	}
 
 	if(plot)
@@ -193,7 +193,7 @@ QToolBar* specActionLibrary::toolBar(QWidget* target)
 		addNewAction(bar, new specXLabelAction(target)) ;
 		addNewAction(bar, new specYLabelAction(target)) ;
 		bar->addActions(plot->actions());
-		bar->setWindowTitle(tr("Plot"));
+		bar->setWindowTitle(tr("Plot toolbar"));
 	}
 
 	if(plotWidget)
@@ -205,7 +205,7 @@ QToolBar* specActionLibrary::toolBar(QWidget* target)
 		bar-> addSeparator() ;
 		bar-> addAction(undoAction(this)) ;
 		bar-> addAction(redoAction(this)) ;
-		bar->setWindowTitle(tr("Main"));
+		bar->setWindowTitle(tr("Main toolbar"));
 	}
 
 	return bar ;

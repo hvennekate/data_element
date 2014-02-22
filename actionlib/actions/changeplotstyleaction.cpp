@@ -53,28 +53,29 @@ changePlotStyleAction::changePlotStyleAction(QObject* parent) :
 	QPixmap customPixmap(icon) ;
 
 	QStringList symbolNames ;
-	symbolNames << "No symbol"
-		    << "Circle"
-		    << "Square"
-		    << "Diamond"
-		    << "Triangle"
-		    << "Inverted triangle"
-		    << "Up triangle"
-		    << "Left triangle"
-		    << "Right triangle"
-		    << "Cross"
-		    << "XCross"
-		    << "Horizontal line"
-		    << "Vertical line"
-		    << "Star 1"
-		    << "Star 2"
-		    << "Hexagon" ;
+	symbolNames << "none"
+		    << "circle"
+		    << "square"
+		    << "diamond"
+		    << "triangle"
+		    << "inverted triangle"
+		    << "up triangle"
+		    << "left triangle"
+		    << "right triangle"
+		    << "cross"
+		    << "x cross"
+		    << "horizontal line"
+		    << "vertical line"
+		    << "star 1"
+		    << "star 2"
+		    << "hexagon" ;
 	for(int i = -1 ; i < QwtSymbol::Hexagon + 1 ; ++i)
 	{
 		symbol.setStyle(QwtSymbol::Style(i)) ;
+		symbol.setSize(iconSize/1.2);
 		icon.fill(Qt::white);  // change to transparent
 		symbol.drawSymbol(&painter, QPointF(iconSize.width() / 2., iconSize.height() / 2.)) ;
-		QAction* newSymbolAction = new QAction(icon, symbolNames[i + 1], this) ;
+		QAction* newSymbolAction = new QAction(icon, "Symbol: " + symbolNames[i + 1], this) ;
 		symbolActions << newSymbolAction ;
 	}
 
@@ -89,20 +90,22 @@ changePlotStyleAction::changePlotStyleAction(QObject* parent) :
 		symbolOuterColorActions << new QAction(icon, "", this) ;
 	}
 
-	lineWidthActions << new QAction(customPixmap, "Custom line width...", this) ;
-	symbolSizeActions << new QAction(customPixmap, "Custom symbol size...", this) ;
+	lineWidthActions << new QAction(customPixmap, "Plot line width: custom...", this) ;
+	symbolSizeActions << new QAction(customPixmap, "Plot mark size: custom...", this) ;
 	for(QVector<double>::iterator i = sizes.begin() ; i != sizes.end() ; ++i)
 	{
-		lineWidthActions << new QAction("Line width " + QString::number(*i), this) ;
-		symbolSizeActions << new QAction("Symbol size " + QString::number(*i), this) ;
+		lineWidthActions << new QAction("Plot line width " + QString::number(*i), this) ;
+		symbolSizeActions << new QAction("Plot mark size " + QString::number(*i), this) ;
 	}
 
-	penStyleActions << new QAction("No line", this) <<
-			new QAction("Solid line", this) <<
-			new QAction("Dashed line", this) <<
-			new QAction("Dotted line", this) <<
-			new QAction("Dash-dotted line", this) <<
-			new QAction("Dash-dot-dotted line", this) ;
+	penStyleActions << new QAction(tr("no line"), this) <<
+			new QAction(tr("solid"), this) <<
+			new QAction(tr("dashed"), this) <<
+			new QAction(tr("dotted"), this) <<
+			new QAction(tr("dash-dotted"), this) <<
+			new QAction(tr("dash-dot-dotted"), this) ;
+	foreach(QAction* lineAction, penStyleActions)
+		lineAction->setText(tr("Plot line style: ") + lineAction->text());
 
 	symbolMenu->addActions(symbolActions.toList());
 	lineColorMenu->addActions(lineColorActions.toList()) ;
