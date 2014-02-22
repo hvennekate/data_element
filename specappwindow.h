@@ -7,6 +7,8 @@
 #include "specplotwidget.h"
 #include <QSettings>
 
+class specShortcutDialog ;
+
 class specAppWindow : public QMainWindow
 {
 	Q_OBJECT

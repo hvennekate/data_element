@@ -4,6 +4,7 @@
 #include "specplotwidget.h"
 #include <QSettings>
 
+#define SETTINGSPREFIX "shortcuts"
 shortcutModel::actionItem::actionItem(const QAction & a)
 {
 	init(a) ;
@@ -51,9 +52,24 @@ void shortcutModel::actionItem::setShortcuts(const QStringList & l)
 		shortCuts << s ;
 }
 
-QString shortcutModel::settingsKey(const QString &category, const QString &command) const
+QString shortcutModel::settingsKey(const QString &category, const QString &command)
 {
-	return "shortcuts/" + category + "/" + command ;
+	return SETTINGSPREFIX + QString("/") + category + "/" + command ;
+}
+
+QString shortcutModel::settingsKey(QAction* action)
+{
+	QObject *parent = elgibleParent(action->parent()) ;
+	return settingsKey(parent ? parent->objectName() : QString(), action->iconText()) ;
+}
+
+QObject* shortcutModel::elgibleParent(QObject *parent)
+{
+	while(parent &&
+		!qobject_cast<specAppWindow*> (parent) &&
+		!qobject_cast<specDockWidget*> (parent))
+		parent = parent->parent() ;
+	return parent ;
 }
 
 #define ITERATEOVERALLACTIONS(DOWITHACTIONS) \
@@ -77,13 +93,8 @@ shortcutModel::shortcutModel(QObject* parent)
 	{
 		if(action->text().isEmpty()) continue ;
 		if(action->menu()) continue ;
-		QObject* parent = action->parent() ;
-		while(parent &&
-			!qobject_cast<specAppWindow*> (parent) &&
-			!qobject_cast<specDockWidget*> (parent))
-			parent = parent->parent() ;
+		parent = elgibleParent(action->parent()) ;
 		if(!parent) continue ;
-
 		modelContent[parent->objectName()] << action ;
 	}
 
@@ -141,9 +152,10 @@ const shortcutModel::actionItem* shortcutModel::fromIndex(const QModelIndex & in
 	return &(modelContent[index.parent().data().toString()][index.row()]) ;
 }
 
-shortcutModel::actionItem* shortcutModel::fromIndex(const QModelIndex & i)
+shortcutModel::actionItem* shortcutModel::fromIndex(const QModelIndex & index)
 {
-	return const_cast<actionItem*>(fromIndex(i)) ;
+	if (!index.parent().isValid()) return 0 ;
+	return &(modelContent[index.parent().data().toString()][index.row()]) ;
 }
 
 QVariant shortcutModel::data(const QModelIndex& index, int role) const
@@ -240,33 +252,47 @@ specShortcutDialog::specShortcutDialog(QWidget* parent) :
 	connect(this, SIGNAL(accepted()), this, SLOT(assignShortcuts())) ;
 }
 
+QMap<QString, QList<QKeySequence> > specShortcutDialog::readSequences(QSettings &settings, const QString& prefix) const
+{
+	QMap<QString, QList<QKeySequence> > result ;
+
+	foreach(const QString& key, settings.childKeys())
+	{
+		QList<QKeySequence> seqs ;
+		foreach(const QString& seq, settings.value(key).toStringList())
+			seqs << seq ;
+		result[prefix + key] = seqs ;
+	}
+
+	foreach(const QString& group, settings.childGroups())
+	{
+		settings.beginGroup(group) ;
+		result = result.unite(readSequences(settings, prefix + group + "/")) ;
+		settings.endGroup();
+	}
+
+	return result ;
+}
+
 void specShortcutDialog::assignShortcuts()
 {
 	shortcutModel* model = findChild<shortcutModel*>() ;
 	if(model)
 		model->applyShortcutsToSettings();
 
-	if(!parent()) return ;
 	QSettings settings ;
-	settings.beginGroup("shortcuts");
-	foreach(const QString & widgetName, settings.childGroups())
+	settings.beginGroup(SETTINGSPREFIX) ;
+	QMap<QString, QList<QKeySequence> > setShortCuts = readSequences(settings, SETTINGSPREFIX + QString("/"));
+
+	qDebug() << setShortCuts ;
+	foreach(QWidget* tlw, qApp->topLevelWidgets())
 	{
-		QList<QWidget*> widgets(parent()->findChildren<QWidget*> (widgetName));
-		if(parent()->objectName() == widgetName && parentWidget())
-			widgets << parentWidget() ;
-		settings.beginGroup(widgetName) ;
-
-		QMap<QString, QList<QKeySequence> > sequencePerAction ;
-		foreach(const QString & actionName, settings.childKeys())
-		foreach(const QString & seq, settings.value(actionName).toStringList())
-		sequencePerAction[actionName] << seq ;
-
-		foreach(QWidget * widget, widgets)
-		foreach(QAction * action, widget->findChildren<QAction*>())
-		if(sequencePerAction.contains(action->text()))
-			action->setShortcuts(sequencePerAction[action->text()]) ;
-
-		settings.endGroup();
+		foreach(QAction* action, tlw->findChildren<QAction*>())
+		{
+			qDebug() << "Searching shortcut:" << shortcutModel::settingsKey(action) ;
+			if (setShortCuts.contains(shortcutModel::settingsKey(action)))
+				action->setShortcuts(setShortCuts[shortcutModel::settingsKey(action)]) ;
+		}
 	}
 }
 

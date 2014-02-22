@@ -4,6 +4,7 @@
 #include <QDialog>
 #include <QAbstractItemModel>
 #include <QIcon>
+#include <QSettings>
 
 class shortcutModel : public QAbstractItemModel
 {
@@ -25,10 +26,12 @@ private:
 	typedef QList<actionItem> actionItemContainer ;
 	typedef QMap<QString, actionItemContainer> modelDataType ;
 	modelDataType modelContent ;
-	QString settingsKey(const QString& category, const QString& command) const ;
 	const actionItem *fromIndex(const QModelIndex&) const ;
 	actionItem *fromIndex(const QModelIndex&) ;
 public:
+	static QString settingsKey(const QString& category, const QString& command) ;
+	static QString settingsKey(QAction*) ;
+	static QObject* elgibleParent(QObject* parent) ;
 	explicit shortcutModel(QObject* parent = 0) ;
 	QModelIndex index(int row, int column, const QModelIndex& parent) const ;
 	QModelIndex parent(const QModelIndex& child) const ;
@@ -57,7 +60,8 @@ public:
 	~specShortcutDialog();
 private:
 	Ui::specShortcutDialog* ui;
-private slots:
+	QMap<QString, QList<QKeySequence> > readSequences(QSettings&, const QString &prefix) const ;
+public slots:
 	void assignShortcuts() ;
 };
 

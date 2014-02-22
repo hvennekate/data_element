@@ -32,6 +32,7 @@
 #include <QFile>
 #include "bzipiodevice.h"
 #include <QPair>
+#include "specshortcutdialog.h"
 
 int main(int argc, char* argv[])
 {
@@ -116,6 +117,7 @@ int main(int argc, char* argv[])
 	else
 	{
 		specAppWindow* mainWindow = new specAppWindow();
+		new specShortcutDialog(mainWindow) ;
 		mainWindow->show();
 		return app.exec();
 	}

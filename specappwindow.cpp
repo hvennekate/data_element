@@ -4,7 +4,8 @@
 #include "names.h"
 
 specAppWindow::specAppWindow()
-	: QMainWindow(), settings()
+	: QMainWindow(),
+	  settings()
 {
 	setAnimated(false) ;
 	setDockOptions(QMainWindow::AllowTabbedDocks) ;
@@ -62,6 +63,9 @@ void specAppWindow::addDock(specPlotWidget* newDock)
 	addDockWidget(Qt::LeftDockWidgetArea, newDock) ;
 	if(inAreaWidget)
 		tabifyDockWidget(inAreaWidget, newDock);
+	specShortcutDialog *shortcutDialog = findChild<specShortcutDialog*>() ;
+	if (shortcutDialog)
+		shortcutDialog->assignShortcuts();
 }
 
 void specAppWindow::openFile()
@@ -106,8 +110,8 @@ void specAppWindow::createActions()
 
 void specAppWindow::editShortcuts()
 {
-	specShortcutDialog* shortcutDialog = new specShortcutDialog(this) ;
-	shortcutDialog->show();
+	specShortcutDialog *shortcutDialog = findChild<specShortcutDialog*>() ;
+	if (shortcutDialog) shortcutDialog->exec();
 }
 
 void specAppWindow::whatsThisMode()
