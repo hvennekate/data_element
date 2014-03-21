@@ -192,20 +192,19 @@ void specModel::checkForNewDescriptors(const QList<specModelItem*>& list, const 
 {
 	// TODO: check if descriptors were removed... hm...
 	// Check for possible new column headers
-	typedef QPair<QString, spec::descriptorFlags> descriptorPropertyPair ;
-	QVector<descriptorPropertyPair> newDescriptors ;
+	QMap<QString, spec::descriptorFlags> newDescriptors ;
 	foreach(specModelItem * pointer, list)
 		foreach(const QString & descriptor, pointer->descriptorKeys())
 			if(!Descriptors.contains(descriptor))
-				newDescriptors << descriptorPropertyPair(descriptor, pointer->descriptorProperties(descriptor)) ;
+				newDescriptors[descriptor] = pointer->descriptorProperties(descriptor) ;
 
+	int col = columnCount(parent) ;
 	insertColumns(columnCount(parent), newDescriptors.size(), parent) ;
-	for (int i = 0 ; i < newDescriptors.size() ; ++i)
+	foreach (const QString& newDescriptor, newDescriptors.keys())
 	{
-		int col = columnCount(parent) - newDescriptors.size() + i ;
-
-		setHeaderData(col, Qt::Horizontal, newDescriptors[i].first) ;
-		setHeaderData(col, Qt::Horizontal, (int) newDescriptors[i].second, spec::descriptorPropertyRole) ;
+		setHeaderData(col, Qt::Horizontal, newDescriptor) ;
+		setHeaderData(col, Qt::Horizontal, (int) newDescriptors[newDescriptor], spec::descriptorPropertyRole) ;
+		++ col ;
 	}
 }
 
