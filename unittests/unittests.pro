@@ -17,7 +17,8 @@ SOURCES += \
     tst_specmetavariable.cpp \
     tst_specmetaparser.cpp \
     tst_main.cpp \
-    tst_moveplotcommand.cpp
+    tst_moveplotcommand.cpp \
+    tst_shortcutactivation.cpp
 DEFINES += SRCDIR=\\\"$$PWD/\\\"
 
 INCLUDEPATH += ../ \
@@ -48,7 +49,8 @@ OBJECTS += ../../build/objects/[^m]*.o \
 HEADERS += \
     tst_specmetavariable.h \
     tst_specmetaparser.h \
-    tst_moveplotcommand.h
+    tst_moveplotcommand.h \
+    tst_shortcutactivation.h
 
 DEFINES += DOUBLEDEVIATIONCORRECTION=1
 DEFINES += NUMBEROFFRACTIONBITSINDOUBLE=52

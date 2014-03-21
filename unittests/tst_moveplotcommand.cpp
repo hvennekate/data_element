@@ -1,7 +1,7 @@
 #include "tst_moveplotcommand.h"
 #include "../model/specdescriptor.h"
 #include "../spectral/specdatapoint.h"
-#include "../actionlib/commands/specplotmovecommand.h"
+#include "../actionlib/commands/specexchangefiltercommand.h"
 #include <cfloat>
 #include <cmath>
 #include <QTime>
@@ -11,8 +11,9 @@
 #include <string>
 #include "../utility-functions.h"
 
-tst_movePlotCommand::tst_movePlotCommand()
-	: model(0),
+tst_movePlotCommand::tst_movePlotCommand(QObject *parent)
+	: QObject(parent),
+	  model(0),
 	  itemA(0),
 	  itemB(0)
 {
@@ -58,6 +59,13 @@ bool xIsEqual(const QPointF&a, const QPointF& b)
 	return a.x() == b.x() ;
 }
 
+bool compareDoubles(const double &a, const double &b)
+{
+	return (a == b)
+			|| (isnan(a) && isnan(b))
+			|| (isinf(a) && isinf(b) && (std::signbit(a) == std::signbit(b))) ;
+}
+
 void tst_movePlotCommand::check()
 {
 	QFETCH(double, Offset) ;
@@ -65,54 +73,52 @@ void tst_movePlotCommand::check()
 	QFETCH(double, Scale) ;
 	QFETCH(double, Shift) ;
 
-	specPlotMoveCommand *command = new specPlotMoveCommand(0) ;
+	specExchangeFilterCommand *command = new specExchangeFilterCommand(0) ;
 	QVector<QPointF> data, newData ;
 	for (size_t i = 0 ; i < itemA->dataSize() ; ++i)
 		data << itemA->sample(i) ;
 	for (int i = 0 ; i < data.size() ; ++i)
 	{
-		data[i].setX(data[i].x() + (std::isnormal(Shift) ? Shift : 0) ) ;
-		data[i].setY(data[i].y() * (std::isnormal(Scale) ? Scale : 1)
-			     + (std::isnormal(Offset) ? Offset : 0)
-			     + data[i].x() * (std::isnormal(Slope) ? Slope :0)
-			     ) ;
+		data[i].setX(data[i].x() + Shift) ;
+		data[i].setY(data[i].y() * Scale + Offset + data[i].x() * Slope) ;
 	}
 	// Average data:
-	QVector<QPointF> ave ;
-	averageToNew(data.begin(), data.end(), xIsEqual, std::back_inserter(ave));
-	data.swap(ave) ;
+//	QVector<QPointF> ave ;
+//	averageToNew(data.begin(), data.end(), xIsEqual, std::back_inserter(ave));
+//	data.swap(ave) ;
 
 	command->setParentObject(model) ;
 	command->setItem(itemA) ;
-	command->setCorrections(Shift, Offset, Slope, Scale) ;
+	command->setRelativeFilter(specDataPointFilter(Offset, Slope, Scale, Shift));
 	command->redo();
 	itemA->revalidate();
 	for (size_t i = 0 ; i < itemA->dataSize() ; ++i)
 		newData << itemA->sample(i) ;
 	command->undo();
 
-	QByteArray newModel ;
-	QDataStream out(&newModel, QIODevice::WriteOnly) ;
-	out << (specStreamable&) *model ;
+//	QByteArray newModel ;
+//	QDataStream out(&newModel, QIODevice::WriteOnly) ;
+//	out << (specStreamable&) *model ;
 
 	bool dataEqual = (data.size() == newData.size()) ;
-	QVector<QPointF> diffData ;
+//	QVector<QPointF> diffData ;
 	for (int i = 0 ; i < qMin(data.size(), newData.size()) ; ++i)
 	{
 		if (!dataEqual) break ;
 		const QPointF &sample = data[i],
 				&newSample = newData[i] ;
-		dataEqual = doubleComparison(sample.x(), newSample.x())
-				&& doubleComparison(sample.y(), newSample.y()) ;
-		diffData << newSample - sample ;
+		dataEqual = compareDoubles(sample.x(), newSample.x())
+				&& compareDoubles(sample.y(), newSample.y()) ;
+		qDebug() << sample << newSample << dataEqual ;
+//		diffData << newSample - sample ;
 	}
 
 	if (!dataEqual)
 	{
-		qDebug() << Offset << Slope << Scale << Shift ;
-		qDebug() << data ;
-		qDebug() << newData ;
-		qDebug() << diffData ;
+		qDebug() << "Offset, Slope, Scale, Shift:" << Offset << Slope << Scale << Shift ;
+		qDebug() << "    Data:" << data ;
+		qDebug() << "New Data:" << newData ;
+//		qDebug() << "Diff:     " << diffData ;
 		QCOMPARE(data, newData) ;
 	}
 //	QCOMPARE(savedModel, newModel) ;
@@ -136,17 +142,20 @@ void tst_movePlotCommand::check_data()
 	QTest::addColumn<double>("Shift") ;
 
 	QVector<double> possibleValues ;
-	possibleValues << NAN
-		       << INFINITY
-		       << - INFINITY
-		       << 0.
-		       << 1
-		       << -1
-		       << 5.
-		       << -5.5
-		       << 4.7477e89
-		       << 4.7477e-89 ;
+	possibleValues
+			<< NAN
+			<< INFINITY
+//			<< - INFINITY
+//			<< 0.
+//			<< 1
+//			<< -1
+//			<< 5.
+//			<< -5.5
+//			<< 4.7477e89
+//			<< 4.7477e-89
+			   ;
 
+	QTest::newRow("") << 1. << 1. << 1. << 100000. ;
 	// now, for the fun of it, some random values:
 	srand(rseed);
 //	const int len = sizeof(double)/sizeof(int16_t) ;
@@ -158,7 +167,7 @@ void tst_movePlotCommand::check_data()
 //			p[i] = rand() ;
 //		possibleValues << r ;
 //	}
-	qDebug() << possibleValues ;
+//	qDebug() << possibleValues ;
 //	char n[len*2*4+1] ;
 //	n[len*2*4] = '\0' ;
 	foreach (double of, possibleValues)

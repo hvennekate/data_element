@@ -34,7 +34,7 @@ void tst_specMetaParser::evaluate()
 	QFETCH(QString,yExpression) ;
 	QFETCH(QVector<QPointF>, result) ;
 	specMetaParser parser(variableDefinitions,xExpression,yExpression,0) ;
-	qDebug() << parser.warnings() ;
+//	qDebug() << parser.warnings() ;
 	QwtSeriesData<QPointF> *data = parser.evaluate(testItems) ;
 	QwtPointSeriesData reference(result) ;
 	QCOMPARE(data->size(),reference.size()) ;
@@ -68,7 +68,7 @@ void tst_specMetaParser::ok()
 	QFETCH(QString,yExpression) ;
 	QFETCH(bool, result) ;
 	specMetaParser parser(variableDefinitions,xExpression,yExpression,0) ;
-	qDebug() << parser.warnings() ;
+//	qDebug() << parser.warnings() ;
 	QCOMPARE(parser.ok(), result) ;
 }
 void tst_specMetaParser::ok_data()
@@ -90,7 +90,7 @@ void tst_specMetaParser::warnings()
 	QFETCH(QString,yExpression) ;
 	QFETCH(QString, result) ;
 	specMetaParser parser(variableDefinitions,xExpression,yExpression,0) ;
-	qDebug() << parser.warnings() ;
+//	qDebug() << parser.warnings() ;
 	QCOMPARE(parser.warnings(), result) ;
 }
 void tst_specMetaParser::warnings_data()

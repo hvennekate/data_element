@@ -57,7 +57,7 @@ void tst_specMetaVariable::xValues()
 	QFETCH(bool, returns) ;
 
 	QCOMPARE(returns, var->xValues(testItem,input)) ;
-	qDebug() << input ;
+//	qDebug() << input ;
 	QCOMPARE(output, input) ;
 	delete var ;
 }
@@ -91,10 +91,10 @@ void tst_specMetaVariable::values()
 
 	testItem->refreshPlotData();
 
-	qDebug() << "XVALUES (ITEM)" << testItem->dataSize() ;
+//	qDebug() << "XVALUES (ITEM)" << testItem->dataSize() ;
 
 	specMetaVariable *var(specMetaVariable::factory(variableString)) ;
-	qDebug() << "Soll:" << output << "Ist:" << var->values(testItem,xValues) << "Gleich:" ;
+//	qDebug() << "Soll:" << output << "Ist:" << var->values(testItem,xValues) << "Gleich:" ;
 //	for (int i = 0 ; i < output.size() ; ++i)
 //		qDebug() << QString().setNum(output[i],'g',18)
 //			 << QString().setNum(var->values(testItem,xValues)[i],'g',18)

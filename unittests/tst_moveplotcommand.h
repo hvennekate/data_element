@@ -16,7 +16,7 @@ private:
 	QByteArray savedModel ;
 	unsigned int rseed ;
 public:
-	tst_movePlotCommand();
+	explicit tst_movePlotCommand(QObject* parent = 0);
 private Q_SLOTS:
 	void init() ;
 	void cleanup() ;
