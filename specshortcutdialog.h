@@ -22,6 +22,7 @@ private:
 		void setShortcuts(const QStringList&) ;
 		void setShortcuts(const QString&) ;
 		bool operator<(const actionItem&) const;
+		bool operator==(const actionItem&) const;
 	};
 	typedef QList<actionItem> actionItemContainer ;
 	typedef QMap<QString, actionItemContainer> modelDataType ;

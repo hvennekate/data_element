@@ -26,6 +26,10 @@ bool shortcutModel::actionItem::operator <(const shortcutModel::actionItem& othe
 {
 	return title < other.title ;
 }
+bool shortcutModel::actionItem::operator ==(const shortcutModel::actionItem& other) const
+{
+	return title == other.title ;
+}
 
 QString shortcutModel::actionItem::shortCutString() const
 {
@@ -205,13 +209,25 @@ bool shortcutModel::setData(const QModelIndex& index, const QVariant& value, int
 		sequences << seq ;
 	}
 
-	QMap<QKeySequence, actionItem*> assignment ;
-	ITERATEOVERALLACTIONS(foreach(QKeySequence seq, a->shortCuts) assignment[seq] = a.operator ->() ;) ;
+	QMultiMap<QKeySequence, actionItem*> assignment ;
+	ITERATEOVERALLACTIONS(foreach(QKeySequence seq, a->shortCuts) assignment.insertMulti(seq, a.operator ->()) ;) ;
 
 	QList<QKeySequence>::iterator i = sequences.begin() ;
+	QString group = index.parent().data().toString() ;
 	while (i != sequences.end())
 	{
-		if (!assignment.contains(*i) || assignment[*i] == ai)
+		if (!assignment.contains(*i))
+		{
+			++i ;
+			continue ;
+		}
+		actionItem* other = 0 ;
+		foreach(actionItem* item, assignment.values(*i))
+		{
+			if (*item == *ai) continue ;
+			if (modelContent[group].contains(*item)) other = item ;
+		}
+		if (!other || other == ai)
 		{
 			++i ;
 			continue ;
@@ -221,13 +237,13 @@ bool shortcutModel::setData(const QModelIndex& index, const QVariant& value, int
 						      tr("Shortcut already assigned"),
 						      tr("The shortcut ")
 						      + i->toString()
-						      + tr("is already assigned to ")
-						      + assignment[*i]->title
-						      + tr(". Reassign?"),
+						      + tr(" is already assigned to \"")
+						      + other->title
+						      + tr("\". Reassign?"),
 						      QMessageBox::Yes | QMessageBox::No,
 						      QMessageBox::No))
 		{
-			assignment[*i]->shortCuts.removeAll(*i) ;
+			other->shortCuts.removeAll(*i) ;
 			++i ;
 		}
 		else
