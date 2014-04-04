@@ -134,7 +134,8 @@ SOURCES += main.cpp \
     specshortcutdialog.cpp \
     actionlib/commands/specexchangefiltercommand.cpp \
     model/specdatapointfilter.cpp \
-    actionlib/actions/specfitaction.cpp
+    actionlib/actions/specfitaction.cpp \
+    plot/specfiltergenerator.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -270,7 +271,8 @@ HEADERS += cutbyintensitydialog.h \
     specshortcutdialog.h \
     actionlib/commands/specexchangefiltercommand.h \
     model/specdatapointfilter.h \
-    actionlib/actions/specfitaction.h
+    actionlib/actions/specfitaction.h \
+    plot/specfiltergenerator.h
 
 INCLUDEPATH += kinetic \
 	log \

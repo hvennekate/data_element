@@ -3,10 +3,9 @@ unsigned int qHash(const double& d)
 	return * ((unsigned int*)(&d)) ;
 }
 #include "specspectrumplot.h"
-#include <QVector3D>
 #include <QActionGroup>
 #include <QBuffer>
-#include "qwt_scale_draw.h"
+#include <qwt_scale_draw.h>
 #include "specmulticommand.h"
 #include "specrange.h"
 #include "specdataitem.h"
@@ -18,7 +17,8 @@ unsigned int qHash(const double& d)
 #include "specexchangefiltercommand.h"
 #include "specactionlibrary.h"
 #include "specexchangedatacommand.h"
-#include "QMessageBox"
+#include <QMessageBox>
+#include "specfiltergenerator.h"
 
 specSpectrumPlot::moveMode specSpectrumPlot::correctionsStatus() const
 {
@@ -374,178 +374,6 @@ void specSpectrumPlot::pointMoved(specCanvasItem* item, int no, double x, double
 	undoPartner()->push(command) ;
 }
 
-void generatePointsInRange(const QwtPlotItemList& zeroRanges,
-			   const specModelItem* spectrum,
-			   QSet<double>& xValues)
-{
-	if(!spectrum) return ;
-	// extract points that lie in any of the ranges
-	for(size_t j = 0 ; j < spectrum->dataSize() ; ++j)
-	{
-		const QPointF& point = spectrum->sample(j) ;
-		for(int k = 0 ; k < zeroRanges.size() ; ++k)
-		{
-			if(((specRange*) zeroRanges[k])->contains(point.x()))
-			{
-				xValues << point.x() ;
-				break ; // only include each point once
-			}
-		}
-	}
-
-}
-
-void generateReferenceSpectrum(const QMap<double, double>& referenceSpectrum,
-			       const QSet<double>& xValues,
-			       QMap<double, double>& refSpectrum)
-{
-	if(referenceSpectrum.isEmpty())
-		foreach(const double & x, xValues)
-		refSpectrum[x] = 0. ;
-	else
-	{
-		foreach(const double & x, xValues)
-		{
-			if(referenceSpectrum.contains(x))
-				refSpectrum[x] = referenceSpectrum[x] ;
-			else
-			{
-				QMap<double, double>::const_iterator pointAfter = referenceSpectrum.upperBound(x);
-				// no points for lin interpol found -> take point from correction list
-				if(pointAfter == referenceSpectrum.begin() ||  // no point before to interpolate with
-					pointAfter == referenceSpectrum.end()) // no point after to interpolate with
-					continue ;
-				QMap<double, double>::const_iterator pointBefore  = pointAfter - 1;
-				// subtract linear interpolation
-				refSpectrum[x] = pointBefore.value()
-						 + (pointAfter.value() - pointBefore.value()) /
-						 (pointAfter.key()   - pointBefore.key()) *
-						 (x - pointBefore.key()) ;
-			}
-		}
-	}
-}
-
-// Here come the macros to boost the performance
-#define ACCUMULATE_ONES count += 1 ;
-#define ACCUMULATE_X    x  += p.x() ;
-#define ACCUMULATE_XX   xx += p.x()*p.x() ;
-#define ACCUMULATE_XY   xy += p.x()*p.y() ;
-#define ACCUMULATE_XZ   xz += p.x()*zv ;
-#define ACCUMULATE_Y    y  += p.y() ;
-#define ACCUMULATE_YZ   yz += p.y()*zv ;
-#define ACCUMULATE_YY   yy += p.y()*p.y() ;
-#define ACCUMULATE_Z    z  += zv ;
-#define LOOPPOINTS(LOOPCORE) \
-	for (size_t i = 0 ; i < spectrum->dataSize() ; ++i) { \
-		QPointF p = spectrum->sample(i) ; \
-		if (refSpectrum.contains(p.x())) { \
-			double zv = (refSpectrum[p.x()] - p.y()) ; \
-			LOOPCORE \
-		}}
-#define MATRIX_VECTOR_ASSIGNMENT_TWO(MATRIX_A, MATRIX_B, MATRIX_C, VECTOR_A, VECTOR_B) \
-	QVector<double> vec(2) ; \
-	QVector<QVector<double> > matrix(2, vec) ; \
-	matrix[0][0] = MATRIX_A ; \
-	matrix[1][0] = matrix[0][1] = MATRIX_B ; \
-	matrix[1][1] = MATRIX_C ; \
-	vec[0] = VECTOR_A ; \
-	vec[1] = VECTOR_B ; \
-	QVector<double> correction = gaussjinv(matrix, vec) ;
-
-specMultiCommand* specSpectrumPlot::generateCorrectionCommand(const QwtPlotItemList& zeroRanges,
-	const QwtPlotItemList& spectra,
-	const QMap<double, double>& referenceSpectrum,
-	specModel* model,
-	bool calcOffset,
-	bool calcSlope,
-	bool calcScale)
-{
-	if(!calcOffset && !calcSlope) return 0 ;  // Nur scale macht keinen Sinn (Referenz wird skaliert)
-	specMultiCommand* zeroCommand = new specMultiCommand ;
-	zeroCommand->setParentObject(model);
-
-	QSet<double> xValues ;
-
-	// Extract points in range and xValues needed (might be a bit heavy on the memory for storing all points)
-	for(int i = 0 ; i < spectra.size() ; ++i)
-		generatePointsInRange(zeroRanges, dynamic_cast<specModelItem*>(spectra[i]), xValues);
-
-	// Generate correct reference spectrum
-	QMap<double, double> refSpectrum ;
-	generateReferenceSpectrum(referenceSpectrum, xValues, refSpectrum);
-
-	typedef QVector3D refPoint ;
-
-	foreach(QwtPlotItem * s, spectra)
-	{
-		specModelItem* spectrum = dynamic_cast<specModelItem*>(s) ;
-		if(!spectrum) continue ;
-		double count = 0, x = 0, xx = 0, y = 0, yy = 0, z = 0, xy = 0, xz = 0, yz = 0 ;
-		double offset = 0, slope = 0 ;
-
-		if(calcOffset && !calcSlope && !calcScale)
-		{
-			LOOPPOINTS(ACCUMULATE_ONES ACCUMULATE_Z) ;
-			offset = z / count ;
-		}
-		else if(!calcOffset && calcSlope && !calcScale)
-		{
-			LOOPPOINTS(ACCUMULATE_XX ACCUMULATE_XZ) ;
-			slope = xz / xx;
-		}
-		else if(calcOffset && calcSlope && !calcScale)
-		{
-			LOOPPOINTS(ACCUMULATE_ONES ACCUMULATE_X ACCUMULATE_XX ACCUMULATE_XZ ACCUMULATE_Z) ;
-			MATRIX_VECTOR_ASSIGNMENT_TWO(count, x, xx, z, xz) ;
-			offset = correction[0] ;
-			slope  = correction[1] ;
-		}
-		else if(calcOffset && !calcSlope && calcScale)
-		{
-			LOOPPOINTS(ACCUMULATE_ONES ACCUMULATE_Y ACCUMULATE_YY ACCUMULATE_YZ ACCUMULATE_Z) ;
-			MATRIX_VECTOR_ASSIGNMENT_TWO(count, y, yy, z, yz) ;
-			if(correction[1] != 1.)
-				offset = correction[0] / (1. - correction[1]) ; // TODO check or disable (this is dangerous!)
-		}
-		else if(!calcOffset && calcSlope && calcScale)
-		{
-			LOOPPOINTS(ACCUMULATE_X ACCUMULATE_XY ACCUMULATE_YY ACCUMULATE_XZ ACCUMULATE_YZ)
-			MATRIX_VECTOR_ASSIGNMENT_TWO(x, xy, yy, xz, yz) ;
-			if(correction[1] != 1.)
-				slope = correction[0] / (1. - correction[1]) ; // TODO check or disable (this is dangerous!)
-		}
-		else if(calcOffset && calcSlope && calcScale)
-		{
-			LOOPPOINTS(ACCUMULATE_ONES ACCUMULATE_X  ACCUMULATE_Y  ACCUMULATE_Z
-				   ACCUMULATE_XX   ACCUMULATE_XY ACCUMULATE_YY
-				   ACCUMULATE_XZ   ACCUMULATE_YZ) ;
-			QVector<double> vec(3) ;
-			QVector<QVector<double> > matrix(3, vec) ;
-			matrix[0][0] = count ;
-			matrix[1][1] = xx ;
-			matrix[2][2] = yy ;
-			matrix[0][1] = matrix[1][0] = x ;
-			matrix[0][2] = matrix[2][0] = y ;
-			matrix[1][2] = matrix[2][1] = xy;
-			vec[0] = z ;
-			vec[1] = xz ;
-			vec[2] = yz ;
-			QVector<double> correction = gaussjinv(matrix, vec) ;
-			if(correction[2] != -1.)
-			{
-				offset = correction[0] / (1. + correction[2]) ;
-				slope  = correction[1] / (1. + correction[2]) ;
-			}
-		}
-
-		specExchangeFilterCommand* command = new specExchangeFilterCommand(zeroCommand) ;
-		command->setItem(spectrum) ;
-		command->setRelativeFilter(specDataPointFilter(offset, slope)) ;
-	}
-	return zeroCommand ;
-}
-
 void specSpectrumPlot::applyZeroRanges(specCanvasItem* range, int point, double newX, double newY)
 {
 	((specRange*) range)->pointMoved(point, newX, newY) ;
@@ -557,24 +385,35 @@ void specSpectrumPlot::applyZeroRanges()
 	QwtPlotItemList zeroRanges = itemList(spec::zeroRange) ;
 	if(zeroRanges.isEmpty()) return ;
 	QwtPlotItemList spectra = itemList(spec::spectrum) ;  // TODO roll back previous undo command if it was of the same kind and merge with what is to come.
+	// REMARK:  should be implemented already.
 	if(spectra.isEmpty()) return ;
-	// prepare map of x and y values
-	QMap<double, double> referenceSpectrum ;
-	if(reference)
-		for(size_t i = 0 ; i < reference->dataSize() ; ++i)
-			referenceSpectrum[reference->sample(i).x()] = reference->sample(i).y() ;
 
-	specMultiCommand* zeroCommand = generateCorrectionCommand(zeroRanges,
-					spectra,
-					referenceSpectrum,
-					view->model(),
-					offsetAction->isChecked(),
-					offlineAction->isChecked(),
-					scaleAction->isChecked()) ;
-	QStringList rangeStrings ;
-	for(QwtPlotItemList::iterator i = zeroRanges.begin() ; i != zeroRanges.end() ; ++i)
+	specFilterGenerator filterGenerator ;
+	if (reference)
+		filterGenerator.setReference(reference->dataMap()) ;
+	filterGenerator.calcOffset(offsetAction->isChecked());
+	filterGenerator.calcScale(scaleAction->isChecked()) ;
+	filterGenerator.calcSlope(offlineAction->isChecked()) ;
+	filterGenerator.setRanges(zeroRanges);
+
+	specMultiCommand* zeroCommand = new specMultiCommand ;
+	zeroCommand->setParentObject(view->model()) ;
+	foreach(QwtPlotItem* s, spectra)
 	{
-		specRange* range = (specRange*)(*i) ;
+		specModelItem* spectrum = dynamic_cast<specModelItem*>(s) ;
+		if (!spectrum) continue ;
+		specDataPointFilter filter = filterGenerator.generateFilter(spectrum) ;
+		if (!filter.valid()) continue ;
+		specExchangeFilterCommand* command = new specExchangeFilterCommand(zeroCommand) ;
+		command->setParentObject(view->model()) ;
+		command->setItem(spectrum) ;
+		command->setRelativeFilter(filter) ;
+	}
+
+	QStringList rangeStrings ;
+	foreach(QwtPlotItem* i, zeroRanges)
+	{
+		specRange* range = (specRange*) i ;
 		rangeStrings << QString::number(range->minValue()) + "--" + QString::number(range->maxValue()) ;
 	}
 	zeroCommand->setText(tr("Apply range correction. Ranges: ") + rangeStrings.join(", "));

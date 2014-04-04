@@ -11,6 +11,7 @@
 #include "specmergedialog.h"
 
 #include "specworkerthread.h"
+#include "specfiltergenerator.h"
 
 class sortItemsByDescriptionFunctor
 {
@@ -50,6 +51,26 @@ private:
 		items.clear();
 		delete Command ;
 		return true ;
+	}
+
+	void mergeItems(specDataItem* newItem, const specDataItem* other) const
+	{
+		if (!newItem || !other) return ;
+		if(spectralAdaptation)
+		{
+			specDataItem* correctedItem = new specDataItem(*other) ;
+			specFilterGenerator filterGenerator ;
+			filterGenerator.calcOffset();
+			filterGenerator.calcSlope();
+			filterGenerator.setReference(newItem->dataMap()) ;
+			specDataPointFilter filter = filterGenerator.generateFilter(correctedItem) ;
+			if (filter.valid())
+				correctedItem->addDataFilter(filter) ;
+			other = correctedItem ;
+		}
+
+		*newItem += *other ;
+		if (spectralAdaptation) delete other ;
 	}
 
 	bool itemsAreEqual(specModelItem* first, specModelItem* second, const QList<stringDoublePair>& criteria) ;
@@ -101,6 +122,7 @@ public:
 			QList<specModelItem*> toInsert ;
 			int chunkSize = chunk.size() ;
 			qSort(chunk.begin(), chunk.end(), sorter) ;
+			QList<specModelItem*> chunkDelete ;
 			while(!chunk.isEmpty())
 			{
 				emit progressValue(progress + chunkSize - chunk.size()) ;
@@ -108,66 +130,30 @@ public:
 				specDataItem* newItem = new specDataItem(QVector<specDataPoint>(), QHash<QString, specDescriptor>()) ;
 				QList<specModelItem*> toMergeWith ;
 				// look for items to merge with
+				// consider iterator-erase
 				do toMergeWith << chunk.takeFirst() ;
 				while(!chunk.isEmpty() && itemsAreEqual(toMergeWith.first(), chunk.first(), criteria)) ;
 
-				toBeDeleted << toMergeWith ;
-				// if there are others, do the merge
-				if(!toMergeWith.isEmpty())
-				{
-					if(spectralAdaptation)
-					{
-						foreach(specModelItem * other, toMergeWith)
-						{
-							// generate reference spectrum
-							QMap<double, double> reference ;
-							newItem->revalidate();
-							for(size_t i = 0 ; i < newItem->dataSize() ; ++i)
-							{
-								const QPointF point = newItem->sample(i) ;
-								reference[point.x()] = point.y() ;
-							}
+				if (toMergeWith.size() == 1) continue ;
+				chunkDelete << toMergeWith ;
 
-							// define spectral ranges
-							specRange* range = new specRange(reference.begin().key(), (reference.end() - 1).key()) ;
-							QwtPlotItemList ranges ;
-							ranges << range ; // DANGER
-							// protection against nan values (make sure spectra do indeed overlap)
-							int overlappingCount = 0 ;
-							for(size_t i = 0 ; i < other->dataSize() ; ++i)
-							{
-								overlappingCount += range->contains(other->sample(i).x()) ;
-								if(overlappingCount == 2) break ;
-							}
-							if(overlappingCount == 2)
-							{
-								// perform spectral adaptation
-								// TODO NAN protection
-								specMultiCommand* correctionCommand = specSpectrumPlot::generateCorrectionCommand(ranges, QwtPlotItemList() << (QwtPlotItem*) other, reference, model, true, true) ;
-								correctionCommand->redo();
-								*newItem += * ((specDataItem*) other) ;
-								correctionCommand->undo();
-								delete correctionCommand ;
-							}
-							else
-								*newItem += * ((specDataItem*) other) ;
-							delete range ;
-						}
-					}
-					else
-						foreach(specModelItem * other, toMergeWith)
-						*newItem += * ((specDataItem*) other) ;  // TODO check this cast
-					newItem->flatten();
-				}
-				toInsert << newItem ; // this creates overhead if  there are many items not to be merged...
+				foreach(specModelItem* other, toMergeWith)
+					mergeItems(newItem, dynamic_cast<specDataItem*>(other)) ;
+				newItem->flatten();
+				toInsert << newItem ;
 			}
 			if(model->insertItems(toInsert, model->index(parent), row))
-				newlyInserted << toInsert ; // TODO else...
+			{
+				newlyInserted << toInsert ;
+				toBeDeleted << chunkDelete ;
+			}
+			else
+				foreach(specModelItem* item, toInsert)
+					delete item ;
 		}
 		emit progressValue(total) ;
 
 		Command = new specMultiCommand ;
-		Command->setParentObject(model) ;
 		Command->setMergeable(false) ;
 
 		// compile description
@@ -185,15 +171,10 @@ public:
 			(description += tr(" Criteria (Tolerance): ")) += criteriaDescription.join(", ") ;
 		Command->setText(description) ;
 
-		// preparing insertion command
 		specAddFolderCommand* insertionCommand = new specAddFolderCommand(Command) ;
-		insertionCommand->setParentObject(model) ;
-		insertionCommand->setItems(newlyInserted) ;
-
-
-		// prepare to delete the old items
 		specDeleteCommand* deletionCommand = new specDeleteCommand(Command) ;
-		deletionCommand->setParentObject(model) ;
+		Command->setParentObject(model) ;
+		insertionCommand->setItems(newlyInserted) ;
 		deletionCommand->setItems(toBeDeleted) ;
 
 		cleanUp() ;
