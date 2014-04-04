@@ -382,6 +382,10 @@ QString specModelItem::editDescriptor(const QString& key) const
 	return descriptor(key, true) ;
 }
 
+void specModelItem::initializeData()
+{
+	revalidate();
+}
 
 // Force instantiation
 template QVector<specDataItem*> specModelItem::findDescendants() ;

@@ -227,3 +227,27 @@ void specCanvasItem::setPenStyle(const qint8& s)
 	newPen.setStyle((Qt::PenStyle) s) ;
 	setPen(newPen) ;
 }
+
+#define GETDATAFUNCTIONMACRO(DATATYPE, FUNCTIONNAME, INNERLOOP) \
+	DATATYPE specCanvasItem::FUNCTIONNAME() \
+	{ initializeData() ; \
+	DATATYPE result ; \
+	for (size_t i = 0 ; i < dataSize() ; ++i) { INNERLOOP } \
+	return result ; }
+
+GETDATAFUNCTIONMACRO(QVector<double>,
+		     xVector,
+		     result << sample(i).x() ; )
+GETDATAFUNCTIONMACRO(QVector<double>,
+		     yVector,
+		     result << sample(i).y() ; )
+typedef QMap<double,double> doubleDoubleMap ;
+GETDATAFUNCTIONMACRO(doubleDoubleMap,
+		     dataMap,
+		     const QPointF point = sample(i) ; result[point.x()] = point.y() ;)
+GETDATAFUNCTIONMACRO(QVector<QPointF>,
+		     dataVector,
+		     result << sample(i) ; )
+
+void specCanvasItem::initializeData()
+{}

@@ -23,18 +23,23 @@ private:
 		void renderSymbols(QPainter*, const QPointF*, int numPoints) const ;
 		QRect boundingRect() const ;
 	};
+	virtual void initializeData() ;
 protected:
 	void writeToStream(QDataStream& out) const;
 	void readFromStream(QDataStream& in) ;
 public:
 	specCanvasItem(QString description = "");
-	virtual void pointMoved(const int&, const double&, const double&) {} ;
+	virtual void pointMoved(const int&, const double&, const double&) {}
 	virtual void refreshPlotData() = 0;
 	virtual void addDataFilter(const specDataPointFilter&) {}
 	virtual void attach(QwtPlot* plot) { QwtPlotCurve::attach(plot) ; }
 	virtual void detach() { QwtPlotCurve::detach() ; }
 	virtual QMenu* contextMenu() ;
 	~specCanvasItem();
+	virtual QMap<double,double> dataMap() ;
+	virtual QVector<double> xVector() ;
+	virtual QVector<double> yVector() ;
+	virtual QVector<QPointF> dataVector() ;
 
 	int rtti() const { return spec::canvasItem ; }
 	virtual void highlight(bool highlight) ;

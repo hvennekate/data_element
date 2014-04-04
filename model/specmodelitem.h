@@ -27,6 +27,7 @@ private:
 	QSet<specMetaItem*> clients ;
 	specDescriptor description ;
 	void processData() ;
+	void initializeData();
 protected:
 	// selectedPoints (3 Punkte fuer Korrekturen)
 	virtual bool shortCircuit(specModelItem* server) ;
@@ -36,6 +37,7 @@ protected:
 public:
 	void revalidate() ;
 	void invalidate() ;
+
 	virtual bool connectServer(specModelItem*) ;
 	virtual bool disconnectServer(specModelItem*) ;
 	bool connectClient(specMetaItem* clnt) ;
