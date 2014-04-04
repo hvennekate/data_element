@@ -88,3 +88,11 @@ bool specDataPointFilter::operator == (const specDataPointFilter& other) const
 		offset == other.offset &&
 		slope  == other.slope) ;
 }
+
+bool specDataPointFilter::valid() const
+{
+	return isfinite(offset) &&
+			isfinite(slope) &&
+			isfinite(factor) &&
+			isfinite(xshift) ;
+}

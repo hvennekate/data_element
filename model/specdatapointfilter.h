@@ -24,6 +24,7 @@ public:
 	specDataPointFilter& operator+= (const specDataPointFilter&) ;
 	bool operator== (const specDataPointFilter&) const ;
 	specDataPointFilter operator-() const ;
+	bool valid() const ;
 };
 
 #endif // SPECDATAPOINTFILTER_H
