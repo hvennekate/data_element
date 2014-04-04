@@ -40,7 +40,7 @@ public:
 	explicit specMergeDialog(QWidget* parent = 0);
 	~specMergeDialog();
 	void setDescriptors(const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties) ;
-	void getMergeCriteria(QList<stringDoublePair>& toCompare, bool& doSpectralAdaptation) const ;
+	void getMergeCriteria(QList<stringDoublePair>& toCompare, bool& doSpectralAdaptation, bool &sortBeforeMerge) const ;
 
 private:
 	Ui::specMergeDialog* ui;

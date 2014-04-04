@@ -212,9 +212,10 @@ void specMergeDialog::setDescriptors(const QStringList& descriptors, const QList
 	ui->criteria->setFixedWidth(ui->criteria->sizeHint().width() + 15);  // TODO bad!
 }
 
-void specMergeDialog::getMergeCriteria(QList<stringDoublePair>& toCompare, bool& doSpectralAdaptation) const
+void specMergeDialog::getMergeCriteria(QList<stringDoublePair>& toCompare, bool& doSpectralAdaptation, bool& sortBeforeMerge) const
 {
 	doSpectralAdaptation = ui->alignment->isChecked() ;
+	sortBeforeMerge = ui->listingOrder->isChecked() ;
 	toCompare = mm->getMergeCriteria() ;
 }
 

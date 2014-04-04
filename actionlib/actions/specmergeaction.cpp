@@ -99,6 +99,10 @@ public:
 	{
 		emit progressValue(0);
 		specProfiler profiler("run merge command thread:") ;
+		// sort the pointers
+		qSort(items.begin(), items.end(), specModel::lessThanItemPointer) ;
+
+		// Lists of items to create actions later on
 		QList<specModelItem*> toBeDeleted ;
 		QList<specModelItem*> newlyInserted ;
 
@@ -106,7 +110,7 @@ public:
 		int total = items.size() ;
 		QStringList comparisons ;
 		foreach(stringDoublePair pair, criteria)
-		comparisons << pair.first ;
+			comparisons << pair.first ;
 		sortItemsByDescriptionFunctor sorter(&comparisons) ;
 		while(!items.isEmpty())
 		{
@@ -116,7 +120,7 @@ public:
 			QList<specModelItem*> chunk ;
 			specFolderItem* const parent = items.first()->parent() ;
 			const int row = parent->childNo(items.first()) ;
-			while(!items.isEmpty() && items.first()->parent() == parent && parent->childNo(items.first()) == row + chunk.size())
+			while(!items.isEmpty() && items.first()->parent() == parent && parent->childNo(items.first()) == row + chunk.size()) // TODO warum muss die Zeile stimmen?
 				chunk << items.takeFirst() ;
 
 			QList<specModelItem*> toInsert ;
@@ -202,15 +206,14 @@ specUndoCommand* specMergeAction::generateUndoCommand()
 {
 	specProfiler profiler("Prepare merge commands:") ;
 	if(selection.size() < 2) return 0 ;
-	qSort(pointers.begin(), pointers.end(), specModel::lessThanItemPointer) ;
 
 	// let user define similarities
 	QList<stringDoublePair > criteria ;
-	bool spectralAdaptation ;
+	bool spectralAdaptation, sortIndexes ;
 	dialog->setDescriptors(model->descriptors(), model->descriptorProperties()) ;
 	if(dialog->exec() != QDialog::Accepted) return 0 ;
-	dialog->getMergeCriteria(criteria, spectralAdaptation);
-	mergeActionThread mat(model, pointers, criteria, spectralAdaptation) ;
+	dialog->getMergeCriteria(criteria, spectralAdaptation, sortIndexes);
+	mergeActionThread mat(model, pointers, criteria, spectralAdaptation, sortIndexes) ;
 	mat.run();
 	return mat.command() ;
 }
