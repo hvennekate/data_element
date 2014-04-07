@@ -94,6 +94,7 @@ void specActionLibrary::push(specUndoCommand* cmd)
 void specActionLibrary::addNewAction(QToolBar* bar, specUndoAction* action)
 {
 	action->setLibrary(this) ;
+	action->setShortcutContext(Qt::WidgetWithChildrenShortcut);
 	bar->addAction(action) ;
 }
 
