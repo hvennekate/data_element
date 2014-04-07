@@ -16,7 +16,8 @@ void specFilterGenerator::setReference(const QMap<double, double> &ref)
 	if (ref.isEmpty())
 		referenceInterval = QwtInterval() ;
 	else
-		referenceInterval.setInterval(ref.begin().key(), ref.end().key());
+		referenceInterval.setInterval(ref.begin().key(),
+					      (ref.end() -1).key());
 	refreshRanges();
 }
 
@@ -83,19 +84,24 @@ double specFilterGenerator::referenceValue(const double &x)
 
 void specFilterGenerator::setRanges(const QwtPlotItemList &newRanges)
 {
-	originalRanges = newRanges ;
+	originalRanges.clear() ;
+	foreach(const QwtPlotItem* item, newRanges)
+	{
+		const QwtInterval* range = dynamic_cast<const QwtInterval*>(item) ;
+		if (range) originalRanges << *range ;
+	}
 	refreshRanges() ;
 }
 
 void specFilterGenerator::refreshRanges()
 {
 	ranges.clear();
-	foreach(QwtPlotItem* range, originalRanges)
+	foreach(const QwtInterval& range, originalRanges)
 	{
 		if (referenceInterval.isValid())
-			ranges << (referenceInterval & *((QwtInterval*) range)) ;
+			ranges << (referenceInterval & range) ;
 		else
-			ranges << *((QwtInterval*) range) ;
+			ranges << range ;
 	}
 }
 
@@ -163,15 +169,15 @@ foreach(const QPointF& p, spectrum) { \
 	{
 		LOOPPOINTS(ACCUMULATE_Y ACCUMULATE_YY ACCUMULATE_YZ ACCUMULATE_Z) ;
 		MATRIX_VECTOR_ASSIGNMENT_TWO(count, y, yy, z, yz) ;
-		if(correction[1] != 1.)
-			offset = correction[0] / (1. - correction[1]) ; // TODO check or disable (this is dangerous!)
+		if(correction[1] != -1.) // Nicht strikt noetig, da dann filter.valid() == false
+			offset = correction[0] / (1. + correction[1]) ;
 	}
 	else if(!CalcOffset && CalcSlope && CalcScale)
 	{
-		LOOPPOINTS(ACCUMULATE_X ACCUMULATE_XY ACCUMULATE_YY ACCUMULATE_XZ ACCUMULATE_YZ)
-		MATRIX_VECTOR_ASSIGNMENT_TWO(x, xy, yy, xz, yz) ;
-		if(correction[1] != 1.)
-			slope = correction[0] / (1. - correction[1]) ; // TODO check or disable (this is dangerous!)
+		LOOPPOINTS(ACCUMULATE_XX ACCUMULATE_XY ACCUMULATE_YY ACCUMULATE_XZ ACCUMULATE_YZ)
+		MATRIX_VECTOR_ASSIGNMENT_TWO(xx, xy, yy, xz, yz) ;
+		if(correction[1] != -1.) // Nicht strikt noetig, da dann filter.valid() == false
+			slope = correction[0] / (1. + correction[1]) ;
 	}
 	else if(CalcOffset && CalcSlope && CalcScale)
 	{

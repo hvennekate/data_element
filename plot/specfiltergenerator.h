@@ -15,8 +15,7 @@ class specFilterGenerator
 {
 private:
 	QMap<double, double> reference ;
-	QVector<QwtInterval> ranges ;
-	QwtPlotItemList originalRanges ;
+	QVector<QwtInterval> ranges, originalRanges ;
 	QwtInterval referenceInterval ;
 	bool CalcOffset, CalcSlope, CalcScale ;
 	void correctionSpectrum(QVector<QPointF>&) ;
