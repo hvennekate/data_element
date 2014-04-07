@@ -8,23 +8,20 @@
 class mergeModel::mergeModelPrivate
 {
 public:
-	struct mergeItem
+	struct mergeItem : specDescriptorComparisonCriterion
 	{
 		bool enabled ;
-		bool numeric ;
-		double tolerance ;
-		QString name ;
+	public:
 		mergeItem()
-			: enabled(false),
-			  numeric(false),
-			  tolerance(0)
+			: specDescriptorComparisonCriterion("", false),
+			  enabled(false)
 		{}
 		mergeItem(const QString& s, bool n)
-			: enabled(false),
-			  numeric(n),
-			  tolerance(0),
-			  name(s)
+			: specDescriptorComparisonCriterion(s, n),
+			  enabled(false)
 		{}
+		bool isEnabled() const { return enabled ; }
+		void enable(bool a = true) { enabled = a ; }
 	};
 
 	QList<mergeItem> items ;
@@ -71,7 +68,7 @@ Qt::ItemFlags mergeModel::flags(const QModelIndex& index) const
 {
 	//	Qt::ItemFlags f = QAbstractTableModel::flags(index) ;
 	if(index.column() == 0) return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled;
-	if(index.column() == 1 && d->items[index.row()].numeric)
+	if(index.column() == 1 && d->items[index.row()].isNumeric())
 		return Qt::ItemIsEditable | Qt::ItemIsEnabled ;
 	return Qt::NoItemFlags ;
 	//	return f ;
@@ -80,16 +77,16 @@ Qt::ItemFlags mergeModel::flags(const QModelIndex& index) const
 QVariant mergeModel::data(const QModelIndex& index, int role) const
 {
 	if(role == Qt::CheckStateRole && index.column() == 0)
-		return d->items[index.row()].enabled ? Qt::Checked : Qt::Unchecked ;
+		return d->items[index.row()].isEnabled() ? Qt::Checked : Qt::Unchecked ;
 	if(role != Qt::DisplayRole)
 		return QVariant() ;
 	mergeModelPrivate::mergeItem item = d->items[index.row()] ;
 	switch(index.column())
 	{
 		case 0:
-			return item.name ;
+			return item.descriptor();
 		case 1:
-			return item.numeric ? QVariant(item.tolerance) : QVariant() ;
+			return item.isNumeric() ? QVariant(item.tolerance()) : QVariant() ;
 		default:
 			return QVariant() ;
 	}
@@ -99,62 +96,53 @@ bool mergeModel::setData(const QModelIndex& index, const QVariant& value, int ro
 {
 	if(index.column() == 0 && Qt::CheckStateRole == role)
 	{
-		d->items[index.row()].enabled = value.toBool() ;
+		d->items[index.row()].enable(value.toBool()) ;
 		emit dataChanged(index, index) ;
 		return true ;
 	}
 	if(index.column() == 1 && Qt::EditRole == role)
 	{
-		d->items[index.row()].tolerance = value.toDouble() ;
+		d->items[index.row()].setTolerance(value.toDouble()) ;
 		emit dataChanged(index, index) ;
 		return true ;
 	}
 	return false ;
 }
 
-QList<stringDoublePair> mergeModel::getMergeCriteria() const
+specDescriptorComparisonCriterion::container mergeModel::getMergeCriteria() const
 {
-	QList<stringDoublePair> result ;
+	specDescriptorComparisonCriterion::container result ;
 	foreach(mergeModelPrivate::mergeItem item, d->items)
-	if(item.enabled)
-		result << stringDoublePair(item.name, item.tolerance) ;
+		if(item.isEnabled())
+			result << item ;
 	return result ;
 }
 
 void mergeModel::setDescriptors(const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties)
 {
 	beginResetModel();
-	// Determine who's who...
-	QStringList oldDesc ;
-	foreach(const mergeModelPrivate::mergeItem & item, d->items)
-	oldDesc << item.name ;
-	QSet<QString> oldSet(oldDesc.toSet()), newSet(descriptors.toSet()) ;
-	QSet<QString> newDescs(newSet - oldSet),
-	     removedDescs(oldSet - newSet) ;
-	// add
-	foreach(const QString & s, newSet - oldSet)
+
+	// create new list
+	QList<mergeModelPrivate::mergeItem> newItems ;
+	for (int i = 0 ; i < qMin(descriptors.size(), descriptorProperties.size()) ; ++i)
 	{
-		d->items << mergeModelPrivate::mergeItem(s, descriptorProperties[descriptors.indexOf(s)] & spec::numeric) ;
-		oldDesc << s;
+		const QString& descriptor = descriptors[i] ;
+		bool isNumeric = descriptorProperties[i] & spec::numeric ;
+		// check if an old one is still around...
+		foreach(mergeModelPrivate::mergeItem item, d->items)
+		{
+			if (item.descriptor() == descriptor)
+			{
+				item.setNumeric(isNumeric);
+				newItems << item ;
+				break ;
+			}
+		}
+		// else add a new one
+		if (newItems.size() == i)
+			newItems << mergeModelPrivate::mergeItem(descriptor, isNumeric) ;
 	}
-	// remove
-	foreach(const QString & s, oldSet - newSet)
-	{
-		int i = oldDesc.indexOf(s) ;
-		d->items.removeAt(i) ;
-		oldDesc.removeAt(i);
-	}
-	// set attributes
-	foreach(const QString & s, oldSet & newSet)
-	d->items[oldDesc.indexOf(s)].numeric = descriptorProperties[descriptors.indexOf(s)] & spec::numeric ;
-	// rearrange
-	foreach(const QString & s, descriptors)
-	{
-		int oldIndex = oldDesc.indexOf(s),
-		    newIndex = descriptors.indexOf(s) ;
-		qSwap(d->items[oldIndex], d->items[newIndex]) ;
-		qSwap(oldDesc[oldIndex], oldDesc[newIndex]) ;
-	}
+	d->items.swap(newItems) ;
 	endResetModel();
 }
 
@@ -212,10 +200,15 @@ void specMergeDialog::setDescriptors(const QStringList& descriptors, const QList
 	ui->criteria->setFixedWidth(ui->criteria->sizeHint().width() + 15);  // TODO bad!
 }
 
-void specMergeDialog::getMergeCriteria(QList<stringDoublePair>& toCompare, bool& doSpectralAdaptation, bool& sortBeforeMerge) const
+void specMergeDialog::getMergeCriteria(specDescriptorComparisonCriterion::container& toCompare, spec::correctionMode& spectralAdaptation) const
 {
-	doSpectralAdaptation = ui->alignment->isChecked() ;
-	sortBeforeMerge = ui->listingOrder->isChecked() ;
+	spectralAdaptation = spec::noCorrection ;
+	if (ui->useOffset->isChecked())
+	{
+		spectralAdaptation = spec::offset ;
+		if (ui->useSlope->isChecked())
+			spectralAdaptation = spec::offsetAndSlope ;
+	}
 	toCompare = mm->getMergeCriteria() ;
 }
 

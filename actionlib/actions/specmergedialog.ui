@@ -6,9 +6,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>325</width>
-    <height>324</height>
+    <width>298</width>
+    <height>327</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
   </property>
   <property name="windowTitle">
    <string>Merge</string>
@@ -24,7 +30,7 @@
    <item>
     <widget class="QTableView" name="criteria">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -41,32 +47,21 @@
     </widget>
    </item>
    <item>
-    <widget class="QCheckBox" name="alignment">
+    <widget class="QCheckBox" name="useOffset">
      <property name="text">
       <string>Align items before merging</string>
      </property>
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QRadioButton" name="listingOrder">
-       <property name="text">
-        <string>Merge order from list</string>
-       </property>
-       <property name="checked">
-        <bool>true</bool>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QRadioButton" name="selectionOrder">
-       <property name="text">
-        <string>Merge order from selection</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+    <widget class="QCheckBox" name="useSlope">
+     <property name="enabled">
+      <bool>false</bool>
+     </property>
+     <property name="text">
+      <string>Use offset and slope for alignment</string>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QDialogButtonBox" name="buttonBox">
@@ -89,8 +84,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>248</x>
-     <y>254</y>
+     <x>252</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
      <x>157</x>
@@ -105,12 +100,28 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>316</x>
-     <y>260</y>
+     <x>293</x>
+     <y>322</y>
     </hint>
     <hint type="destinationlabel">
      <x>286</x>
      <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>useOffset</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>useSlope</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>66</x>
+     <y>261</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>71</x>
+     <y>278</y>
     </hint>
    </hints>
   </connection>

@@ -25,6 +25,7 @@ namespace spec
 	enum itemRoles { descriptorPropertyRole = 34 } ;
 
 	enum rtti {canvasItem = 1001, spectrum = 1010, zeroRange = 1020, metaItem = 1030, kineticRange = 1040, SVGItem = 1050, metaRange = 1060 } ;
+	enum correctionMode { noCorrection = -1, offset = 0, offsetAndSlope = 1 } ;
 }
 
 typedef QList<specModelItem*> (* specFileImportFunction)(QFile&)  ;

@@ -5,6 +5,7 @@
 #include <QAbstractTableModel>
 #include <QItemDelegate>
 #include "names.h"
+#include "specdescriptorcomparisoncriterion.h"
 
 namespace Ui
 {
@@ -22,7 +23,7 @@ public:
 	mergeModel(QObject* parent = 0) ;
 	~mergeModel() ;
 	void setDescriptors(const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties) ;
-	QList<stringDoublePair> getMergeCriteria() const ;
+	specDescriptorComparisonCriterion::container getMergeCriteria() const ;
 
 	int rowCount(const QModelIndex& parent) const ;
 	int columnCount(const QModelIndex& parent) const ;
@@ -40,7 +41,7 @@ public:
 	explicit specMergeDialog(QWidget* parent = 0);
 	~specMergeDialog();
 	void setDescriptors(const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties) ;
-	void getMergeCriteria(QList<stringDoublePair>& toCompare, bool& doSpectralAdaptation, bool &sortBeforeMerge) const ;
+	void getMergeCriteria(specDescriptorComparisonCriterion::container &toCompare, spec::correctionMode &spectralAdaptation) const ;
 
 private:
 	Ui::specMergeDialog* ui;
