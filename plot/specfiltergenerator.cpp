@@ -56,7 +56,7 @@ bool specFilterGenerator::isContainedInRanges(const double &x) const
 
 void specFilterGenerator::correctionSpectrum(QVector<QPointF> &spectrum)
 {
-	if (reference.empty()) return ;
+	if (reference.empty() && ranges.empty()) return ;
 	QVector<QPointF> newSpec ;
 	foreach(const QPointF& p, spectrum)
 		if (isContainedInRanges(p.x()))
