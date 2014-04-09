@@ -1,7 +1,7 @@
 #include "specflattentreeaction.h"
 #include "specmulticommand.h"
 #include "specmovecommand.h"
-#include "specdeletecommand.h"
+#include "specdeleteaction.h"
 
 specFlattenTreeAction::specFlattenTreeAction(QObject* parent) :
 	specRequiresItemAction(parent)
@@ -40,8 +40,7 @@ specUndoCommand* specFlattenTreeAction::generateUndoCommand()
 		moveCommand->redo();
 	}
 
-	specDeleteCommand* deleteCommand = new specDeleteCommand(command) ;
-	deleteCommand->setItems(foldersToFlatten) ;
+	specUndoCommand* deleteCommand = specDeleteAction::command(model, foldersToFlatten, command) ;
 	deleteCommand->redo();
 	command->undo();
 

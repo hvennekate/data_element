@@ -1,5 +1,5 @@
 #include "specmergeaction.h"
-#include "specdeletecommand.h"
+#include "specdeleteaction.h"
 #include "specaddfoldercommand.h"
 #include "specmulticommand.h"
 #include "specspectrumplot.h"
@@ -197,10 +197,9 @@ specUndoCommand* specMergeAction::generateUndoCommand()
 
 	// Create actual worker commands
 	specAddFolderCommand* insertionCommand = new specAddFolderCommand(Command) ;
-	specDeleteCommand* deletionCommand = new specDeleteCommand(Command) ;
 	Command->setParentObject(model) ;
 	insertionCommand->setItems(toInsert) ;
-	deletionCommand->setItems(toDelete) ;
+	specDeleteAction::command(model, toDelete, Command) ;
 
 	return Command ;
 }

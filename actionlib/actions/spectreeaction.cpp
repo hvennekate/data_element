@@ -2,7 +2,7 @@
 #include "specmulticommand.h"
 #include "specaddfoldercommand.h"
 #include "specmovecommand.h"
-#include "specdeletecommand.h"
+#include "specdeleteaction.h"
 #include "specworkerthread.h"
 
 class treeActionThread : public specWorkerThread
@@ -126,9 +126,7 @@ public:
 		}
 
 		// delete superfluous folders:  TODO: connections???
-		specDeleteCommand* deleteOldFolders = new specDeleteCommand(Command) ;
-		deleteOldFolders->setParentObject(model) ;
-		deleteOldFolders->setItems(toBeDeletedFolders) ;
+		specDeleteAction::command(model, toBeDeletedFolders, Command) ;
 		if(cleanUp()) return ;
 		emit progressValue(100);
 	}
