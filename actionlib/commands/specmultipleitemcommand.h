@@ -8,6 +8,8 @@ class specMultipleItemCommand : public specUndoCommand
 {
 private:
 	QVector<specGenealogy> items ;
+	QMap<specGenealogy, QVector<QPair<int, int> > > clients ; // first: old index in client's server list, second: index in all items
+	QMap<int, QVector<QPair<specGenealogy, bool> > > servers ; // bool: is meta?
 	void writeCommand(QDataStream& out) const ;
 	void readCommand(QDataStream& in);
 protected:
@@ -19,6 +21,7 @@ protected:
 	qint32 itemCount() const ;
 	QSet<specFolderItem*> parents() const;
 	QList<specModelItem*> itemPointers() ;
+	QList<specModelItem*> recursiveItemPointers() ;
 	void addItems(QList<specModelItem*>&) ;
 	void clearItems() ;
 	QList<specModelItem*> firstItems() ;

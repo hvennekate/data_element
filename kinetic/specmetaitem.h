@@ -30,8 +30,9 @@ public:
 	void refreshOtherPlots() ;
 	void setModels(specModel* meta, specModel* data) ;
 	bool disconnectServer(specModelItem*) ;
-	bool connectServer(specModelItem*) ;
+	bool connectServer(specModelItem*, int index = -1) ;
 	QList<specModelItem*> serverList() const { return items ; }
+	int serverIndex(specModelItem* item) const { return items.indexOf(item) ;}
 	bool isServedBy(specModelItem* item) const { return items.contains(item) ;}
 	explicit specMetaItem(specFolderItem* par = 0, QString description = "");
 	~specMetaItem() ;

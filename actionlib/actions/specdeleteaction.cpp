@@ -21,45 +21,11 @@ specDeleteAction::specDeleteAction(QObject* parent) :
 
 specUndoCommand* specDeleteAction::command(specModel* model, QList<specModelItem*>& selection, specUndoCommand* parentsParent)
 {
-	specMultiCommand* parentCommand = 0 ;
-	QString descriptionText = tr("Delete ") + QString::number(selection.size()) + tr(" items.") ;
-	if(!qobject_cast<specLogModel*> (model))
-	{
-		parentCommand = new specMultiCommand(parentsParent) ;
-		parentCommand->setParentObject(model) ;
-		parentCommand->setText(descriptionText) ;
-		parentCommand->setMergeable(false) ;
-
-		// collect all indexes and remove connections
-
-		selection = specModel::expandFolders(selection, true) ;
-
-		QMap<specMetaItem*, QList<specModelItem*> > toDisconnect ;
-		foreach(specModelItem * item, selection)
-		{
-			specMetaItem* metaItem = dynamic_cast<specMetaItem*>(item) ;
-			if(metaItem)
-				toDisconnect[metaItem] << metaItem->serverList() ;
-			foreach(specMetaItem * metaItem, item->clientList())
-			toDisconnect[metaItem] << item ;
-		}
-
-		foreach(specMetaItem * metaItem, toDisconnect.keys())
-		(new specDeleteConnectionsCommand(parentCommand))->
-		setItems(metaItem, toDisconnect[metaItem]) ;
-	}
-
-	specDeleteCommand* command = new specDeleteCommand(parentCommand) ;
+	specDeleteCommand* command = new specDeleteCommand(parentsParent) ;
 	command->setParentObject(model);
 	command->setItems(selection) ;
-
-	if(!parentCommand)
-	{
-		command->setText(descriptionText) ;
-		return command ;
-	}
-
-	return parentCommand ;
+	command->setText(tr("Delete ") + QString::number(selection.size()) + tr(" items.")) ;
+	return command ;
 }
 
 specUndoCommand* specDeleteAction::generateUndoCommand()

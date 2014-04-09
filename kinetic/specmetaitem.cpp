@@ -169,7 +169,7 @@ bool specMetaItem::disconnectServer(specModelItem* server)  // TODO template ? -
 	return true ;
 }
 
-bool specMetaItem::connectServer(specModelItem* server)
+bool specMetaItem::connectServer(specModelItem* server, int index)
 {
 	if(currentlyConnectingServer == server)
 		return true ;
@@ -184,7 +184,9 @@ bool specMetaItem::connectServer(specModelItem* server)
 		return false ;
 	}
 	currentlyConnectingServer = 0 ;
-	items << server ;
+	if (index > 0 && index < items.size())
+		items.insert(index, server) ;
+	else items << server ;
 	invalidate() ;
 	return true ;
 }
