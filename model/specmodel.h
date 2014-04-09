@@ -56,6 +56,7 @@ public:
 	static QVector<int> hierarchy(specModelItem*) ;
 	static QVector<int> hierarchy(const QModelIndex&) ;
 	static bool lessThanItemPointer(specModelItem*, specModelItem*) ;
+	static bool lessThanHierarchies(const QVector<int>& a, const QVector<int>& b) ;
 	static bool lessThanIndex(const QModelIndex&, const QModelIndex&) ;
 	QList<specModelItem*> pointerList(const QModelIndexList&) const ;
 	QModelIndexList indexList(const QList<specModelItem*>&) const ;

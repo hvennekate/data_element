@@ -40,8 +40,9 @@ public:
 	specModelItem* firstItem() const ;
 	QModelIndex firstIndex() ;
 
-	bool operator== (const specGenealogy& other) ;
-	bool operator!= (const specGenealogy& other) ;
+	bool operator== (const specGenealogy& other) const ;
+	bool operator<  (const specGenealogy& other) const ;
+	bool operator!= (const specGenealogy& other) const ;
 	specGenealogy& operator= (specGenealogy& other) ;
 	specGenealogy& operator= (const specGenealogy& other) ;
 };

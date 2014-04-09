@@ -181,7 +181,7 @@ QModelIndex specGenealogy::firstIndex()
 	return model()->index(firstItem()) ;
 }
 
-bool specGenealogy::operator == (const specGenealogy& other)
+bool specGenealogy::operator == (const specGenealogy& other) const
 {
 	bool returnValue = true ;
 	if(other.Items.size() != Items.size()) return false ;
@@ -190,7 +190,12 @@ bool specGenealogy::operator == (const specGenealogy& other)
 	return returnValue ;
 }
 
-bool specGenealogy::operator != (const specGenealogy& other)
+bool specGenealogy::operator < (const specGenealogy& other) const
+{
+	return specModel::lessThanHierarchies(indexes, other.indexes) ;
+}
+
+bool specGenealogy::operator != (const specGenealogy& other) const
 {
 	return !(*this == other) ;
 }
