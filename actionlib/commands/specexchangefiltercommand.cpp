@@ -112,7 +112,7 @@ void specExchangeFilterCommand::generateDescription()
 	else
 	{
 		if(absoluteFilters.size() == 1)
-			setText(QObject::tr("Exchange filter.") + absoluteFilters.first().description()) ;
+			setText(QObject::tr("Exchange filter. ") + absoluteFilters.first().description()) ;
 		else
 			setText(QObject::tr("Exchange ") + QString::number(absoluteFilters.size()) + QObject::tr(" filters.")) ;
 	}
