@@ -419,7 +419,7 @@ QPair<QString, QString> interpretString(QString& string)
 		return QPair<QString, QString> ("Erfolg", success ? "Ja" : "Nein") ;
 	}
 	QString descriptor = string.mid(0, string.indexOf(": ")), content ;
-	string.remove(0, string.indexOf(QRegExp("[^:\\s]"), descriptor.size())) ;
+	string.remove(0, qMax(string.indexOf(QRegExp("[^:\\s]"), descriptor.size()), descriptor.size())) ;
 	if(string.left(1) == "\"")
 	{
 		content = string.mid(0, string.remove(0, 1).indexOf("\"")) ;
@@ -477,7 +477,7 @@ QList<specModelItem*> readLogFile(QFile& file)  // TODO revise when logentry cla
 			QMessageBox::critical(0, QObject::tr("Not a log file"),
 					      QObject::tr("File ") +
 					      file.fileName() +
-					      QObject::tr(" does not conform with the log file format (not date and time at beginning of a line at position ") +
+					      QObject::tr(" does not conform with the log file format (no date and time at beginning of a line at position ") +
 					      QString::number(in.pos()) +
 					      QObject::tr("). Offending line:\n")
 					      + firstLine) ;
