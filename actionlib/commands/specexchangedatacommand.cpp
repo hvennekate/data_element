@@ -2,14 +2,22 @@
 #include "qwt_plot.h"
 
 specExchangeDataCommand::specExchangeDataCommand(specUndoCommand* parent)
-	: specSingleItemCommand(parent)
+    : specSingleItemCommand
+#ifdef WIN32BUILD
+	      <specDataItem>
+#endif
+      (parent)
 {
 }
 
 void specExchangeDataCommand::setItem(specModelItem* p, const QVector<specDataPoint>& newData)
 {
 	data = newData ;
-	specSingleItemCommand::setItem(p) ;
+	specSingleItemCommand
+#ifdef WIN32BUILD
+		<specDataItem>
+#endif
+		::setItem(p) ;
 }
 
 void specExchangeDataCommand::undoIt()

@@ -2,7 +2,11 @@
 #include "specmetaitem.h"
 
 specMetaRangeCommand::specMetaRangeCommand(specUndoCommand* parent)
-	: specSingleItemCommand(parent)
+	: specSingleItemCommand
+#ifdef WIN32BUILD
+	  <specMetaItem>
+#endif
+	  (parent)
 {
 }
 
@@ -38,7 +42,11 @@ bool specMetaRangeCommand::mergeWith(const QUndoCommand* ot)
 
 void specMetaRangeCommand::setItem(specMetaItem* i, int variableIndex, int rangeIndex, int point, double nX, double nY)
 {
-	specSingleItemCommand::setItem(i) ;
+	specSingleItemCommand
+#ifdef WIN32BUILD
+		<specMetaItem>
+#endif
+		::setItem(i) ;
 	pointNo = point ;
 	variableNo = variableIndex ;
 	rangeNo = rangeIndex ;

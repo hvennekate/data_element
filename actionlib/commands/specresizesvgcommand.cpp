@@ -4,14 +4,22 @@
 #include "qwt_plot.h"
 
 specResizeSVGcommand::specResizeSVGcommand(specUndoCommand* parent)
-	: specSingleItemCommand(parent),
+	: specSingleItemCommand
+#ifdef WIN32BUILD
+		<specSVGItem>
+#endif
+	  (parent),
 	  anchor(specSVGItem::undefined)
 {
 }
 
 void specResizeSVGcommand::setItem(specModelItem* item, const specSVGItem::bounds& bounds, specSVGItem::SVGCornerPoint a)
 {
-	specSingleItemCommand::setItem(item) ;
+	specSingleItemCommand
+#ifdef WIN32BUILD
+		<specSVGItem>
+#endif
+		::setItem(item) ;
 	other = bounds ;
 	anchor = a ;
 	doIt() ;

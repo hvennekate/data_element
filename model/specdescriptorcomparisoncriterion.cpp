@@ -32,7 +32,7 @@ void specDescriptorComparisonCriterion::setDescriptor(const QString &s)
 
 bool specDescriptorComparisonCriterion::isNumeric() const
 {
-	return !isnan(toleranceValue) ;
+	return !std::isnan(toleranceValue) ;
 }
 
 void specDescriptorComparisonCriterion::setNumeric(bool a)
@@ -63,7 +63,7 @@ bool specDescriptorComparisonCriterion::itemsEqual(const specModelItem *first, c
 		       b = second->descriptorValue(descriptorName) ;
 		if(b - toleranceValue <= a && a <= b + toleranceValue)
 			return true ;
-		if (isnan(a) && isnan(b)) return true ; // TODO check if both have this descriptor
+		if (std::isnan(a) && std::isnan(b)) return true ; // TODO check if both have this descriptor
 		return false ;
 	}
 

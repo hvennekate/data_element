@@ -121,5 +121,6 @@ int main(int argc, char* argv[])
 		mainWindow->show();
 		return app.exec();
 	}
+	return 0 ;
 }
 

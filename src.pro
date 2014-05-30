@@ -305,15 +305,21 @@ LIBS += -L/home/hendrik/Programme/qwt-6.1.0/lib \
 }
 win32 {
 INCLUDEPATH += . \
-    C:/builds/Qwt-6.0.1/qwt \
-    C:/builds/muparser_v2_2_2/include
-LIBS += -LC:/builds/Qwt-6.0.1/lib \
+    C:/qwt/src \
+    C:/muparser/include \
+    C:/gsl/include \
+    C:/bzip2
+LIBS += -LC:/qwt/lib \
     -lqwt \
-    C:/builds/muparser_v2_2_2/lib/libmuparser.a
+    C:/muparser/lib/libmuparser.a \
+    C:/gsl/lib/libgslcblas.a \
+    C:/gsl/lib/libgsl.a \
+    -LC:/bzip2/release \
+    -lbzip2
 DEFINES += WIN32BUILD \
     QT_DLL \
     QWT_DLL
-DEPENDPATH += C:/Users/Hendrik/Downloads/muparser_v2_2_2/lib
+#DEPENDPATH += C:/Users/Hendrik/Downloads/muparser_v2_2_2/lib
 RESOURCES += oxygen.qrc
 }
 CONFIG += qwt

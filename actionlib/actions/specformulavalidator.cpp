@@ -23,7 +23,7 @@ void specFormulaValidator::fixup(QString& s) const
 	if(num > 0) s.append(QString(num, ')')) ;
 }
 
-double modulo(double a, double b)
+double mumodulo(double a, double b)
 {
 	return int (a) % int (b) ;
 }
@@ -43,7 +43,7 @@ QValidator::State specFormulaValidator::validate(QString& expr, int& pos) const
 
 	// parser setup test
 	mu::Parser parser ;
-	parser.DefineOprt("%", modulo, 6);  // TODO dies ist nicht die feine englische Art!  Subclass mu::Parser and add operator(s) in custom constructor!
+	parser.DefineOprt("%", mumodulo, 6);  // TODO dies ist nicht die feine englische Art!  Subclass mu::Parser and add operator(s) in custom constructor!
 	std::map<mu::string_type, mu::value_type*> usedVariables ;
 	try
 	{

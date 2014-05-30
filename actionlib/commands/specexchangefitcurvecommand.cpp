@@ -2,7 +2,11 @@
 #include "specfitcurve.h"
 
 specExchangeFitCurveCommand::specExchangeFitCurveCommand(specUndoCommand* parent)
-	: specSingleItemCommand(parent),
+    : specSingleItemCommand
+#ifdef WIN32BUILD
+      <specMetaItem>
+#endif
+      (parent),
 	  curve(0)
 {
 }

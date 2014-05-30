@@ -3,12 +3,14 @@
 	<file alias="index.theme">icons/oxygen/index.theme</file>
 
 	<file alias="16x16/document-revert.png">icons/oxygen/document-revert.png</file>
+	<file alias="16x16/folder.png">icons/oxygen/folder.png</file>
+	<file alias="16x16/list-add.png">icons/oxygen/list-add.png</file>
 	<file alias="16x16/document-new.png">icons/oxygen/document-new.png</file>
 	<file alias="16x16/edit-copy.png">icons/oxygen/edit-copy.png</file>
 	<file alias="16x16/edit-undo.png">icons/oxygen/edit-undo.png</file>
 	<file alias="16x16/edit-delete.png">icons/oxygen/edit-delete.png</file>
 	<file alias="16x16/document-open.png">icons/oxygen/document-open.png</file>
-	<file alias="16x16/document-properties.png">icons/oxygen/document-properties.png</file>
+	<file alias="16x16/help-contextual.png">icons/oxygen/help-contextual.png</file>
 	<file alias="16x16/document-print.png">icons/oxygen/document-print.png</file>
 	<file alias="16x16/dialog-warning.png">icons/oxygen/dialog-warning.png</file>
 	<file alias="16x16/go-down.png">icons/oxygen/go-down.png</file>
@@ -18,13 +20,18 @@
 	<file alias="16x16/insert-image.png">icons/oxygen/insert-image.png</file>
 	<file alias="16x16/document-save.png">icons/oxygen/document-save.png</file>
 	<file alias="16x16/edit-cut.png">icons/oxygen/edit-cut.png</file>
+	<file alias="16x16/archive-insert.png">icons/oxygen/archive-insert.png</file>
 	<file alias="16x16/format-text-italic.png">icons/oxygen/format-text-italic.png</file>
+	<file alias="16x16/input-keyboard.png">icons/oxygen/input-keyboard.png</file>
 	<file alias="16x16/format-text-bold.png">icons/oxygen/format-text-bold.png</file>
 	<file alias="16x16/user-trash.png">icons/oxygen/user-trash.png</file>
-	<file alias="16x16/help-contextual.png">icons/oxygen/help-contextual.png</file>
+	<file alias="16x16/document-properties.png">icons/oxygen/document-properties.png</file>
 	<file alias="16x16/folder-new.png">icons/oxygen/folder-new.png</file>
 	<file alias="16x16/edit-paste.png">icons/oxygen/edit-paste.png</file>
+	<file alias="16x16/view-list-tree.png">icons/oxygen/view-list-tree.png</file>
 	<file alias="16x16/document-save-as.png">icons/oxygen/document-save-as.png</file>
+	<file alias="16x16/list-remove.png">icons/oxygen/list-remove.png</file>
+	<file alias="16x16/view-history.png">icons/oxygen/view-history.png</file>
 	<file alias="16x16/edit-redo.png">icons/oxygen/edit-redo.png</file>
 </qresource>
 </RCC>

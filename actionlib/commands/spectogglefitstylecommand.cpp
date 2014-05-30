@@ -1,7 +1,11 @@
 #include "spectogglefitstylecommand.h"
 
 specToggleFitStyleCommand::specToggleFitStyleCommand(specUndoCommand* parent)
-	: specSingleItemCommand(parent)
+    : specSingleItemCommand
+#ifdef WIN32BUILD
+	      <specMetaItem>
+#endif
+		(parent)
 {
 }
 

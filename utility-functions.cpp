@@ -593,8 +593,8 @@ QVector<double> gaussjinv(QVector<QVector<double> >& A, QVector<double>& b)
 	QVector<QVector<double>::size_type> indxc ;
 	for(QVector<QVector<double> >::size_type i = 0 ; i < A.size() ; i++)
 	{
-		QVector<QVector<double> >::size_type irow ;
-		QVector<double>::size_type icol ;
+		QVector<QVector<double> >::size_type irow = 0;
+		QVector<double>::size_type icol = 0 ;
 		double max = 0 ;
 		for(QVector<QVector<double> >::size_type j = 0 ; j < A.size() ; j++)
 		{

@@ -2,7 +2,11 @@
 #include <QQueue>
 
 specEditDescriptorCommand::specEditDescriptorCommand(specUndoCommand* parent)
-	: specSingleItemCommand(parent)
+	: specSingleItemCommand
+#ifdef WIN32BUILD
+	  <specModelItem>
+#endif
+	  (parent)
 {
 }
 
@@ -14,7 +18,11 @@ void specEditDescriptorCommand::setItem(specModelItem* i, QString desc,
 	previousContent << newContent ;
 	previousActiveLine << activeLine ;
 	if(!i) return ;
-	specSingleItemCommand::setItem(i) ;
+	specSingleItemCommand
+#ifdef WIN32BUILD
+			<specModelItem>
+#endif
+			::setItem(i) ;
 	descriptor = desc ;
 	generateDescription();
 }
