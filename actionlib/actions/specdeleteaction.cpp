@@ -49,7 +49,7 @@ specUndoCommand* specDeleteAction::command(specModel* model, QList<specModelItem
 		setItems(metaItem, toDisconnect[metaItem]) ;
 	}
 
-	specDeleteCommand* command = new specDeleteCommand(parentCommand) ;
+	specDeleteCommand* command = new specDeleteCommand(parentCommand ? parentCommand : parentsParent) ;
 	command->setParentObject(model);
 	command->setItems(selection) ;
 

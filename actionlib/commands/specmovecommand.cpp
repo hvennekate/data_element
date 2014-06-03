@@ -42,7 +42,7 @@ void specMoveCommand::moveUnit::moveIt()
 	specFolderItem* oldParent = items.first()->parent() ;
 	int oldRow = oldParent->childNo(items.first()) ;
 	foreach(specModelItem * item, items)
-	item->setParent(0);
+		item->setParent(0);
 	parent->addChildren(items.toList(), row) ;
 	row = oldRow ;
 	parent = oldParent ;

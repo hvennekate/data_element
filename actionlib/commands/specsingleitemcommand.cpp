@@ -5,7 +5,7 @@
 
 template <class itemType>
 specSingleItemCommand<itemType>::specSingleItemCommand(specUndoCommand* parent)
-	: specUndoCommand(parent)
+    : specUndoCommand(parent)
 {
 }
 
