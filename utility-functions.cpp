@@ -181,9 +181,9 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 			// interpret and discard if not equal
 			if(posSQZdigits.exactMatch(firstChar))
 				yInput.prepend(firstChar == "@" ? "+0" :
-					       QString("%1").arg(firstChar.data()->toAscii() - 'A' + 1)) ;
+					       QString("%1").arg(firstChar.data()->toLatin1() - 'A' + 1)) ;
 			else if(negSQZdigits.exactMatch(firstChar))
-				yInput.prepend(QString("-%1").arg(firstChar.data()->toAscii() - 'a' + 1)) ;
+				yInput.prepend(QString("-%1").arg(firstChar.data()->toLatin1() - 'a' + 1)) ;
 			else
 				yInput.prepend(firstChar) ;
 
@@ -217,32 +217,32 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 			if(posSQZdigits.exactMatch(firstChar))
 			{
 				yInput.prepend(firstChar == "@" ? "+0" :
-					       QString("%1").arg(firstChar.data()->toAscii() - 'A' + 1)) ;
+					       QString("%1").arg(firstChar.data()->toLatin1() - 'A' + 1)) ;
 				yvals << yInput.toDouble() *yfactor ;
 				wasDiff = false ;
 			}
 			else if(negSQZdigits.exactMatch(firstChar))
 			{
-				yInput.prepend(QString("-%1").arg(firstChar.data()->toAscii() - 'a' + 1)) ;
+				yInput.prepend(QString("-%1").arg(firstChar.data()->toLatin1() - 'a' + 1)) ;
 				yvals << yInput.toDouble() *yfactor ;
 				wasDiff = false ;
 			}
 			else if(posDIFdigits.exactMatch(firstChar))
 			{
 				yInput.prepend(firstChar == "%" ? "+0" :
-					       QString("%1").arg(firstChar.data()->toAscii() - 'I')) ;
+					       QString("%1").arg(firstChar.data()->toLatin1() - 'I')) ;
 				yvals << yInput.toDouble() *yfactor + (yvals.isEmpty() ? NAN : yvals.last()) ;
 				wasDiff = true ;
 			}
 			else if(negDIFdigits.exactMatch(firstChar))
 			{
-				yInput.prepend(QString("-%1").arg(firstChar.data()->toAscii() - 'i')) ;
+				yInput.prepend(QString("-%1").arg(firstChar.data()->toLatin1() - 'i')) ;
 				yvals << yInput.toDouble() *yfactor + (yvals.isEmpty() ? NAN : yvals.last()) ;
 				wasDiff = true ;
 			}
 			else if(posDUPdigits.exactMatch(firstChar))
 			{
-				yInput.prepend(firstChar == QString('s') ? "9" : QString("%1").arg(firstChar.data()->toAscii() - 'R')) ;
+				yInput.prepend(firstChar == QString('s') ? "9" : QString("%1").arg(firstChar.data()->toLatin1() - 'R')) ;
 				int count = yInput.toInt() - 1 ;
 				if(wasDiff)
 				{

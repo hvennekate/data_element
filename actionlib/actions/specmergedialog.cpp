@@ -194,9 +194,9 @@ specMergeDialog::specMergeDialog(QWidget* parent) :
 void specMergeDialog::setDescriptors(const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties)
 {
 	mm->setDescriptors(descriptors, descriptorProperties);
-	ui->criteria->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
+	ui->criteria->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 	ui->criteria->resizeColumnsToContents();
-	ui->criteria->horizontalHeader()->setResizeMode(QHeaderView::Fixed);
+	ui->criteria->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
 	ui->criteria->setFixedWidth(ui->criteria->sizeHint().width() + 15);  // TODO bad!
 }
 

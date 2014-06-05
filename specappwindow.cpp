@@ -2,6 +2,13 @@
 #include <QFile>
 #include "specshortcutdialog.h"
 #include "names.h"
+#include <QAction>
+#include <QFileDialog>
+#include <QWhatsThis>
+#include <QToolBar>
+#include <QMenuBar>
+#include <QMenu>
+#include <QMessageBox>
 
 specAppWindow::specAppWindow()
 	: QMainWindow(),

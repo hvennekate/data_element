@@ -3,6 +3,7 @@
 #include "specappwindow.h"
 #include "specplotwidget.h"
 #include <QSettings>
+#include <QMessageBox>
 
 #define SETTINGSPREFIX "shortcuts"
 shortcutModel::actionItem::actionItem(const QAction & a)
@@ -40,7 +41,7 @@ QStringList shortcutModel::actionItem::shortCutList() const
 {
 	QStringList result ;
 	foreach (const QKeySequence shortcut, shortCuts)
-		result << shortcut ;
+		result << shortcut.toString() ;
 	return result ;
 }
 
