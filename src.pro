@@ -304,18 +304,17 @@ LIBS += -L/home/hendrik/Programme/qwt/lib \
 	-lgslcblas
 }
 win32 {
+WININCLUDES = /home/hendrik/Programme/windows/mxe/usr/i686-pc-mingw32
+WINLIBS = $$WININCLUDES/lib
 INCLUDEPATH += . \
-    C:/qwt/src \
-    C:/muparser/include \
-    C:/gsl/include \
-    C:/bzip2
-LIBS += -LC:/qwt/lib \
-    -lqwt \
-    C:/muparser/lib/libmuparser.a \
-    C:/gsl/lib/libgslcblas.a \
-    C:/gsl/lib/libgsl.a \
-    -LC:/bzip2/release \
-    -lbzip2
+    $$WININCLUDES/qt5/include \
+    $$WININCLUDES/include \
+    $$WININCLUDES/include/gsl
+LIBS += $$WININCLUDES/qt5/lib/libqwt.a \
+    $$WINLIBS/libmuparser.a \
+    $$WINLIBS/libgslcblas.a \
+    $$WINLIBS/libgsl.a \
+    /home/hendrik/.wine/drive_c/bzip2/release/libbzip2.a
 DEFINES += WIN32BUILD \
     QT_DLL \
     QWT_DLL
