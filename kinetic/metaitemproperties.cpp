@@ -175,7 +175,7 @@ void metaItemProperties::buildAssignments(const QList<specModelItem*>& items)  /
 		QModelIndex itemIndex =
 		    ui->connectedItemsList->model()->index(
 			ui->connectedItemsList->row(modelItemInfo[modelItem]), 0) ;
-		selection.append(QItemSelectionRange());
+		selection.append(QItemSelectionRange(itemIndex));
 	}
 	ui->connectedItemsList->selectionModel()->select(selection, QItemSelectionModel::ClearAndSelect);
 }

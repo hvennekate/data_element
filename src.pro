@@ -327,7 +327,7 @@ TARGET = data_element
 
 RESOURCES += icons/application.qrc
 
-QT += svg
+QT += svg printsupport
 
 #QMAKE_CXXFLAGS += -std=c++0x
 
