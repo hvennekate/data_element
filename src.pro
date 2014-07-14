@@ -304,17 +304,27 @@ LIBS += -L/home/hendrik/Programme/qwt/lib \
 	-lgslcblas
 }
 win32 {
-WININCLUDES = /home/hendrik/Programme/windows/mxe/usr/i686-pc-mingw32
-WINLIBS = $$WININCLUDES/lib
+WINPREFIX = Z:/home/hendrik/.wine/drive_c
 INCLUDEPATH += . \
-    $$WININCLUDES/qt5/include \
-    $$WININCLUDES/include \
-    $$WININCLUDES/include/gsl
-LIBS += $$WININCLUDES/qt5/lib/libqwt.a \
-    $$WINLIBS/libmuparser.a \
-    $$WINLIBS/libgslcblas.a \
-    $$WINLIBS/libgsl.a \
-    /home/hendrik/.wine/drive_c/bzip2/release/libbzip2.a
+    $$WINPREFIX/qwt/include \
+    $$WINPREFIX/gsl/include \
+    $$WINPREFIX/bzip2/include \
+    $$WINPREFIX/muparser/include
+LIBS += -L$$WINPREFIX/qwt/lib \
+	-L$$WINPREFIX/gsl/bin \
+	-L$$WINPREFIX/bzip2/lib \
+	-lqwt \
+	-llibgslcblas-0 \
+	-llibgsl-0 \
+	-lbzip2 \
+	$$WINPREFIX/muparser/lib/libmuparser.a
+# 	-L$$WINPREFIX/muparser/lib \
+# 	-lmuparser
+# LIBS += $$WININCLUDES/qt5/lib/libqwt.a \
+#     $$WINLIBS/libmuparser.a \
+#     $$WINLIBS/libgslcblas.a \
+#     $$WINLIBS/libgsl.a \
+#     /home/hendrik/.wine/drive_c/bzip2/release/libbzip2.a
 DEFINES += WIN32BUILD \
     QT_DLL \
     QWT_DLL
