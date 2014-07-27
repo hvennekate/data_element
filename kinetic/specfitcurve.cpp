@@ -347,7 +347,7 @@ void specFitCurve::refit(QwtSeriesData<QPointF>* data)
 		int j = fitParameters.indexOf(name) ;
 		int dof = data->size() - fitParameters.size() ;
 		numericalErrors << (j > -1 ? sqrt(sumOfSquaredResiduals * covarianceMatrix[j * fitParameters.size() + j] / dof) *
-				    ((0 < confidence && 1 > confidence) ? gsl_cdf_tdist_Pinv(confidence, dof) : 1)
+				    ((0 < confidence && 1 > confidence) ? gsl_cdf_tdist_Pinv(1-0.5*(1-confidence), dof) : 1)
 					    : NAN) ;
 	}
 	//		errorString = QObject::tr("Covariance matrix not positive definite.") +
