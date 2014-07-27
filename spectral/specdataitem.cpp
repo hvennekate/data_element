@@ -67,13 +67,13 @@ specDataItem& specDataItem::operator+= (const specDataItem& toAdd)
 				description[key] = description[key].numericValue() * data.size() / total + toAdd.description[key].numericValue() * toAdd.data.size() / total ;
 			}
 			else if(!descriptor(key, true).contains(toAdd.descriptor(key, true)))
-				description[key] = descriptor(key).append(", ").append(toAdd.descriptor(key)) ;
+				description[key] = descriptor(key, true).append(", ").append(toAdd.descriptor(key, true)) ;
 		}
 		else
 			description[key] = toAdd.description[key] ;
 	}
 	if(!descriptor("").contains(toAdd.descriptor("")))
-		changeDescriptor("", toAdd.descriptor("").prepend(descriptor("").isEmpty() ? "" : descriptor("").append(", "))) ;
+		changeDescriptor("", toAdd.descriptor("", true).prepend(descriptor("", true).isEmpty() ? "" : descriptor("", true).append(", "))) ;
 	// merging actual data
 	foreach(specDataPoint point, toAdd.correctedData())
 	{
