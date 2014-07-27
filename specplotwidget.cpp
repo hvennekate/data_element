@@ -82,33 +82,36 @@ void specPlotWidget::read(QString fileName)
 	}
 
 	// Basic layout of the file:
-	quint64 check ;
 	QDataStream inStream(&file) ;
+	quint64 check = 0 ;
 	inStream >> check ;
+	QByteArray fileContent  = file.readAll();
+
 	if(check != FILECHECKRANDOMNUMBER && check != FILECHECKCOMPRESSNUMBER)
 	{
-		QString version(file.readAll().right(versionString().size())) ;
-		version = version.left(version.size()-1) ;
-		QString refVersion = versionString().mid(1) ;
-		QMessageBox::critical(0, tr("File error"),
+		QString version(fileContent.right(versionString().size())) ;
+		if (QMessageBox::No ==
+				QMessageBox::critical(0, tr("File error"),
 				      tr("File ")
 				      + fileName
-				      + tr(" does not seem to have the right format. or might be damaged.")
+				      + tr(" does not seem to have the right format. or might be damaged (file check number did not match.")
 				      + tr("\nIf it is indeed a spec-file, it might have been created by a different version of this program.  The file's version ID is: ")
-				      + version
+				      + version.mid(1)
 				      + "\n"
-				      + (version == refVersion ?
+				      + (version == versionString() ?
 						 tr("Since your program version is the same, it is likely the file is broken.  You can still send the complete file in for recovery, if possible.")
 					       : tr("Your program's version ID is: ")
-						 + refVersion
+						 + versionString().mid(1)
 				      + tr("\nPlease try to obtain the appropriate version of the program."))
 				      + tr("\nFor support e-mail HVennekate@gmx.de \n\n")
-				      ) ;
-		return ;
+				      + tr("\nIn case this is a very old file, shall I try opening it anyway?"),
+				      QMessageBox::Yes | QMessageBox::No
+				      ))
+			return ;
+		fileContent.prepend((char*)(&check), sizeof(check)) ;
 	}
-
-	QByteArray fileContent = file.readAll() ;
 	file.close();
+
 	bzipIODevice* zipDevice = 0 ;
 	QBuffer buffer(&fileContent) ;  // does not take ownership of byteArray
 	if(FILECHECKCOMPRESSNUMBER == check)
@@ -213,8 +216,10 @@ bool specPlotWidget::saveFile()
 	QDataStream out(&buffer) ;
 	out << quint64(FILECHECKCOMPRESSNUMBER) ;
 	out.setDevice(0);  // safety
+
 	bzipIODevice zipDevice(&buffer) ;
 	zipDevice.open(bzipIODevice::WriteOnly) ;
+	buffer.seek(buffer.size()) ; // Go to end of current buffer (seems to have changed from Qt 4.5 to Qt 5.3)
 	QDataStream zipOut(&zipDevice) ;
 
 	QProgressDialog progress ;
@@ -247,12 +252,12 @@ bool specPlotWidget::saveFile()
 		i *= 2 ;
 	}
 	zipOut << visibility ;
-	zipDevice.close() ;
+	zipDevice.close();
 	zipDevice.releaseDevice() ;
 	// Insert git hash as build number
-	buffer.buffer().append(versionString()) ;
-	qDebug() << QString("GITSHA1HASH") ;
-	buffer.close();
+	buffer.open(QBuffer::Append) ;
+	buffer.write(versionString().toLatin1()) ;
+
 	if(!file.open(QFile::WriteOnly))
 	{
 		QMessageBox::critical(0, tr("Write error"), tr("Could not open file ")
@@ -260,6 +265,8 @@ bool specPlotWidget::saveFile()
 				      + tr("for writing.")) ;
 		return false ;
 	}
+	buffer.close() ;
+
 	if(file.write(buffer.data()) == -1)
 	{
 		QMessageBox::critical(0, tr("Severe error!"), tr("Error writing file!  Data could not be saved!")) ;
@@ -267,6 +274,7 @@ bool specPlotWidget::saveFile()
 	}
 	file.close();
 	changeFileName(file.fileName());
+
 	return true ;
 }
 
