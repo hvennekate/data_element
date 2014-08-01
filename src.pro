@@ -335,7 +335,8 @@ CONFIG += qwt
 
 TARGET = data_element
 
-RESOURCES += icons/application.qrc
+RESOURCES += icons/application.qrc \
+    icons/fromOxygen.qrc
 
 QT += svg printsupport
 

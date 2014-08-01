@@ -271,6 +271,7 @@ QVariant specModel::data(const QModelIndex& index, int role) const
 		return QVariant();
 
 	specModelItem* pointer = itemPointer(index) ;
+	if (!pointer) return QVariant() ;
 
 	switch(role)
 	{
@@ -346,8 +347,27 @@ QVariant specModel::headerData(int section, Qt::Orientation orientation,
 		return Descriptors[section] ;
 	if(role == spec::descriptorPropertyRole)
 		return (int) DescriptorProperties[section] ;
+	if(role == Qt::DecorationRole)
+		return descriptorIcon(section) ;
 	return QVariant();
 
+}
+
+QIcon specModel::descriptorIcon(int index) const
+{
+	if (index < 0 || index >= DescriptorProperties.size()) return QIcon() ;
+	if (DescriptorProperties[index] & spec::editable)
+	{
+		if (DescriptorProperties[index] & spec::numeric)
+			return QIcon(":/numeric.png") ;
+	}
+	else
+	{
+		if (DescriptorProperties[index] & spec::numeric)
+			return QIcon(":/lockednumeric.png") ;
+		return QIcon(":/locked.png") ;
+	}
+	return QIcon() ;
 }
 
 bool specModel::removeRows(int position, int rows, const QModelIndex& parent)

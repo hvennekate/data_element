@@ -89,3 +89,10 @@ void specDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewI
 		geom.setX(geom.x() + option.decorationSize.width() + 3) ;
 	editor->setGeometry(geom);
 }
+
+QSize specDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+	QSize size = QItemDelegate::sizeHint(option, index) ;
+	size.setHeight(qMax(16, size.height())) ; // TODO get actual icon size
+	return size ;
+}

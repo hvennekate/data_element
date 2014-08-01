@@ -26,6 +26,7 @@ private:
 	specModelItem* root ;
 	QStringList Descriptors ;
 	QList<spec::descriptorFlags> DescriptorProperties ;
+	QIcon descriptorIcon(int index) const ;
 	void insertFromStream(QDataStream& stream, const QModelIndex& parent, int row) ;
 	bool itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria) ;
 	QModelIndexList merge(QModelIndexList& list, const QList<QPair<QStringList::size_type, double> >& criteria) ;
@@ -41,6 +42,7 @@ private:
 	specMetaModel* metaModel ;
 	void checkForNewDescriptors(const QList<specModelItem*>& list, const QModelIndex& parent) ;
 	bool resetPending ;
+	QSize generateSizeHint(const QModelIndex&) const ;
 public:
 	virtual QStringList dataTypes() const ;
 	specModel(QObject* par = 0) ;
