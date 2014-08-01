@@ -136,7 +136,8 @@ SOURCES += main.cpp \
     model/specdatapointfilter.cpp \
     actionlib/actions/specfitaction.cpp \
     plot/specfiltergenerator.cpp \
-    model/specdescriptorcomparisoncriterion.cpp
+    model/specdescriptorcomparisoncriterion.cpp \
+    model/specdatatokineticmime.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -274,7 +275,8 @@ HEADERS += cutbyintensitydialog.h \
     model/specdatapointfilter.h \
     actionlib/actions/specfitaction.h \
     plot/specfiltergenerator.h \
-    model/specdescriptorcomparisoncriterion.h
+    model/specdescriptorcomparisoncriterion.h \
+    model/specdatatokineticmime.h
 
 INCLUDEPATH += kinetic \
 	log \

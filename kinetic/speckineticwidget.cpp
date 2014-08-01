@@ -2,6 +2,7 @@
 #include <QTextStream>
 #include "speccanvasitem.h"
 #include "specgenericmimeconverter.h"
+#include "specdatatokineticmime.h"
 #include "specmimetextexporter.h"
 #include "specsplitter.h"
 #include "canvaspicker.h"
@@ -25,6 +26,7 @@ specKineticWidget::specKineticWidget(QWidget* parent)
 	items->setModel(new specMetaModel(items)) ;
 	new specGenericMimeConverter(items->model());
 	new specMimeTextExporter(items->model()) ;
+	new specDataToKineticMime(items->model()) ;
 
 	connect(plot->svgAction(), SIGNAL(toggled(bool)), this, SLOT(svgModification(bool))) ;
 	svgModification(false) ;

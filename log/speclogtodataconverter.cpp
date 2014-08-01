@@ -106,22 +106,23 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData* data)
 				if(!file.exists())
 				{
 					QFileDialog path ;
-					path.setWindowTitle("Datei zum Importieren angeben") ;
+					path.setWindowTitle(tr("Find file to import")) ;
 					path.setDirectory(currentDirectory) ;
 					path.setFileMode(QFileDialog::ExistingFile);
 					path.selectFile(fileName) ;
 					path.setNameFilters(QStringList(QString("%1 (%1)").arg(fileName))) ;
 					if(path.exec() == QDialog::Rejected || path.selectedFiles().isEmpty())
 					{
-						if(QMessageBox::question(0,
-									 "Import abbrechen?",
-									 "Soll der Import von Datendateien abgebrochen werden?",
+						if(!in.atEnd()
+								&& QMessageBox::question(0,
+									 tr("Cancel importing?"),
+									 tr("Cancel the import of pending files?"),
 									 QMessageBox::Yes | QMessageBox::No,
 									 QMessageBox::No) == QMessageBox::Yes)
 						{
-							foreach(specModelItem * item, items)
-							delete item ;
-							items.clear();
+//							foreach(specModelItem * item, items)
+//								delete item ;
+//							items.clear();
 							return items ;
 						}
 						continue ;
@@ -135,8 +136,8 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData* data)
 			if(!file.open(QFile::ReadOnly | QFile::Text))
 			{
 				QMessageBox::warning(0,
-						     "Fehler",
-						     "Kann Datei nicht oeffnen: " + fileName) ;
+						     tr("Error"),
+						     tr("Cannot open this file: ") + fileName) ;
 				continue ;
 			}
 			// TODO check if this works under windows... (opening an open file again...)
@@ -144,8 +145,8 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData* data)
 			if(!filter)
 			{
 				QMessageBox::warning(0,
-						     "Fehler",
-						     "Kein gueltiger Dateityp:" + fileName) ;
+						     tr("Error"),
+						     tr("Not a valid file type: ") + fileName) ;
 				continue ;
 			}
 			specFolderItem* newItem = new specFolderItem ;

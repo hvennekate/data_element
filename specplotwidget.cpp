@@ -12,6 +12,7 @@
 #include "speclogtodataconverter.h"
 #include "spectextmimeconverter.h"
 #include "specmimefileimporter.h"
+#include "specdatatokineticmime.h"
 #include "speckineticwidget.h"
 #include "specactionlibrary.h"
 #include "specdataview.h"
@@ -47,6 +48,7 @@ specPlotWidget::specPlotWidget(QWidget* parent)
 	new specLogToDataConverter(items->model()) ;
 	new specMimeFileImporter(items->model()) ;
 	new specTextMimeConverter(items->model()) ;
+	new specDataToKineticMime(items->model()) ;
 
 	kineticWidget->view()->assignDataView(items) ;
 
@@ -212,7 +214,7 @@ bool specPlotWidget::saveFile()
 	if(file.fileName().isEmpty()) return false ;
 
 	QBuffer buffer ;
-	buffer.open(QBuffer::WriteOnly) ;
+	buffer.open(QBuffer::Append) ;
 	QDataStream out(&buffer) ;
 	out << quint64(FILECHECKCOMPRESSNUMBER) ;
 	out.setDevice(0);  // safety
