@@ -118,6 +118,19 @@ specModelItem* readJCAMPBlock(QTextStream& in)
 					      descriptors["YFACTOR"].content().toDouble()
 					     ) ;
 		}
+		else if (parsedLabel == "XYPOINTS")
+		{
+			QString content = ldr.second.content(true) ;
+			QTextStream dataStream(&content) ;
+			QString typeOfData = dataStream.readLine() ;
+			if(typeOfData == "(XY..XY)")
+				readJCAMPpoints(dataStream, data,
+						(descriptors["LASTX"].numericValue() - descriptors["FIRSTX"].numericValue()) /
+						(descriptors["NPOINTS"].numericValue() -1),
+						descriptors["XFACTOR"].numericValue(),
+						descriptors["YFACTOR"].numericValue()
+						) ;
+		}
 		else
 			descriptors[ldr.first] = ldr.second ;
 	}
@@ -142,9 +155,42 @@ specModelItem* readJCAMPBlock(QTextStream& in)
 	return item ;
 }
 
+void readJCAMPpoints(QTextStream& in, QVector<specDataPoint>& data, double step, double xfactor, double yfactor)  // TODO verify final x-value
+{
+	QChar character ;
+	QString input ;
+	while (!in.atEnd())
+	{
+		QRegExp pairTemplate("\\s*(\\([\\+\\-0-9eE\\.]+[,\\s]+[\\+\\-0-9eE\\.]+\\)|[\\+\\-0-9eE\\.]+[ ,\\t]+[\\+\\-0-9eE\\.]+)\\s*;?\\s*") ;
+		while (!pairTemplate.exactMatch(input))
+		{
+			in >> character ;
+			input += character ;
+		}
+		in >> character ;
+		while (pairTemplate.exactMatch(input+character))
+		{
+			input += character ;
+			in >> character ;
+		}
+
+		input.remove(";").remove("(").remove(")").replace("\n"," ").remove(QRegExp("^\\s+")).remove(QRegExp("\\s+$")) ;
+		QStringList numbers = input.split(QRegExp("(\\s*,\\s*|\\s+)")) ;
+		if (numbers.size() < 2)
+		{
+			QMessageBox::warning(0, QObject::tr("JCAMP-DX Error"),QObject::tr("Not enough numbers for point: ") + input) ;
+			continue ;
+		}
+		else if (numbers.size() > 2)
+			QMessageBox::warning(0, QObject::tr("JCAMP-DX Error"),QObject::tr("Too many numbers for point: ") + input) ;
+		data << specDataPoint(numbers[0].toDouble()*xfactor, numbers[1].toDouble()*yfactor,0) ;
+		input = character ;
+	}
+}
+
 void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, double xfactor, double yfactor)  // TODO verify final x-value
 {
-	QRegExp specialCharacters("[?@%A-DF-Za-df-s+\\-\\s]|[Ee](?![+\\-\\s])"),
+	QRegExp specialCharacters("[?@%A-DF-Za-df-s+\\-\\s,]|[Ee](?![+\\-\\s])"),
 		posSQZdigits("[A-DF-I@]|E(?![+\\-\\s])"),
 		negSQZdigits("[a-df-i]|e(?![+\\-\\s])"),
 		posDIFdigits("[J-R%]"),
@@ -169,7 +215,7 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 			if(itemLength == -1) itemLength = line.size() ;
 			QString yInput = line.left(itemLength) ;
 			line.remove(0, itemLength) ;
-			yInput.remove(QRegExp("[\\s]")) ;
+			yInput.remove(QRegExp("[\\s,]")) ;
 			// discard if empty
 			if(yInput.isEmpty()) break ;
 
@@ -198,7 +244,7 @@ void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, d
 			if(itemLength == -1) itemLength = line.size() ;
 			QString yInput = line.left(itemLength) ;
 			line.remove(0, itemLength) ;
-			yInput.remove(QRegExp("[\\s]")) ;
+			yInput.remove(QRegExp("[\\s,]")) ;
 			if(yInput.isEmpty()) break ;
 
 

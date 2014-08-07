@@ -25,6 +25,7 @@ QList<specModelItem*> readSKHIFile(QFile&) ;
 QList<specModelItem*> readXYFILE(QFile&) ;
 QPair<QString, specDescriptor> readJCAMPldr(QString& first, QTextStream& in) ;
 specModelItem* readJCAMPBlock(QTextStream& in) ;
+void readJCAMPpoints(QTextStream& in, QVector<specDataPoint>& data, double step, double xfactor, double yfactor) ;
 void readJCAMPdata(QTextStream& in, QVector<specDataPoint>& data, double step, double xfactor, double yfactor) ;
 QVector<double> waveNumbers(QTextStream&) ;
 QHash<QString, specDescriptor> fileHeader(QTextStream&) ;
