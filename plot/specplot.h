@@ -75,6 +75,7 @@ public:
 	virtual void attachToPicker(specCanvasItem*) ;
 	virtual void detachFromPicker(specCanvasItem*) ;
 	void setAutoScaling(bool) ;
+	void haltPlotting(bool) ;
 signals:
 	void startingReplot() ;
 	void replotted() ;

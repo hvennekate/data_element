@@ -140,6 +140,8 @@ SOURCES += main.cpp \
     model/specdatatokineticmime.cpp \
     model/specmatrixmimeexporter.cpp \
     actionlib/actions/matrixexportaction.cpp \
+    plot/spec3dquickplot.cpp \
+    actionlib/actions/toggle3dplotaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -281,6 +283,8 @@ HEADERS += cutbyintensitydialog.h \
     model/specdatatokineticmime.h \
     model/specmatrixmimeexporter.h \
     actionlib/actions/matrixexportaction.h \
+    plot/spec3dquickplot.h \
+    actionlib/actions/toggle3dplotaction.h
 
 INCLUDEPATH += kinetic \
 	log \
@@ -297,17 +301,22 @@ INCLUDEPATH += kinetic \
 TEMPLATE = app
 CONFIG += warn_on \
     thread \
-    qt
+    qt \
+    opengl
 
 unix {
 INCLUDEPATH += . \
-	/home/hendrik/Programme/qwt/include
+	/home/hendrik/Programme/qwt/include \
+	/home/hendrik/Downloads/qwtplot3d/include
 LIBS += -L/home/hendrik/Programme/qwt/lib \
+	-L/home/hendrik/Downloads/qwtplot3d/lib \
+	-lqwtplot3d \
 	-lqwt \
 	-lmuparser \
 	-lbz2 \
 	-lgsl \
-	-lgslcblas
+	-lgslcblas \
+	-lGLU
 }
 win32 {
 WINPREFIX = Z:/home/hendrik/.wine/drive_c
@@ -344,7 +353,7 @@ TARGET = data_element
 RESOURCES += icons/application.qrc \
     icons/fromOxygen.qrc
 
-QT += svg printsupport
+QT += svg printsupport opengl
 
 #QMAKE_CXXFLAGS += -std=c++0x
 

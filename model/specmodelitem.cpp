@@ -322,14 +322,14 @@ void specModelItem::attach(QwtPlot* plot)
 {
 	specCanvasItem::attach(plot) ;
 	foreach(specMetaItem * client, clients)
-	client->refreshOtherPlots();
+		client->refreshOtherPlots();
 }
 
 void specModelItem::detach()
 {
 	specCanvasItem::detach() ;
 	foreach(specMetaItem * client, clients)
-	client->refreshOtherPlots();
+		client->refreshOtherPlots();
 }
 
 QString specModelItem::toolTip(const QString& column) const

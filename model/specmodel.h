@@ -84,6 +84,8 @@ public:
 	void fillSubMap(const QModelIndexList&) ;
 	void applySubMap(const QModelIndexList&) ;
 	const QStringList& descriptors() const ;
+	QStringList descriptorsWithFlags(const spec::descriptorFlags& flags) const ;
+	QStringList descriptorsMatchFlags(const spec::descriptorFlags& flags) const ;
 	const QList<spec::descriptorFlags>& descriptorProperties() const;
 	void setDescriptorProperties(spec::descriptorFlags flags, const QString& key) ;
 	void renameDescriptors(const QMap<QString, QString>&) ;

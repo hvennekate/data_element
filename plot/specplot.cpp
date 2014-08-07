@@ -139,6 +139,12 @@ void specPlot::setAutoScaling(bool on)
 	autoScaling = on ;
 }
 
+void specPlot::haltPlotting(bool b)
+{
+	replotting = b ;
+	if (!replotting) replot() ;
+}
+
 void specPlot::replot()
 {
 	if(replotting) return ;

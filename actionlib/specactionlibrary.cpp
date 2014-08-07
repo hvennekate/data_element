@@ -42,6 +42,7 @@
 #include <specdockwidget.h>
 #include "specnormalizeaction.h"
 #include "matrixexportaction.h"
+#include "toggle3dplotaction.h"
 
 specDockWidget* specActionLibrary::undoWidget()
 {
@@ -162,6 +163,7 @@ QToolBar* specActionLibrary::toolBar(QWidget* target)
 		}
 		if(dataView)
 		{
+			addNewAction(bar, new toggle3DPlotAction(target)) ;
 			addNewAction(bar, new specMergeAction(target)) ;
 			addNewAction(bar, new specTiltMatrixAction(target)) ;
 			addNewAction(bar, new specDescriptorEditAction(target)) ;

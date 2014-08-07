@@ -193,7 +193,7 @@ void specMetaItem::refreshOtherPlots()
 {
 	QSet<specPlot*> otherPlots ;
 	foreach(specModelItem * item, items)
-	otherPlots << ((specPlot*) item->plot()) ;
+		otherPlots << ((specPlot*) item->plot()) ;
 	otherPlots.remove(0) ;
 	QColor rangeColor = pen().color() ;
 	rangeColor.setAlpha(128);
@@ -202,7 +202,7 @@ void specMetaItem::refreshOtherPlots()
 	else
 		filter->detachRanges();
 	foreach(QwtPlot * otherPlot, otherPlots)
-	otherPlot->replot(); // TODO leads to crashes
+		otherPlot->replot(); // TODO leads to crashes
 }
 
 void specMetaItem::attach(QwtPlot* plot)

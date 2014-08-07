@@ -286,13 +286,13 @@ bool specMetaParser::containsNan(const QVector<QVector<double> >& matrix, int co
 void specMetaParser::attachRanges(QSet<specPlot*> plots, QColor color)
 {
 	foreach(specMetaVariable * evaluator, evaluators)
-	evaluator->produceRanges(plots, color) ;
+		evaluator->produceRanges(plots, color) ;
 }
 
 void specMetaParser::detachRanges()
 {
 	foreach(specMetaVariable * evaluator, evaluators)
-	evaluator->detachRanges();
+		evaluator->detachRanges();
 }
 
 specMetaRange::addressObject specMetaParser::addressOf(specMetaVariable* v) const

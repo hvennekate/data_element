@@ -93,7 +93,7 @@ public:
 	virtual void restoreDescriptor(QListIterator<specDescriptor>& origin, const QString& key) ;
 	virtual QString editDescriptor(const QString& key) const ;
 
-	int rtti() const { return spec::spectrum ; }
+	int rtti() const { return spec::spectrum ; } // TODO zu dataItem verschieben.
 	void attach(QwtPlot* plot) ;
 	void detach();
 

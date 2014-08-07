@@ -4,6 +4,7 @@
 specSplitter::specSplitter(Qt::Orientation o, QWidget* parent)
 	: QSplitter(o, parent)
 {
+	setOpaqueResize(false);
 }
 
 specSplitter::specSplitter(QWidget* parent)

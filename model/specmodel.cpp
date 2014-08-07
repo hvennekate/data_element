@@ -765,3 +765,21 @@ void specModel::signalEndReset()
 		endResetModel();
 	resetPending = false ;
 }
+
+QStringList specModel::descriptorsMatchFlags(const spec::descriptorFlags &flags) const
+{
+	QStringList result ;
+	for (int i = 0 ; i < Descriptors.size() && i < DescriptorProperties.size() ; ++i)
+		if (descriptorProperties()[i] == flags)
+			result << Descriptors[i] ;
+	return result ;
+}
+
+QStringList specModel::descriptorsWithFlags(const spec::descriptorFlags &flags) const
+{
+	QStringList result ;
+	for (int i = 0 ; i < Descriptors.size() && i < DescriptorProperties.size() ; ++i)
+		if ((descriptorProperties()[i] & flags) == flags)
+			result << Descriptors[i] ;
+	return result ;
+}

@@ -41,5 +41,6 @@
         <file>zeroRange.png</file>
         <file>multiline.png</file>
         <file>matrix-export.png</file>
+        <file>fast3dplot.png</file>
     </qresource>
 </RCC>

@@ -91,6 +91,8 @@ void specDockWidget::changeEvent(QEvent* event)
 
 void specDockWidget::selectionChanged(const QItemSelection& selected, const QItemSelection& deselected)
 {
+	if (Plot) Plot->haltPlotting(true);
+
 	foreach(QModelIndex index, deselected.indexes())
 	{
 		if(!index.isValid()) continue ;
@@ -109,7 +111,7 @@ void specDockWidget::selectionChanged(const QItemSelection& selected, const QIte
 		++ selectedTypes[pointer->typeId()] ;
 	}
 
-	if(Plot) Plot->replot();
+	if(Plot) Plot->haltPlotting(false) ;
 
 	foreach(specItemAction * action, findChildren<specItemAction*>())
 	{
