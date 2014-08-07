@@ -41,6 +41,7 @@
 #include <QMessageBox>
 #include <specdockwidget.h>
 #include "specnormalizeaction.h"
+#include "matrixexportaction.h"
 
 specDockWidget* specActionLibrary::undoWidget()
 {
@@ -81,7 +82,7 @@ specActionLibrary::specActionLibrary(QObject* parent) :
 
 void specActionLibrary::stackClean(const bool& b)  // This is due to the stack being clean
 {
-	// when the window is UNmodified ... (chiams are bad!)
+	// when the window is UNmodified ... (chiasms are bad!)
 	emit stackModified(!b) ;
 }
 
@@ -147,6 +148,8 @@ QToolBar* specActionLibrary::toolBar(QWidget* target)
 		addNewAction(bar, new genericExportAction(target)) ;
 		bar->addSeparator() ;
 		addNewAction(bar, new specCopyAction(target)) ;
+		if(dataView || metaView)
+			addNewAction(bar, new matrixExportAction(target)) ;
 		addNewAction(bar, new specCutAction(target)) ;
 		addNewAction(bar, new specPasteAction(target)) ;
 		addNewAction(bar, new specDeleteAction(target)) ;

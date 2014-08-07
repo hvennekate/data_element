@@ -40,5 +40,6 @@
         <file>removeFit.png</file>
         <file>zeroRange.png</file>
         <file>multiline.png</file>
+        <file>matrix-export.png</file>
     </qresource>
 </RCC>

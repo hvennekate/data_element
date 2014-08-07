@@ -137,7 +137,9 @@ SOURCES += main.cpp \
     actionlib/actions/specfitaction.cpp \
     plot/specfiltergenerator.cpp \
     model/specdescriptorcomparisoncriterion.cpp \
-    model/specdatatokineticmime.cpp
+    model/specdatatokineticmime.cpp \
+    model/specmatrixmimeexporter.cpp \
+    actionlib/actions/matrixexportaction.cpp \
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -276,7 +278,9 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/actions/specfitaction.h \
     plot/specfiltergenerator.h \
     model/specdescriptorcomparisoncriterion.h \
-    model/specdatatokineticmime.h
+    model/specdatatokineticmime.h \
+    model/specmatrixmimeexporter.h \
+    actionlib/actions/matrixexportaction.h \
 
 INCLUDEPATH += kinetic \
 	log \
@@ -353,7 +357,8 @@ FORMS += \
     actionlib/actions/specnormalizeactiondialog.ui \
     actionlib/actions/specmergedialog.ui \
     actionlib/actions/averagedialog.ui \
-    specshortcutdialog.ui
+    specshortcutdialog.ui \
+    model/matrixexportdialog.ui
 
 OTHER_FILES += icons/oxygen/index.theme \
     icons/oxygen/geticons.py
