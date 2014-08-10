@@ -324,14 +324,17 @@ INCLUDEPATH += . \
     $$WINPREFIX/qwt/include \
     $$WINPREFIX/gsl/include \
     $$WINPREFIX/bzip2/include \
-    $$WINPREFIX/muparser/include
+    $$WINPREFIX/muparser/include \
+    $$WINPREFIX/qwtplot3d/include
 LIBS += -L$$WINPREFIX/qwt/lib \
 	-L$$WINPREFIX/gsl/bin \
 	-L$$WINPREFIX/bzip2/lib \
+	-L$$WINPREFIX/qwtplot3d/lib \
 	-lqwt \
 	-llibgslcblas-0 \
 	-llibgsl-0 \
 	-lbzip2 \
+	-lqwtplot3d \
 	$$WINPREFIX/muparser/lib/libmuparser.a
 # 	-L$$WINPREFIX/muparser/lib \
 # 	-lmuparser
@@ -342,7 +345,8 @@ LIBS += -L$$WINPREFIX/qwt/lib \
 #     /home/hendrik/.wine/drive_c/bzip2/release/libbzip2.a
 DEFINES += WIN32BUILD \
     QT_DLL \
-    QWT_DLL
+    QWT_DLL \
+    QWT3D_DLL
 #DEPENDPATH += C:/Users/Hendrik/Downloads/muparser_v2_2_2/lib
 RESOURCES += oxygen.qrc
 }
