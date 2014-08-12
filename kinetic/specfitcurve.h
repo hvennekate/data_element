@@ -59,6 +59,7 @@ public:
 	void refreshPlotData();
 	void refit(QwtSeriesData<QPointF>* data) ;
 	QVector<double> getFitData(QwtSeriesData<QPointF>* data) ;
+	double getFitPoint(double x) ;
 	int rtti() const { return specStreamable::fitCurve ; }
 	void attach(QwtPlot* plot) ;
 	void setDescriptorProperties(QString key, spec::descriptorFlags f) ;

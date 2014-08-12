@@ -39,15 +39,14 @@ void exportDialog::setDataTypes(const QStringList& dTs)
 	if(dataTypesWereEmpty)
 		prepareData();
 	foreach(exportFormatItem * pointer, getItems<exportFormatItem>())
-	pointer->setDataTypes(dataTypes) ;
+		pointer->setDataTypes(dataTypes) ;
 }
 
 void exportDialog::setDescriptors(const QStringList& newDs)
 {
 	descriptors = newDs ;
 	foreach(exportLayoutItem * pointer, getItems<exportLayoutItem>())
-	pointer->setDescriptors(newDs) ;
-
+		pointer->setDescriptors(newDs) ;
 }
 
 void exportDialog::prepareHeader()
@@ -117,7 +116,8 @@ void exportDialog::prepareData()
 	dataLayout->setContentsMargins(0, 0, 0, 0) ;
 
 	exportFormatItem* pointer ;
-	for(int i = 0 ; i < dataTypes.size() ; ++i)
+	int defaultItemCount = qMin(dataTypes.size(), (int) spec::numericDescriptor) ;
+	for(int i = 0 ; i < defaultItemCount ; ++i)
 	{
 		addDataItem();
 		if(dataLayout->itemAt(i) &&
@@ -132,7 +132,7 @@ void exportDialog::prepareData()
 	if(!dataTypes.isEmpty() &&
 		dataLayout->itemAt(dataTypes.size() - 1) &&
 		(pointer =
-		     dynamic_cast<exportFormatItem*>(dataLayout->itemAt(dataTypes.size() - 1)->widget())))
+		     dynamic_cast<exportFormatItem*>(dataLayout->itemAt(defaultItemCount - 1)->widget())))
 		pointer->setSeparator(spec::newline) ;
 
 	if(scrollData)
@@ -153,11 +153,11 @@ void exportDialog::addDataItem()
 	dataLayout->insertWidget(dataLayout->count() - 2, new exportFormatItem(dataTypes, this)) ;
 }
 
-QList<QPair<spec::value, QString> > exportDialog::dataFormat() const
+QList<QPair<int, QString> > exportDialog::dataFormat() const
 {
-	QList<QPair<spec::value, QString> > returnData ;
+	QList<QPair<int, QString> > returnData ;
 	foreach(exportFormatItem * pointer, getItems<exportFormatItem>())
-	returnData << QPair<spec::value, QString> (pointer->value(), pointer->separator()) ;
+	returnData << QPair<int, QString> (pointer->value(), pointer->separator()) ;
 	return returnData ;
 }
 

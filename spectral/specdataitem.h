@@ -24,6 +24,7 @@ private:
 	void readFromStream(QDataStream&) ;
 	void writeToStream(QDataStream&) const ;
 	type typeId() const { return specStreamable::dataItem ; }
+	QString exportCoreData(const QList<QPair<int, QString> > &dataFormat, const QStringList &numericDescriptors) const ;
 public:
 	/*! Standard constructor.*/
 	specDataItem(const dataContainer& data,  // TODO change to reference/pointer
@@ -57,9 +58,6 @@ public:
 	/* for plot picker*/
 	void attach(QwtPlot* plot) ;
 	void detach() ;
-
-	/* not reviewed */
-	void exportData(const QList<QPair<bool, QString> >&, const QList<QPair<spec::value, QString> >&, QTextStream&) ;
 
 	specUndoCommand* itemPropertiesAction(QObject* parentObject) ;
 };

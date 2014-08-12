@@ -19,7 +19,7 @@ namespace spec
 
 	/*! Enums for export formats */
 	enum separator { nosep = 0, space = 1, tab = 2, newline = 3 } ;
-	enum value { wavenumber = 0, signal = 1, maxInt = 2 } ;
+	enum value { wavenumber = 0, signal = 1, maxInt = 2, numericDescriptor = 3 } ;
 
 	enum undoActionIds { } ;
 	enum itemRoles { descriptorPropertyRole = 34 } ;

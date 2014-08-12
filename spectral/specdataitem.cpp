@@ -98,28 +98,26 @@ void specDataItem::flatten()
 	invalidate() ;
 }
 
-void specDataItem::exportData(const QList<QPair<bool, QString> >& headerFormat, const QList<QPair<spec::value, QString> >& dataFormat, QTextStream& out)  // TODO split into two
+QString specDataItem::exportCoreData(const QList<QPair<int, QString> > &dataFormat, const QStringList &numericDescriptors) const
 {
-	revalidate();
-	for(int i = 0 ; i < headerFormat.size() ; i++)
-		out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
-	out << endl ;
-
-	typedef QPair<spec::value, QString>  formatPair ;
+	QString result ;
+	typedef QPair<int, QString>  formatPair ;
 	foreach(const specDataPoint & point, correctedData())
 	{
 		foreach(const formatPair & format, dataFormat)
 		{
 			switch(format.first)
 			{
-				case spec::wavenumber: out << point.nu ; break ;
-				case spec::signal: out << point.sig ; break ;
-				case spec::maxInt: out << point.mint ; break ;
+				case spec::wavenumber: result += QString::number(point.nu) ; break ;
+				case spec::signal: result += QString::number(point.sig) ; break ;
+				case spec::maxInt: result += QString::number(point.mint) ; break ;
+			default:
+				result += descriptor(numericDescriptors[format.first - spec::numericDescriptor]) ;
 			}
-			out << format.second ;
+			result += format.second ;
 		}
 	}
-	out << endl ;
+	return result ;
 }
 
 QVector<specDataPoint> specDataItem::getDataExcept(const QList<specRange*>& ranges)

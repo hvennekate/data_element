@@ -21,7 +21,7 @@ void specMimeTextExporter::exportData(QList<specModelItem*>& items, QMimeData* d
 
 void specMimeTextExporter::writeItem(specModelItem* item, QTextStream& out)
 {
-	QList<QPair<spec::value, QString> > dataTypeList ;
+	QList<QPair<int, QString> > dataTypeList ;
 	dataTypeList << QPair<spec::value, QString> (spec::wavenumber, "\t")
 		     << QPair<spec::value, QString> (spec::signal, "\t")
 		     << QPair<spec::value, QString> (spec::maxInt, "\n") ;
@@ -34,6 +34,7 @@ void specMimeTextExporter::writeItem(specModelItem* item, QTextStream& out)
 			i->prepend("#   " + padding) ;
 		out << content.join("\n") << endl ;
 	}
+	QStringList numericalDescriptors ;
 	if(item->isFolder())
 	{
 		for(int i = 0 ; i < item->children() ; ++i)
@@ -43,7 +44,7 @@ void specMimeTextExporter::writeItem(specModelItem* item, QTextStream& out)
 		}
 	}
 	else
-		item->exportData(QList<QPair<bool, QString> >(), dataTypeList , out);
+		out << item->exportData(QList<QPair<bool, QString> >(), dataTypeList, numericalDescriptors);
 
 	out << endl ;
 }

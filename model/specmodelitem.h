@@ -31,6 +31,10 @@ private:
 protected:
 	// selectedPoints (3 Punkte fuer Korrekturen)
 	virtual bool shortCircuit(specModelItem* server) ;
+	virtual QString exportX(int index) const ;
+	virtual QString exportY(int) const ;
+	virtual QString exportZ(int index) const ;
+	virtual QString exportCoreData(const QList<QPair<int, QString> > &dataFormat, const QStringList &numericDescriptors) const ;
 	void readFromStream(QDataStream&) ;
 	void writeToStream(QDataStream&) const ;
 	specModelItem* factory(const type&) const ;
@@ -82,7 +86,7 @@ public:
 	virtual QStringList descriptorKeys() const ;
 	virtual spec::descriptorFlags descriptorProperties(const QString& key) const ;
 	virtual void setDescriptorProperties(const QString& key, spec::descriptorFlags f) ;
-	virtual void exportData(const QList<QPair<bool, QString> >&, const QList<QPair<spec::value, QString> >&, QTextStream&) ;
+	virtual QString exportData(const QList<QPair<bool, QString> >&, const QList<QPair<int, QString> > &, const QStringList &numericDescriptors) ;
 	virtual QVector<double> intensityData() const ;
 	virtual void movingAverage(int) {}
 	virtual void average(int) {}

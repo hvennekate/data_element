@@ -43,7 +43,7 @@ public:
 	spec::descriptorFlags descriptorProperties(const QString& key) const ;
 	/*! Reimplementation from specCanvasItem -- passing on to all children */
 	void addDataFilter(const specDataPointFilter&) ;
-	void exportData(const QList<QPair<bool, QString> >&, const QList<QPair<spec::value, QString> >&, QTextStream&) ;
+	QString exportData(const QList<QPair<bool, QString> > &headerFormat, const QList<QPair<int, QString> > &dataFormat, const QStringList &numericDescriptors) ;
 	void deleteDescriptor(const QString& key) ;
 	void renameDescriptors(const QMap<QString, QString>& map);
 	void dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const ;

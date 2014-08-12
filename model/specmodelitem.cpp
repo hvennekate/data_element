@@ -209,16 +209,60 @@ void specModelItem::setDescriptorProperties(const QString& key, spec::descriptor
 	if(key == "") description.setFlags(f) ;
 }
 
-void specModelItem::exportData(const QList<QPair<bool, QString> >& headerFormat, const QList<QPair<spec::value, QString> >& dataFormat, QTextStream& out)
+QString specModelItem::exportData(const QList<QPair<bool, QString> >& headerFormat, const QList<QPair<int, QString> >& dataFormat, const QStringList& numericDescriptors)
 {
+	revalidate();
+	QString descriptorString ;
 	for(int i = 0 ; i < headerFormat.size() ; i++)
-		out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
-	out << endl ;
-	for(size_t j = 0 ; j < dataSize() ; j++)
-		for(int i = 0 ; i < dataFormat.size() ; i++)
-			out << (dataFormat[i].first ? sample(j).x() : sample(j).y()) << dataFormat[i].second ;
-	out << endl ;
+		descriptorString += (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
+	if (!descriptorString.isEmpty())
+		descriptorString += "\n" ;
+	return descriptorString + exportCoreData(dataFormat, numericDescriptors) + "\n" ;
 }
+
+QString specModelItem::exportCoreData(const QList<QPair<int, QString> > & dataFormat, const QStringList &numericDescriptors) const
+{
+	QString result ;
+	for(size_t j = 0 ; j < dataSize() ; j++)
+	{
+		for(int i = 0 ; i < dataFormat.size() ; i++)
+		{
+			switch (dataFormat[i].first)
+			{
+			case spec::wavenumber:
+				result += exportX(j) ;
+				break ;
+			case spec::signal:
+				result += exportY(j) ;
+				break ;
+			case spec::maxInt:
+				result += exportZ(j) ;
+				break ;
+			default:
+				result += descriptor(numericDescriptors[dataFormat[i].first - spec::numericDescriptor]) ;
+			}
+			result += dataFormat[i].second ;
+		}
+	}
+	return result ;
+}
+
+QString specModelItem::exportX(int index) const
+{
+	return QString::number(sample(index).x()) ;
+}
+
+QString specModelItem::exportY(int index) const
+{
+	return QString::number(sample(index).y()) ;
+}
+
+QString specModelItem::exportZ(int index) const
+{
+	Q_UNUSED(index)
+	return "NaN" ;
+}
+
 
 QVector<double> specModelItem::intensityData() const
 {

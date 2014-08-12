@@ -33,7 +33,7 @@ public:
 	void setDataTypes(const QStringList& dataTypes) ;
 	void setDescriptors(const QStringList& descriptors) ;
 	QList<QPair<bool, QString> > headerFormat() const ;
-	QList<QPair<spec::value, QString> > dataFormat() const ;
+	QList<QPair<int, QString> > dataFormat() const ;
 	~exportDialog();
 };
 

@@ -383,6 +383,21 @@ QVector<double> specFitCurve::getFitData(QwtSeriesData<QPointF>* data)
 	return yValues ;
 }
 
+double specFitCurve::getFitPoint(double x)
+{
+	double* oldX = (double*)(parser->GetVar().at("x")) ;
+	double result = 0 ;
+
+	parser->DefineVar("x", &x) ;
+	try
+	{
+		result = parser->Eval() ;
+	}
+	catch(...) {}
+	parser->DefineVar("x", oldX);
+	return result ;
+}
+
 void evaluateParser(const double* parameters, int count, const void* data, double* fitResults, int* info)
 {
 	Q_UNUSED(info) ;

@@ -20,8 +20,8 @@ public:
 	exportFormatItem(const QStringList& values, QWidget* parent = 0);
 	~exportFormatItem();
 	QString separator() ;
-	spec::value value() ;
-	void setValue(spec::value) ;
+	int value() ;
+	void setValue(int) ;
 	void setSeparator(spec::separator) ;
 	void setDataTypes(const QStringList& ds) ;
 signals:

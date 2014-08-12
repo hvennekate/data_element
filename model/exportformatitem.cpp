@@ -58,12 +58,12 @@ QString exportFormatItem::separator()
 	return retString ;
 }
 
-spec::value exportFormatItem::value()
+int exportFormatItem::value()
 {
-	return (spec::value) Value->currentIndex() ;
+	return Value->currentIndex() ;
 }
 
-void exportFormatItem::setValue(spec::value v)
+void exportFormatItem::setValue(int v)
 {
 	Value->setCurrentIndex(v) ;
 }

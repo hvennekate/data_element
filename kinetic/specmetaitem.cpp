@@ -413,29 +413,9 @@ void specMetaItem::setSymbolSize(int w, int h)
 		specCanvasItem::setSymbolSize(w, h) ;
 }
 
-void specMetaItem::exportData(const QList<QPair<bool, QString> >& headerFormat, const QList<QPair<spec::value, QString> >& dataFormat, QTextStream& out)  // TODO split into two
+QString specMetaItem::exportZ(int index) const
 {
-	revalidate();
-
-	for(int i = 0 ; i < headerFormat.size() ; i++)
-		out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
-	out << endl ;
-	QVector<double> fitValues ;
-	if(fitCurve) fitValues = fitCurve->getFitData(data()) ;
-	for(size_t j = 0 ; j < dataSize() ; j++)
-	{
-		for(int i = 0 ; i < dataFormat.size() ; i++)
-		{
-			switch(dataFormat[i].first)
-			{
-				case spec::wavenumber: out << sample(j).x() ; break ;
-				case spec::signal: out << sample(j).y() ; break ;
-				case spec::maxInt:
-					if(j < (size_t) fitValues.size())
-						out <<  fitValues[j] ; break ;
-			}
-			out << dataFormat[i].second ;
-		}
-	}
-	out << endl ;
+	if (fitCurve)
+		return QString::number(fitCurve->getFitPoint(sample(index).x())) ;
+	return QString() ;
 }

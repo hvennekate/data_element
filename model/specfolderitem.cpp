@@ -133,12 +133,13 @@ void specFolderItem::addDataFilter(const specDataPointFilter& filter)
 	invalidate(); // TODO include this in child's function
 }
 
-void specFolderItem::exportData(const QList<QPair<bool, QString> >& headerFormat, const QList<QPair<spec::value, QString> >& dataFormat, QTextStream& out)
+QString specFolderItem::exportData(const QList<QPair<bool, QString> > & headerFormat, const QList<QPair<int, QString> > & dataFormat, const QStringList &numericDescriptors)
 {
 	revalidate();
+	QString result ;
 	for(int i = 0 ; i < headerFormat.size() ; i++)
-		out << (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
-	out << endl ;
+		result += (headerFormat[i].first ? headerFormat[i].second : this->descriptor(headerFormat[i].second)) ;
+	result += '\n' ;
 	/* 	if(mergePlotData) // TODO
 	{
 		for (int j = 0 ; j < dataSize() ; j++)
@@ -149,8 +150,9 @@ void specFolderItem::exportData(const QList<QPair<bool, QString> >& headerFormat
 	// 	else
 	// 	{
 	foreach(specModelItem * child, ChildrenList)
-	child->exportData(headerFormat, dataFormat, out) ;
+		result += child->exportData(headerFormat, dataFormat, numericDescriptors) ;
 	// 	}
+	return result ;
 }
 
 void specFolderItem::deleteDescriptor(const QString& descriptorName)

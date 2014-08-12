@@ -26,6 +26,7 @@ private:
 	bool styleFitCurve ;
 	bool fitCurveDescriptor(const QString&) const ;
 	void syncFitCurveName() const ;
+	QString exportZ(int index) const ;
 public:
 	void refreshOtherPlots() ;
 	void setModels(specModel* meta, specModel* data) ;
@@ -78,7 +79,6 @@ public:
 	void setPenStyle(const qint8&);
 	qint8 penStyle() const ;
 	void connectedItems(QModelIndexList& dataItems, QModelIndexList& metaItems) ;
-	void exportData(const QList<QPair<bool, QString> >&, const QList<QPair<spec::value, QString> >&, QTextStream&) ;
 };
 
 /* TODO in other classes
