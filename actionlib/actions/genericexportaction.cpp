@@ -25,7 +25,11 @@ specUndoCommand* genericExportAction::generateUndoCommand()
 	QFile exportFile(QFileDialog::getSaveFileName(0, "File name", "", "ASCII files (*.asc)")) ;
 	if(exportFile.fileName() == "") return 0 ;
 
-	exportFormat->setDataTypes(model->dataTypes()) ;
+	QStringList dataTypes = model->dataTypes() ;
+	QStringList numericalDescriptors = model->descriptorsWithFlags(spec::numeric) ;
+	if (dataTypes.size() == spec::numericDescriptor)
+		dataTypes += numericalDescriptors ;
+	exportFormat->setDataTypes(dataTypes) ;
 	exportFormat->setDescriptors(model->descriptors()) ;
 	if(exportFormat->exec() != QDialog::Accepted) return 0 ;
 
@@ -36,12 +40,13 @@ specUndoCommand* genericExportAction::generateUndoCommand()
 	}
 	QTextStream out(&exportFile) ;
 	QList<QPair<bool, QString> > headerFormat = exportFormat->headerFormat() ;
-	QList<QPair<spec::value, QString> > dataFormat = exportFormat->dataFormat() ;
+	QList<QPair<int, QString> > dataFormat = exportFormat->dataFormat() ;
 	if(selection.isEmpty())
 		selection << QModelIndex() ;
 	QList<specModelItem*> pointers = model->pointerList(selection) ;
+
 	foreach(specModelItem * item, pointers)
-	item->exportData(headerFormat, dataFormat, out) ;
+		out << item->exportData(headerFormat, dataFormat, numericalDescriptors) ;
 	exportFile.close() ;
 	return 0 ;
 }
