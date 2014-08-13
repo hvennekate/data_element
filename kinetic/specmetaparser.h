@@ -3,10 +3,14 @@
 
 #include <QString>
 #include <QMap>
-#include <muParser.h>
 #include "specmodelitem.h"
 #include <QVector>
 #include "specmetavariable.h"
+
+namespace mu
+{
+	class Parser ;
+}
 
 class specMetaParser
 {
@@ -17,10 +21,10 @@ private:
 	QStringList symbols ;
 	QVector<double> valueVector ;
 	QList<specMetaVariable*> evaluators ;
-	mu::Parser prepare(const QString&) ;
-	mu::Parser x, y ;
-	QString xExp, yExp ;
+	mu::Parser* prepare(const QString&) ;
 	specMetaItem* parent ;
+	mu::Parser *x, *y ;
+	QString xExp, yExp ;
 	void clear() ;
 	bool containsNan(const QVector<double>&) ;
 	bool containsNan(const QVector<QVector<double> >& matrix, int column) ;

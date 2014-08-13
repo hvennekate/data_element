@@ -1,12 +1,15 @@
 #include "specmetaparser.h"
 #include <QStringList>
 #include <QRegExp>
+#include <muParser.h>
 #include <qwt_series_data.h>
 #include <iostream>
 #include "specmetaitem.h"
 
 specMetaParser::specMetaParser(const QString& expressionList, const QString& xExpression, const QString& yExpression, specMetaItem* par)
 	: parent(par),
+	  x(0),
+	  y(0),
 	  changingRange(false)
 {
 	setAssignments(expressionList, xExpression, yExpression) ;
@@ -20,7 +23,10 @@ void specMetaParser::clear()
 	symbols.clear();
 	valueVector.clear();
 	errors.clear();
-
+	delete x ;
+	delete y ;
+	x = 0 ;
+	y = 0 ;
 }
 
 void specMetaParser::setAssignments(const QString& expressionList, const QString& xExpression, const QString& yExpression)
@@ -152,9 +158,10 @@ void specMetaParser::getPoints(const QVector<QVector<double> >& variableValues,
 		}
 		for(int j = 0 ; j < valueVector.size() ; ++j)
 			valueVector[j] = variableValues[i][j] ;
+		if (!x || !y) return ;
 		try
 		{
-			result << QPointF(x.Eval(), y.Eval()) ;
+			result << QPointF(x->Eval(), y->Eval()) ;
 		}
 		catch(mu::Parser::exception_type& p)
 		{
@@ -249,15 +256,15 @@ bool specMetaParser::ok() const
 	return valid ;
 }
 
-mu::Parser specMetaParser::prepare(const QString& val)
+mu::Parser* specMetaParser::prepare(const QString& val)
 {
-	mu::Parser retVal ;
+	mu::Parser *retVal = new mu::Parser ;
 	try
 	{
 		int i = 0 ;
 		foreach(QString symbol, symbols)
-		retVal.DefineVar(symbol.toStdString(), & (valueVector[i++]));
-		retVal.SetExpr(val.toStdString()) ;
+			retVal->DefineVar(symbol.toStdString(), & (valueVector[i++]));
+		retVal->SetExpr(val.toStdString()) ;
 	}
 	catch(mu::Parser::exception_type& p)
 	{

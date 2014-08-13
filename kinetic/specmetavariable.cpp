@@ -116,7 +116,7 @@ QVector<double> specMetaVariable::values(specModelItem* item, const QVector<doub
 bool specMetaVariable::extractXs(specModelItem* item, QVector<double>& xvals) const
 {
 	item->revalidate() ;
-	if(xvals.size() == 1 && std::isnan(xvals[0]))
+	if(xvals.size() == 1 && isnan(xvals[0]))
 	{
 		double value ;
 		xvals.clear();
