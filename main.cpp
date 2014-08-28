@@ -33,17 +33,30 @@
 #include "bzipiodevice.h"
 #include <QPair>
 #include "specshortcutdialog.h"
+#include <QString>
 
 int main(int argc, char* argv[])
 {
 #ifdef WIN32BUILD
 	QIcon::setThemeName("oxygen") ;
+	QString appPath ;
+	if (argc) appPath = QDir::fromNativeSeparators(argv[0]) ;
+	appPath = appPath.left(appPath.lastIndexOf('/')) ;
+	std::cout << "String: \"" << appPath.toStdString() << "\" " << appPath.size() << std::endl ;
+	if (!appPath.isEmpty())
+		appPath += "/" ;
+	(appPath += "platforms").prepend("QT_QPA_PLATFORM_PLUGIN_PATH=") ;
+	std::cout << "Platform path: " << appPath.toStdString() << std::endl ;
+	_putenv(appPath.toStdString().c_str()) ;
 #endif
+
 	Q_INIT_RESOURCE(application);
 	QCoreApplication::setOrganizationName("MPIbpC") ;
 	QCoreApplication::setOrganizationDomain("mpibpc.mpg.de") ;
 	QCoreApplication::setApplicationName("spec-PumpProbe") ;
+
 	QApplication app(argc, argv) ;
+
 	QString parameter(argc > 1 ? QString(argv[1]) : QString("")) ;
 	if(parameter.left(2).toLower() == "-e")
 	{
