@@ -54,6 +54,7 @@ void toggle3DPlotAction::execute()
 		if (0 > splitter->indexOf(plotWidget))
 			splitter->addWidget(plotWidget) ;
 		plotWidget->setVisible(true) ;
+		plotWidget->show();
 		specModel* model = parent()->findChild<specModel*>() ;
 		QString descriptor = descriptors->currentText() ;
 		descriptors->clear();

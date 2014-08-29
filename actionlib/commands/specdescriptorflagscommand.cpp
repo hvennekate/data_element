@@ -11,7 +11,7 @@ void specDescriptorFlagsCommand::setItems(QList<specModelItem*>& list, QString K
 	items.clear();
 	if(list.isEmpty()) return ;
 	foreach(specModelItem * item, list)
-	items << itemPropertyPair(specGenealogy(item, model()), f) ;
+		items << itemPropertyPair(specGenealogy(item, model()), f) ;
 }
 
 void specDescriptorFlagsCommand::addItem(specModelItem* item, QString Key, spec::descriptorFlags f)

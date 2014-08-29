@@ -287,6 +287,8 @@ QVariant specModel::data(const QModelIndex& index, int role) const
 			return pointer->editDescriptor(Descriptors[index.column()]) ;
 		case Qt::ToolTipRole :
 			return pointer->toolTip(Descriptors[index.column()]) ;
+		case spec::descriptorPropertyRole:
+			return (int) pointer->descriptorProperties(Descriptors[index.column()]) ;
 	}
 	return QVariant() ;
 }
