@@ -27,6 +27,16 @@ void specDockWidget::setupWindow(specActionLibrary* actions)
 	widget->setWindowFlags(Qt::Widget);
 	setWidget(widget) ;
 
+//	// get brushes
+//	QPalette pal = palette() ;
+//	QBrush activeWindow = pal.brush(QPalette::Active, QPalette::Window),
+//			inactiveWindow = pal.brush(QPalette::Inactive, QPalette::Window) ;
+//	if (activeWindow == inactiveWindow)
+//		inactiveWindow.setColor(inactiveWindow.color().darker()) ;
+//
+//	pal.setBrush(QPalette::Inactive, QPalette::Window, inactiveWindow) ;
+//	setPalette(pal) ;
+
 	// add inner widgets
 	QList<QWidget*> innerWidgets = mainWidgets() ;
 	if(innerWidgets.size() == 1)
@@ -65,6 +75,8 @@ void specDockWidget::setupWindow(specActionLibrary* actions)
 			delete toolbar ;
 		else
 			widget->addToolBar(toolbar);
+
+//		w->setPalette(pal);
 	}
 
 	specView* view = findChild<specView*>() ;
