@@ -42,11 +42,9 @@ int main(int argc, char* argv[])
 	QString appPath ;
 	if (argc) appPath = QDir::fromNativeSeparators(argv[0]) ;
 	appPath = appPath.left(appPath.lastIndexOf('/')) ;
-	std::cout << "String: \"" << appPath.toStdString() << "\" " << appPath.size() << std::endl ;
 	if (!appPath.isEmpty())
 		appPath += "/" ;
 	(appPath += "platforms").prepend("QT_QPA_PLATFORM_PLUGIN_PATH=") ;
-	std::cout << "Platform path: " << appPath.toStdString() << std::endl ;
 	_putenv(appPath.toStdString().c_str()) ;
 #endif
 
