@@ -21,6 +21,7 @@ private:
 	bool changingTitle ;
 private slots:
 	void selectionChanged(const QItemSelection& selected, const QItemSelection& deselected) ;
+//	void currentChanged(const QModelIndex& current, const QModelIndex& previous) ;
 protected:
 	void changeEvent(QEvent* event) ;
 	virtual QList<QWidget*> mainWidgets() const = 0 ;

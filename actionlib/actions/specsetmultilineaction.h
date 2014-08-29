@@ -10,6 +10,7 @@ public:
 	explicit specSetMultilineAction(QObject* parent = 0);
 private:
 	specUndoCommand* generateUndoCommand() ;
+	bool specificCheckRequirements() ;
 };
 
 #endif // SPECSETMULTILINEACTION_H

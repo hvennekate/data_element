@@ -15,8 +15,10 @@ public:
 	virtual const std::type_info& possibleParent() ;
 	virtual QList<specStreamable::type> requiredTypes() const ;
 	bool requirements() ;
+	bool checkRequirements() ;
 protected:
-	virtual bool specificRequirements() { return true ;}
+	virtual bool specificRequirements() { return true ; }
+	virtual bool specificCheckRequirements() { return true ; }
 	virtual bool postProcessingRequirements() const  { return true ; }
 	void execute();
 	specView* view ;

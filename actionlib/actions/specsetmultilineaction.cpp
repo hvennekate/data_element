@@ -24,3 +24,10 @@ specUndoCommand* specSetMultilineAction::generateUndoCommand()
 	command->setText(tr("Toggle multiline")) ;
 	return command ;
 }
+
+bool specSetMultilineAction::specificCheckRequirements()
+{
+	if (!model) return false ;
+	if (!currentIndex.isValid()) return false ;
+	return spec::multiline & model->data(currentIndex, spec::descriptorPropertyRole).toInt() ;
+}

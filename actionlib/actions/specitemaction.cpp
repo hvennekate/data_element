@@ -106,3 +106,8 @@ bool specItemAction::requirements()
 	currentItem = model->itemPointer(currentIndex) ;
 	return specificRequirements() ;
 }
+
+bool specItemAction::checkRequirements()
+{
+	return (isCheckable() && specificCheckRequirements()) ;
+}

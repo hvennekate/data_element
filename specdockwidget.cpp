@@ -64,6 +64,8 @@ void specDockWidget::setupWindow(specActionLibrary* actions)
 			actions->addDragDropPartner(view->model());
 			connect(view->selectionModel(), SIGNAL(selectionChanged(QItemSelection, QItemSelection)),
 				this, SLOT(selectionChanged(QItemSelection, QItemSelection))) ;
+//			connect(view->selectionModel(), SIGNAL(currentChanged(QModelIndex,QModelIndex)),
+//				this, SLOT(currentChanged(QModelIndex,QModelIndex))) ;
 		}
 		if(plot)
 		{
@@ -130,7 +132,17 @@ void specDockWidget::selectionChanged(const QItemSelection& selected, const QIte
 		QList<specStreamable::type> ts = action->requiredTypes() ;
 		bool enable = ts.isEmpty();
 		foreach(specStreamable::type t, ts)
-		enable = enable || selectedTypes[t] ;
+			enable = enable || selectedTypes[t] ;
 		action->setEnabled(enable && action->requirements()) ;
+		action->setChecked(action->checkRequirements());
 	}
 }
+
+//void specDockWidget::currentChanged(const QModelIndex &current, const QModelIndex &previous) // TODO why does this not work?
+//{
+//	foreach (specItemAction* action, findChildren<specItemAction*>())
+//	{
+//		action->setEnabled(action->isEnabled() && action->requirements());
+//		action->setCheckable(action->checkRequirements());
+//	}
+//}
