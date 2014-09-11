@@ -9,6 +9,7 @@
 #include <QMenuBar>
 #include <QMenu>
 #include <QMessageBox>
+#include "editimportdirsaction.h"
 
 specAppWindow::specAppWindow()
 	: QMainWindow(),
@@ -113,6 +114,12 @@ void specAppWindow::createActions()
 	whatsThisAction = new QAction(QIcon::fromTheme("help-contextual"), tr("&What's this"), this) ;
 	whatsThisAction->setStatusTip(tr("What's this?")) ;
 	connect(whatsThisAction, SIGNAL(triggered()), this, SLOT(whatsThisMode())) ;
+
+	searchPathAction = new editImportDirsAction(this) ;
+#ifdef QT_DEBUG
+	dumpAction = new QAction(QIcon::fromTheme("applicatons-science"), tr("Dump object info to debug"), this) ;
+	connect(dumpAction, SIGNAL(triggered()), this, SLOT(dumpInfo())) ;
+#endif
 }
 
 void specAppWindow::editShortcuts()
@@ -131,10 +138,37 @@ void specAppWindow::createToolBars()
 	fileToolBar = addToolBar(tr("File toolbar"));
 	fileToolBar->addAction(newAction);
 	fileToolBar->addAction(openAction);
+	fileToolBar->addSeparator() ;
 	fileToolBar->addAction(shortCutAction) ;
-	fileToolBar->addAction(restoreSessionAction) ;
+	fileToolBar->addAction(restoreSessionAction);
+	fileToolBar->addAction(searchPathAction) ;
+	fileToolBar->addSeparator() ;
 	fileToolBar->addAction(whatsThisAction) ;
+#ifdef QT_DEBUG
+	fileToolBar->addSeparator() ;
+	fileToolBar->addAction(dumpAction) ;
+#endif
 }
+
+#ifdef QT_DEBUG
+void printChild(int indent, QObject* object)
+{
+	qDebug()
+			<< (QString(" ").repeated(indent)).toStdString().c_str()
+			<< object->metaObject()->className()
+			<< object->objectName().toStdString().c_str() ;
+	foreach(QObject* child, object->children())
+		printChild(indent+1, child) ;
+}
+
+void specAppWindow::dumpInfo()
+{
+	qDebug() << "Dumping app window info" << metaObject()->propertyCount() ;
+	for (int i = 0 ; i < metaObject()->propertyCount() ; ++i)
+		qDebug() << "Property" << i << metaObject()->property(i).name() << metaObject()->property(i).read(this) ;
+	printChild(0, this) ;
+}
+#endif
 
 void specAppWindow::createMenus()
 {
@@ -143,6 +177,7 @@ void specAppWindow::createMenus()
 	fileMenu->addAction(openAction);
 	fileMenu->addAction(shortCutAction) ;
 	fileMenu->addAction(restoreSessionAction) ;
+	fileMenu->addAction(searchPathAction) ;
 
 	helpMenu = menuBar()->addMenu(tr("&Help")) ;
 	helpMenu->addAction(whatsThisAction) ;

@@ -20,6 +20,9 @@ private slots:
 	void newFile();
 	void openFile();
 	void openFile(const QString&) ;
+#ifdef QT_DEBUG
+	void dumpInfo() ;
+#endif
 
 protected:
 	void closeEvent(QCloseEvent*) ;
@@ -39,6 +42,10 @@ private:
 	QAction* whatsThisAction ;
 	QAction* restoreSessionAction ;
 	QAction* shortCutAction ;
+	QAction* searchPathAction ;
+#ifdef QT_DEBUG
+	QAction* dumpAction ;
+#endif
 private slots:
 	void about() ;
 	void whatsThisMode() ;
