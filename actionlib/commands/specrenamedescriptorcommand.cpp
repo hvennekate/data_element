@@ -23,7 +23,7 @@ void specRenameDescriptorCommand::readCommand(QDataStream& in)
 
 void specRenameDescriptorCommand::doIt()
 {
-	specModel* myModel = qobject_cast<specModel*> (parentObject()) ;
+	specModel* myModel = model() ;
 	if(!myModel) return ;
 	myModel->signalBeginReset();
 	myModel->renameDescriptors(map) ;

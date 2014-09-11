@@ -49,5 +49,6 @@ QString specUndoCommand::description() const
 
 specModel* specUndoCommand::model() const
 {
-	return dynamic_cast<specModel*>(parentObject()) ;
+	// TODO macro um gleich abzubrechen, wenn nicht vorhanden
+	return qobject_cast<specModel*>(parentObject()) ;
 }
