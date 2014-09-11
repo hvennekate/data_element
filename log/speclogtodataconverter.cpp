@@ -62,9 +62,20 @@ void specLogToDataConverter::exportData(QList<specModelItem*>& items, QMimeData*
 		data->setData("application/spec.logged.files", ba) ;
 }
 
-QList<specModelItem*> specLogToDataConverter::importData(const QMimeData* data)
+QStringList specLogToDataConverter::searchDirectories()
 {
 	QSettings settings ;
+	return settings.value("logConverter/importDirectory").toStringList() ;
+}
+
+void specLogToDataConverter::setSearchDirectories(const QStringList &dirs)
+{
+	QSettings settings ;
+	settings.setValue("logConverter/importDirectory", dirs) ;
+}
+
+QList<specModelItem*> specLogToDataConverter::importData(const QMimeData* data)
+{
 	QByteArray ba(data->data("application/spec.logged.files")) ;
 	QDataStream in(&ba, QIODevice::ReadOnly) ;
 	QPair<qint8, QString> entry ;
@@ -94,8 +105,7 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData* data)
 			QFile file(fileName) ;
 			if(!file.exists())
 			{
-				QStringList directories(settings.value("logConverter/importDirectory").toStringList()) ;
-				foreach(QString directory, directories)
+				foreach(QString directory, searchDirectories())
 				{
 					currentDirectory.setPath(directory) ;
 					QDir::setCurrent(currentDirectory.absolutePath()) ;
@@ -128,8 +138,8 @@ QList<specModelItem*> specLogToDataConverter::importData(const QMimeData* data)
 						continue ;
 					}
 					currentDirectory = path.directory() ;
-					directories << currentDirectory.absolutePath() ;
-					settings.setValue("logConverter/importDirectory", directories) ;
+					setSearchDirectories(searchDirectories()
+							     << currentDirectory.absolutePath()) ;
 					file.setFileName(path.selectedFiles().first()) ;
 				}
 			}

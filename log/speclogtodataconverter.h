@@ -22,6 +22,8 @@ public:
 	void exportData(QList<specModelItem*>&, QMimeData*) ;
 	bool canImport(const QStringList&) ;
 	QStringList importableTypes() const ;
+	static QStringList searchDirectories() ;
+	static void setSearchDirectories(const QStringList &dirs) ;
 };
 
 #endif // SPECLOGTODATACONVERTER_H

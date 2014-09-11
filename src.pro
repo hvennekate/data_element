@@ -141,7 +141,8 @@ SOURCES += main.cpp \
     model/specmatrixmimeexporter.cpp \
     actionlib/actions/matrixexportaction.cpp \
     plot/spec3dquickplot.cpp \
-    actionlib/actions/toggle3dplotaction.cpp
+    actionlib/actions/toggle3dplotaction.cpp \
+    log/editimportdirsaction.cpp \
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -284,7 +285,8 @@ HEADERS += cutbyintensitydialog.h \
     model/specmatrixmimeexporter.h \
     actionlib/actions/matrixexportaction.h \
     plot/spec3dquickplot.h \
-    actionlib/actions/toggle3dplotaction.h
+    actionlib/actions/toggle3dplotaction.h \
+    log/editimportdirsaction.h \
 
 INCLUDEPATH += kinetic \
 	log \
@@ -371,7 +373,8 @@ FORMS += \
     actionlib/actions/specmergedialog.ui \
     actionlib/actions/averagedialog.ui \
     specshortcutdialog.ui \
-    model/matrixexportdialog.ui
+    model/matrixexportdialog.ui \
+    logconverterimportdirectoriesdialog.ui
 
 OTHER_FILES += icons/oxygen/index.theme \
     icons/oxygen/geticons.py
