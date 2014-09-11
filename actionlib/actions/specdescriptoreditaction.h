@@ -3,6 +3,9 @@
 
 #include <QDialog>
 #include <QValidator>
+#include <QItemDelegate>
+#include "names.h"
+
 class QLineEdit ;
 class QCheckBox ;
 
@@ -43,6 +46,19 @@ class stringListEntryValidator : public stringListValidator
 public:
 	stringListEntryValidator(QList<stringListEntryWidget*> allWidgets, stringListEntryWidget* parent = 0) ;
 	State validate(QString&, int&) const ;
+};
+
+class descriptorDelegate : public QItemDelegate
+{
+public:
+	descriptorDelegate (QObject* parent) ;
+	void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const ;
+	QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const ;
+	bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) ;
+private:
+	QPixmap numericMap, lockedMap, lockedNumericMap ;
+	spec::descriptorFlags getFlags(const QModelIndex& index) const ;
+	spec::descriptorFlags setFlags(const QModelIndex& index, spec::descriptorFlags f) const ;
 };
 
 class stringListChangeDialog : public QDialog

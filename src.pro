@@ -143,6 +143,7 @@ SOURCES += main.cpp \
     plot/spec3dquickplot.cpp \
     actionlib/actions/toggle3dplotaction.cpp \
     log/editimportdirsaction.cpp \
+    actionlib/commands/changemodeldescriptorpropertiescommand.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -287,6 +288,7 @@ HEADERS += cutbyintensitydialog.h \
     plot/spec3dquickplot.h \
     actionlib/actions/toggle3dplotaction.h \
     log/editimportdirsaction.h \
+    actionlib/commands/changemodeldescriptorpropertiescommand.h
 
 INCLUDEPATH += kinetic \
 	log \

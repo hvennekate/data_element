@@ -73,7 +73,8 @@ public:
 	    dataItem = 67,
 	    deleteDescriptorCommandId = 68,
 	    renameDescriptorCommandId = 69,
-	    exchangeFilterCommandId = 70
+	    exchangeFilterCommandId = 70,
+	    changeModelDescriptorPropertiesCommandId = 71
 	};
 	virtual type typeId() const = 0;
 protected:

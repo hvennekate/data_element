@@ -99,6 +99,12 @@ const QList<spec::descriptorFlags>& specModel::descriptorProperties() const
 	return DescriptorProperties ;
 }
 
+spec::descriptorFlags specModel::descriptorProperties(const QString &key) const
+{
+	if (!Descriptors.contains(key)) return spec::def ;
+	return DescriptorProperties[Descriptors.indexOf(key)] ;
+}
+
 bool specModel::isFolder(const QModelIndex& index) const
 { return itemPointer(index)->isFolder() ;}
 

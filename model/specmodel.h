@@ -87,6 +87,7 @@ public:
 	QStringList descriptorsWithFlags(const spec::descriptorFlags& flags) const ;
 	QStringList descriptorsMatchFlags(const spec::descriptorFlags& flags) const ;
 	const QList<spec::descriptorFlags>& descriptorProperties() const;
+	spec::descriptorFlags descriptorProperties(const QString& key) const;
 	void setDescriptorProperties(spec::descriptorFlags flags, const QString& key) ;
 	void renameDescriptors(const QMap<QString, QString>&) ;
 	void deleteDescriptor(const QString&) ;

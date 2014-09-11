@@ -9,6 +9,8 @@
 #include "specmulticommand.h"
 #include "specdeletedescriptorcommand.h"
 #include "specrenamedescriptorcommand.h"
+#include <QTableWidget>
+#include <QMouseEvent>
 
 stringListEntryValidator::stringListEntryValidator(QList<stringListEntryWidget*> aW, stringListEntryWidget* parent)
 	: stringListValidator(parent),
@@ -116,20 +118,42 @@ void stringListEntryWidget::checkStateChanged(int s)
 stringListChangeDialog::stringListChangeDialog(QStringList strings, QWidget* parent) :
 	QDialog(parent)
 {
-	QScrollArea* scrollArea = new QScrollArea(this) ;
-	QWidget* areaWidget = new QWidget(scrollArea) ;
-	QVBoxLayout* layout = new QVBoxLayout(this), *scrollLayout = new QVBoxLayout(areaWidget) ;
-	layout->addWidget(scrollArea) ;
-	foreach(QString string, strings)
+	setWindowTitle(tr("Edit descriptors")) ;
+//	QScrollArea* scrollArea = new QScrollArea(this) ;
+//	QWidget* areaWidget = new QWidget(scrollArea) ;
+//	QVBoxLayout* layout = new QVBoxLayout(this), *scrollLayout = new QVBoxLayout(areaWidget) ;
+//	layout->addWidget(scrollArea) ;
+//	foreach(QString string, strings)
+//	{
+//		stringListEntryWidget* widget = new stringListEntryWidget(string, this) ;
+//		widgets << widget ;
+//		scrollLayout->addWidget(widget) ;
+//	}
+//	foreach(stringListEntryWidget * widget, widgets)
+//		widget->setAllWidgets(widgets);
+//	scrollArea->setWidget(areaWidget);
+//	layout->addWidget(buttonBox) ;
+
+	QVBoxLayout* layout = new QVBoxLayout(this) ;
+
+	QTableWidget *table = new QTableWidget(strings.size(), 2, this) ;
+	layout->addWidget(table);
+	// Disable/change headers
+
+	for (int i = 0 ; i < strings.size() ; ++i)
 	{
-		stringListEntryWidget* widget = new stringListEntryWidget(string, this) ;
-		widgets << widget ;
-		scrollLayout->addWidget(widget) ;
+		QTableWidgetItem *item = new QTableWidgetItem(strings[i]) ;
+		item->setFlags(item->flags() | Qt::ItemIsEditable | Qt::ItemIsUserCheckable);
+		item->setCheckState(Qt::Checked);
+		table->setItem(i, 0, item);
+
+		QTableWidgetItem *flagItem = new QTableWidgetItem ;
+		flagItem->setData(Qt::DisplayRole, (uint) (spec::editable | spec::numeric));
+		table->setItem(i, 1, flagItem) ;
 	}
-	foreach(stringListEntryWidget * widget, widgets)
-	widget->setAllWidgets(widgets);
+	table->setItemDelegate(new descriptorDelegate(table));
+
 	QDialogButtonBox* buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, Qt::Horizontal, this) ;
-	scrollArea->setWidget(areaWidget);
 	layout->addWidget(buttonBox) ;
 	connect(buttonBox, SIGNAL(accepted()), this, SLOT(accept())) ;
 	connect(buttonBox, SIGNAL(rejected()), this, SLOT(reject())) ;
@@ -138,18 +162,18 @@ stringListChangeDialog::stringListChangeDialog(QStringList strings, QWidget* par
 QStringList stringListChangeDialog::inactive() const
 {
 	QStringList result ;
-	foreach(stringListEntryWidget * widget, widgets)
-	if(!widget->active())
-		result << widget->content() ;
+//	foreach(stringListEntryWidget * widget, widgets)
+//	if(!widget->active())
+//		result << widget->content() ;
 	return result ;
 }
 
 QMap<QString, QString> stringListChangeDialog::active() const
 {
 	QMap<QString, QString> map ;
-	foreach(stringListEntryWidget * widget, widgets)
-	if(widget->active())
-		map[widget->oldContent()] = widget->content() ;
+//	foreach(stringListEntryWidget * widget, widgets)
+//	if(widget->active())
+//		map[widget->oldContent()] = widget->content() ;
 	return map ;
 }
 
@@ -206,3 +230,67 @@ const std::type_info& specDescriptorEditAction::possibleParent()
 {
 	return typeid(specView) ;
 }
+
+
+descriptorDelegate::descriptorDelegate(QObject *parent)
+	: QItemDelegate(parent),
+	  numericMap(QPixmap(":/numeric.png")),
+	  lockedMap(QPixmap(":/locked.png")),
+	  lockedNumericMap(QPixmap(":/lockednumeric.png"))
+{
+}
+
+void descriptorDelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+	if (index.column() != 1)
+	{
+		QItemDelegate::paint(painter, option, index) ;
+		return ;
+	}
+	spec::descriptorFlags flags = getFlags(index) ;
+	painter->drawPixmap(option.rect.x(), option.rect.y(),
+			    flags & spec::numeric
+			    ? (flags & spec::editable ? numericMap
+						      : lockedNumericMap)
+			    : (flags & spec::editable ? QPixmap()
+						      : lockedMap));
+}
+
+QSize descriptorDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
+{
+	if (index.column() != 1)
+		return QItemDelegate::sizeHint(option, index) ;
+	return lockedNumericMap.size() ;
+}
+
+bool descriptorDelegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
+{
+	if (index.column() != 1)
+		return QItemDelegate::editorEvent(event, model, option, index) ;
+
+	if (event->type() == QEvent::MouseButtonPress)
+	{
+		spec::descriptorFlags flags = getFlags(index) ;
+		flags = (flags == spec::editable) ? spec::def
+						  : (flags == spec::def ? spec::numeric
+									: ((flags == spec::numeric) ? (spec::editable | spec::numeric)
+												   : spec::editable)) ;
+		model->setData(index, (uint) setFlags(index, flags)) ;
+		return false ;
+	}
+
+	return true ;
+}
+
+spec::descriptorFlags descriptorDelegate::getFlags(const QModelIndex &index) const
+{
+	spec::descriptorFlags flags = (spec::descriptorFlags) index.data().toInt() ;
+	return flags & (spec::editable | spec::numeric) ;
+}
+
+spec::descriptorFlags descriptorDelegate::setFlags(const QModelIndex &index, spec::descriptorFlags f) const
+{
+	spec::descriptorFlags flags = (spec::descriptorFlags) index.data().toInt() ;
+	return f | (flags & ~(spec::editable | spec::numeric)) ;
+}
+
