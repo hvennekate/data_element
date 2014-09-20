@@ -335,11 +335,10 @@ QHash<QString, specDescriptor> fileHeader(QTextStream& in)
 	for(QStringList::size_type i = 0 ; i < headerContent.size() ; i++)
 	{
 		QString content = QStringList(headerContent[i].split(": ").mid(1)).join(": ").remove(QRegExp("^\"")).remove(QRegExp("\"$")) ;
-		headerItems[headerContent[i].split(": ") [0]] = (specDescriptor(content,
-			(content.contains(QRegExp("\\D"))) ? spec::editable : spec::numeric)) ;
+		headerItems[headerContent[i].split(": ") [0]] = (specDescriptor(content)) ;
 	}
 	if(headerItems["Kommentar"].content().contains("@"))
-		headerItems["Pump"] = specDescriptor(headerItems["Kommentar"].content().split("@ ") [1].split(" nm") [0], spec::numeric) ;    // Pumpwellenlaenge
+		headerItems["Pump"] = specDescriptor(headerItems["Kommentar"].content().split("@ ") [1].split(" nm") [0]) ;    // Pumpwellenlaenge
 	return headerItems ;
 }
 
@@ -348,21 +347,16 @@ void fileHeader(QString header, QHash<QString, specDescriptor>& description)
 	QStringList headerContent = header.split(QRegExp(", (?=(\\w+\\s)*\\w+:)")) ;
 	QHash<QString, specDescriptor> headerItems ;
 	QDoubleValidator validator ;
-	int a = 0 ;
 	foreach(QString headerEntry, headerContent)
 	{
-		a = 0 ;
 		QString name = headerEntry.section(": ", 0, 0),
 			content = headerEntry.section(": ", 1) ;
 		content.remove(QRegExp("^\"")).remove(QRegExp("\"$")) ;
-		description[name] = specDescriptor(content,
-						   validator.validate(content, a) == QValidator::Acceptable ?
-						   spec::numeric : spec::editable) ;
-
+		description[name] = specDescriptor(content) ;
 	}
 
 	if(description["Kommentar"].content().contains("@"))
-		description["Pump"] = specDescriptor(description["Kommentar"].content().section("@ ", 1, -1).section(" nm", 0, 0), spec::numeric) ;    // Pumpwellenlaenge
+		description["Pump"] = specDescriptor(description["Kommentar"].content().section("@ ", 1, -1).section(" nm", 0, 0)) ;    // Pumpwellenlaenge
 }
 
 QVector<double> waveNumbers(const QStringList& wns)
@@ -609,7 +603,6 @@ QList<specModelItem*> readPEBinary(QFile& file)
 	specPEFile peData(file.readAll()) ;
 	specDataItem dataItem(peData) ;  // TODO interface is clumsy...
 	dataItem.changeDescriptor("Datei", QFileInfo(file.fileName()).fileName()) ;
-	dataItem.setDescriptorProperties("Datei", spec::def);
 	return QList<specModelItem*>() << new specDataItem(dataItem) ;
 }
 
@@ -619,7 +612,7 @@ QList<specModelItem*> readPEFile(QFile& file)
 
 	in.setCodec(QTextCodec::codecForName("ISO 8859-1")) ;   // File produced on windows system
 	QHash<QString, specDescriptor> headerItems ;
-	headerItems["Datei"] = specDescriptor(QFileInfo(file.fileName()).fileName(), spec::def) ;
+	headerItems["Datei"] = specDescriptor(QFileInfo(file.fileName()).fileName()) ;
 	while(in.readLine() != "#DATA") ;  // skip header
 
 	QList<specModelItem*> specData ;
@@ -711,7 +704,7 @@ QList<specModelItem*> readSKHIFile(QFile& file)
 
 	QHash<QString, specDescriptor> headerItems ;
 	foreach(QString descriptor, in.readLine().split(", "))
-	headerItems[descriptor.section(": ", 0, 0)] = specDescriptor(descriptor.section(": ", 1, 1), spec::numeric | spec::editable) ;
+	headerItems[descriptor.section(": ", 0, 0)] = specDescriptor(descriptor.section(": ", 1, 1)) ;
 	headerItems["raw"] = 1 ;
 	headerItems["file"] = QFileInfo(file.fileName()).fileName() ;
 

@@ -62,7 +62,7 @@ public:
 	specUndoCommand* itemPropertiesAction(QObject* parentObject) ;
 };
 
-class specLegacyDataItem : public specDataItem
+class specLegacyDataItem : public specDataItem // TODO durch readAlternative ersetzen
 {
 private:
 	type myType ;

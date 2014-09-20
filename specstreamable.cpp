@@ -24,11 +24,10 @@ QDataStream& operator>> (QDataStream& in, specStreamable& item)
 	quint32 ta ;
 	stream >> ta ;
 	specStreamable::type t(ta) ;
-	if(t != item.effectiveId())
-	{
-		return in ;
-	}
-	item.readFromStream(stream) ;
+	if(item.effectiveId() == t)
+		item.readFromStream(stream) ;
+	else if (item.alternativeType(t))
+		item.readAlternative(stream, t) ;
 	return in ;
 }
 
@@ -41,6 +40,12 @@ specStreamable* specStreamable::produceItem(QDataStream& in) const
 	stream >> t ;
 	qDebug() << "reading type:" << t ;
 	specStreamable* item = factory(t) ;
-	if(item) item->readFromStream(stream);
+	if(item)
+	{
+		if (item->effectiveId() == t)
+			item->readFromStream(stream);
+		else if (item->alternativeType(t))
+			item->readAlternative(stream, t) ;
+	}
 	return item ;
 }

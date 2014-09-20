@@ -128,6 +128,10 @@ void exportDialog::prepareData()
 			pointer->setSeparator(spec::space) ;
 		}
 	}
+	if (dataLayout->itemAt(defaultItemCount-1)
+			&& (pointer =
+			    dynamic_cast<exportFormatItem*>(dataLayout->itemAt(defaultItemCount-1)->widget())))
+		pointer->setSeparator(spec::newline) ;
 
 	if(!dataTypes.isEmpty() &&
 		dataLayout->itemAt(dataTypes.size() - 1) &&

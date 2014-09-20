@@ -6,9 +6,9 @@
 class specEditDescriptorCommand : public specSingleItemCommand<specModelItem>
 {
 private:
-	QStringList previousContent ;
+	QStringList previousContent ; // TODO change this to variant, make folder responsible for spreading to children
 	QString descriptor ;
-	QVector<int> previousActiveLine ;
+	QVector<int> previousActiveLine ; // TODO multiline bzw. gleich ganzen Descriptor mitnehmen
 	void doIt() ;
 	void undoIt() ;
 	void writeCommand(QDataStream& out) const ;

@@ -10,8 +10,11 @@ class specUndoCommand : public QUndoCommand, public specStreamable
 {
 private:
 	QObject* pO ;
+	void readLabel(QDataStream& in) ;
 	virtual void writeToStream(QDataStream& out) const ;
 	virtual void readFromStream(QDataStream& in) ;
+	void readAlternative(QDataStream &in, type t) ;
+	virtual void readAlternativeCommand(QDataStream& in, type t) ;
 protected:
 	virtual QString description() const ;
 	virtual void doIt() = 0;

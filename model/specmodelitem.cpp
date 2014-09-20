@@ -16,7 +16,7 @@ specModelItem::specModelItem(specFolderItem* par, QString desc)
 	: specCanvasItem(),
 	  iparent(0),
 	  dataValid(false),
-	  description(desc, spec::editable),
+	  description(desc),
 	  mergePlotData(true),
 	  sortPlotData(true)
 {
@@ -59,37 +59,26 @@ specFolderItem* specModelItem::parent() const
 QList<specModelItem*>::size_type specModelItem::children() const
 { return 0 ; }
 
-bool specModelItem::isEditable(QString key) const
+void specModelItem::changeDescriptor(const QString &key, QString value)
 {
 	if(key == "")
-		return true ;
-	return descriptorProperties(key) & spec::editable ;
-}
-
-bool specModelItem::changeDescriptor(QString key, QString value)
-{
-	if(key == "" && description.isEditable())
 	{
-		description.setContent(value) ;
+		description.setAppropriateContent(value) ;
 		setTitle(value) ;
-		return true ;
 	}
-
-	return false ;
 }
 
-bool specModelItem::setActiveLine(const QString& key, int line)
+void specModelItem::setActiveLine(const QString& key, quint32 line)
 {
 	if(key == "")
-		return description.setActiveLine(line) ;
-	return false ;
+	{
+		description.setActiveLine(line) ;
+	}
 }
 
-int specModelItem::activeLine(const QString& key) const
+quint32 specModelItem::activeLine(const QString& key) const
 {
-	if(key == "")
-		return description.activeLine() ;
-	return -1 ;
+	return getDescriptor(key).activeLine() ;
 }
 
 void specModelItem::refreshPlotData()
@@ -136,8 +125,12 @@ void specModelItem::processData()
 
 QString specModelItem::descriptor(const QString& key, bool full) const
 {
-	if(key == "") return description.content(full) ;
-	return QString() ;
+	return getDescriptor(key).content(full) ;
+}
+
+double specModelItem::descriptorValue(const QString &key) const
+{
+	return getDescriptor(key).numericValue() ;
 }
 
 bool specModelItem::isFolder() const { return false ;}
@@ -182,6 +175,22 @@ bool specModelItem::addChildren(QList<specModelItem*> list, QList<specModelItem*
 QStringList specModelItem::descriptorKeys() const
 { return QStringList(QString("")) ;}
 
+bool specModelItem::hasDescriptor(const QString& d) const
+{
+	return descriptorKeys().contains(d) ;
+}
+
+void specModelItem::setMultiline(const QString &key, bool on)
+{
+	if (key == "")
+		description.setMultiline(on) ;
+}
+
+bool specModelItem::isMultiline(const QString &key) const
+{
+	return getDescriptor(key).isMultiline() ;
+}
+
 void specModelItem::writeToStream(QDataStream& out) const
 {
 	specCanvasItem::writeToStream(out) ;
@@ -196,17 +205,6 @@ void specModelItem::readFromStream(QDataStream& in)
 	   >> description ;
 	setTitle(descriptor("", true));
 	invalidate() ;
-}
-
-spec::descriptorFlags specModelItem::descriptorProperties(const QString& key) const
-{
-	if(key == "") return description.flags() ;
-	return spec::def ;
-}
-
-void specModelItem::setDescriptorProperties(const QString& key, spec::descriptorFlags f)
-{
-	if(key == "") description.setFlags(f) ;
 }
 
 QString specModelItem::exportData(const QList<QPair<bool, QString> >& headerFormat, const QList<QPair<int, QString> >& dataFormat, const QStringList& numericDescriptors)
@@ -388,12 +386,6 @@ specModelItem::specModelItem(const specModelItem& other)
 	  description(other.description)
 {}
 
-bool specModelItem::isNumeric(const QString& key) const
-{
-	Q_UNUSED(key)
-	return false ;
-}
-
 void specModelItem::renameDescriptors(const QMap<QString, QString>& map)
 {
 	Q_UNUSED(map) ;
@@ -419,6 +411,12 @@ void specModelItem::restoreDescriptor(QListIterator<specDescriptor>& origin, con
 		description = origin.next() ;
 	else
 		origin.next() ;
+}
+
+specDescriptor specModelItem::getDescriptor(const QString &key) const
+{
+	if (key == "") return description ;
+	return specDescriptor() ;
 }
 
 QString specModelItem::editDescriptor(const QString& key) const

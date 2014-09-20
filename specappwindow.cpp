@@ -199,6 +199,7 @@ void specAppWindow::about()
 			      "- muParser (muparser.sourceforge.net)\n"
 			      "- lmfit (joachimwuttke.de/lmfit)"
 			      "- GSL (www.gnu.org/software/gsl)")
-			   + tr("\n\nVersion ID is: ") + QString(STRINGIFYMACRO(GITSHA1HASH))) ;
+			   + tr("\n\nVersion ID is: ") + QString(STRINGIFYMACRO(GITSHA1HASH))
+			   + tr("\nBuild date: ") + QString(STRINGIFYMACRO(__DATE__)));
 }
 

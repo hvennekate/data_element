@@ -26,9 +26,9 @@ specMetaItem::specMetaItem(specFolderItem* par, QString description)
 {
 	filter = new specMetaParser("", "", "", this) ;
 	invalidate() ;
-	variables["x"] = specDescriptor("", spec::editable) ;
-	variables["y"] = specDescriptor("", spec::editable) ;
-	variables["variables"] = specDescriptor("", spec::editable) ;
+	variables["x"] = specDescriptor("") ;
+	variables["y"] = specDescriptor("") ;
+	variables["variables"] = specDescriptor("") ;
 	variables["errors"] = specDescriptor("No data") ;
 }
 
@@ -243,12 +243,12 @@ QStringList specMetaItem::genericDescriptorKeys()
 	return keys ;
 }
 
-QString specMetaItem::descriptor(const QString& key, bool full) const
+specDescriptor specMetaItem::getDescriptor(const QString& key) const
 {
-	if(key == "") return specModelItem::descriptor(key, full) ;
+	if(key == "") return specModelItem::getDescriptor(key) ;
 	if(fitCurveDescriptor(key))
-		return fitCurve->descriptor(key, full) ;
-	return variables[key].content(full) ;
+		return fitCurve->getDescriptor(key) ;
+	return variables[key] ;
 }
 
 QString specMetaItem::editDescriptor(const QString& key) const
@@ -257,37 +257,24 @@ QString specMetaItem::editDescriptor(const QString& key) const
 	return specModelItem::editDescriptor(key) ;
 }
 
-bool specMetaItem::changeDescriptor(QString key, QString value)
+void specMetaItem::changeDescriptor(const QString& key, QString value)
 {
 	if(key == "")
 	{
-		bool result = specModelItem::changeDescriptor(key, value) ;
+		specModelItem::changeDescriptor(key, value) ;
 		syncFitCurveName();
-		return result ;
+		return ;
 	}
 	if(fitCurveDescriptor(key))
-		return fitCurve->changeDescriptor(key, value) ;
-	if(!variables.contains(key)) return false ;
+	{
+		fitCurve->changeDescriptor(key, value) ;
+		return ;
+	}
+	if(!variables.contains(key)) return ;
 	variables[key] = value ;
 	filter->setAssignments(variables["variables"].content(true), variables["x"].content(true), variables["y"].content(true)) ;     // TODO put in function (see above)
 	invalidate();
-	return true ;
-}
-
-spec::descriptorFlags specMetaItem::descriptorProperties(const QString& key) const
-{
-	if(key == "") return specModelItem::descriptorProperties(key) ;
-	if(variables.contains(key))
-		return variables[key].flags() ;
-	if(fitCurveDescriptor(key)) return fitCurve->descriptorProperties(key) ;    // TODO dangerous
-	return spec::def ;
-}
-
-void specMetaItem::setDescriptorProperties(const QString& key, spec::descriptorFlags f)
-{
-	if(key == "") specModelItem::setDescriptorProperties(key, f) ;
-	if(variables.contains(key)) variables[key].setFlags(f) ;
-	if(fitCurveDescriptor(key) && key != "") fitCurve->setDescriptorProperties(key, f) ;
+	return ;
 }
 
 QIcon specMetaItem::decoration() const
@@ -308,25 +295,19 @@ void specMetaItem::setRange(int variableNo, int rangeNo, int pointNo, double new
 	filter->setRange(variableNo, rangeNo, pointNo, newX, newY) ;
 }
 
-bool specMetaItem::setActiveLine(const QString& s, int i)
+void specMetaItem::setActiveLine(const QString& s, quint32 i)
 {
-	if(fitCurveDescriptor(s))
-		return fitCurve->setActiveLine(s, i) ;
-	if(variables.contains(s))
-	{
-		variables[s].setActiveLine(i) ;
-		return true ;
-	}
-	bool result = specModelItem::setActiveLine(s, i) ;
+	if(fitCurveDescriptor(s)) return fitCurve->setActiveLine(s, i) ;
+	else if(variables.contains(s)) variables[s].setActiveLine(i) ;
+	else specModelItem::setActiveLine(s, i) ;
 	syncFitCurveName();
-	return result ;
 }
 
-int specMetaItem::activeLine(const QString& key) const
+void specMetaItem::setMultiline(const QString &key, bool on)
 {
-	if(fitCurveDescriptor(key)) return fitCurve->activeLine(key) ;
-	if(variables.contains(key)) return variables[key].activeLine() ;
-	return specModelItem::activeLine(key) ;
+	if (fitCurveDescriptor(key)) fitCurve->setMultiline(key, on) ;
+	else if (variables.contains(key)) variables[key].setMultiline(on) ;
+	else specModelItem::setMultiline(key, on) ;
 }
 
 specUndoCommand* specMetaItem::itemPropertiesAction(QObject* parentObject)

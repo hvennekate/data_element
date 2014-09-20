@@ -4,13 +4,7 @@
 
 specDescriptorComparisonCriterion::specDescriptorComparisonCriterion()
 {
-	setNumeric(false) ;
-}
-
-specDescriptorComparisonCriterion::specDescriptorComparisonCriterion(const QString &descriptor, bool numeric)
-{
-	setDescriptor(descriptor);
-	setNumeric(numeric) ;
+	setTolerance(0);
 }
 
 specDescriptorComparisonCriterion::specDescriptorComparisonCriterion(const QString &descriptor, double tol)
@@ -30,17 +24,6 @@ void specDescriptorComparisonCriterion::setDescriptor(const QString &s)
 	descriptorName = s ;
 }
 
-bool specDescriptorComparisonCriterion::isNumeric() const
-{
-	return !std::isnan(toleranceValue) ;
-}
-
-void specDescriptorComparisonCriterion::setNumeric(bool a)
-{
-	if (a != isNumeric())
-		toleranceValue = a ? 0 : NAN ;
-}
-
 double specDescriptorComparisonCriterion::tolerance() const
 {
 	return toleranceValue ;
@@ -57,18 +40,8 @@ bool specDescriptorComparisonCriterion::itemsEqual(const specModelItem *first, c
 		return false ;
 	if (first == second) return true ; // TODO : necessary?
 
-	if(isNumeric())
-	{
-		double a = first->descriptorValue(descriptorName),
-		       b = second->descriptorValue(descriptorName) ;
-		if(b - toleranceValue <= a && a <= b + toleranceValue)
-			return true ;
-		if (std::isnan(a) && std::isnan(b)) return true ; // TODO check if both have this descriptor
-		return false ;
-	}
-
-	return first->descriptor(descriptorName, true)
-			== second->descriptor(descriptorName, true) ;
+	return first->getDescriptor(descriptorName)
+			.fuzzyComparison(second->getDescriptor(descriptorName), toleranceValue);
 }
 
 bool specDescriptorComparisonCriterion::itemsEqual(specModelItem *a, specModelItem *b, const container &criteria)

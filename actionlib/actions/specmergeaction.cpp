@@ -61,8 +61,6 @@ private:
 		delete correctedItem ;
 	}
 
-	bool itemsAreEqual(specModelItem* first, specModelItem* second, const QList<stringDoublePair>& criteria) ;
-
 public:
 	mergeActionThread(const QList<specModelItem*>& itms,
 			  const specDescriptorComparisonCriterion::container& crit,
@@ -152,7 +150,7 @@ specUndoCommand* specMergeAction::generateUndoCommand()
 	// let user define similarities
 	specDescriptorComparisonCriterion::container criteria ;
 	spec::correctionMode spectralAdaptation;
-	dialog->setDescriptors(model->descriptors(), model->descriptorProperties()) ;
+	dialog->setDescriptors(model->descriptors()) ;
 	if(dialog->exec() != QDialog::Accepted) return 0 ;
 	dialog->getMergeCriteria(criteria, spectralAdaptation);
 
@@ -187,7 +185,7 @@ specUndoCommand* specMergeAction::generateUndoCommand()
 	QStringList criteriaDescription ;
 	foreach(const specDescriptorComparisonCriterion& comparison, criteria)
 		criteriaDescription << comparison.descriptor()
-				       + (comparison.isNumeric() ?
+				       + (comparison.tolerance() ?
 						  " (" + QString::number(comparison.tolerance()) + ")"
 						: QString());
 	if(!criteriaDescription.isEmpty())

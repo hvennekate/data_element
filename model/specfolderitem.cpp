@@ -41,18 +41,6 @@ bool specFolderItem::isFolder() const { return true ;}
 
 QIcon specFolderItem::decoration() const { return QIcon::fromTheme("folder") ; }
 
-bool specFolderItem::isEditable(QString key) const
-{
-	if(key == "")
-		return specModelItem::isEditable(key) ;
-
-	foreach(specModelItem * item, ChildrenList)
-	if(item->isEditable(key))
-		return true ;
-
-	return false ;
-}
-
 void specFolderItem::refreshPlotData()
 {
 	QVector<double> x, y ;
@@ -76,8 +64,9 @@ void specFolderItem::removeChild(specModelItem* child)
 
 void specFolderItem::readFromStream(QDataStream& in)
 {
+	// delete old children
 	foreach(specModelItem * child, ChildrenList)
-	delete child ;
+		delete child ;
 	quint64 numChildren ;
 	specModelItem::readFromStream(in) ;
 	in >> numChildren ;
@@ -99,8 +88,7 @@ void specFolderItem::writeToStream(QDataStream& out) const
 
 QStringList specFolderItem::descriptorKeys() const
 {
-	QStringList keys;
-	keys << specModelItem::descriptorKeys() ;
+	QStringList keys = specModelItem::descriptorKeys() ;
 	foreach(specModelItem * child, ChildrenList)
 	{
 		QStringList childKeys = child->descriptorKeys() ;
@@ -116,15 +104,6 @@ specModelItem* specFolderItem::child(QList<specModelItem*>::size_type i) const
 
 int specFolderItem::childNo(specModelItem* child) const
 { return ChildrenList.indexOf(child) ; }
-
-spec::descriptorFlags specFolderItem::descriptorProperties(const QString& key) const
-{
-	if(key == "") return specModelItem::descriptorProperties(key) ;
-	spec::descriptorFlags flags = spec::numeric | spec::editable ;
-	foreach(specModelItem * child, ChildrenList)
-	flags = (spec::descriptorFlags)(flags & child->descriptorProperties(key)) ;
-	return flags ;
-}
 
 void specFolderItem::addDataFilter(const specDataPointFilter& filter)
 {
@@ -153,6 +132,11 @@ QString specFolderItem::exportData(const QList<QPair<bool, QString> > & headerFo
 		result += child->exportData(headerFormat, dataFormat, numericDescriptors) ;
 	// 	}
 	return result ;
+}
+
+bool specFolderItem::hasDescriptor(const QString &d) const
+{
+	return specModelItem::descriptorKeys().contains(d) ;
 }
 
 void specFolderItem::deleteDescriptor(const QString& descriptorName)
@@ -190,12 +174,24 @@ template<typename T>
 QVector<T> specFolderItem::findDescendants()
 {
 	QVector<T> items = specModelItem::findDescendants<T>();
-	for(int i = 0 ; i < children() ; ++i)
-	{
-		specModelItem* item = child(i) ;
-		if(T value = dynamic_cast<T>(item))
-			items << value ;
+	// This has been changed from a previous version that would have included
+	// items twice (once here and once in their own findDescendants().
+	// Since it would only have applied if the item, for which findDescendants() would have
+	// been called, had been a specFolderItem and the only usage was in
+	// specExchangeFilterCommand::doIt() and specExchangeFilterCommand::setAbsoluteFilter(),
+	// and specExchangeFilterCommand is only created in
+	// - specNormalizeAction (which is of type specRequiresDataItemAction
+	// - specCommandGenerator (obviously)
+	// - specSpectrumPlot::pointMoved (which uses the correction picker, which only specDataItem attaches to
+	//	(specDataItem::attach) // TODO rework
+	// - specSpectrumPlot::applyZeroRanges (which only takes from spec::spectrum rtti
+	// - dataItemProperties
+	// this should never have been a problem.
+	// (also:  the only forced instantiation in specmodelitem.cpp is for
+	// specDataItem -- which is necessary, but not sufficient.)
+	// In future usage, however, it may very well be
+	//
+	foreach (specModelItem* item, ChildrenList)
 		items << item->findDescendants<T>() ;
-	}
 	return items ;
 }

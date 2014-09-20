@@ -70,10 +70,9 @@ void specFitCurve::fitData::reevaluate()
 }
 
 specFitCurve::specFitCurve()
-	: expression(specDescriptor("", spec::editable)),
+	: expression(specDescriptor("")),
 	  parser(0),
 	  variablesMulti(false),
-	  expressionMulti(false),
 	  messagesMulti(false)
 {
 	setItemAttribute(Legend, true) ;
@@ -109,13 +108,13 @@ QString specFitCurve::editDescriptor(const QString& key)
 	{
 		QStringList results ;
 		foreach(variablePair vpair, variables)
-		results << vpair.first + " = " + QString::number(vpair.second) ;
+			results << vpair.first + " = " + QString::number(vpair.second) ;
 		return results.join("\n") ;
 	}
-	return descriptor(key, true) ;
+	return getDescriptor(key).content(true) ;
 }
 
-QString specFitCurve::descriptor(const QString& key, bool full)
+specDescriptor specFitCurve::getDescriptor(const QString& key)
 {
 	if(QObject::tr("Fit variables") == key)
 	{
@@ -125,35 +124,23 @@ QString specFitCurve::descriptor(const QString& key, bool full)
 					    + ((i < numericalErrors.size() && !std::isnan(numericalErrors[i])) ?
 					       " +/- " + QString::number(numericalErrors[i])
 					       : QString(""));
-		if(full || variablesMulti)
-			return variableDescriptors.join("\n") ;
-		if(activeVar >= 0 && activeVar < variableDescriptors.size())
-			return variableDescriptors[activeVar] ;
-		return QString() ;
+		return specDescriptor(variableDescriptors, activeVar, variablesMulti) ;
 	}
 	if(QObject::tr("Fit parameters") == key)
 		return fitParameters.join(", ") ;
 	if(QObject::tr("Fit expression") == key)
-		return expression.content(full || expressionMulti) ;
+		return expression ;
 	if(QObject::tr("Fit messages") == key)
 	{
 		if(!errorString.isEmpty())
-		{
-			if(full)
-				return errorString ;
-			return errorString.section("\n", 0, 0) ;
-		}
+			return specDescriptor(errorString, 0, messagesMulti) ;
 		if(fitData* fit = dynamic_cast<fitData*>(data()))
-		{
-			if(full || messagesMulti)
-				return fit->errorString ;
-			return fit->errorString.section("\n", 0, 0) ;
-		}
+			return specDescriptor(fit->errorString, 0, messagesMulti) ;
 	}
 	return QString() ;
 }
 
-bool specFitCurve::changeDescriptor(QString key, QString value)
+bool specFitCurve::changeDescriptor(const QString& key, QString value)
 {
 	if(QObject::tr("Fit variables") == key)
 	{
@@ -206,22 +193,12 @@ void specFitCurve::attach(QwtPlot* plot)
 	specCanvasItem::attach(plot) ;
 }
 
-bool specFitCurve::setActiveLine(const QString& key, int n)
+void specFitCurve::setActiveLine(const QString& key, quint32 n)
 {
 	if(key == QObject::tr("Fit expression"))
-		return expression.setActiveLine(n) ;
+		expression.setActiveLine(n) ;
 	if(key == QObject::tr("Fit variables"))
 		activeVar = n ;
-	return false ;
-}
-
-int specFitCurve::activeLine(const QString& key) const
-{
-	if(key == QObject::tr("Fit expression"))
-		return expression.activeLine() ;
-	if(key == QObject::tr("Fit variables"))
-		return activeVar ;
-	return 0 ;
 }
 
 bool specFitCurve::acceptableVariable(const QString& s)
@@ -440,12 +417,13 @@ void specFitCurve::writeToStream(QDataStream& out) const
 	    expression <<
 	    errorString <<
 	    numericalErrors ;
-	if(variablesMulti || expressionMulti || messagesMulti)
-		out << qint8(variablesMulti + 2 * expressionMulti + 4 * messagesMulti) ;
+	if(variablesMulti || expression.isMultiline() || messagesMulti)
+		out << qint8(variablesMulti + 2 * expression.isMultiline() + 4 * messagesMulti) ;
 }
 
 void specFitCurve::readFromStream(QDataStream& in)
 {
+	bool expressionMulti ;
 	specCanvasItem::readFromStream(in) ;
 	in >> variables >>
 	   activeVar >>
@@ -466,6 +444,7 @@ void specFitCurve::readFromStream(QDataStream& in)
 	generateParser();
 	setParserConstants();
 	//	setData(new fitData(parser)) ;
+	expression.setMultiline(expressionMulti);
 }
 
 void specFitCurve::clearParser()
@@ -514,22 +493,11 @@ specFitCurve::~specFitCurve()
 	clearParser();
 }
 
-void specFitCurve::setDescriptorProperties(QString key, spec::descriptorFlags f)
+void specFitCurve::setMultiline(const QString& key, bool on)
 {
-	// TODO implement
-	if(key == QObject::tr("Fit variables")) variablesMulti = f & spec::multiline ;
-	if(key == QObject::tr("Fit expression")) expressionMulti = f & spec::multiline ;
-	if(key == QObject::tr("Fit messages")) messagesMulti = f & spec::multiline ;
-}
-
-spec::descriptorFlags specFitCurve::descriptorProperties(const QString& key) const
-{
-	spec::descriptorFlags flags = spec::def ;
-	if(key != QObject::tr("Fit messages")) flags |= spec::editable ;
-	if(key == QObject::tr("Fit variables") && variablesMulti) flags |= spec::multiline ;
-	if(key == QObject::tr("Fit expression") && expressionMulti) flags |= spec::multiline ;
-	if(key == QObject::tr("Fit messages") && messagesMulti) flags |= spec::multiline ;
-	return flags ;
+	if(key == QObject::tr("Fit variables")) variablesMulti = on ;
+	if(key == QObject::tr("Fit expression")) expression.setMultiline(on); ;
+	if(key == QObject::tr("Fit messages")) messagesMulti = on ;
 }
 
 double specFitCurve::confidenceInterval(const QString& v) const

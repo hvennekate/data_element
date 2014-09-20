@@ -289,8 +289,12 @@ void specActionLibrary::readFromStream(QDataStream& in)
 		{
 			qDebug() << "Error reading command no." << i << "of type" << t ;
 			undoStack->clear();
-			parentIndex.clear();
 			delete streamable ;
+
+			// Reset loop invariants
+			num -= i ;
+			i = 0 ;
+			parentIndex = QVector<qint32>(num,0) ;
 			continue ;
 		}
 		////// For manually discarding corrupted undo commands:

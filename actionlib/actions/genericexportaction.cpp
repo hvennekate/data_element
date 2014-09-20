@@ -26,9 +26,8 @@ specUndoCommand* genericExportAction::generateUndoCommand()
 	if(exportFile.fileName() == "") return 0 ;
 
 	QStringList dataTypes = model->dataTypes() ;
-	QStringList numericalDescriptors = model->descriptorsWithFlags(spec::numeric) ;
 	if (dataTypes.size() == spec::numericDescriptor)
-		dataTypes += numericalDescriptors ;
+		dataTypes << model->descriptors() ;
 	exportFormat->setDataTypes(dataTypes) ;
 	exportFormat->setDescriptors(model->descriptors()) ;
 	if(exportFormat->exec() != QDialog::Accepted) return 0 ;
@@ -46,7 +45,7 @@ specUndoCommand* genericExportAction::generateUndoCommand()
 	QList<specModelItem*> pointers = model->pointerList(selection) ;
 
 	foreach(specModelItem * item, pointers)
-		out << item->exportData(headerFormat, dataFormat, numericalDescriptors) ;
+		out << item->exportData(headerFormat, dataFormat, model->descriptors()) ;
 	exportFile.close() ;
 	return 0 ;
 }

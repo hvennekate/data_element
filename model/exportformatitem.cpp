@@ -83,5 +83,7 @@ void exportFormatItem::setDataTypes(const QStringList& ds)
 	}
 	Value->clear();
 	Value->addItems(ds) ;
+	if (ds.size() > spec::numericDescriptor)
+		Value->insertSeparator(spec::numericDescriptor);
 	Value->setCurrentIndex(ds.indexOf(currentText));
 }

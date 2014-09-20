@@ -24,52 +24,30 @@ specTiltMatrixAction::specTiltMatrixAction(QObject* parent) :
 	setShortcut(tr("Ctrl+j")) ;
 }
 
-class descriptorPreparationObject
-{
-	QSet<QString> values ;
-	spec::descriptorFlags flagValue ;
-public:
-	void addDescriptor(const QString& value, const spec::descriptorFlags& Flags)
-	{
-		values << value ;
-		flagValue &= Flags ; // TODO reconsider
-	}
-	QString descriptorValue() const
-	{
-		QStringList valueList(values.toList()) ;
-		valueList.sort();
-		return valueList.join("\n") ;
-	}
-	spec::descriptorFlags flags() const
-	{ return values.size() > 1 ? (flagValue & ~spec::numeric) : flagValue ; }
-	specDescriptor descriptor() const
-	{ return specDescriptor(descriptorValue(), flags()) ; }
-};
-
 class dataItemPreparationObject
 {
 	QVector<specDataPoint> dataPoints ;
-	QMap<QString, descriptorPreparationObject> description ;
+	QMap<QString, QSet<specDescriptor> > description ;
 public:
 	void addDataPoint(double x, double y) { dataPoints << specDataPoint(x, y, 0) ; }
 
-	void addDescriptor(const QString& key, const QString& value, const spec::descriptorFlags& flags)
+	void addDescriptor(const QString& key, const specDescriptor& desc)
 	{
-		description[key].addDescriptor(value, flags) ;
+		description[key] << desc ;
 	}
 
 	void addItem(const specModelItem* item, double x, double y)
 	{
 		addDataPoint(x, y) ;
 		foreach(const QString & key, item->descriptorKeys())
-		addDescriptor(key, item->descriptor(key, true), item->descriptorProperties(key));
+			addDescriptor(key, item->getDescriptor(key)) ;
 	}
 
 	specDataItem* dataItem() const
 	{
 		QHash<QString, specDescriptor> descriptionHash ;
 		foreach(const QString & key, description.keys())
-		descriptionHash[key] = description[key].descriptor() ;
+			descriptionHash[key] = specDescriptor::merge(description[key].toList()) ;
 		return new specDataItem(dataPoints, descriptionHash) ;
 	}
 };
@@ -104,10 +82,7 @@ specUndoCommand* specTiltMatrixAction::generateUndoCommand()
 	QList<specModelItem*> newItems ;
 	foreach(const double & key, newData.keys())
 	{
-		// TODO avoid back and forth conversions double <-> string!!
-		newData[key].addDescriptor(newDescriptor,
-					   QString::number(key),
-					   spec::numeric);
+		newData[key].addDescriptor(newDescriptor,key);
 		newItems << newData[key].dataItem() ;
 	}
 	// remove descriptor exchanged for x value
@@ -135,18 +110,23 @@ specUndoCommand* specTiltMatrixAction::generateUndoCommand()
 	parentCommand->setParentObject(model) ;
 	parentCommand->setMergeable(false) ;
 	specAddFolderCommand* insertionCommand = new specAddFolderCommand(parentCommand) ;
+	int newItemCount = newItems.size() ;
 	insertionCommand->setItems(newItems);  // TODO integrate into command constructor
 
 	// delete old items
 	items << toBeDeletedFolders ;
+	int oldItemCount = items.size() ;
 	specDeleteAction::command(model, items, parentCommand) ;
 
 	parentCommand->setText(tr("Exchange \"") +
 			       conversionDescriptor +
 			       tr("\" and \"") +
 			       newDescriptor +
-			       tr("\" in ") +
-			       QString::number(newItems.size()) +
-			       tr(" items.")) ;
+			       tr("\" creating ") +
+			       QString::number(newItemCount) +
+			       tr(" item(s) from ") +
+			       QString::number(oldItemCount) +
+			       tr(" item(s).")
+			       ) ;
 	return parentCommand ;
 }

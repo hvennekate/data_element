@@ -12,14 +12,10 @@ private:
 	QString descriptorName ;
 public:
 	specDescriptorComparisonCriterion();
-	explicit specDescriptorComparisonCriterion(const QString& descriptor, bool numeric = false) ;
-	specDescriptorComparisonCriterion(const QString& descriptor, double tolerance) ;
+	explicit specDescriptorComparisonCriterion(const QString& descriptor, double tolerance = 0) ;
 
 	QString descriptor() const ;
 	void setDescriptor(const QString& s) ;
-
-	bool isNumeric() const ;
-	void setNumeric(bool a = true) ;
 
 	double tolerance() const ;
 	void setTolerance(double d) ;

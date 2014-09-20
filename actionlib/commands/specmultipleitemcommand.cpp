@@ -49,6 +49,7 @@ void specMultipleItemCommand::writeCommand(QDataStream& out) const
 {
 	out << itemCount() ;
 	writeItems(out);
+	writeCommandData(out);
 }
 
 void specMultipleItemCommand::readCommand(QDataStream& in)
@@ -56,6 +57,17 @@ void specMultipleItemCommand::readCommand(QDataStream& in)
 	qint32 num = 0;
 	in >> num;
 	readItems(in, num);
+	readCommandData(in);
+}
+
+void specMultipleItemCommand::writeCommandData(QDataStream &out) const
+{
+	Q_UNUSED(out)
+}
+
+void specMultipleItemCommand::readCommandData(QDataStream &in)
+{
+	Q_UNUSED(in)
 }
 
 void specMultipleItemCommand::writeItems(QDataStream& out) const

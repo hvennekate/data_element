@@ -10,14 +10,12 @@ specDeleteDescriptorCommand::specDeleteDescriptorCommand(specUndoCommand* parent
 
 void specDeleteDescriptorCommand::writeCommand(QDataStream& out) const
 {
-	out << position << (qint8) flags << key << contents ;
+	out << position << key << contents ;
 }
 
 void specDeleteDescriptorCommand::readCommand(QDataStream& in)
 {
-	qint8 f ;
-	in >> position >> f >> key >> contents ;
-	flags = (spec::descriptorFlags) f ;
+	in >> position >> key >> contents ; // TODO remove flags
 }
 
 #define DELETEDESCRIPTORFUNCTIONMACRO(fname, code)     void specDeleteDescriptorCommand::fname() \
@@ -28,12 +26,29 @@ void specDeleteDescriptorCommand::readCommand(QDataStream& in)
 		code ; \
 	}
 
-DELETEDESCRIPTORFUNCTIONMACRO(doIt, myModel->deleteDescriptor(key))
-DELETEDESCRIPTORFUNCTIONMACRO(undoIt, QListIterator<specDescriptor> it(contents) ; myModel->restoreDescriptor(position, flags, it, key))
-DELETEDESCRIPTORFUNCTIONMACRO(parentAssigned, if(contents.isEmpty()) \
+DELETEDESCRIPTORFUNCTIONMACRO(doIt, \
+			      if(contents.isEmpty()) \
+			      { \
+				      myModel->dumpDescriptor(contents, key) ; \
+				      position = myModel->descriptors().indexOf(key) ; \
+			      } \
+			      myModel->deleteDescriptor(key))
+DELETEDESCRIPTORFUNCTIONMACRO(undoIt, QListIterator<specDescriptor> it(contents) ; myModel->restoreDescriptor(position, it, key))
+DELETEDESCRIPTORFUNCTIONMACRO(parentAssigned,)
+
+bool specDeleteDescriptorCommand::alternativeType(type t) const
 {
-\
-myModel->dumpDescriptor(contents, key) ; \
-	position = myModel->descriptors().indexOf(key) ; \
-	flags = myModel->descriptorProperties() [position] ; \
-})
+	return legacyDeleteDescriptorCommandId == t ;
+}
+
+void specDeleteDescriptorCommand::readAlternativeCommand(QDataStream &in, type t)
+{
+	if (t != legacyDeleteDescriptorCommandId) return ;
+	qint8 f ;
+	QList<specLegacyDescriptor> oldDescriptors ;
+	in >> position >> f >> key >> oldDescriptors ;
+	contents.clear();
+	foreach(const specLegacyDescriptor& d, oldDescriptors)
+		contents << d ;
+}
+

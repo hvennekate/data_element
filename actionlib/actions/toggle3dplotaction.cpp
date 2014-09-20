@@ -59,7 +59,7 @@ void toggle3DPlotAction::execute()
 		QString descriptor = descriptors->currentText() ;
 		descriptors->clear();
 		if (!model) return ;
-		descriptors->addItems(model->descriptorsWithFlags(spec::numeric)) ;
+		descriptors->addItems(model->descriptors()) ;
 		descriptors->setCurrentText(descriptor) ;
 		quickplot->setPlot(parent()->parent()->parent()->findChild<specPlot*>()) ;
 	}

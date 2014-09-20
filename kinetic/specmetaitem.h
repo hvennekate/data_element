@@ -42,16 +42,14 @@ public:
 	void refreshPlotData();
 	QStringList descriptorKeys() const ;
 	static QStringList genericDescriptorKeys() ;
-	QString descriptor(const QString& key, bool full = false) const ;
+	specDescriptor getDescriptor(const QString &key) const ;
 	QString editDescriptor(const QString& key) const ;
-	bool changeDescriptor(QString key, QString value) ;  // TODO add changeDescriptor(key,specDescriptor)
-	spec::descriptorFlags descriptorProperties(const QString& key) const ;
-	void setDescriptorProperties(const QString& key, spec::descriptorFlags f);
+	void changeDescriptor(const QString &key, QString value) ;  // TODO add changeDescriptor(key,specDescriptor)
 	QIcon decoration() const ;
 	void getRangePoint(int variable, int range, int point, double& x, double& y) const ;
 	void setRange(int variableNo, int rangeNo, int pointNo, double newX, double newY) ;
-	bool setActiveLine(const QString&, int) ;
-	int activeLine(const QString& key) const ;
+	void setActiveLine(const QString&, quint32) ;
+	void setMultiline(const QString& key, bool on = true) ;
 	int rtti() { return spec::metaItem ; }
 	specUndoCommand* itemPropertiesAction(QObject* parentObject) ;
 

@@ -51,8 +51,15 @@ void specEditDescriptorCommand::doIt()
 		QString currentContent = pointer->descriptor(descriptor, true) ;
 		int currentLine = pointer->activeLine(descriptor) ;
 
-		if(pointer->changeDescriptor(descriptor, *previousContentIterator))
+		if (pointer->isFolder() && !pointer->hasDescriptor(descriptor))
 		{
+			specFolderItem* folder = dynamic_cast<specFolderItem*>(pointer) ;
+			if (!folder) continue ;
+			items << folder->childrenList() ;
+		}
+		else
+		{
+			pointer->changeDescriptor(descriptor, *previousContentIterator) ;
 			pointer->setActiveLine(descriptor, *previousActiveLineIterator) ;
 			newContent << currentContent ;
 			newActiveLines << currentLine ;
@@ -60,14 +67,6 @@ void specEditDescriptorCommand::doIt()
 				++ previousActiveLineIterator;
 			if(previousContentIterator + 1 != previousContent.end())
 				++ previousContentIterator ;
-
-		}
-		else if(pointer->isFolder())
-		{
-			specFolderItem* folder = dynamic_cast<specFolderItem*>(pointer) ;
-			if(!folder) continue ;
-			for(int i = 0 ; i < folder->children() ; ++i)
-				items.enqueue(folder->child(i)) ;
 		}
 	}
 

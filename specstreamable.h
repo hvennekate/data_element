@@ -50,7 +50,7 @@ public:
 	    multiCommandId = 42,
 	    genealogyId = 43,
 	    model = 44,
-	    descriptor = 45,
+	    legacyDescriptor = 45,
 	    plotStyle = 46,
 	    metaItem = 47,
 	    metaModel = 48,
@@ -71,16 +71,19 @@ public:
 	    penStyleCommandId = 65,
 	    descriptorFlagsCommand = 66,
 	    dataItem = 67,
-	    deleteDescriptorCommandId = 68,
+	    legacyDeleteDescriptorCommandId = 68,
 	    renameDescriptorCommandId = 69,
-	    exchangeFilterCommandId = 70
+	    exchangeFilterCommandId = 70,
+	    descriptor = 71,
+	    multilineCommandId = 72,
+	    deleteDescriptorCommandId = 73,
 	};
 	virtual type typeId() const = 0;
+	virtual bool alternativeType(type t) const {Q_UNUSED(t) ; return false ; }
 protected:
 	virtual void writeToStream(QDataStream& out) const = 0;
 	virtual void readFromStream(QDataStream& in) = 0;
-	virtual void writeContents(QDataStream& out) const {Q_UNUSED(out) }   // write container contents
-	virtual void readContents(QDataStream& in) {Q_UNUSED(in) }   // read container contents
+	virtual void readAlternative(QDataStream& in, type t) {Q_UNUSED(in) ; Q_UNUSED(t) }
 	virtual specStreamable* factory(const type& t) const {Q_UNUSED(t) ; return 0; }   // to be implemented in parent!
 	specStreamable* produceItem(QDataStream& in) const;
 private:

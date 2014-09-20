@@ -13,10 +13,10 @@
 #include "specexchangefitcurvecommand.h"
 #include "spectogglefitstylecommand.h"
 #include "specstylecommand.h"
-#include "specdescriptorflagscommand.h"
 #include "specdeletedescriptorcommand.h"
 #include "specrenamedescriptorcommand.h"
 #include "specexchangefiltercommand.h"
+#include "specmultilinecommand.h"
 
 specCommandGenerator::specCommandGenerator(specUndoCommand* p)
 	: parent(p)
@@ -67,12 +67,15 @@ specUndoCommand* specCommandGenerator::commandById(int id) const
 		case specStreamable::plotYLabelCommandId:
 		case specStreamable::plotXLabelCommandId:
 			return generatePlotLabelCommand(id, parent) ;
-		case specStreamable::descriptorFlagsCommand:
-			return new specDescriptorFlagsCommand(parent) ;
 		case specStreamable::deleteDescriptorCommandId:
+		case specStreamable::legacyDeleteDescriptorCommandId:
 			return new specDeleteDescriptorCommand(parent) ;
 		case specStreamable::renameDescriptorCommandId:
 			return new specRenameDescriptorCommand(parent) ;
+		case specStreamable::multilineCommandId:
+			return new specMultiLineCommand(parent) ;
+		case specStreamable::descriptorFlagsCommand:
+			return new specDescriptorFlagsCommand(parent) ;
 		default:
 			return 0 ;
 	}

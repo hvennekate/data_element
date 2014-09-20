@@ -107,7 +107,6 @@ SOURCES += main.cpp \
     actionlib/speccommandgenerator.cpp \
     actionlib/actions/specselectconnectedaction.cpp \
     actionlib/specworkerthread.cpp \
-    actionlib/commands/specdescriptorflagscommand.cpp \
     actionlib/actions/specsetmultilineaction.cpp \
     actionlib/commands/specdeletedescriptorcommand.cpp \
     actionlib/commands/specrenamedescriptorcommand.cpp \
@@ -143,6 +142,7 @@ SOURCES += main.cpp \
     plot/spec3dquickplot.cpp \
     actionlib/actions/toggle3dplotaction.cpp \
     log/editimportdirsaction.cpp \
+    actionlib/commands/specmultilinecommand.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -251,7 +251,6 @@ HEADERS += cutbyintensitydialog.h \
     actionlib/speccommandgenerator.h \
     actionlib/actions/specselectconnectedaction.h \
     actionlib/specworkerthread.h \
-    actionlib/commands/specdescriptorflagscommand.h \
     actionlib/actions/specsetmultilineaction.h \
     actionlib/commands/specdeletedescriptorcommand.h \
     actionlib/commands/specrenamedescriptorcommand.h \
@@ -287,6 +286,7 @@ HEADERS += cutbyintensitydialog.h \
     plot/spec3dquickplot.h \
     actionlib/actions/toggle3dplotaction.h \
     log/editimportdirsaction.h \
+    actionlib/commands/specmultilinecommand.h
 
 INCLUDEPATH += kinetic \
 	log \

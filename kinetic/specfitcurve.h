@@ -45,25 +45,23 @@ private:
 	void clearParser() ;
 	void generateParser() ;
 	void setParserConstants();
-	bool variablesMulti, expressionMulti, messagesMulti ;
+	bool variablesMulti, messagesMulti ;
 public:
 	specFitCurve();
 	~specFitCurve() ;
 	QStringList descriptorKeys() ;
 	static QStringList genericDescriptorKeys() ;
-	QString descriptor(const QString& key, bool full = false) ;
+	specDescriptor getDescriptor(const QString& key) ;
 	QString editDescriptor(const QString& key) ;
-	bool changeDescriptor(QString key, QString value) ;
-	bool setActiveLine(const QString& key, int n) ;
-	int activeLine(const QString& key) const ;
+	bool changeDescriptor(const QString &key, QString value) ;
+	void setActiveLine(const QString& key, quint32 n) ;
 	void refreshPlotData();
 	void refit(QwtSeriesData<QPointF>* data) ;
 	QVector<double> getFitData(QwtSeriesData<QPointF>* data) ;
 	double getFitPoint(double x) ;
 	int rtti() const { return specStreamable::fitCurve ; }
 	void attach(QwtPlot* plot) ;
-	void setDescriptorProperties(QString key, spec::descriptorFlags f) ;
-	spec::descriptorFlags descriptorProperties(const QString& key) const ;
+	void setMultiline(const QString& key, bool on = true) ;
 };
 
 // from lmcurve.c:

@@ -25,12 +25,8 @@ class specModel : public QAbstractItemModel, public specStreamable
 private:
 	specModelItem* root ;
 	QStringList Descriptors ;
-	QList<spec::descriptorFlags> DescriptorProperties ;
-	QIcon descriptorIcon(int index) const ;
 	void insertFromStream(QDataStream& stream, const QModelIndex& parent, int row) ;
-	bool itemsAreEqual(QModelIndex& first, QModelIndex& second, const QList<QPair<QStringList::size_type, double> >& criteria) ;
 	QModelIndexList merge(QModelIndexList& list, const QList<QPair<QStringList::size_type, double> >& criteria) ;
-	QModelIndexList allChildren(const QModelIndex&) const ;
 	QMap<double, double> subMap ;
 	bool internalDrop ;
 	specActionLibrary* dropBuddy ;
@@ -40,7 +36,7 @@ private:
 	type typeId() const { return specStreamable::model ; }
 	QList<specMimeConverter*> mimeConverters() const ;
 	specMetaModel* metaModel ;
-	void checkForNewDescriptors(const QList<specModelItem*>& list, const QModelIndex& parent) ;
+	void checkForNewDescriptors() ;
 	bool resetPending ;
 	QSize generateSizeHint(const QModelIndex&) const ;
 public:
@@ -53,6 +49,7 @@ public:
 	// Own functions
 	specModelItem* itemPointer(const QModelIndex&) const;
 	specModelItem* itemPointer(const QVector<int>&) const;
+	specFolderItem *parentPointer(const QVector<int>&indexes) const ;
 	QModelIndex index(const QVector<int>&, int column = 0) const ;
 	QModelIndex index(specModelItem*, int column = 0) const ;
 	static QVector<int> hierarchy(specModelItem*) ;
@@ -84,14 +81,10 @@ public:
 	void fillSubMap(const QModelIndexList&) ;
 	void applySubMap(const QModelIndexList&) ;
 	const QStringList& descriptors() const ;
-	QStringList descriptorsWithFlags(const spec::descriptorFlags& flags) const ;
-	QStringList descriptorsMatchFlags(const spec::descriptorFlags& flags) const ;
-	const QList<spec::descriptorFlags>& descriptorProperties() const;
-	void setDescriptorProperties(spec::descriptorFlags flags, const QString& key) ;
 	void renameDescriptors(const QMap<QString, QString>&) ;
 	void deleteDescriptor(const QString&) ;
 	void dumpDescriptor(QList<specDescriptor>& destination, const QString& key) const ;
-	void restoreDescriptor(qint16 position, spec::descriptorFlags flags, QListIterator<specDescriptor>& origin, const QString& key) ;
+	void restoreDescriptor(qint16 position, QListIterator<specDescriptor>& origin, const QString& key) ;
 
 	// QAbstractItemModel virtual functions:
 

@@ -60,15 +60,9 @@ specDataItem& specDataItem::operator+= (const specDataItem& toAdd)
 	foreach(QString key, toAdd.description.keys())
 	{
 		if(description.keys().contains(key))
-		{
-			if(description[key].isNumeric())
-			{
-				double total = data.size() + toAdd.data.size() ;
-				description[key] = description[key].numericValue() * data.size() / total + toAdd.description[key].numericValue() * toAdd.data.size() / total ;
-			}
-			else if(!descriptor(key, true).contains(toAdd.descriptor(key, true)))
-				description[key] = descriptor(key, true).append(", ").append(toAdd.descriptor(key, true)) ;
-		}
+			description[key] = (description[key] * data.size()
+					    + toAdd.description[key] * toAdd.data.size())
+					* (1./(data.size() + toAdd.data.size()));
 		else
 			description[key] = toAdd.description[key] ;
 	}

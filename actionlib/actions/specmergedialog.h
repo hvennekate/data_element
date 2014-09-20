@@ -22,7 +22,7 @@ private:
 public:
 	mergeModel(QObject* parent = 0) ;
 	~mergeModel() ;
-	void setDescriptors(const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties) ;
+	void setDescriptors(const QStringList& descriptors) ;
 	specDescriptorComparisonCriterion::container getMergeCriteria() const ;
 
 	int rowCount(const QModelIndex& parent) const ;
@@ -40,7 +40,7 @@ class specMergeDialog : public QDialog
 public:
 	explicit specMergeDialog(QWidget* parent = 0);
 	~specMergeDialog();
-	void setDescriptors(const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties) ;
+	void setDescriptors(const QStringList& descriptors) ;
 	void getMergeCriteria(specDescriptorComparisonCriterion::container &toCompare, spec::correctionMode &spectralAdaptation) const ;
 
 private:

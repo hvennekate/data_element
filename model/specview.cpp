@@ -38,13 +38,13 @@ void specView::columnMoved(int i, int j, int k)
 		QList<QPair<QVariant, QVariant> > descriptors ;
 		for(int a = qMin(j, k) ; a < qMax(j, k) + 1 ; a++)    // read out column heads of concern
 			descriptors += qMakePair(model()->headerData(a, Qt::Horizontal),
-						 model()->headerData(a, Qt::Horizontal, spec::descriptorPropertyRole)) ;
+						 model()->headerData(a, Qt::Horizontal, spec::MultiLineRole)) ;
 		if(k < j) descriptors.prepend(descriptors.takeLast()) ;   // doing the move
 		else descriptors.append(descriptors.takeFirst()) ;
 		for(QList<QVariant>::size_type a = 0 ; a < descriptors.size() ; a++)  // reinserting the heads
 		{
 			model()->setHeaderData(qMin(j, k) + a, Qt::Horizontal, descriptors[a].first) ;
-			model()->setHeaderData(qMin(j, k) + a, Qt::Horizontal, descriptors[a].second, spec::descriptorPropertyRole) ;
+			model()->setHeaderData(qMin(j, k) + a, Qt::Horizontal, descriptors[a].second, spec::MultiLineRole) ;
 		}
 	}
 }

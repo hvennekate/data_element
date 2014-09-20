@@ -6,16 +6,18 @@
 
 class specDeleteDescriptorCommand : public specUndoCommand
 {
+	friend class legacyDeleteDescriptorCommand ;
 private:
 	QList<specDescriptor> contents ;
 	QString key ;
 	qint16 position ;
-	spec::descriptorFlags flags ;
 	void writeCommand(QDataStream& out) const ;
 	void readCommand(QDataStream& in) ;
 	void doIt() ;
 	void undoIt() ;
 	type typeId() const { return specStreamable::deleteDescriptorCommandId ; }
+	bool alternativeType(type t) const ;
+	void readAlternativeCommand(QDataStream &in, type t) ;
 	void parentAssigned();
 public:
 	specDeleteDescriptorCommand(specUndoCommand* parent =  0, QString key = "");

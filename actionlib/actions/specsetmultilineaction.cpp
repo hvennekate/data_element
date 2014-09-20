@@ -1,5 +1,5 @@
 #include "specsetmultilineaction.h"
-#include "specdescriptorflagscommand.h"
+#include "specmultilinecommand.h"
 
 specSetMultilineAction::specSetMultilineAction(QObject* parent) :
 	specRequiresItemAction(parent)
@@ -15,12 +15,9 @@ specSetMultilineAction::specSetMultilineAction(QObject* parent) :
 specUndoCommand* specSetMultilineAction::generateUndoCommand()
 {
 	if(!currentIndex.isValid()) return 0 ;
-	specDescriptorFlagsCommand* command = new specDescriptorFlagsCommand ;
+	specMultiLineCommand* command = new specMultiLineCommand(model->descriptors() [currentIndex.column()]) ;
 	command->setParentObject(model) ;
-	QString key = model->descriptors() [currentIndex.column()] ; // TODO function descriptor(int) in specModel
-	foreach(specModelItem * item, pointers)
-	command->addItem(item, key, item->descriptorProperties(key)
-			 ^ spec::multiline) ; // XOR
+	command->setItems(pointers) ;
 	command->setText(tr("Toggle multiline")) ;
 	return command ;
 }
@@ -29,5 +26,5 @@ bool specSetMultilineAction::specificCheckRequirements()
 {
 	if (!model) return false ;
 	if (!currentIndex.isValid()) return false ;
-	return spec::multiline & model->data(currentIndex, spec::descriptorPropertyRole).toInt() ;
+	return model->data(currentIndex, spec::MultiLineRole).toBool() ;
 }

@@ -10,6 +10,8 @@ private:
 	QVector<specGenealogy> items ;
 	void writeCommand(QDataStream& out) const ;
 	void readCommand(QDataStream& in);
+	virtual void writeCommandData(QDataStream& out) const ;
+	virtual void readCommandData (QDataStream& in) ;
 protected:
 	void writeItems(QDataStream&) const ;
 	void readItems(QDataStream&, qint32 = -1) ;

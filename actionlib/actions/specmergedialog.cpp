@@ -12,12 +12,8 @@ public:
 	{
 		bool enabled ;
 	public:
-		mergeItem()
-			: specDescriptorComparisonCriterion("", false),
-			  enabled(false)
-		{}
-		mergeItem(const QString& s, bool n)
-			: specDescriptorComparisonCriterion(s, n),
+		mergeItem(const QString& s = QString())
+			: specDescriptorComparisonCriterion(s),
 			  enabled(false)
 		{}
 		bool isEnabled() const { return enabled ; }
@@ -68,8 +64,7 @@ Qt::ItemFlags mergeModel::flags(const QModelIndex& index) const
 {
 	//	Qt::ItemFlags f = QAbstractTableModel::flags(index) ;
 	if(index.column() == 0) return Qt::ItemIsUserCheckable | Qt::ItemIsEnabled;
-	if(index.column() == 1 && d->items[index.row()].isNumeric())
-		return Qt::ItemIsEditable | Qt::ItemIsEnabled ;
+	if(index.column() == 1)	return Qt::ItemIsEditable | Qt::ItemIsEnabled ; // TODO checkable?
 	return Qt::NoItemFlags ;
 	//	return f ;
 }
@@ -86,7 +81,7 @@ QVariant mergeModel::data(const QModelIndex& index, int role) const
 		case 0:
 			return item.descriptor();
 		case 1:
-			return item.isNumeric() ? QVariant(item.tolerance()) : QVariant() ;
+			return QVariant(item.tolerance()) ;
 		default:
 			return QVariant() ;
 	}
@@ -118,29 +113,26 @@ specDescriptorComparisonCriterion::container mergeModel::getMergeCriteria() cons
 	return result ;
 }
 
-void mergeModel::setDescriptors(const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties)
+void mergeModel::setDescriptors(const QStringList& descriptors)
 {
 	beginResetModel();
 
 	// create new list
 	QList<mergeModelPrivate::mergeItem> newItems ;
-	for (int i = 0 ; i < qMin(descriptors.size(), descriptorProperties.size()) ; ++i)
+	foreach (const QString& descriptor, descriptors)
 	{
-		const QString& descriptor = descriptors[i] ;
-		bool isNumeric = descriptorProperties[i] & spec::numeric ;
-		// check if an old one is still around...
+		bool old = false ;
 		foreach(mergeModelPrivate::mergeItem item, d->items)
 		{
-			if (item.descriptor() == descriptor)
+			old = (item.descriptor() == descriptor) ;
+			if (old)
 			{
-				item.setNumeric(isNumeric);
 				newItems << item ;
 				break ;
 			}
 		}
-		// else add a new one
-		if (newItems.size() == i)
-			newItems << mergeModelPrivate::mergeItem(descriptor, isNumeric) ;
+		if (!old)
+			newItems << mergeModelPrivate::mergeItem(descriptor) ;
 	}
 	d->items.swap(newItems) ;
 	endResetModel();
@@ -191,9 +183,9 @@ specMergeDialog::specMergeDialog(QWidget* parent) :
 	ui->criteria->setItemDelegateForColumn(1, new mergeDelegate(ui->criteria));
 }
 
-void specMergeDialog::setDescriptors(const QStringList& descriptors, const QList<spec::descriptorFlags>& descriptorProperties)
+void specMergeDialog::setDescriptors(const QStringList& descriptors)
 {
-	mm->setDescriptors(descriptors, descriptorProperties);
+	mm->setDescriptors(descriptors);
 	ui->criteria->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 	ui->criteria->resizeColumnsToContents();
 	ui->criteria->horizontalHeader()->setSectionResizeMode(QHeaderView::Fixed);
