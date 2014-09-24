@@ -19,7 +19,6 @@ private:
 	bool alternativeType(type t) const ;
 	void initializeFromString(const QString&, quint32, bool) ;
 	bool bothNumeric(const specDescriptor& other) const ;
-	bool isNumeric() const ;
 protected:
 	void readAlternative(QDataStream &in, type t) ;
 public:
@@ -35,6 +34,7 @@ public:
 	QString content(bool full = false) const;
 	quint32 activeLine() const ;
 	bool isMultiline() const ;
+	bool isNumeric() const ;
 
 	void setContent(const QString&) ;
 	void setContent(const QStringList& l) ;

@@ -6,7 +6,8 @@ specEditDescriptorCommand::specEditDescriptorCommand(specUndoCommand* parent)
 #ifdef WIN32BUILD
 	  <specModelItem>
 #endif
-	  (parent)
+	  (parent),
+	  deleteOnEmpty(false)
 {
 }
 
@@ -27,6 +28,11 @@ void specEditDescriptorCommand::setItem(specModelItem* i, QString desc,
 	generateDescription();
 }
 
+void specEditDescriptorCommand::setDeleteOnEmpty(bool on)
+{
+	deleteOnEmpty = on ;
+}
+
 void specEditDescriptorCommand::undoIt()
 {
 	doIt() ;
@@ -43,11 +49,12 @@ void specEditDescriptorCommand::doIt()
 	QStringList newContent ;
 	QVector<int> newActiveLines ;
 
-	QQueue<specModelItem*> items ;
+	QQueue<specModelItem*> items, allItems ;
 	items.enqueue(pointer) ;
 	while(!items.isEmpty())
 	{
 		pointer = items.dequeue() ;
+		allItems << pointer ;
 		QString currentContent = pointer->descriptor(descriptor, true) ;
 		int currentLine = pointer->activeLine(descriptor) ;
 
@@ -71,6 +78,13 @@ void specEditDescriptorCommand::doIt()
 	}
 
 	specModel* model = qobject_cast<specModel*> (parentObject()) ;
+	if (deleteOnEmpty)
+	{
+		foreach(specModelItem* item, allItems)
+			if (item->descriptor(descriptor, true).isEmpty())
+				item->deleteDescriptor(descriptor) ;
+	}
+
 	if(model)  // TODO: maybe implement specModel::index(specModelItem*, QString descriptor)
 		model->signalChanged(model->index(itemPointer())) ;
 	previousContent.swap(newContent) ;
@@ -83,6 +97,7 @@ void specEditDescriptorCommand::writeCommand(QDataStream& out) const
 	    << descriptor
 	    << previousActiveLine ;
 	writeItem(out);
+	out << (qint8) deleteOnEmpty ;
 }
 
 void specEditDescriptorCommand::readCommand(QDataStream& in)
@@ -91,6 +106,9 @@ void specEditDescriptorCommand::readCommand(QDataStream& in)
 	   >> descriptor
 	   >> previousActiveLine ;
 	readItem(in);
+	qint8 doe ;
+	in >> doe ;
+	deleteOnEmpty = doe ;
 	generateDescription();
 }
 

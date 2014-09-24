@@ -835,3 +835,20 @@ QwtSymbol* cloneSymbol(const QwtSymbol* original)
 			     original->pen(),
 			     original->size()) ;
 }
+
+
+QString uniqueString(QString in, QStringList comparison)
+{
+	QStringList::iterator i = comparison.begin() ;
+	while ( i != comparison.end() )
+		if (i->left(in.size()) != in)
+			i = comparison.erase(i) ;
+		else
+			++i ;
+	if (!comparison.contains(in)) return in ;
+
+	int counter = 0 ;
+	while (comparison.contains(in + QString::number(counter)))
+		++ counter ;
+	return in + QString::number(counter) ;
+}

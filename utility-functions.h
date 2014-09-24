@@ -15,6 +15,8 @@
 #include <QFile>
 #include <names.h>
 
+QString uniqueString(QString in, QStringList comparison) ;
+
 // bool roundedEqual(double a, double b) ;
 QList<specModelItem*> readLogFile(QFile& file) ;
 QList<specModelItem*> readHVFile(QFile&) ;

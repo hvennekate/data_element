@@ -9,6 +9,7 @@ private:
 	QStringList previousContent ; // TODO change this to variant, make folder responsible for spreading to children
 	QString descriptor ;
 	QVector<int> previousActiveLine ; // TODO multiline bzw. gleich ganzen Descriptor mitnehmen
+	bool deleteOnEmpty ;
 	void doIt() ;
 	void undoIt() ;
 	void writeCommand(QDataStream& out) const ;
@@ -20,6 +21,7 @@ public:
 	explicit specEditDescriptorCommand(specUndoCommand* parent = 0) ;
 	void setItem(specModelItem*, QString descriptor,
 		     QString newContent, int activeLine = 0) ;
+	void setDeleteOnEmpty(bool on = true) ;
 	//	bool mergeWith(const QUndoCommand *other) ;
 	//	bool mergeable(const specUndoCommand *other) ;
 };

@@ -26,7 +26,7 @@ bool specDescriptor::alternativeType(specStreamable::type t) const
 
 void specDescriptor::initializeFromString(const QString &c, quint32 l, bool ml)
 {
-	setContent(c) ;
+	setAppropriateContent(c) ;
 	setActiveLine(l) ;
 	setMultiline(ml);
 }

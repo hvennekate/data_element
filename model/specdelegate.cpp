@@ -63,12 +63,12 @@ void specDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, cons
 {
 	QTextEdit* ed = (QTextEdit*) editor ;
 	QString text = ed->toPlainText() ;
-	model->setData(index,
-		       QList<QVariant>() << text << ed->textCursor().blockNumber(),
-		       Qt::EditRole) ;
 	specModel* sm = qobject_cast<specModel*> (model) ;
 	if(sm)
 	{
+		sm->setData(index,
+			       QList<QVariant>() << text << ed->textCursor().blockNumber(),
+			       Qt::EditRole) ;
 		QString descriptor = sm->descriptors() [index.column()] ;
 		if(completerMap->contains(descriptor))
 		{
@@ -80,6 +80,8 @@ void specDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, cons
 			completerMap->value(descriptor)->swap(newList) ;
 		}
 	}
+	else
+		model->setData(index, text) ;
 }
 
 void specDelegate::updateEditorGeometry(QWidget* editor, const QStyleOptionViewItem& option, const QModelIndex& index) const
