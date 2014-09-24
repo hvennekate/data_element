@@ -236,6 +236,8 @@ QVariant specModel::data(const QModelIndex& index, int role) const
 			return pointer->toolTip(descriptor) ;
 		case spec::MultiLineRole:
 			return pointer->isMultiline(descriptor) ;
+		case spec::ActiveLineRole:
+			return pointer->activeLine(descriptor) ;
 	}
 	return QVariant() ;
 }

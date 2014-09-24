@@ -56,7 +56,11 @@ void specDelegate::setEditorData(QWidget* e, const QModelIndex& index) const
 {
 	QTextEdit* editor = qobject_cast<QTextEdit*> (e) ;
 	if(!editor) return ;
-	editor->setText(index.model()->data(index, Qt::EditRole).toString()) ;
+	QString text = index.model()->data(index, Qt::EditRole).toString() ;
+	editor->setText(text) ;
+	int cursorIndex = 0, activeLine = index.model()->data(index, spec::ActiveLineRole).toInt() ;
+	for (int i = 0 ; i < activeLine ; ++i)
+		editor->moveCursor(QTextCursor::Down);
 }
 
 void specDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
