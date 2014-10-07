@@ -2,6 +2,7 @@
 #include "lmmin.h"
 #include <algorithm>
 #include <gsl/gsl_cdf.h>
+#include "utility-functions.h"
 
 specFitCurve::fitData::fitData(mu::Parser* p)
 	: parser(p),
@@ -114,6 +115,26 @@ QString specFitCurve::editDescriptor(const QString& key)
 	return getDescriptor(key).content(true) ;
 }
 
+QStringList specFitCurve::variableNames() const
+{
+	QStringList result ;
+	foreach(const variablePair& variable, variables)
+		result << variable.first.mid(0, variable.first.indexOf("/")) ;
+	return result ;
+}
+
+QStringList specFitCurve::formulaVariableNames() const
+{
+	QStringList result ;
+	if (parser) // TODO function or macro for this
+	{
+		try { parser->Eval() ; } catch (...) {}
+		for (mu::varmap_type::const_iterator i = parser->GetVar().begin() ; i != parser->GetVar().end() ; ++i)
+			result << QString::fromStdString(i->first) ;
+	}
+	return result ;
+}
+
 specDescriptor specFitCurve::getDescriptor(const QString& key)
 {
 	if(QObject::tr("Fit variables") == key)
@@ -203,7 +224,7 @@ void specFitCurve::setActiveLine(const QString& key, quint32 n)
 
 bool specFitCurve::acceptableVariable(const QString& s)
 {
-	QRegExp re("[A-Za-z][A-Za-z0-9]*(/0?.[0-9]+)?") ;
+	QRegExp re("[A-Za-z][A-Za-z0-9]*(/0?\\.[0-9]+)?") ;
 	return re.exactMatch(s) ;
 }
 
@@ -460,6 +481,7 @@ void specFitCurve::generateParser()
 	parser = new mu::Parser ;
 	try // this is sort of paranoid
 	{
+		parser->SetVarFactory(dummyFactoryFunction);
 		parser->SetExpr(expression.content(true).toStdString()) ;
 	}
 	catch(mu::Parser::exception_type& p)

@@ -852,3 +852,11 @@ QString uniqueString(QString in, QStringList comparison)
 		++ counter ;
 	return in + QString::number(counter) ;
 }
+
+double* dummyFactoryFunction(const char* c, void* v)
+{
+	Q_UNUSED(c)
+	Q_UNUSED(v)
+	static double a = 0 ;
+	return &a ;
+}

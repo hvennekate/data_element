@@ -57,6 +57,18 @@ void specMetaItem::connectedItems(QModelIndexList& dataItems, QModelIndexList& m
 	}
 }
 
+QSet<QString> specMetaItem::variableNames() const
+{
+	if (filter) return filter->variableNames() ;
+	return QSet<QString>() ;
+}
+
+QSet<QString> specMetaItem::variablesInFormulae() const
+{
+	if (filter) return filter->variablesInFormulae() ;
+	return QSet<QString>() ;
+}
+
 void specMetaItem::setModels(specModel* m, specModel* d)
 {
 	metaModel = m ;
@@ -330,6 +342,18 @@ specFitCurve* specMetaItem::setFitCurve(specFitCurve* fc)
 specFitCurve* specMetaItem::getFitCurve() const
 {
 	return fitCurve ;
+}
+
+QStringList specMetaItem::fitVariableNames() const
+{
+	if (!fitCurve) return QStringList() ;
+	return fitCurve->variableNames() ;
+}
+
+QStringList specMetaItem::fitFormulaVariableNames() const
+{
+	if (!fitCurve) return QStringList() ;
+	return fitCurve->formulaVariableNames() ;
 }
 
 bool specMetaItem::hasFitCurve() const

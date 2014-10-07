@@ -142,7 +142,13 @@ SOURCES += main.cpp \
     plot/spec3dquickplot.cpp \
     actionlib/actions/toggle3dplotaction.cpp \
     log/editimportdirsaction.cpp \
-    actionlib/commands/specmultilinecommand.cpp
+    actionlib/commands/specmultilinecommand.cpp \
+    kinetic/editorWidgets/metavariableeditor.cpp \
+    kinetic/editorWidgets/exclusivevalidator.cpp \
+    kinetic/editorWidgets/widgetlist.cpp \
+    kinetic/editorWidgets/fitvariableeditor.cpp \
+    kinetic/editorWidgets/abstractvariableeditor.cpp \
+    kinetic/editorWidgets/activefitvareditor.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -286,9 +292,16 @@ HEADERS += cutbyintensitydialog.h \
     plot/spec3dquickplot.h \
     actionlib/actions/toggle3dplotaction.h \
     log/editimportdirsaction.h \
-    actionlib/commands/specmultilinecommand.h
+    actionlib/commands/specmultilinecommand.h \
+    kinetic/editorWidgets/metavariableeditor.h \
+    kinetic/editorWidgets/exclusivevalidator.h \
+    kinetic/editorWidgets/widgetlist.h \
+    kinetic/editorWidgets/fitvariableeditor.h \
+    kinetic/editorWidgets/abstractvariableeditor.h \
+    kinetic/editorWidgets/activefitvareditor.h
 
 INCLUDEPATH += kinetic \
+	kinetic/editorWidgets \
 	log \
 	model \
 	plot \
@@ -374,7 +387,10 @@ FORMS += \
     actionlib/actions/averagedialog.ui \
     specshortcutdialog.ui \
     model/matrixexportdialog.ui \
-    logconverterimportdirectoriesdialog.ui
+    logconverterimportdirectoriesdialog.ui \
+    kinetic/editorWidgets/metavariableeditor.ui \
+    kinetic/editorWidgets/widgetlist.ui \
+    kinetic/editorWidgets/fitvariableeditor.ui
 
 OTHER_FILES += icons/oxygen/index.theme \
     icons/oxygen/geticons.py

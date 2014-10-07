@@ -62,5 +62,27 @@ QVariant specMetaModel::data(const QModelIndex& index, int role) const
 	{
 		return QBrush(Qt::gray) ;
 	}
+	if (spec::variableNamesRole == role
+			|| spec::variablesInFormulaeRole == role
+			|| spec::fitVariablesInFormulaRole == role
+			|| spec::fitVariablesRole == role)
+	{
+		specMetaItem* item = dynamic_cast<specMetaItem*>(itemPointer(index)) ;
+		if (item)
+		{
+			switch(role)
+			{
+			case spec::variableNamesRole:
+				return QStringList(item->variableNames().toList()) ;
+			case spec::variablesInFormulaeRole:
+				return QStringList(item->variablesInFormulae().toList()) ;
+			case spec::fitVariablesRole:
+				return item->fitVariableNames() ;
+			case spec::fitVariablesInFormulaRole:
+				return item->fitFormulaVariableNames() ;
+			}
+
+		}
+	}
 	return specModel::data(index, role) ;
 }

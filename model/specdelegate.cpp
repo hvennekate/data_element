@@ -20,11 +20,6 @@ specDelegate::~specDelegate()
 	delete completerMap ;
 }
 
-bool specDelegate::editorEvent(QEvent* event, QAbstractItemModel* model, const QStyleOptionViewItem& option, const QModelIndex& index)
-{
-	return QItemDelegate::editorEvent(event, model, option, index) ;
-}
-
 void specDelegate::syncCompleterMap(const QStringList& descriptors) const
 {
 	QSet<QString> newDescriptors(descriptors.toSet()),
@@ -58,14 +53,15 @@ void specDelegate::setEditorData(QWidget* e, const QModelIndex& index) const
 	if(!editor) return ;
 	QString text = index.model()->data(index, Qt::EditRole).toString() ;
 	editor->setText(text) ;
-	int cursorIndex = 0, activeLine = index.model()->data(index, spec::ActiveLineRole).toInt() ;
+	int activeLine = index.data(spec::ActiveLineRole).toInt() ;
 	for (int i = 0 ; i < activeLine ; ++i)
 		editor->moveCursor(QTextCursor::Down);
 }
 
 void specDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, const QModelIndex& index) const
 {
-	QTextEdit* ed = (QTextEdit*) editor ;
+	QTextEdit* ed = qobject_cast<QTextEdit*>(editor) ;
+	if (!ed) return ;
 	QString text = ed->toPlainText() ;
 	specModel* sm = qobject_cast<specModel*> (model) ;
 	if(sm)
@@ -78,7 +74,7 @@ void specDelegate::setModelData(QWidget* editor, QAbstractItemModel* model, cons
 		{
 			QSet<QString> newWords = completerMap->value(descriptor)->toSet() ;
 			foreach(const QString & word, text.split(QRegExp("\\s+")))
-			newWords << word ;
+				newWords << word ;
 			QStringList newList = newWords.toList() ;
 			qSort(newList) ;
 			completerMap->value(descriptor)->swap(newList) ;

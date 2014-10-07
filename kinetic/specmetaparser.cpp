@@ -5,6 +5,7 @@
 #include <qwt_series_data.h>
 #include <iostream>
 #include "specmetaitem.h"
+#include "utility-functions.h"
 
 specMetaParser::specMetaParser(const QString& expressionList, const QString& xExpression, const QString& yExpression, specMetaItem* par)
 	: parent(par),
@@ -54,10 +55,10 @@ void specMetaParser::setAssignments(const QString& expressionList, const QString
 				 "(\"[^\"]*\"|"
 				 "((x|y|i|u|l|p|P)"
 				 "("
-				 "(([+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?"
-				 "(:[+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?)|"
-				 "(([+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?:)?"
-				 "([+\\-]?([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?))"
+				 "(([+\\-]?(inf)|([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?"
+				 "(:[+\\-]?(inf)|([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?)|"
+				 "(([+\\-]?(inf)|([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?:)?"
+				 "([+\\-]?(inf)|([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?))"
 				 "))") ;
 	const QRegExp assignment(" *= *") ;
 	QStringList expressions = expressionList.split("\n") ;
@@ -264,6 +265,7 @@ mu::Parser* specMetaParser::prepare(const QString& val)
 		int i = 0 ;
 		foreach(QString symbol, symbols)
 			retVal->DefineVar(symbol.toStdString(), & (valueVector[i++]));
+		retVal->SetVarFactory(dummyFactoryFunction);
 		retVal->SetExpr(val.toStdString()) ;
 	}
 	catch(mu::Parser::exception_type& p)
@@ -334,4 +336,27 @@ void specMetaParser::setRange(int variableNo, int rangeNo, int pointNo, double n
 	}
 	changingRange = false ;
 
+}
+
+QSet<QString> specMetaParser::variablesInFormulae() const
+{
+	QSet<QString> result ;
+	if (x)
+	{
+		try{ x->Eval() ; } catch (...) {}
+		for (mu::varmap_type::const_iterator i = x->GetVar().begin() ; i != x->GetVar().end() ; ++i)
+			result << QString::fromStdString(i->first) ;
+	}
+	if (y)
+	{
+		try{ y->Eval() ; } catch (...) {}
+		for (mu::varmap_type::const_iterator i = y->GetVar().begin() ; i != y->GetVar().end() ; ++i)
+			result << QString::fromStdString(i->first) ;
+	}
+	return result ;
+}
+
+QSet<QString> specMetaParser::variableNames() const
+{
+	return symbols.toSet() ;
 }

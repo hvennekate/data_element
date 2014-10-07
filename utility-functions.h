@@ -84,6 +84,8 @@ inline void averageToNew(forwardIterator begin, forwardIterator end,
 //		*target++ = average(begin, end) ;
 //}
 
+double* dummyFactoryFunction(const char* c, void* v) ;
+
 inline bool doubleComparison(const double& a, const double& b)
 {
 	// this is an evil hack to overcome double precision's limitations...

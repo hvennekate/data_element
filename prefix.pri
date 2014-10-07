@@ -31,4 +31,15 @@ win32 {
 
 DEFINES += FILECHECKRANDOMNUMBER=469222828 FILECHECKCOMPRESSNUMBER=469333828
 
-DEFINES += GITSHA1HASH=$$sprintf("%1", $$system(git rev-parse HEAD))
+GITSHA1HASHVALUE = $$system(git rev-parse HEAD)
+DEFINES += GITSHA1HASH=$$sprintf("%1", $$GITSHA1HASHVALUE)
+
+#### make solution for updating git hash value -- does not work under windows
+#### (unfortunately, this always triggers the link process, because "rmappwindowobjectfile" is a phony target)
+#rmappwindowobjectfile.target = rmappwindowobjectfile
+#rmappwindowobjectfile.commands = [ `cat $$OBJECTS_DIR/gitsha1hashvalue` = $$GITSHA1HASHVALUE ] \
+#		 || rm $$OBJECTS_DIR/specappwindow.o ;\
+#		 echo $$GITSHA1HASHVALUE > $$OBJECTS_DIR/gitsha1hashvalue
+
+#QMAKE_EXTRA_TARGETS += rmappwindowobjectfile
+#PRE_TARGETDEPS += rmappwindowobjectfile

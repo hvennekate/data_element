@@ -44,6 +44,8 @@ public:
 	specMetaRange::addressObject addressOf(specMetaVariable*) const ;
 	void getRangePoint(int variable, int range, int point, double& x, double& y) const ;
 	void setRange(int variableNo, int rangeNo, int pointNo, double newX, double newY) ;
+	QSet<QString> variablesInFormulae() const ;
+	QSet<QString> variableNames() const ;
 };
 
 #endif // SPECMETAPARSER_H

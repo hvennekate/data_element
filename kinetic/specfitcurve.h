@@ -53,6 +53,8 @@ public:
 	static QStringList genericDescriptorKeys() ;
 	specDescriptor getDescriptor(const QString& key) ;
 	QString editDescriptor(const QString& key) ;
+	QStringList variableNames() const ;
+	QStringList formulaVariableNames() const ;
 	bool changeDescriptor(const QString &key, QString value) ;
 	void setActiveLine(const QString& key, quint32 n) ;
 	void refreshPlotData();

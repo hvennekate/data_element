@@ -56,6 +56,8 @@ public:
 	// for fitting:
 	specFitCurve* setFitCurve(specFitCurve*) ;
 	specFitCurve* getFitCurve() const ;
+	QStringList fitVariableNames() const ;
+	QStringList fitFormulaVariableNames() const ;
 	bool hasFitCurve() const ;
 	void conductFit() ;
 	void toggleFitStyle() ;
@@ -77,6 +79,8 @@ public:
 	void setPenStyle(const qint8&);
 	qint8 penStyle() const ;
 	void connectedItems(QModelIndexList& dataItems, QModelIndexList& metaItems) ;
+	QSet<QString> variableNames() const ;
+	QSet<QString> variablesInFormulae() const ;
 };
 
 /* TODO in other classes

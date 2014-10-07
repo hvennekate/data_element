@@ -1,3 +1,5 @@
 Makefile
 src.pro.user*
 unittests/unittests.pro.user*
+icons/.directory
+icons/oxygen/.directory
