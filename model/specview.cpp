@@ -72,17 +72,19 @@ void specView::keyPressEvent(QKeyEvent* event)
 
 	else if(event->key() == Qt::Key_A && event->modifiers() == Qt::ControlModifier)
 	{
-		QModelIndex index = currentIndex() ;
-		if(!model()->isFolder(currentIndex()))
-			index = index.parent() ;
-		else
-			selectionModel()->select(QItemSelection(model()->index(index.row(), 0, index.parent()),
-								model()->index(index.row(), model()->columnCount(index) - 1, index.parent())),
-						 QItemSelectionModel::Deselect); // TODO deselect folder
 		QItemSelection newSelection ;
-		int columnCount = model()->columnCount(index) ;
-		for(int i = 0 ; i < model()->rowCount(index) ; i++)
-			newSelection.select(model()->index(i, 0, index), model()->index(i, columnCount - 1, index)) ;
+		foreach(QModelIndex index, selectionModel()->selectedRows())
+		{
+			if(!model()->isFolder(index))
+				index = index.parent() ;
+			else
+				selectionModel()->select(QItemSelection(model()->index(index.row(), 0, index.parent()),
+									model()->index(index.row(), model()->columnCount(index) - 1, index.parent())),
+							 QItemSelectionModel::Deselect); // TODO deselect folder
+			int columnCount = model()->columnCount(index) ;
+			for(int i = 0 ; i < model()->rowCount(index) ; i++)
+				newSelection.select(model()->index(i, 0, index), model()->index(i, columnCount - 1, index)) ;
+		}
 		selectionModel()->select(newSelection, QItemSelectionModel::Select) ;
 	}
 
