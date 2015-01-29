@@ -9,15 +9,16 @@
 #endif
 
 specPrintPlotAction::specPrintPlotAction(QObject* parent) :
-	specUndoAction(parent),
+	specAbstractPlotAction(parent),
 	printer(0)
 {
 #ifndef WIN32BUILD
 	signal(SIGPIPE, SIG_IGN) ;
 #endif
 	printer = new QPrinter ; // TODO seems to cause CUPS-related program crashes...
-	specPlot* plot = (specPlot*) parentWidget() ;
-	QSize plotSize = plot->size() ;
+	QSize plotSize ;
+	if (plot())
+		plotSize = plot()->size() ;
 	double aspectRatio = (double) plotSize.width() / plotSize.height() ;
 	printer->setOrientation(aspectRatio > 1. ? QPrinter::Landscape : QPrinter::Portrait) ;
 	setIcon(QIcon::fromTheme("document-print"));
@@ -39,8 +40,8 @@ specPrintPlotAction::~specPrintPlotAction()
 
 void specPrintPlotAction::execute()
 {
-	specPlot* plot = (specPlot*) parentWidget() ;
-	QSize plotSize = plot->size() ;
+	specPlot* myPlot = plot() ;
+	QSize plotSize = myPlot->size() ;
 	double aspectRatio = (double) plotSize.width() / plotSize.height() ;
 
 	QPrintDialog dialog(printer) ;
@@ -59,8 +60,8 @@ void specPrintPlotAction::execute()
 		printer->getPageMargins(&left, &top, &right, &bottom, QPrinter::Millimeter);
 		if(QMessageBox::question(0, "Keep Aspect", "Preserve aspect ratio?", QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes) != QMessageBox::Yes)
 		{
-			plot->resize(printer->pageRect().size()) ;
-			plot->replot();
+			myPlot->resize(printer->pageRect().size()) ;
+			myPlot->replot();
 		}
 		else
 		{
@@ -81,8 +82,8 @@ void specPrintPlotAction::execute()
 		renderer.setLayoutFlags(QwtPlotRenderer::FrameWithScales) ;
 		renderer.setDiscardFlags(QwtPlotRenderer::DiscardBackground
 					 | QwtPlotRenderer::DiscardCanvasBackground);
-		renderer.renderTo(plot, *printer) ;
+		renderer.renderTo(myPlot, *printer) ;
 		printer->setPageMargins(left, top, right, bottom, QPrinter::Millimeter) ;
 	}
-	plot->resize(plotSize) ;
+	myPlot->resize(plotSize) ;
 }

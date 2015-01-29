@@ -19,7 +19,7 @@ protected:
 	virtual void execute() = 0 ;
 	bool event(QEvent *) ;
 private slots:
-	void gotTrigger() ;
+	virtual void gotTrigger() ;
 };
 
 #endif // SPECUNDOACTION_H

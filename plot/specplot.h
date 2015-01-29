@@ -41,7 +41,8 @@ private:
 		 *fixYAxisAction,
 		 *modifySVGs,
 		 *printAction,
-		 *legendAction ;
+		 *legendAction,
+		 *exportAction ;
 	CanvasPicker* MetaPicker, *SVGpicker ; // TODO make pickers more prominent: accessible through
 	// function, attach metaRanges direktly to picker etc.
 	QwtPlotMarker* zeroYLine, *zeroXLine ;

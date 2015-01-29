@@ -148,7 +148,9 @@ SOURCES += main.cpp \
     kinetic/editorWidgets/widgetlist.cpp \
     kinetic/editorWidgets/fitvariableeditor.cpp \
     kinetic/editorWidgets/abstractvariableeditor.cpp \
-    kinetic/editorWidgets/activefitvareditor.cpp
+    kinetic/editorWidgets/activefitvareditor.cpp \
+    actionlib/actions/specplotexportaction.cpp \
+    actionlib/actions/specabstractplotaction.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -298,7 +300,9 @@ HEADERS += cutbyintensitydialog.h \
     kinetic/editorWidgets/widgetlist.h \
     kinetic/editorWidgets/fitvariableeditor.h \
     kinetic/editorWidgets/abstractvariableeditor.h \
-    kinetic/editorWidgets/activefitvareditor.h
+    kinetic/editorWidgets/activefitvareditor.h \
+    actionlib/actions/specplotexportaction.h \
+    actionlib/actions/specabstractplotaction.h
 
 INCLUDEPATH += kinetic \
 	kinetic/editorWidgets \
@@ -390,7 +394,8 @@ FORMS += \
     logconverterimportdirectoriesdialog.ui \
     kinetic/editorWidgets/metavariableeditor.ui \
     kinetic/editorWidgets/widgetlist.ui \
-    kinetic/editorWidgets/fitvariableeditor.ui
+    kinetic/editorWidgets/fitvariableeditor.ui \
+    actionlib/actions/sizedialog.ui
 
 OTHER_FILES += icons/oxygen/index.theme \
     icons/oxygen/geticons.py

@@ -6,6 +6,7 @@
 #include "specactionlibrary.h"
 #include "specview.h"
 #include "specprintplotaction.h"
+#include "specplotexportaction.h"
 #include "specsvgitem.h"
 #include "specmetaitem.h"
 #include <qwt_scale_widget.h>
@@ -73,6 +74,7 @@ specPlot::specPlot(QWidget* parent)
 	fixXAxisAction->setChecked(false) ;
 
 	printAction = new specPrintPlotAction(this) ;
+	exportAction = new specPlotExportAction(this) ;
 	legendAction = new QAction(QIcon(":/legend.png"), tr("Legend"), this) ;
 	legendAction->setToolTip(tr("Legend")) ;
 	legendAction->setWhatsThis(tr("Turn legend on/off")) ;
@@ -278,7 +280,7 @@ specPlot::~specPlot()
 
 QList<QAction*> specPlot::actions()
 {
-	return (QList<QAction*>() << modifySVGs << printAction << fixXAxisAction << fixYAxisAction << legendAction) ;
+	return (QList<QAction*>() << modifySVGs << printAction << exportAction << fixXAxisAction << fixYAxisAction << legendAction) ;
 }
 
 void specPlot::writeToStream(QDataStream& out) const
@@ -305,6 +307,7 @@ void specPlot::setUndoPartner(specActionLibrary* lib)
 {
 	undoP = lib ;
 	((specUndoAction*) printAction)->setLibrary(lib);
+	((specUndoAction*) exportAction)->setLibrary(lib);
 }
 
 specActionLibrary* specPlot::undoPartner() const

@@ -1,11 +1,11 @@
 #ifndef SPECPRINTPLOTACTION_H
 #define SPECPRINTPLOTACTION_H
 
-#include "specundoaction.h"
+#include "specabstractplotaction.h"
 
 class QPrinter ;
 
-class specPrintPlotAction : public specUndoAction
+class specPrintPlotAction : public specAbstractPlotAction
 {
 	Q_OBJECT
 public:
