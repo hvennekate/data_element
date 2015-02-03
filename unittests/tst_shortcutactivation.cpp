@@ -17,7 +17,7 @@ void tst_shortCutActivation::initTestCase()
 {
 	mainWidget = new specPlotWidget ;
 	mainWidget->show();
-	QTest::qWaitForWindowShown(mainWidget) ;
+//	QTest::qWaitForWindowShown(mainWidget) ; // TODO!
 }
 
 void tst_shortCutActivation::cleanupTestCase()
@@ -31,7 +31,7 @@ void tst_shortCutActivation::testTrigger_data()
 	QTest::addColumn<QAction*>("action") ;
 
 	foreach(QAction* action, mainWidget->findChildren<QAction*>())
-		QTest::newRow(action->iconText().toAscii().data()) << action ;
+		QTest::newRow(action->iconText().toLatin1().data()) << action ;
 }
 
 void tst_shortCutActivation::testTrigger()
@@ -45,7 +45,7 @@ void tst_shortCutActivation::testTrigger()
 	QTest::keyClick(action->parentWidget(), Qt::Key_9, Qt::ControlModifier) ;
 //	action->trigger();
 	action->setShortcuts(QList<QKeySequence>());
-	QVERIFY2(triggered, action->iconText().toAscii().data()) ;
+	QVERIFY2(triggered, action->iconText().toLatin1().data()) ;
 }
 
 void tst_shortCutActivation::trigger()

@@ -20,6 +20,7 @@ class specUndoCommand ;
 /*! Base class of list items. */
 class specModelItem : public specCanvasItem
 {
+	friend class tst_movePlotCommand ;
 private:
 	specFolderItem* iparent ;
 	void detachChild(specModelItem* child) ;

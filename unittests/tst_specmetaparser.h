@@ -1,8 +1,8 @@
 #ifndef TST_SPECMETAPARSER_H
 #define TST_SPECMETAPARSER_H
 
-#include <QtCore/QString>
-#include <QtTest/QtTest>
+#include <QString>
+#include <QtTest>
 #include "../kinetic/specmetaparser.h"
 #include "../spectral/specdataitem.h"
 #include <QVector>

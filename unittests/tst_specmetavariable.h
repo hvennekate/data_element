@@ -1,8 +1,8 @@
 #ifndef TST_SPECMETAVARIABLE_H
 #define TST_SPECMETAVARIABLE_H
 
-#include <QtCore/QString>
-#include <QtTest/QtTest>
+#include <QString>
+#include <QtTest>
 #include "../kinetic/specmetavariable.h"
 #include "../spectral/specdataitem.h"
 

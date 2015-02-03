@@ -2,7 +2,7 @@
 #define TST_MOVEPLOTCOMMAND_H
 
 #include <QObject>
-#include <QtTest/QtTest>
+#include <QtTest>
 
 class specModel ;
 class specModelItem ;

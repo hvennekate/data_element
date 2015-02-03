@@ -1,7 +1,7 @@
 #ifndef TST_SHORTCUTACTIVATION_H
 #define TST_SHORTCUTACTIVATION_H
 
-#include <QtTest/QtTest>
+#include <QtTest>
 #include <QObject>
 
 class specPlotWidget ;
