@@ -1,118 +1,16 @@
+#include <QVector>
+#include <QThreadPool>
 #include "specmergeaction.h"
 #include "specdeleteaction.h"
 #include "specaddfoldercommand.h"
 #include "specmulticommand.h"
-#include "specspectrumplot.h"
+#include "specmergerunnable.h"
 
 #include "names.h"
 #include "specprofiler.h"
 #include <QProgressDialog>
 #include "specdataitem.h"
 #include "specmergedialog.h"
-
-#include "specworkerthread.h"
-#include "specfiltergenerator.h"
-
-bool mergeActionThread::cleanUp() // TODO parentClass
-{
-	if(!toTerminate) return false ;
-	items.clear();
-	toBeDeleted.clear();
-	foreach (specModelItem* item, toInsert)
-		delete item ;
-	toInsert.clear();
-	return true ;
-}
-
-void mergeActionThread::mergeItems(specDataItem* newItem, const specDataItem* other) const
-{
-	if (!newItem || !other) return ;
-	specDataItem* correctedItem = 0 ;
-	if(spectralAdaptation != spec::noCorrection)
-	{
-		QMap<double, double> reference = newItem->dataMap() ;
-		if (!reference.isEmpty())
-		{
-			specFilterGenerator filterGenerator ;
-			filterGenerator.calcOffset();
-			if (spectralAdaptation == spec::offsetAndSlope)
-				filterGenerator.calcSlope();
-			filterGenerator.setReference(reference) ;
-			correctedItem = new specDataItem(*other) ;
-			specDataPointFilter filter = filterGenerator.generateFilter(correctedItem) ;
-			if (filter.valid())
-			{
-				correctedItem->addDataFilter(filter) ;
-				other = correctedItem ; // alternatively:  const_cast
-			}
-		}
-	}
-
-	*newItem += *other ;
-	delete correctedItem ;
-}
-
-mergeActionThread::mergeActionThread(const QList<specModelItem*>& itms,
-				     const specDescriptorComparisonCriterion::container& crit,
-				     spec::correctionMode sadap)
-	: specWorkerThread(itms.size()),
-	  criteria(crit),
-	  spectralAdaptation(sadap),
-	  items(itms)
-{
-}
-
-mergeActionThread::~mergeActionThread() { cleanUp() ; }
-
-#define PASSLISTFUNCTIONMACRO(FUNCTIONNAME,LISTNAME) \
-	QList<specModelItem*> mergeActionThread::FUNCTIONNAME() { \
-	QList<specModelItem*> result = LISTNAME; \
-	LISTNAME.clear(); \
-	return result ; }
-PASSLISTFUNCTIONMACRO(getItemsToDelete, toBeDeleted)
-PASSLISTFUNCTIONMACRO(getItemsToInsert, toInsert)
-
-void mergeActionThread::run()
-{
-//	emit progressValue(0);
-	specProfiler profiler("run merge command thread:") ;
-	// sort the pointers
-
-	// Create and insert new merged items
-	int total = items.size() ;
-	while(!items.isEmpty())
-	{
-//		emit progressValue(total - items.size());
-		if(cleanUp()) return ;
-
-		specModelItem *comparisonItem = items.first() ;
-
-		QList<specModelItem*> toMergeWith ;
-		QList<specModelItem*>::iterator i = items.begin() ;
-		while (i != items.end())
-		{
-			if (specDescriptorComparisonCriterion::itemsEqual(comparisonItem, *i, criteria))
-			{
-				toMergeWith << *i ;
-				i = items.erase(i) ;
-			}
-			else
-				++i ;
-		}
-		if (toMergeWith.size() == 1) continue ;
-
-		specDataItem* newItem = new specDataItem() ;
-		foreach(specModelItem* other, toMergeWith)
-			mergeItems(newItem, dynamic_cast<specDataItem*>(other));
-		newItem->flatten();
-
-		toBeDeleted << toMergeWith ;
-		toInsert << newItem ;
-	}
-//	emit progressValue(total) ;
-
-	finish() ; // enable cleanUp()
-}
 
 specMergeAction::specMergeAction(QObject* parent)
 	: specRequiresDataItemAction(parent),
@@ -142,19 +40,40 @@ specUndoCommand* specMergeAction::generateUndoCommand()
 	if(dialog->exec() != QDialog::Accepted) return 0 ;
 	dialog->getMergeCriteria(criteria, spectralAdaptation);
 
-	mergeActionThread mat(pointers, criteria, spectralAdaptation) ;
-	mat.start();
-	mat.wait() ;
-	while(!mat.isFinished()) ; // just to be sure
+	// setup
+	assembleSelection();
+	specMergeRunnable::dataContainer *originalData = new specMergeRunnable::dataContainer ;
+	QVector<specModelItem*> input = pointers.toVector(), output(pointers.size(),0) ;
+	QThreadPool pool ;
+	originalData->input = &input;
+	originalData->output= &output;
+	originalData->criteria = &criteria ;
+	originalData->threadPool = &pool ;
+	originalData->cmode = spectralAdaptation ;
+	originalData->itemIndexes = QVector<int>(pointers.size()) ;
+	for (int i = 0 ; i < pointers.size() ; ++i)
+		originalData->itemIndexes[i] = i ;
 
-	QList<specModelItem*> toInsert = mat.getItemsToInsert() ;
-	if (!model->insertItems(toInsert, insertionIndex, insertionRow))
+	// run
+	pool.start(new specMergeRunnable(originalData));
+	pool.waitForDone() ;
+
+	// sort out the items
+	QList<specModelItem*> toInsert, toDelete ;
+	for (int i = 0 ; i < pointers.size() ; ++i)
 	{
-		foreach(specModelItem* item, toInsert)
-			delete item ;
-		return 0 ;
+		specModelItem *newItem = output[i],
+				*oldItem = input[i] ;
+		if (oldItem) toDelete << oldItem ;
+		if (!newItem) continue ; // no item to insert
+		QModelIndex insertionIndex(model->index(oldItem)) ;
+		if (!model->insertItems(QList<specModelItem*>() << newItem,
+					insertionIndex.parent(),
+					insertionIndex.row()))
+			delete newItem ;
+		else
+			toInsert << newItem ;
 	}
-	QList<specModelItem*> toDelete = mat.getItemsToDelete() ;
 
 	// Prepare umbrella command
 	specMultiCommand* Command = new specMultiCommand ;

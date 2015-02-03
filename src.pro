@@ -150,7 +150,8 @@ SOURCES += main.cpp \
     kinetic/editorWidgets/abstractvariableeditor.cpp \
     kinetic/editorWidgets/activefitvareditor.cpp \
     actionlib/actions/specplotexportaction.cpp \
-    actionlib/actions/specabstractplotaction.cpp
+    actionlib/actions/specabstractplotaction.cpp \
+    actionlib/actions/specmergerunnable.cpp
 
 HEADERS += cutbyintensitydialog.h \
     specappwindow.h \
@@ -302,7 +303,8 @@ HEADERS += cutbyintensitydialog.h \
     kinetic/editorWidgets/abstractvariableeditor.h \
     kinetic/editorWidgets/activefitvareditor.h \
     actionlib/actions/specplotexportaction.h \
-    actionlib/actions/specabstractplotaction.h
+    actionlib/actions/specabstractplotaction.h \
+    actionlib/actions/specmergerunnable.h
 
 INCLUDEPATH += kinetic \
 	kinetic/editorWidgets \
