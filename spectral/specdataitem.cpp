@@ -220,3 +220,8 @@ void specDataItem::addDataFilter(const specDataPointFilter& other)
 	invalidate();
 }
 
+int specDataItem::size() const
+{
+	return data.size() ;
+}
+

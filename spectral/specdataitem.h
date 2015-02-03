@@ -54,6 +54,7 @@ public:
 	specDataPointFilter dataFilter() const;
 	void setDataFilter(const specDataPointFilter&) ;
 	void addDataFilter(const specDataPointFilter&) ;
+	int size() const ;
 
 	/* for plot picker*/
 	void attach(QwtPlot* plot) ;

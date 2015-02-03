@@ -3,6 +3,7 @@
 #include "tst_specmetaparser.h"
 #include "tst_moveplotcommand.h"
 #include "tst_shortcutactivation.h"
+#include "bmk_mergeitems.h"
 
 typedef QPair<QString, int> stringIntPair ;
 
@@ -18,10 +19,12 @@ int main(int argc, char *argv[])
 {
 	QApplication app(argc, argv);
 	QVector<stringIntPair> results ;
-	results << runTest<tst_specMetaParser>()
-		<< runTest<tst_specMetaVariable>()
-		<< runTest<tst_movePlotCommand>()
-		<< runTest<tst_shortCutActivation>() ;
+	results
+//			<< runTest<tst_specMetaParser>()
+//			<< runTest<tst_specMetaVariable>()
+//			<< runTest<tst_movePlotCommand>()
+//			<< runTest<tst_shortCutActivation>()
+			<< runTest<bmk_mergeItems>() ;
 	qDebug() << "=========== All tests done. ===========" ;
 	foreach(const stringIntPair& result, results)
 		qDebug() << (result.second ? "!!" : "  ")

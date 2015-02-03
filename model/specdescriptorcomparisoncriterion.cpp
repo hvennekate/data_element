@@ -44,6 +44,12 @@ bool specDescriptorComparisonCriterion::itemsEqual(const specModelItem *first, c
 			.fuzzyComparison(second->getDescriptor(descriptorName), toleranceValue);
 }
 
+bool specDescriptorComparisonCriterion::itemMatchesDescriptor(const specModelItem *item, const specDescriptor &descriptor) const
+{
+	if (!item) return false ;
+	return item->getDescriptor(descriptorName).fuzzyComparison(descriptor, toleranceValue) ;
+}
+
 bool specDescriptorComparisonCriterion::itemsEqual(specModelItem *a, specModelItem *b, const container &criteria)
 {
 	foreach(const specDescriptorComparisonCriterion& criterion, criteria)

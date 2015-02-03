@@ -30,6 +30,8 @@ public:
 	void calcOffset(bool doIt = true) ;
 	void calcSlope(bool doIt = true) ;
 	void calcScale(bool doIt = true) ;
+	void setMode(spec::correctionMode cMode) ;
+	bool valid() const ;
 };
 
 #endif // SPECFILTERGENERATOR_H

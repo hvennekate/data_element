@@ -36,6 +36,18 @@ void specFilterGenerator::calcScale(bool doIt)
 	CalcScale = doIt ;
 }
 
+void specFilterGenerator::setMode(spec::correctionMode cMode)
+{
+	CalcScale = false ;
+	CalcSlope = (cMode == spec::offsetAndSlope) ;
+	CalcOffset = (cMode == spec::offset || cMode == spec::offsetAndSlope) ;
+}
+
+bool specFilterGenerator::valid() const
+{
+	return (CalcOffset || CalcSlope) ;// Nur scale macht keinen Sinn (Referenz wird skaliert) -> return invalid filter
+}
+
 bool specFilterGenerator::isContainedInRanges(const double &x) const
 {
 	// Iterate over all ranges, if is contained:  return true
@@ -107,7 +119,7 @@ void specFilterGenerator::refreshRanges()
 
 specDataPointFilter specFilterGenerator::generateFilter(specCanvasItem *item)
 {
-	if (!CalcOffset && !CalcSlope) return specDataPointFilter(NAN,NAN,NAN) ; // Nur scale macht keinen Sinn (Referenz wird skaliert) -> return invalid filter
+	if (!valid()) return specDataPointFilter(NAN,NAN,NAN) ;
 	QVector<QPointF> spectrum = item->dataVector() ;
 	correctionSpectrum(spectrum) ;
 	if (spectrum.size() < CalcOffset + CalcScale + CalcSlope)

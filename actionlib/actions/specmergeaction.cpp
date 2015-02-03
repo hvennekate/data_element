@@ -13,118 +13,106 @@
 #include "specworkerthread.h"
 #include "specfiltergenerator.h"
 
-class mergeActionThread : public specWorkerThread
+bool mergeActionThread::cleanUp() // TODO parentClass
 {
-private:
-	specDescriptorComparisonCriterion::container criteria ;
-	spec::correctionMode spectralAdaptation ;
-	QList<specModelItem*> items ;
-	QList<specModelItem*> toBeDeleted ;
-	QList<specModelItem*> toInsert ;
+	if(!toTerminate) return false ;
+	items.clear();
+	toBeDeleted.clear();
+	foreach (specModelItem* item, toInsert)
+		delete item ;
+	toInsert.clear();
+	return true ;
+}
 
-	bool cleanUp() // TODO parentClass
+void mergeActionThread::mergeItems(specDataItem* newItem, const specDataItem* other) const
+{
+	if (!newItem || !other) return ;
+	specDataItem* correctedItem = 0 ;
+	if(spectralAdaptation != spec::noCorrection)
 	{
-		if(!toTerminate) return false ;
-		items.clear();
-		toBeDeleted.clear();
-		foreach (specModelItem* item, toInsert)
-			delete item ;
-		toInsert.clear();
-		return true ;
-	}
-
-	void mergeItems(specDataItem* newItem, const specDataItem* other) const
-	{
-		if (!newItem || !other) return ;
-		specDataItem* correctedItem = 0 ;
-		if(spectralAdaptation != spec::noCorrection)
+		QMap<double, double> reference = newItem->dataMap() ;
+		if (!reference.isEmpty())
 		{
-			QMap<double, double> reference = newItem->dataMap() ;
-			if (!reference.isEmpty())
+			specFilterGenerator filterGenerator ;
+			filterGenerator.calcOffset();
+			if (spectralAdaptation == spec::offsetAndSlope)
+				filterGenerator.calcSlope();
+			filterGenerator.setReference(reference) ;
+			correctedItem = new specDataItem(*other) ;
+			specDataPointFilter filter = filterGenerator.generateFilter(correctedItem) ;
+			if (filter.valid())
 			{
-				specFilterGenerator filterGenerator ;
-				filterGenerator.calcOffset();
-				if (spectralAdaptation == spec::offsetAndSlope)
-					filterGenerator.calcSlope();
-				filterGenerator.setReference(reference) ;
-				correctedItem = new specDataItem(*other) ;
-				specDataPointFilter filter = filterGenerator.generateFilter(correctedItem) ;
-				if (filter.valid())
-				{
-					correctedItem->addDataFilter(filter) ;
-					other = correctedItem ; // alternatively:  const_cast
-				}
+				correctedItem->addDataFilter(filter) ;
+				other = correctedItem ; // alternatively:  const_cast
 			}
 		}
-
-		*newItem += *other ;
-		delete correctedItem ;
 	}
 
-public:
-	mergeActionThread(const QList<specModelItem*>& itms,
-			  const specDescriptorComparisonCriterion::container& crit,
-			  spec::correctionMode sadap)
-		: specWorkerThread(itms.size()),
-		  criteria(crit),
-		  spectralAdaptation(sadap),
-		  items(itms)
-	{
-	}
+	*newItem += *other ;
+	delete correctedItem ;
+}
 
-	~mergeActionThread() { cleanUp() ; }
+mergeActionThread::mergeActionThread(const QList<specModelItem*>& itms,
+				     const specDescriptorComparisonCriterion::container& crit,
+				     spec::correctionMode sadap)
+	: specWorkerThread(itms.size()),
+	  criteria(crit),
+	  spectralAdaptation(sadap),
+	  items(itms)
+{
+}
+
+mergeActionThread::~mergeActionThread() { cleanUp() ; }
 
 #define PASSLISTFUNCTIONMACRO(FUNCTIONNAME,LISTNAME) \
-QList<specModelItem*> FUNCTIONNAME() { \
-		QList<specModelItem*> result = LISTNAME; \
-		LISTNAME.clear(); \
-		return result ; }
-	PASSLISTFUNCTIONMACRO(getItemsToDelete, toBeDeleted)
-	PASSLISTFUNCTIONMACRO(getItemsToInsert, toInsert)
+	QList<specModelItem*> mergeActionThread::FUNCTIONNAME() { \
+	QList<specModelItem*> result = LISTNAME; \
+	LISTNAME.clear(); \
+	return result ; }
+PASSLISTFUNCTIONMACRO(getItemsToDelete, toBeDeleted)
+PASSLISTFUNCTIONMACRO(getItemsToInsert, toInsert)
 
-	void run()
+void mergeActionThread::run()
+{
+//	emit progressValue(0);
+	specProfiler profiler("run merge command thread:") ;
+	// sort the pointers
+
+	// Create and insert new merged items
+	int total = items.size() ;
+	while(!items.isEmpty())
 	{
-		emit progressValue(0);
-		specProfiler profiler("run merge command thread:") ;
-		// sort the pointers
+//		emit progressValue(total - items.size());
+		if(cleanUp()) return ;
 
-		// Create and insert new merged items
-		int total = items.size() ;
-		while(!items.isEmpty())
+		specModelItem *comparisonItem = items.first() ;
+
+		QList<specModelItem*> toMergeWith ;
+		QList<specModelItem*>::iterator i = items.begin() ;
+		while (i != items.end())
 		{
-			emit progressValue(total - items.size());
-			if(cleanUp()) return ;
-
-			specModelItem *comparisonItem = items.first() ;
-
-			QList<specModelItem*> toMergeWith ;
-			QList<specModelItem*>::iterator i = items.begin() ;
-			while (i != items.end())
+			if (specDescriptorComparisonCriterion::itemsEqual(comparisonItem, *i, criteria))
 			{
-				if (specDescriptorComparisonCriterion::itemsEqual(comparisonItem, *i, criteria))
-				{
-					toMergeWith << *i ;
-					i = items.erase(i) ;
-				}
-				else
-					++i ;
+				toMergeWith << *i ;
+				i = items.erase(i) ;
 			}
-			if (toMergeWith.size() == 1) continue ;
-
-			specDataItem* newItem = new specDataItem() ;
-			foreach(specModelItem* other, toMergeWith)
-				mergeItems(newItem, dynamic_cast<specDataItem*>(other));
-			newItem->flatten();
-
-			toBeDeleted << toMergeWith ;
-			toInsert << newItem ;
+			else
+				++i ;
 		}
-		emit progressValue(total) ;
+		if (toMergeWith.size() == 1) continue ;
 
-		finish() ; // enable cleanUp()
+		specDataItem* newItem = new specDataItem() ;
+		foreach(specModelItem* other, toMergeWith)
+			mergeItems(newItem, dynamic_cast<specDataItem*>(other));
+		newItem->flatten();
+
+		toBeDeleted << toMergeWith ;
+		toInsert << newItem ;
 	}
+//	emit progressValue(total) ;
 
-};
+	finish() ; // enable cleanUp()
+}
 
 specMergeAction::specMergeAction(QObject* parent)
 	: specRequiresDataItemAction(parent),
@@ -155,7 +143,9 @@ specUndoCommand* specMergeAction::generateUndoCommand()
 	dialog->getMergeCriteria(criteria, spectralAdaptation);
 
 	mergeActionThread mat(pointers, criteria, spectralAdaptation) ;
-	mat.run();
+	mat.start();
+	mat.wait() ;
+	while(!mat.isFinished()) ; // just to be sure
 
 	QList<specModelItem*> toInsert = mat.getItemsToInsert() ;
 	if (!model->insertItems(toInsert, insertionIndex, insertionRow))

@@ -3,6 +3,8 @@
 #include <QString>
 #include <QList>
 
+#include "specdescriptor.h"
+
 class specModelItem ;
 
 class specDescriptorComparisonCriterion
@@ -21,6 +23,7 @@ public:
 	void setTolerance(double d) ;
 
 	bool itemsEqual(const specModelItem* a, const specModelItem* b) const ;
+	bool itemMatchesDescriptor(const specModelItem* item, const specDescriptor &descriptor) const ;
 	typedef QList<specDescriptorComparisonCriterion> container ;
 	static bool itemsEqual(specModelItem *a, specModelItem *b, const container& criteria) ;
 };

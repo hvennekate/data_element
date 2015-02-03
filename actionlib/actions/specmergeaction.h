@@ -3,8 +3,11 @@
 
 #include "specrequiresitemaction.h"
 #include "specdataview.h"
+#include "specdescriptorcomparisoncriterion.h"
+#include "specworkerthread.h"
 
 class specMergeDialog ;
+class specDataItem ;
 
 class specMergeAction : public specRequiresDataItemAction
 {
@@ -19,6 +22,30 @@ private:
 	specUndoCommand* generateUndoCommand() ;
 	specMergeDialog* dialog ;
 
+};
+
+class mergeActionThread : public specWorkerThread
+{
+private:
+	specDescriptorComparisonCriterion::container criteria ;
+	spec::correctionMode spectralAdaptation ;
+	QList<specModelItem*> items ;
+	QList<specModelItem*> toBeDeleted ;
+	QList<specModelItem*> toInsert ;
+
+	bool cleanUp() ;
+	void mergeItems(specDataItem* newItem, const specDataItem* other) const ;
+
+public:
+	mergeActionThread(const QList<specModelItem*>& itms,
+			  const specDescriptorComparisonCriterion::container& crit,
+			  spec::correctionMode sadap) ;
+	~mergeActionThread() ;
+
+	QList<specModelItem*> getItemsToDelete() ;
+	QList<specModelItem*> getItemsToInsert() ;
+
+	void run() ;
 };
 
 #endif // SPECMERGEACTION_H
