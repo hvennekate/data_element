@@ -20,6 +20,7 @@ public:
 	QList<specFileImportFunction> acceptableImportFunctions() const ;
 	QVariant data(const QModelIndex& index, int role) const;
 	bool insertItems(QList<specModelItem*> list, QModelIndex parent, int row) ;
+	Qt::ItemFlags flags(const QModelIndex &index) const;
 	// TODO reimplement read/insert mime.
 };
 

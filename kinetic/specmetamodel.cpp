@@ -32,6 +32,15 @@ bool specMetaModel::insertItems(QList<specModelItem*> list, QModelIndex parent, 
 	return specModel::insertItems(list, parent, row) ;
 }
 
+Qt::ItemFlags specMetaModel::flags(const QModelIndex &index) const
+{
+	Qt::ItemFlags result = specModel::flags(index);
+	if (descriptors().at(index.column()) == "errors"
+			|| descriptors().at(index.column()) == QObject::tr("Fit messages"))
+		result &= ~Qt::ItemIsEditable;
+	return result;
+}
+
 void specMetaModel::setModels(specModelItem* item)
 {
 	for(int i = 0 ; i < item->children() ; ++i)
