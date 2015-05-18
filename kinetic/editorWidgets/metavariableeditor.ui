@@ -41,7 +41,7 @@
    <item>
     <widget class="QLineEdit" name="variableName">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
@@ -341,12 +341,12 @@ indexes</string>
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>227</x>
+     <x>223</x>
      <y>40</y>
     </hint>
     <hint type="destinationlabel">
-     <x>259</x>
-     <y>10</y>
+     <x>257</x>
+     <y>12</y>
     </hint>
    </hints>
   </connection>
@@ -357,11 +357,11 @@ indexes</string>
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>227</x>
+     <x>223</x>
      <y>40</y>
     </hint>
     <hint type="destinationlabel">
-     <x>259</x>
+     <x>257</x>
      <y>36</y>
     </hint>
    </hints>
@@ -373,11 +373,11 @@ indexes</string>
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>227</x>
+     <x>223</x>
      <y>40</y>
     </hint>
     <hint type="destinationlabel">
-     <x>259</x>
+     <x>257</x>
      <y>54</y>
     </hint>
    </hints>
@@ -389,7 +389,7 @@ indexes</string>
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>227</x>
+     <x>223</x>
      <y>40</y>
     </hint>
     <hint type="destinationlabel">
@@ -405,8 +405,8 @@ indexes</string>
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>227</x>
-     <y>36</y>
+     <x>223</x>
+     <y>40</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>
@@ -421,8 +421,8 @@ indexes</string>
    <slot>setVisible(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>227</x>
-     <y>38</y>
+     <x>223</x>
+     <y>40</y>
     </hint>
     <hint type="destinationlabel">
      <x>290</x>

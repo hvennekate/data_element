@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>319</width>
-    <height>23</height>
+    <width>237</width>
+    <height>24</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,7 +30,20 @@
     <number>0</number>
    </property>
    <item>
-    <widget class="QLineEdit" name="variableName"/>
+    <widget class="QLineEdit" name="variableName">
+     <property name="sizePolicy">
+      <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+       <horstretch>0</horstretch>
+       <verstretch>0</verstretch>
+      </sizepolicy>
+     </property>
+     <property name="minimumSize">
+      <size>
+       <width>30</width>
+       <height>0</height>
+      </size>
+     </property>
+    </widget>
    </item>
    <item>
     <widget class="QLabel" name="label">
@@ -71,6 +84,19 @@
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="QPushButton" name="deleteButton">
+     <property name="text">
+      <string/>
+     </property>
+     <property name="icon">
+      <iconset theme="list-remove"/>
+     </property>
+     <property name="flat">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
@@ -88,6 +114,22 @@
     <hint type="destinationlabel">
      <x>276</x>
      <y>10</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>deleteButton</sender>
+   <signal>clicked()</signal>
+   <receiver>fitVariableEditor</receiver>
+   <slot>deleteLater()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>312</x>
+     <y>15</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>208</x>
+     <y>20</y>
     </hint>
    </hints>
   </connection>
