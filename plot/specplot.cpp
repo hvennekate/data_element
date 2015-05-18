@@ -16,6 +16,7 @@
 #include <qwt_plot_marker.h>
 #include "specfitcurve.h"
 #include <qwt_plot_layout.h>
+#include <cmath>
 
 // TODO solve the myth of autoscaleaxis...
 
@@ -199,12 +200,12 @@ void specPlot::autoScale(const QwtPlotItemList& allItems)
 			if((pointer = dynamic_cast<specModelItem*>(item)))
 				pointer->revalidate() ;
 			QRectF br = item->boundingRect() ;
-			if(br.isValid() || br.width() || br.height())  // TODO scale axes independently
+			if(br.isValid() || (std::isnormal(br.width()) && std::isnormal(br.height())))  // TODO scale axes independently
 				boundaries |= br ;
 			else
 			{
 				QPointF p = br.topLeft() ;
-				if(!boundaries.contains(br))
+				if(!boundaries.contains(br) && !isnan(p.x()) && !isnan(p.y()))
 				{
 					if(firstItem)
 						boundaries.moveTopLeft(p) ;
