@@ -26,7 +26,6 @@ void specMetaDelegate::initializeVariableEditor(widgetList *parent, QString init
 	if (!editor) return ;
 	if ("variables" == role) editor->setData(*descriptors) ;
 	if (tr("Fit parameters") == role) editor->setData(*fitVariableNames) ;
-	if (initString.isEmpty()) initString = "a" ;
 	editor->initialize(initString) ;
 
 	QLineEdit* le = editor->findChild<QLineEdit*>("variableName") ;
@@ -133,6 +132,13 @@ void specMetaDelegate::setModelData(QWidget *editor, QAbstractItemModel *model, 
 		}
 		model->setData(index, variableDefinitions.join("\n")) ;
 		return ;
+	}
+	else if (columnTitle == tr("Fit parameters"))
+	{
+		activeFitVarEditor* ed = editor->findChild<activeFitVarEditor*>();
+		specModel *sm = qobject_cast<specModel*>(model);
+		if (ed && sm) // TODO not nice. But this entire function is too complicated
+			sm->setData(index, ed->variableDefinition());
 	}
 	else specDelegate::setModelData(editor, model, index) ;
 
