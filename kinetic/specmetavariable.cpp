@@ -27,7 +27,7 @@ specMetaVariable* specMetaVariable::factory(QString init, specMetaParser* par)
 {
 	const QRegExp rangeExp("(\\[[0-9]*(:([0-9]*)?(:([0-9]*)?)?)?\\])"),
 	      descriptorExp("(\\\"[^\\\"]*\\\"|" "(x|y|i|u|l|p|P))"),
-	      number("[+\\-]?([0-9]+|[0-9]*\\.[0-9]+)([eE][+-]?[0-9]+)?");
+	      number("[+\\-]?((inf)|([0-9]+|[0-9]*\\.[0-9]+)([eE][+-]?[0-9]+)?)");
 	QString range = extract(init, rangeExp) ;
 	QString descString = extract(init, descriptorExp) ;
 	QString xlower = extract(init, number) ;

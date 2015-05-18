@@ -51,14 +51,16 @@ void specMetaParser::setAssignments(const QString& expressionList, const QString
 	//  x-Werte pruefen, matchen.
 	//
 	//  Dann x, y auswerten.
+
+	// TODO dies koennte sehr viel einfacher mit der richtigen QRegExp geloest werden (capture relevant parts)
 	const QRegExp acceptable("(\\[[0-9]*(:[0-9]*(:[0-9]*)?)?\\])?"
 				 "(\"[^\"]*\"|"
 				 "((x|y|i|u|l|p|P)"
 				 "("
-				 "(([+\\-]?(inf)|([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?"
-				 "(:[+\\-]?(inf)|([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?)|"
-				 "(([+\\-]?(inf)|([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?:)?"
-				 "([+\\-]?(inf)|([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+)?)?))"
+				 "(([+\\-]?((inf)|([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+))?)?"
+				 "(:[+\\-]?((inf)|([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+))?)?)|"
+				 "(([+\\-]?((inf)|([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+))?:)?"
+				 "([+\\-]?((inf)|([0-9]+|[0-9]*.[0-9]+)([eE][+-]?[0-9]+))?)?))"
 				 "))") ;
 	const QRegExp assignment(" *= *") ;
 	QStringList expressions = expressionList.split("\n") ;
