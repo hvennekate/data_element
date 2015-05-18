@@ -205,7 +205,7 @@ void specPlot::autoScale(const QwtPlotItemList& allItems)
 			else
 			{
 				QPointF p = br.topLeft() ;
-				if(!boundaries.contains(br) && !isnan(p.x()) && !isnan(p.y()))
+				if(!boundaries.contains(br) && !std::isnan(p.x()) && !std::isnan(p.y()))
 				{
 					if(firstItem)
 						boundaries.moveTopLeft(p) ;
