@@ -116,7 +116,7 @@ specUndoCommand* specAverageDataAction::generateUndoCommand()
 				      + ui->toleranceEdit->text()
 				      + (ui->rightToLeft->isChecked() ? tr(", inverse x direction") : tr("."))) ;
 
-		tolerantComparison comp(ui->toleranceEdit->text().toDouble()) ;
+		tolerantComparison comp(ui->toleranceEdit->value()) ;
 		foreach(QModelIndex index, selection)
 		{
 			specDataItem* item = dynamic_cast<specDataItem*>(model->itemPointer(index)) ;
